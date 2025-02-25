@@ -10,8 +10,8 @@ from .lab import Lab
 from .team import Team
 
 
-from .relationship_customer_request import CustomerRequest
-from .relationship_program_lab import ProgramLab
+from .relationship_customer_request import RelationshipCustomerRequest
+from .relationship_program_lab import RelationshipProgramLab
 
 __all__ = [
     'Request',
@@ -21,9 +21,9 @@ __all__ = [
     'Organization',
     'Customer',
     'CustomerType',
-    'CustomerRequest',
     'Program',
     'Lab',
-    'ProgramLab',
     'Team'
+    'RelationshipCustomerRequest',
+    'RelationshipProgramLab',
 ]

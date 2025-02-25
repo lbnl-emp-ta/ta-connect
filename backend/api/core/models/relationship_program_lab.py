@@ -1,6 +1,6 @@
 from django.db import models
 
-class ProgramLab(models.Model):
+class RelationshipProgramLab(models.Model):
     program = models.ForeignKey('core.Program', on_delete=models.CASCADE)
     lab = models.ForeignKey('core.Lab', on_delete=models.CASCADE)
 

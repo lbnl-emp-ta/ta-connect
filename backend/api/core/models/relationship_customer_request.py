@@ -1,6 +1,6 @@
 from django.db import models
 
-class CustomerRequest(models.Model):
+class RelationshipCustomerRequest(models.Model):
     customer = models.ForeignKey('core.Customer', on_delete=models.CASCADE)
     request = models.ForeignKey('core.Request', on_delete=models.CASCADE)
     type = models.ForeignKey('core.CustomerType', on_delete=models.PROTECT)
