@@ -8,6 +8,7 @@ from .customer_type import CustomerType
 from .relationship_customer_request import CustomerRequest
 from .program import Program
 from .lab import Lab
+from .team import Team
 
 
 __all__ = [
@@ -20,5 +21,6 @@ __all__ = [
     'CustomerType',
     'CustomerRequest',
     'Program',
-    'Lab'
+    'Lab',
+    'Team'
 ]
