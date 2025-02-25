@@ -8,7 +8,7 @@ class CustomerRequest(models.Model):
     last_incoming_interaction = models.DateTimeField(blank=True, null=True)
 
     class Meta:
-        contraints = [
+        constraints = [
             models.UniqueConstraint(fields=['customer', 'request'], name='unique_customer_request')
         ]
 
