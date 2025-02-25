@@ -5,11 +5,13 @@ from .organization_type import OrganizationType
 from .organization import Organization
 from .customer import Customer
 from .customer_type import CustomerType
-from .relationship_customer_request import CustomerRequest
 from .program import Program
 from .lab import Lab
 from .team import Team
 
+
+from .relationship_customer_request import CustomerRequest
+from .relationship_program_lab import ProgramLab
 
 __all__ = [
     'Request',
@@ -22,5 +24,6 @@ __all__ = [
     'CustomerRequest',
     'Program',
     'Lab',
+    'ProgramLab',
     'Team'
 ]

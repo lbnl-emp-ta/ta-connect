@@ -8,7 +8,7 @@ class Customer(models.Model):
     organization = models.ForeignKey('core.Organization', on_delete=models.PROTECT)
     state = models.ForeignKey('core.State', on_delete=models.PROTECT)
 
-    request = models.ManyToManyField('core.Request', through='core.CustomerRequest')
+    requests = models.ManyToManyField('core.Request', through='core.CustomerRequest')
 
     def __str__(self):
         return self.email 
