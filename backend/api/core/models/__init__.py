@@ -12,7 +12,6 @@ from .region import Region
 
 
 from .relationship_customer_request import RelationshipCustomerRequest
-from .relationship_program_lab import RelationshipProgramLab
 
 __all__ = [
     'Request',
@@ -27,5 +26,4 @@ __all__ = [
     'Team',
     'Region',
     'RelationshipCustomerRequest',
-    'RelationshipProgramLab'
 ]
