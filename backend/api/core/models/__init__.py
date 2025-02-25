@@ -4,6 +4,8 @@ from .state import State
 from .organization_type import OrganizationType
 from .organization import Organization
 from .customer import Customer
+from .customer_type import CustomerType
+from .relationship_customer_request import CustomerRequest
 
 
 __all__ = [
@@ -12,5 +14,7 @@ __all__ = [
     'State',
     'OrganizationType',
     'Organization',
-    'Customer'
+    'Customer',
+    'CustomerType',
+    'CustomerRequest'
 ]
