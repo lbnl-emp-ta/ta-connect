@@ -11,7 +11,7 @@ from .team import Team
 from .region import Region
 
 
-from .relationship_customer_request import RelationshipCustomerRequest
+from .customer_request import CustomerRequest
 
 __all__ = [
     'Request',
@@ -25,5 +25,5 @@ __all__ = [
     'Lab',
     'Team',
     'Region',
-    'RelationshipCustomerRequest',
+    'CustomerRequest',
 ]
