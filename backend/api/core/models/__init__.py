@@ -11,6 +11,7 @@ from .team import Team
 from .region import Region
 from .topic import Topic
 from .depth import Depth
+from .transmission_planning_region import TransmissionPlanningRegion
 
 from .customer_request import CustomerRequest
 
@@ -29,4 +30,5 @@ __all__ = [
     'CustomerRequest',
     'Topic',
     'Depth',
+    'TransmissionPlanningRegion',
 ]

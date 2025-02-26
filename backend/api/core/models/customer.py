@@ -7,6 +7,7 @@ class Customer(models.Model):
     job_title = models.CharField(max_length=255)
     organization = models.ForeignKey('core.Organization', on_delete=models.PROTECT)
     state = models.ForeignKey('core.State', on_delete=models.PROTECT)
+    tpr = models.ForeignKey('core.TransmissionPlanningRegion', on_delete=models.PROTECT)
 
     requests = models.ManyToManyField('core.Request', through='core.CustomerRequest')
 
