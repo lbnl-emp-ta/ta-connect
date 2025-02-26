@@ -9,6 +9,8 @@ class Request(models.Model):
     completion_date = models.DateField(blank=True, null=True)
     statement_of_work_date = models.DateField(blank=True, null=True)
 
+    topics = models.ManyToManyField('core.Topic')
+
     def __str__(self):
         return self.pk
     

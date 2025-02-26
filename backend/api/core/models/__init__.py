@@ -9,7 +9,7 @@ from .program import Program
 from .lab import Lab
 from .team import Team
 from .region import Region
-
+from .topic import Topic
 
 from .customer_request import CustomerRequest
 
@@ -26,4 +26,5 @@ __all__ = [
     'Team',
     'Region',
     'CustomerRequest',
+    'Topic',
 ]

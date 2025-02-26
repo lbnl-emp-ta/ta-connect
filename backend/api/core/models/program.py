@@ -5,6 +5,7 @@ class Program(models.Model):
     description = models.TextField()
 
     labs = models.ManyToManyField('core.Lab')
+    topics = models.ManyToManyField('core.Topic')
 
     def __str__(self):
         return self.name
