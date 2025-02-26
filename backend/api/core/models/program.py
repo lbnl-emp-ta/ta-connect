@@ -6,6 +6,7 @@ class Program(models.Model):
 
     labs = models.ManyToManyField('core.Lab')
     topics = models.ManyToManyField('core.Topic')
+    depths = models.ManyToManyField('core.Depth')
 
     def __str__(self):
         return self.name

@@ -9,6 +9,7 @@ class Request(models.Model):
     completion_date = models.DateField(blank=True, null=True)
     statement_of_work_date = models.DateField(blank=True, null=True)
 
+    depth = models.ForeignKey('core.Depth', blank=True, null=True, on_delete=models.PROTECT)
     topics = models.ManyToManyField('core.Topic')
 
     def __str__(self):
