@@ -5,6 +5,8 @@ class Program(models.Model):
     description = models.TextField()
 
     labs = models.ManyToManyField('core.Lab')
+
+    sectors = models.ManyToManyField('core.Sector')
     topics = models.ManyToManyField('core.Topic')
     depths = models.ManyToManyField('core.Depth')
 

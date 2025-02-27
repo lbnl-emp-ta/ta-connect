@@ -9,6 +9,7 @@ from .program import Program
 from .lab import Lab
 from .team import Team
 from .region import Region
+from .sector import Sector
 from .topic import Topic
 from .depth import Depth
 from .transmission_planning_region import TransmissionPlanningRegion
@@ -28,6 +29,7 @@ __all__ = [
     'Team',
     'Region',
     'CustomerRequest',
+    'Sector',
     'Topic',
     'Depth',
     'TransmissionPlanningRegion',
