@@ -9,3 +9,5 @@ class RequestStatus(models.Model):
     
     class Meta:
         db_table = "request_status"
+        verbose_name = "request status"
+        verbose_name_plural = "request statuses"
