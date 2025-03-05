@@ -1,10 +1,10 @@
 import datetime
 
-from django.test import TestCase
+from rest_framework.test import APITestCase
 from core.models import Request
 from django.db.utils import IntegrityError
 
-class RequestModelTests(TestCase):
+class RequestModelTests(APITestCase):
     def test_proj_start_date_in_past(self):
         """
         The projected start date of a Request should not be

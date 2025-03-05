@@ -1,8 +1,8 @@
-from django.test import TestCase
+from rest_framework.test import APITestCase
 from core.models import RequestStatus
 
 # Create your tests here.
-class RequestStatusModelTests(TestCase):
+class RequestStatusModelTests(APITestCase):
     def test_get_default_pk_when_does_not_exist(self):
         """
         If the default status for a new Request does not 
