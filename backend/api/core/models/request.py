@@ -5,10 +5,12 @@ from django.db.models import CheckConstraint, Q, F
 from core.models import RequestStatus
 
 class Request(models.Model):
+    """
+    Represent the requests coming in from customers for technical assistance.
+    """
     status = models.ForeignKey(RequestStatus, on_delete=models.PROTECT, default=RequestStatus.get_default_pk)
     description = models.TextField()
     date_created = models.DateTimeField(auto_now_add=True)
-    sow_approval_date = models.DateField(blank=True, null=True, verbose_name="statement of work approval date")
     proj_start_date = models.DateField(blank=True, null=True, verbose_name="projected start date")
     proj_completion_date = models.DateField(blank=True, null=True, verbose_name="projected completion date")
     actual_completion_date = models.DateField(blank=True, null=True)
