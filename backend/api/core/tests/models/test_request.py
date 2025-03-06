@@ -80,7 +80,7 @@ class RequestModelTests(APITestCase):
         
         arbitrary_future_date = datetime.date.today() + datetime.timedelta(days=7)
         
-        did_not_raise_integrity_error = True
+        raised_validation_error = False
         
         try:
             Request.objects.create(
@@ -89,9 +89,9 @@ class RequestModelTests(APITestCase):
                 proj_completion_date=None
             )
         except IntegrityError:
-            did_not_raise_integrity_error = False
+            raised_validation_error = True
             
-        self.assertTrue(did_not_raise_integrity_error)
+        self.assertFalse(raised_validation_error)
         
     def test_can_set_proj_completion_date_if_proj_start_date_null(self):
         """
@@ -101,7 +101,7 @@ class RequestModelTests(APITestCase):
         
         arbitrary_future_date = datetime.date.today() + datetime.timedelta(days=7)
         
-        did_not_raise_integrity_error = True
+        raised_validation_error = False
         
         try:
             Request.objects.create(
@@ -110,6 +110,6 @@ class RequestModelTests(APITestCase):
                 proj_completion_date=arbitrary_future_date
             )
         except IntegrityError:
-            did_not_raise_integrity_error = False
+            raised_validation_error = True
             
-        self.assertTrue(did_not_raise_integrity_error)
+        self.assertFalse(raised_validation_error)

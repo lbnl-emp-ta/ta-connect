@@ -1,5 +1,5 @@
-from .test_request_status import RequestStatusModelTests
+from .utils import check_if_given_exception_raised
 
-all = [
-    'RequestStatusModelTests'
+__all__ = [
+    "check_if_given_exception_raised",
 ]
