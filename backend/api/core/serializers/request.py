@@ -11,20 +11,20 @@ class RequestSerializer(serializers.ModelSerializer):
     )
     
     @classmethod
-    def check_date_in_past(cls, date):
+    def date_in_past(cls, date):
         if date < datetime.date.today():
             return True
         
         return False
     
     def validate_proj_start_date(self, value):
-        if RequestSerializer.check_date_in_past(value):
+        if RequestSerializer.date_in_past(value):
             raise serializers.ValidationError("Projected start date cannot be in the past")
         return value
             
     
     def validate_proj_completion_date(self, value):
-        if RequestSerializer.check_date_in_past(value):
+        if RequestSerializer.date_in_past(value):
             raise serializers.ValidationError("Projected completion date cannot be in the past")
         return value
     

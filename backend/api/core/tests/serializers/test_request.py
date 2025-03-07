@@ -2,25 +2,24 @@ import datetime
 
 from rest_framework.test import APITestCase
 from rest_framework import serializers
-from core.models import Request
 from core.serializers import RequestSerializer
 
 class RequestSerializerTest(APITestCase):
-    def test_check_date_in_past_with_past_date(self):
+    def test_date_in_past_with_past_date(self):
         """
-        Given a date in the past, check_date_in_past should return True.
+        Given a date in the past, date_in_past should return True.
         """
         
         past_date = datetime.date.today() + datetime.timedelta(days=-1)
-        self.assertTrue(RequestSerializer.check_date_in_past(past_date))
+        self.assertTrue(RequestSerializer.date_in_past(past_date))
         
-    def test_check_date_in_past_with_future_date(self):
+    def test_date_in_past_with_future_date(self):
         """
-        Given a date in the past, check_date_in_past should return False.
+        Given a date in the past, date_in_past should return False.
         """
         
         past_date = datetime.date.today() + datetime.timedelta(days=1)
-        self.assertFalse(RequestSerializer.check_date_in_past(past_date))
+        self.assertFalse(RequestSerializer.date_in_past(past_date))
         
     def test_validate_proj_start_date_with_past_date(self):
         """
