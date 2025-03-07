@@ -45,5 +45,6 @@ class RequestSerializer(serializers.ModelSerializer):
             "date_created",
             "proj_start_date",
             "proj_completion_date",
+            "actual_completion_date"
         ]
         read_only_fields = ["date_created"]
