@@ -20,5 +20,5 @@ from core.views import RequestCreateView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('request/create', RequestCreateView.as_view())
+    path('request/create', RequestCreateView.as_view(), name="request-create")
 ]
