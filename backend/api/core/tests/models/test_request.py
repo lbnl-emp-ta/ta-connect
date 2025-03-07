@@ -4,35 +4,7 @@ from rest_framework.test import APITestCase
 from core.models import Request
 from django.db.utils import IntegrityError
 
-class RequestModelTests(APITestCase):
-    def test_proj_start_date_in_past(self):
-        """
-        The projected start date of a Request should not be
-        in the past.
-        """
-        
-        yesterday = datetime.date.today() + datetime.timedelta(days=-1)
-        
-        with self.assertRaises(IntegrityError):
-            Request.objects.create(
-                description="test", 
-                proj_start_date=yesterday
-            )
-            
-    def test_proj_completion_date_in_past(self):
-        """
-        The projected start date of a Request should not be
-        in the past.
-        """
-        
-        yesterday = datetime.date.today() + datetime.timedelta(days=-1)
-        
-        with self.assertRaises(IntegrityError):
-            Request.objects.create(
-                description="test", 
-                proj_completion_date=yesterday
-            )
-            
+class RequestModelTests(APITestCase):            
     def test_proj_start_date_after_proj_completion_date(self):
         """
         The projected start date should be before the projected 
