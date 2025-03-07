@@ -24,6 +24,17 @@ class RequestEndpointTests(APITestCase):
         
         self.assertEqual(response.status_code, 201)
         
+    def test_create_request_with_no_desc(self):
+        """
+        Description is a required field.
+        """
+        
+        data = {}
+        request = self.factory.post("request-create", data=data)
+        response = RequestCreateView.as_view()(request)
+        
+        self.assertEqual(response.status_code, 400)
+        
     def test_create_request_with_date_created(self):
         """
         Any given date created field should be ignored. Date 
