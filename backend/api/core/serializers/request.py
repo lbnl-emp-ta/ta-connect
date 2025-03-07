@@ -1,9 +1,15 @@
 import datetime
 
 from rest_framework import serializers
-from core.models import Request
+from core.models import Request, RequestStatus
 
 class RequestSerializer(serializers.ModelSerializer):
+    status = serializers.SlugRelatedField(
+        slug_field="name", 
+        required=False, 
+        queryset=RequestStatus.objects.all()
+    )
+    
     @classmethod
     def date_in_past(cls, date):
         if date < datetime.date.today():
@@ -34,6 +40,7 @@ class RequestSerializer(serializers.ModelSerializer):
     class Meta:
         model = Request
         fields = [
+            "status",
             "description",
             "date_created",
             "proj_start_date",
