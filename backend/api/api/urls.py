@@ -16,9 +16,11 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-from core.views import RequestCreateView
+from core.views import RequestCreateView, DepthListView, DepthRetrieveView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('request/create', RequestCreateView.as_view(), name="request-create")
+    path('request/create', RequestCreateView.as_view(), name="request-create"),
+    path('depth/', DepthListView.as_view(), name="depth-list"),
+    path('depth/<int:pk>', DepthRetrieveView.as_view(), name="depth-get"),
 ]
