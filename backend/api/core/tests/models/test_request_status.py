@@ -4,7 +4,7 @@ import pytest
 # Create your tests here.
 @pytest.mark.django_db
 class TestRequestStatusModel():
-    def test_get_default_pk_when_does_not_exist(self):
+    def test_get_default_pk_creates_status_when_default_does_not_exist(self):
         """
         If the default status for a new Request does not 
         exist, one is created.
@@ -18,7 +18,7 @@ class TestRequestStatusModel():
         default_status_exists_after_call = RequestStatus.objects.filter(name=RequestStatus.default_name).exists()
         assert default_status_exists_after_call
     
-    def test_get_default_pk_when_does_exist(self):
+    def test_get_default_pk_gets_existing_status_when_default_does_exist(self):
         """
         If the default status for a new Request exists,
         it is returned.
