@@ -20,7 +20,7 @@ from core.views import RequestCreateView, DepthListView, DepthRetrieveView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('request/create', RequestCreateView.as_view(), name="request-create"),
-    path('depth/', DepthListView.as_view(), name="depth-list"),
-    path('depth/<int:pk>', DepthRetrieveView.as_view(), name="depth-get"),
+    path('requests/', RequestCreateView.as_view(), name="request-create"),
+    path('depths/', DepthListView.as_view(), name="depth-list"),
+    path('depths/<int:pk>', DepthRetrieveView.as_view(), name="depth-retrieve"),
 ]

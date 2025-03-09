@@ -4,7 +4,6 @@ import pytest
 
 from rest_framework.test import APIClient
 from rest_framework.reverse import reverse
-
 from django.utils import timezone
 
 
@@ -17,6 +16,14 @@ class TestRequestCreateEndpoint():
     @classmethod
     def make_post_request_with(cls, data):
         return cls.client.post(reverse("request-create"), data=data)
+    
+    def test_create_request_endpoint_exists_at_desired_location(self):
+        data = {
+            "description": "test"
+        }
+        
+        response = self.client.post("/requests/", data=data)
+        assert response.status_code == 201
     
     def test_create_request_is_successful_given_only_desc(self):
         """
