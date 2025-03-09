@@ -3,6 +3,7 @@ import datetime
 from rest_framework.test import APITestCase
 from core.models import Request
 from django.db.utils import IntegrityError
+from django.utils import timezone
 
 class RequestModelTests(APITestCase):            
     def test_proj_start_date_after_proj_completion_date(self):
@@ -11,7 +12,7 @@ class RequestModelTests(APITestCase):
         completion date.
         """
         
-        completion_date = datetime.date.today()
+        completion_date = timezone.now().date()
         start_date = completion_date + datetime.timedelta(days=1)
         
         request = Request(
@@ -30,7 +31,7 @@ class RequestModelTests(APITestCase):
         projected start date.
         """
         
-        completion_date = datetime.date.today()
+        completion_date = timezone.now().date()
         start_date = completion_date + datetime.timedelta(days=1)
         
         request = Request(
@@ -50,7 +51,7 @@ class RequestModelTests(APITestCase):
         if the projected completion date has not been set.
         """
         
-        arbitrary_future_date = datetime.date.today() + datetime.timedelta(days=7)
+        arbitrary_future_date = timezone.now().date() + datetime.timedelta(days=7)
         
         raised_validation_error = False
         
@@ -71,7 +72,7 @@ class RequestModelTests(APITestCase):
         if the projected completion date has not been set.
         """
         
-        arbitrary_future_date = datetime.date.today() + datetime.timedelta(days=7)
+        arbitrary_future_date = timezone.now().date() + datetime.timedelta(days=7)
         
         raised_validation_error = False
         

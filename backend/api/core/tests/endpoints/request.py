@@ -4,6 +4,8 @@ import dateutil
 from rest_framework.test import APITestCase
 from rest_framework.test import APIRequestFactory
 
+from django.utils import timezone
+
 from core.views import RequestCreateView
 
 class RequestEndpointTests(APITestCase):
@@ -54,7 +56,7 @@ class RequestEndpointTests(APITestCase):
         received_date_created = dateutil.parser.parse(response.data.get("date_created"))
         
         given_date_ignored = received_date_created != given_date_created
-        received_date_is_today = received_date_created.date() == datetime.now(timezone.utc).date()
+        received_date_is_today = received_date_created.date() == timezone.now().date()
     
         
         

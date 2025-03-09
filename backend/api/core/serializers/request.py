@@ -1,6 +1,6 @@
-from datetime import datetime, timezone
-
 from rest_framework import serializers
+from django.utils import timezone
+
 from core.models import Request, RequestStatus
 
 class RequestSerializer(serializers.ModelSerializer):
@@ -12,7 +12,7 @@ class RequestSerializer(serializers.ModelSerializer):
     
     @classmethod
     def date_in_past(cls, date):
-        if date < datetime.now(timezone.utc).date():
+        if date < timezone.now().date():
             return True
         
         return False
