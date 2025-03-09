@@ -1,4 +1,4 @@
-import datetime
+from datetime import datetime, timezone
 import dateutil
 
 from rest_framework.test import APITestCase
@@ -42,7 +42,7 @@ class RequestEndpointTests(APITestCase):
         Request.
         """
         
-        given_date_created = datetime.datetime.strptime("2000-01-01", "%Y-%m-%d")
+        given_date_created = datetime.strptime("2000-01-01", "%Y-%m-%d")
         
         data = {
             "description": "test",
@@ -54,7 +54,8 @@ class RequestEndpointTests(APITestCase):
         received_date_created = dateutil.parser.parse(response.data.get("date_created"))
         
         given_date_ignored = received_date_created != given_date_created
-        received_date_is_today = received_date_created.date() == datetime.date.today()
+        received_date_is_today = received_date_created.date() == datetime.now(timezone.utc).date()
+    
         
         
         self.assertTrue(given_date_ignored and received_date_is_today)
