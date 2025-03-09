@@ -24,12 +24,12 @@ class Request(models.Model):
         db_table = "request"
         constraints = [
             CheckConstraint(
-                check = Q(proj_completion_date__gt=F('proj_start_date')) | Q(proj_start_date__isnull=True),
+                condition = Q(proj_completion_date__gt=F('proj_start_date')) | Q(proj_start_date__isnull=True),
                 name = "projected_completion_date_after_projected_start_date_or_null",
                 violation_error_message="The projected completion date must be after the projected start date"
             ),
             CheckConstraint(
-                check = Q(proj_start_date__lt=F('proj_completion_date')) | Q(proj_completion_date__isnull=True),
+                condition = Q(proj_start_date__lt=F('proj_completion_date')) | Q(proj_completion_date__isnull=True),
                 name = "projected_start_date_before_projected_completion_date_or_null",
                 violation_error_message="The projected start date must be before the projected completion date"
             )
