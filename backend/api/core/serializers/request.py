@@ -39,12 +39,5 @@ class RequestSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Request
-        fields = [
-            "status",
-            "description",
-            "date_created",
-            "proj_start_date",
-            "proj_completion_date",
-            "actual_completion_date"
-        ]
+        fields = "__all__"
         read_only_fields = ["date_created"]
