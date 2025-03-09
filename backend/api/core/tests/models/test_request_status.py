@@ -1,8 +1,9 @@
-from rest_framework.test import APITestCase
 from core.models import RequestStatus
+import pytest
 
 # Create your tests here.
-class RequestStatusModelTests(APITestCase):
+@pytest.mark.django_db
+class TestRequestStatusModel():
     def test_get_default_pk_when_does_not_exist(self):
         """
         If the default status for a new Request does not 
@@ -10,12 +11,12 @@ class RequestStatusModelTests(APITestCase):
         """
         
         default_status_exists_before_call = RequestStatus.objects.filter(name=RequestStatus.default_name).exists()
-        self.assertFalse(default_status_exists_before_call)
+        assert not default_status_exists_before_call
             
         RequestStatus.get_default_pk()
         
         default_status_exists_after_call = RequestStatus.objects.filter(name=RequestStatus.default_name).exists()
-        self.assertTrue(default_status_exists_after_call)
+        assert default_status_exists_after_call
     
     def test_get_default_pk_when_does_exist(self):
         """
@@ -32,7 +33,7 @@ class RequestStatusModelTests(APITestCase):
         
         found_default_status_pk = RequestStatus.get_default_pk()
         
-        self.assertEqual(existing_default_status_pk, found_default_status_pk)
+        assert existing_default_status_pk == found_default_status_pk
         
         
         

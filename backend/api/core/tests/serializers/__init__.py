@@ -1,5 +1,5 @@
-from .test_request import RequestSerializerTest
+from .test_request import TestRequestSerializer
 
 __all__ = [
-    "RequestSerializerTest",
+    "TestRequestSerializer",
 ]

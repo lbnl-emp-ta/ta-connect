@@ -1,7 +1,7 @@
-from .test_request_status import RequestStatusModelTests
-from .test_request import RequestModelTests
+from .test_request_status import TestRequestStatusModel
+from .test_request import TestRequestModel
 
 all = [
-    'RequestStatusModelTests',
-    'RequestModelTests'
+    'TestRequestStatusModel',
+    'TestRequestModel'
 ]

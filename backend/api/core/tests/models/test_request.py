@@ -1,12 +1,13 @@
 import datetime
 
-from rest_framework.test import APITestCase
 from core.models import Request
 from django.db.utils import IntegrityError
 from django.utils import timezone
+import pytest
 
-class RequestModelTests(APITestCase):            
-    def test_proj_start_date_after_proj_completion_date(self):
+@pytest.mark.django_db
+class TestRequestModel():            
+    def test_request_model_raises_integrity_error_when_proj_start_date_after_proj_completion_date(self):
         """
         The projected start date should be before the projected 
         completion date.
@@ -22,10 +23,10 @@ class RequestModelTests(APITestCase):
         
         request.proj_start_date = start_date
         
-        with self.assertRaises(IntegrityError): 
+        with pytest.raises(IntegrityError): 
             request.save()
             
-    def test_proj_completion_date_before_start_date(self):
+    def test_request_model_raises_integrity_error_when_proj_completion_date_before_proj_start_date(self):
         """
         The projected completion date should be after the 
         projected start date.
@@ -41,7 +42,7 @@ class RequestModelTests(APITestCase):
         
         request.proj_completion_date = completion_date
         
-        with self.assertRaises(IntegrityError): 
+        with pytest.raises(IntegrityError): 
             request.save()
             
             
@@ -64,7 +65,7 @@ class RequestModelTests(APITestCase):
         except IntegrityError:
             raised_validation_error = True
             
-        self.assertFalse(raised_validation_error)
+        assert not raised_validation_error
         
     def test_can_set_proj_completion_date_if_proj_start_date_null(self):
         """
@@ -85,4 +86,4 @@ class RequestModelTests(APITestCase):
         except IntegrityError:
             raised_validation_error = True
             
-        self.assertFalse(raised_validation_error)
+        assert not raised_validation_error

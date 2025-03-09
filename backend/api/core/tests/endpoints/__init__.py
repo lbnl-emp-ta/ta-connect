@@ -1,5 +1,5 @@
-from .request import RequestEndpointTests
+from .test_request import TestRequestCreateEndpoint
 
 __all__ = [
-    "RequestEndpointTests",
+    "TestRequestCreateEndpoint",
 ]
