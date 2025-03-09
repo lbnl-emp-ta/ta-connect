@@ -16,11 +16,16 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-from core.views import RequestCreateView, DepthListView, DepthRetrieveView
+from core.views import RequestCreateView, DepthListView, DepthRetrieveView, StateListView, StateRetrieveView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    
     path('requests/', RequestCreateView.as_view(), name="request-create"),
+    
     path('depths/', DepthListView.as_view(), name="depth-list"),
     path('depths/<int:pk>', DepthRetrieveView.as_view(), name="depth-retrieve"),
+    
+    path('states/', StateListView.as_view(), name="state-list"),
+    path('states/<int:pk>', StateRetrieveView.as_view(), name="state-retrieve"),
 ]
