@@ -16,7 +16,7 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-from core.views import RequestCreateView, DepthListView, DepthRetrieveView, StateListView, StateRetrieveView
+from core.views import *
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -28,4 +28,7 @@ urlpatterns = [
     
     path('states/', StateListView.as_view(), name="state-list"),
     path('states/<int:pk>', StateRetrieveView.as_view(), name="state-retrieve"),
+    
+    path('organization-types/', OrganizationListView.as_view(), name="organization-type-list"),
+    path('organization-types/<int:pk>', OrganizationRetrieveView.as_view(), name="organization-type-retrieve"),
 ]
