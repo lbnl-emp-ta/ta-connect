@@ -32,5 +32,5 @@ urlpatterns = [
     path('organization-types/', OrganizationTypeListView.as_view(), name="organization-type-list"),
     path('organization-types/<int:pk>', OrganizationTypeRetrieveView.as_view(), name="organization-type-retrieve"),
     
-    path('organizations/', OrganizationCreateView.as_view(), name="organization-create"),
+    path('organizations/', OrganizationListCreateView.as_view(), name="organization-list-create"),
 ]

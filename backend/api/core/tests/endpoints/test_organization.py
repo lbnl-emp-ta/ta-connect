@@ -6,6 +6,16 @@ from rest_framework.reverse import reverse
 from core.models import OrganizationType
 
 @pytest.mark.django_db
+class TestOrganizationListEndpoint():
+    @classmethod  
+    def setup_class(cls):
+        cls.client = APIClient()
+    
+    def test_list_organization_endpoint_exists_at_desired_location(self):
+        response = self.client.get("/organizations/")
+        assert response.status_code == 200
+
+@pytest.mark.django_db
 class TestOrganizationCreateEndpoint():
     @classmethod  
     def setup_class(cls):

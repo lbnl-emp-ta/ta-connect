@@ -2,7 +2,7 @@ from .request import RequestCreateView
 from .depth import DepthListView, DepthRetrieveView
 from .state import StateListView, StateRetrieveView
 from .organization_type import OrganizationTypeListView, OrganizationTypeRetrieveView
-from .organization import OrganizationCreateView
+from .organization import OrganizationListCreateView
 
 __all__ = [
     "RequestCreateView",
@@ -12,5 +12,5 @@ __all__ = [
     "StateRetrieveView",
     "OrganizationTypeListView",
     "OrganizationTypeRetrieveView",
-    "OrganizationCreateView",
+    "OrganizationListCreateView",
 ]
