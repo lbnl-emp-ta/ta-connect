@@ -6,6 +6,7 @@ from .organization_type import OrganizationType
 from .organization import Organization
 from .transmission_planning_region import TransmissionPlanningRegion
 from .customer import Customer
+from .customer_type import CustomerType
 
 __all__ = [
     "RequestStatus",
@@ -16,4 +17,5 @@ __all__ = [
     "Organization",
     "TransmissionPlanningRegion",
     "Customer",
+    "CustomerType",
 ]
