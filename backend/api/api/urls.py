@@ -35,4 +35,6 @@ urlpatterns = [
     path('organizations/', OrganizationListCreateView.as_view(), name="organization-list-create"),
     
     path('transmission-planning-regions/', TransmissionPlanningRegionListView.as_view(), name="transmission-planning-regions-list"),
+    
+    path('customers/', CustomerCreateView.as_view(), name="customer-create"),
 ]

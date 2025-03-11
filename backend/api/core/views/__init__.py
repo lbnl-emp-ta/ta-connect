@@ -4,6 +4,7 @@ from .state import StateListView, StateRetrieveView
 from .organization_type import OrganizationTypeListView, OrganizationTypeRetrieveView
 from .organization import OrganizationListCreateView
 from .transmission_planning_region import TransmissionPlanningRegionListView
+from .customer import CustomerCreateView
 
 __all__ = [
     "RequestCreateView",
@@ -15,4 +16,5 @@ __all__ = [
     "OrganizationTypeRetrieveView",
     "OrganizationListCreateView",
     "TransmissionPlanningRegionListView",
+    "CustomerCreateView",
 ]
