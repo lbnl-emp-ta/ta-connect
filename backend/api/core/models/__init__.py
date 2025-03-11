@@ -7,6 +7,7 @@ from .organization import Organization
 from .transmission_planning_region import TransmissionPlanningRegion
 from .customer import Customer
 from .customer_type import CustomerType
+from .customer_request_relationship import CustomerRequestRelationship
 
 __all__ = [
     "RequestStatus",
@@ -18,4 +19,5 @@ __all__ = [
     "TransmissionPlanningRegion",
     "Customer",
     "CustomerType",
+    "CustomerRequestRelationship",
 ]
