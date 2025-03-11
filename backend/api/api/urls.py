@@ -29,6 +29,8 @@ urlpatterns = [
     path('states/', StateListView.as_view(), name="state-list"),
     path('states/<int:pk>', StateRetrieveView.as_view(), name="state-retrieve"),
     
-    path('organization-types/', OrganizationListView.as_view(), name="organization-type-list"),
-    path('organization-types/<int:pk>', OrganizationRetrieveView.as_view(), name="organization-type-retrieve"),
+    path('organization-types/', OrganizationTypeListView.as_view(), name="organization-type-list"),
+    path('organization-types/<int:pk>', OrganizationTypeRetrieveView.as_view(), name="organization-type-retrieve"),
+    
+    path('organizations/', OrganizationCreateView.as_view(), name="organization-create"),
 ]
