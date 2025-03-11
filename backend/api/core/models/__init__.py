@@ -4,6 +4,7 @@ from .depth import Depth
 from .state import State
 from .organization_type import OrganizationType
 from .organization import Organization
+from .transmission_planning_region import TransmissionPlanningRegion
 
 __all__ = [
     "RequestStatus",
@@ -12,4 +13,5 @@ __all__ = [
     "State",
     "OrganizationType",
     "Organization",
+    "TransmissionPlanningRegion",
 ]
