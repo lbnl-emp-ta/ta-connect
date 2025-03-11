@@ -4,6 +4,7 @@ from .state import StateSerializer
 from .organization_type import OrganizationTypeSerializer
 from .organization import OrganizationSerializer
 from .transmission_planning_region import TransmissionPlanningRegionSerializer
+from .customer import CustomerSerializer
 
 __all__ = [
     "RequestSerializer",
@@ -12,4 +13,5 @@ __all__ = [
     "OrganizationTypeSerializer",
     "OrganizationSerializer",
     "TransmissionPlanningRegionSerializer",
+    "CustomerSerializer",
 ]
