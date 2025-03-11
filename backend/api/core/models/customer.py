@@ -1,0 +1,19 @@
+from django.db import models
+
+from core.models import Organization, State, TransmissionPlanningRegion
+
+class Customer(models.Model):
+    org = models.ForeignKey(Organization, on_delete=models.PROTECT, verbose_name="organization")
+    state = models.ForeignKey(State, on_delete=models.PROTECT)
+    tpr = models.ForeignKey(TransmissionPlanningRegion, on_delete=models.PROTECT, verbose_name="transmission planning region")
+    email = models.EmailField(unique=True)
+    name = models.CharField(max_length=256)
+    phone = models.CharField(max_length=64, verbose_name="phone number")
+    title = models.CharField(max_length=256, verbose_name="job title")
+    
+    def __str__(self):
+        return self.email
+    
+    class Meta:
+        db_table = "customer"
+    
