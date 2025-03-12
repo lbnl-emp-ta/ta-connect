@@ -6,23 +6,13 @@ from core.models import Depth
 
 @pytest.mark.django_db
 class TestDepthListEndpoint():
-    @classmethod  
-    def setup_class(cls):
-        cls.client = APIClient()
-    
-    def test_list_depths_endpoint_exists_at_desired_location(self):
-        response = self.client.get("/depths", follow=True)
+    def test_list_depths_endpoint_exists_at_desired_location(self, api_client):
+        response = api_client.get("/depths/")
         assert response.status_code == 200
 
 
 @pytest.mark.django_db
-class TestDepthRetrieveEndpoint():
-    @classmethod  
-    def setup_class(cls):
-        cls.client = APIClient()
-    
-    def test_retrieve_depth_endpoint_exists_at_desired_location(self):
-        test_depth = Depth.objects.create(name="Test", description="for testing")
-        
-        response = self.client.get(f"/depths/{test_depth.pk}", follow=True)
+class TestDepthRetrieveEndpoint():  
+    def test_retrieve_depth_endpoint_exists_at_desired_location(self, api_client, test_depth):
+        response = api_client.get(f"/depths/{test_depth.pk}")
         assert response.status_code == 200
