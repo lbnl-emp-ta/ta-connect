@@ -6,7 +6,7 @@ from .organization import OrganizationListCreateView
 from .transmission_planning_region import TransmissionPlanningRegionListView
 from .customer import CustomerCreateView
 from .customer_request_relationship import CustomerRequestRelationshipCreateView
-from .cohort import CohortCreateView
+from .cohort import CohortCreateView, CohortAddCustomerView
 
 __all__ = [
     "RequestCreateView",
@@ -21,4 +21,5 @@ __all__ = [
     "CustomerCreateView",
     "CustomerRequestRelationshipCreateView",
     "CohortCreateView",
+    "CohortAddCustomerView",
 ]

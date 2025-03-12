@@ -99,3 +99,14 @@ def test_customer_type(django_db_blocker):
         )
         
         return _test_customer_type
+    
+@pytest.fixture(scope="function")
+def test_cohort(django_db_blocker, test_request):
+    with django_db_blocker.unblock():
+        _test_cohort, _ = Cohort.objects.get_or_create(
+            request=test_request,
+            name="FixtureTestCohort",
+            description="for testing"
+        )
+        
+        return _test_cohort

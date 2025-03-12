@@ -40,4 +40,5 @@ urlpatterns = [
     path('customer-request-relationships/', CustomerRequestRelationshipCreateView.as_view(), name="customer-request-relationship-create"),
     
     path('cohorts/', CohortCreateView.as_view(), name="cohort-create"),
+    path('cohorts/add-customer/', CohortAddCustomerView.as_view(), name="cohort-customer-add"),
 ]
