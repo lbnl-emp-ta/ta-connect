@@ -1,7 +1,5 @@
 import pytest
 
-from core.models import State
-
 @pytest.mark.django_db
 class TestStateListEndpoint():
     def test_list_states_endpoint_exists_at_desired_location(self, api_client):
