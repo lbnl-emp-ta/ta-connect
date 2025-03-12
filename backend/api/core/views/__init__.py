@@ -5,6 +5,7 @@ from .organization_type import OrganizationTypeListView, OrganizationTypeRetriev
 from .organization import OrganizationListCreateView
 from .transmission_planning_region import TransmissionPlanningRegionListView
 from .customer import CustomerCreateView
+from .customer_request_relationship import CustomerRequestRelationshipCreateView
 
 __all__ = [
     "RequestCreateView",
@@ -17,4 +18,5 @@ __all__ = [
     "OrganizationListCreateView",
     "TransmissionPlanningRegionListView",
     "CustomerCreateView",
+    "CustomerRequestRelationshipCreateView",
 ]
