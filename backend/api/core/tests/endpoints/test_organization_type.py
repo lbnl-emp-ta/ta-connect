@@ -13,6 +13,6 @@ class TestOrganizationTypeListEndpoint():
 
 @pytest.mark.django_db
 class TestOrganizationTypeRetrieveEndpoint():
-    def test_retrieve_organization_type_endpoint_exists_at_desired_location(self, api_client, test_organization_type):
-        response = api_client.get(f"/organization-types/{test_organization_type.pk}", follow=True)
+    def test_retrieve_organization_type_endpoint_exists_at_desired_location(self, api_client, test_org_type):
+        response = api_client.get(f"/organization-types/{test_org_type.pk}", follow=True)
         assert response.status_code == 200

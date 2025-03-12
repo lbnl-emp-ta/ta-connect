@@ -13,11 +13,11 @@ class TestOrganizationListEndpoint():
 
 @pytest.mark.django_db
 class TestOrganizationCreateEndpoint():
-    def test_create_request_endpoint_exists_at_desired_location(self, api_client, test_organization_type):
+    def test_create_request_endpoint_exists_at_desired_location(self, api_client, test_org_type):
         data = {
             "name": "TestOrg",
             "address": "123 Test Street, TestVille, South Testerland",
-            "type": test_organization_type.pk,
+            "type": test_org_type.pk,
         }
         
         response = api_client.post("/organizations/", data=data)
