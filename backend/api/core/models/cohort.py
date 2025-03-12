@@ -7,7 +7,7 @@ class Cohort(models.Model):
     name = models.CharField(max_length=256)
     description = models.TextField()
     
-    customers = models.ManyToManyField(Customer)
+    customers = models.ManyToManyField(Customer, related_name="cohort", blank=True)
     
     def __str__(self):
         return self.name
