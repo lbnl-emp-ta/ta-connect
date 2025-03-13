@@ -1,10 +1,12 @@
 import pytest
 
+from rest_framework import status
+
 from core.models import *
 
 @pytest.mark.django_db
 class TestCustomerCreateEndpoint():     
-    def test_create_request_endpoint_exists_at_desired_location(self, api_client, test_state, test_org, test_tpr):        
+    def test_create_customer_endpoint_exists_at_desired_location(self, api_client, test_state, test_org, test_tpr):        
         data = {
             "org": test_org.pk,
             "state": test_state.pk,
@@ -16,4 +18,4 @@ class TestCustomerCreateEndpoint():
         }
         
         response = api_client.post("/customers/", data=data)
-        assert response.status_code == 201
+        assert response.status_code == status.HTTP_201_CREATED

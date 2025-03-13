@@ -23,7 +23,6 @@ class RequestCreateView(generics.CreateAPIView):
         serializer.is_valid(raise_exception=True)
         self.perform_create(serializer)
         headers = self.get_success_headers(serializer.data)
-        # ****
         
         outgoing_fields_to_keep = ["description", "date_created"]
         outgoing_data = serializer.data.copy()

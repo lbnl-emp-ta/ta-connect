@@ -1,8 +1,6 @@
 import pytest
 
-from rest_framework.test import APIClient
-
-from core.models import Depth
+from rest_framework import status
 
 @pytest.mark.django_db
 class TestDepthListEndpoint():
@@ -15,4 +13,4 @@ class TestDepthListEndpoint():
 class TestDepthRetrieveEndpoint():  
     def test_retrieve_depth_endpoint_exists_at_desired_location(self, api_client, test_depth):
         response = api_client.get(f"/depths/{test_depth.pk}")
-        assert response.status_code == 200
+        assert response.status_code == status.HTTP_200_OK

@@ -7,17 +7,20 @@ from core.serializers import CohortSerializer
 class CohortCreateView(generics.CreateAPIView):
     queryset = Cohort.objects.all()
     serializer_class = CohortSerializer
-    
+
+
+#TODO: MORE TESTS NEEDED!!!!!!!!
 class CohortAddCustomerView(views.APIView):
     """
     Add a Customer to a Cohort.
     """
+        
     def post(self, request):
         if not request.data.get("cohort"):
-            return response.Response({"cohort": ["Must include a Cohort."]}, status=status.HTTP_400_BAD_REQUEST)
+            return response.Response({"cohort": ["Missing cohort field."]}, status=status.HTTP_400_BAD_REQUEST)
         
         if not request.data.get("customer"):
-            return response.Response({"customer": ["Must include a Customer."]}, status=status.HTTP_400_BAD_REQUEST)
+            return response.Response({"customer": ["Missing customer field."]}, status=status.HTTP_400_BAD_REQUEST)
         
         cohort_pk = request.data.get("cohort")
         customer_pk = request.data.get("customer")
@@ -26,7 +29,7 @@ class CohortAddCustomerView(views.APIView):
             return response.Response({"cohort": [f"Cohort with pk={cohort_pk} does not exist!"]}, status=status.HTTP_400_BAD_REQUEST)
         
         if not Customer.objects.filter(pk=customer_pk).exists():
-            return response.Response({"customer": [f"Cohort with pk={customer_pk} does not exist!"]}, status=status.HTTP_400_BAD_REQUEST)
+            return response.Response({"customer": [f"Customer with pk={customer_pk} does not exist!"]}, status=status.HTTP_400_BAD_REQUEST)
         
         try:
             Cohort.objects.get(pk=cohort_pk).customers.add(Customer.objects.get(pk=customer_pk))

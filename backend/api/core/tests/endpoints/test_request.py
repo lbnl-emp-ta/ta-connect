@@ -3,6 +3,7 @@ import dateutil
 import pytest
 
 from rest_framework.reverse import reverse
+from rest_framework import status
 from django.utils import timezone
 
 
@@ -18,7 +19,7 @@ class TestRequestCreateEndpoint():
         }
         
         response = api_client.post("/requests/", data=data)
-        assert response.status_code == 201
+        assert response.status_code == status.HTTP_201_CREATED
     
     def test_create_request_is_successful_given_only_desc(self, api_client):
         """
@@ -31,7 +32,7 @@ class TestRequestCreateEndpoint():
         }
         
         response = api_client.post(self.post_endpoint(), data=data)
-        assert response.status_code == 201
+        assert response.status_code == status.HTTP_201_CREATED
         
     def test_create_request_fails_given_no_desc(self, api_client):
         """
@@ -41,7 +42,7 @@ class TestRequestCreateEndpoint():
         data = {}
         response = api_client.post(self.post_endpoint(), data=data)
         
-        assert response.status_code == 400
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
         
     def test_create_request_is_succesful_and_ignores_given_date_created(self, api_client):
         """

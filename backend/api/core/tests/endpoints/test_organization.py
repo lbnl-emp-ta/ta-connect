@@ -1,19 +1,16 @@
 import pytest
 
-from rest_framework.test import APIClient
-from rest_framework.reverse import reverse
-
-from core.models import OrganizationType
+from rest_framework import status
 
 @pytest.mark.django_db
 class TestOrganizationListEndpoint():
     def test_list_organization_endpoint_exists_at_desired_location(self, api_client):
         response = api_client.get("/organizations/")
-        assert response.status_code == 200
+        assert response.status_code == status.HTTP_200_OK
 
 @pytest.mark.django_db
 class TestOrganizationCreateEndpoint():
-    def test_create_request_endpoint_exists_at_desired_location(self, api_client, test_org_type):
+    def test_create_organization_endpoint_exists_at_desired_location(self, api_client, test_org_type):
         data = {
             "name": "TestOrg",
             "address": "123 Test Street, TestVille, South Testerland",
@@ -21,5 +18,5 @@ class TestOrganizationCreateEndpoint():
         }
         
         response = api_client.post("/organizations/", data=data)
-        assert response.status_code == 201
+        assert response.status_code == status.HTTP_201_CREATED
     
