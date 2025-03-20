@@ -1,6 +1,6 @@
 from .request_status import RequestStatus
-from .request import Request
 from .depth import Depth
+from .request import Request
 from .state import State
 from .organization_type import OrganizationType
 from .organization import Organization

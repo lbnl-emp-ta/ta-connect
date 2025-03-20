@@ -7,6 +7,7 @@ from .transmission_planning_region import TransmissionPlanningRegionListView
 from .customer import CustomerCreateView
 from .customer_request_relationship import CustomerRequestRelationshipCreateView
 from .cohort import CohortCreateView, CohortAddCustomerView
+from .intake_form import ProcessIntakeForm
 
 __all__ = [
     "RequestCreateView",
@@ -22,4 +23,5 @@ __all__ = [
     "CustomerRequestRelationshipCreateView",
     "CohortCreateView",
     "CohortAddCustomerView",
+    "ProcessIntakeForm",
 ]

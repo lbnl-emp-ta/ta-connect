@@ -1,4 +1,4 @@
-import {ChangeEvent, useEffect, useState} from 'react'
+import {useEffect, useState} from 'react'
 import './App.css'
 
 function App() {
@@ -19,21 +19,26 @@ interface OrganiztionType {
     description: string;
 }
 
-
+interface TransmissionPlanningRegion {
+    name: string;
+}
 
 function IntakeForm() {
     const [states, setStates] = useState<State[]>([]);
     const [orgTypes, setOrgTypes] = useState<OrganiztionType[]>([])
+    const [tprs, setTPRs] = useState<TransmissionPlanningRegion[]>([])
 
-    const [name, setName] = useState<string>("");
-    const [title, setTitle] = useState<string>("");
-    const [stateAbbr, setStateAbbr] = useState<string>("");
-    const [orgName, setOrgName] = useState<string>("");
-    const [email, setEmail] = useState<string>("");
-    const [phone, setPhone] = useState<string>("");
-    const [orgType, setOrgType] = useState<string>("");
-    const [TAType, setTAType] = useState<string>("");
-    const [desc, setDesc] = useState<string>("")
+    const [name, setName] = useState<string>("test name");
+    const [title, setTitle] = useState<string>("test title");
+    const [stateAbbr, setStateAbbr] = useState<string>("NY");
+    const [orgName, setOrgName] = useState<string>("test org name");
+    const [orgAddress, setOrgAddress] = useState<string>("test org addr");
+    const [email, setEmail] = useState<string>("test email");
+    const [phone, setPhone] = useState<string>("999-999-9999");
+    const [orgType, setOrgType] = useState<string>("Utility Commission");
+    const [TADepth, setTADepth] = useState<string>("Help Desk");
+    const [desc, setDesc] = useState<string>("test desc")
+    const [tpr, setTPR] = useState<string>("TestTPR")
 
     async function handleSubmit(event: React.SyntheticEvent<HTMLFormElement>) {
         event.preventDefault()
@@ -49,10 +54,12 @@ function IntakeForm() {
                     email: email,
                     phone: phone,
                     title: title,
+                    tpr: tpr,
                     state: stateAbbr,
                     organization: orgName,
+                    organizationAddress: orgAddress,
                     organizationType: orgType,
-                    tatype: TAType,
+                    tadepth: TADepth,
                     description: desc
                 })
             });
@@ -93,6 +100,19 @@ function IntakeForm() {
             }
     }
 
+    async function fetchTPRs() {
+        const url = "http://127.0.0.1:8000/transmission-planning-regions/";
+            try {
+                const response = await fetch(url);
+                if (!response.ok) {
+                    throw Error(`Request status: ${response.status}`);
+                }
+                return await response.json() as TransmissionPlanningRegion[]
+            } catch (error) {
+                console.log(error);
+            }
+    }
+
     useEffect(() => {
         let ignore = false;
 
@@ -127,6 +147,23 @@ function IntakeForm() {
         }
     }, []);
 
+    useEffect(() => {
+        let ignore = false;
+
+        async function startFetchingTPRs() {
+            const json = await fetchTPRs();
+            if(!ignore && json) {
+                setTPRs(json);
+            }
+        }
+
+        startFetchingTPRs()
+
+        return () => {
+            ignore = true;
+        }
+    }, []);
+
     return (
         <form className="intake-form" onSubmit={handleSubmit}>
             <h1>TA Request Form</h1>
@@ -150,45 +187,6 @@ function IntakeForm() {
                         name="full name" 
                         required
                         />
-                </p>
-                <p>
-                    <label htmlFor="title">
-                        <strong>
-                            <span>Title</span>
-                        </strong>
-                    </label>
-                    <input 
-                        value={title}
-                        onChange={e => setTitle(e.target.value)}
-                        type="text" 
-                        id="title" 
-                        name="job title" 
-                        required/>
-                </p>
-                <p>
-                    <label htmlFor="state">
-                        <strong>
-                            <span>State</span>
-                            <span aria-label="required"> *</span>
-                        </strong>
-                    </label>
-                    <select id="state" name='state' onChange={e => setStateAbbr(e.target.value)}>
-                        <option value="none"></option>
-                        {
-                            states.map((state) => (
-                                <option key={state.abbreviation} value={state.abbreviation}>{state.name}</option>
-                            ))
-                        }
-                    </select>
-                </p>
-                <p>
-                    <label htmlFor="org-name">
-                        <strong>
-                            <span>Organization Name</span>
-                            <span aria-label="required"> *</span>
-                        </strong>
-                    </label>
-                    <input value={orgName} onChange={e => setOrgName(e.target.value)} type="text" id="org-name" name="organization name" required/>
                 </p>
                 <p>
                     <label htmlFor="email">
@@ -219,6 +217,71 @@ function IntakeForm() {
                         id="phone" 
                         name="phone number" 
                         required/>
+                </p>
+                <p>
+                    <label htmlFor="title">
+                        <strong>
+                            <span>Title</span>
+                            <span aria-label="required"> *</span>
+                        </strong>
+                    </label>
+                    <input 
+                        value={title}
+                        onChange={e => setTitle(e.target.value)}
+                        type="text" 
+                        id="title" 
+                        name="job title" 
+                        required/>
+                </p>
+                <p>
+                    <label htmlFor="tpr">
+                        <strong>
+                            <span>Tramission Planning Region</span>
+                            <span aria-label="required"> *</span>
+                        </strong>
+                    </label>
+                    <select id="tpr" name='transmission planning region' onChange={e => setTPR(e.target.value)}>
+                        <option value="none"></option>
+                        {
+                            tprs.map((region) => (
+                                <option key={region.name} value={region.name}>{region.name}</option>
+                            ))
+                        }
+                    </select>
+                </p>
+                <p>
+                    <label htmlFor="state">
+                        <strong>
+                            <span>State</span>
+                            <span aria-label="required"> *</span>
+                        </strong>
+                    </label>
+                    <select id="state" name='state' onChange={e => setStateAbbr(e.target.value)}>
+                        <option value="none"></option>
+                        {
+                            states.map((state) => (
+                                <option key={state.abbreviation} value={state.abbreviation}>{state.name}</option>
+                            ))
+                        }
+                    </select>
+                </p>
+                <p>
+                    <label htmlFor="org-name">
+                        <strong>
+                            <span>Organization Name</span>
+                            <span aria-label="required"> *</span>
+                        </strong>
+                    </label>
+                    <input value={orgName} onChange={e => setOrgName(e.target.value)} type="text" id="org-name" name="organization name" required/>
+                </p>
+                <p>
+                    <label htmlFor="org-address">
+                        <strong>
+                            <span>Organization Address</span>
+                            <span aria-label="required"> *</span>
+                        </strong>
+                    </label>
+                    <input value={orgAddress} onChange={e => setOrgAddress(e.target.value)} type="text" id="org-address" name="organization address" required/>
                 </p>
                 <fieldset id="org-type-fieldset">
                     <legend>
@@ -252,7 +315,7 @@ function IntakeForm() {
                 <fieldset>
                     <legend>
                         <strong>
-                            <span>Technical Assistance Type</span>
+                            <span>Technical Assistance Depth</span>
                             <span aria-label="required"> *</span>
                         </strong>
                     </legend>
@@ -262,34 +325,34 @@ function IntakeForm() {
                     </p>
                     <ul>
                         <li>
-                            <label htmlFor="ta_type_1">
+                            <label htmlFor="ta_depth_1">
                                 <input 
-                                    onChange={e => setTAType(e.target.value)}
+                                    onChange={e => setTADepth(e.target.value)}
                                     type="radio" 
-                                    id='ta_type_1' 
-                                    name="technical assistance type" 
+                                    id='ta_depth_1' 
+                                    name="technical assistance depth" 
                                     value="Help Desk"/>
                                 Help Desk
                            </label>
                         </li>
                         <li>
-                            <label htmlFor="ta_type_2">
+                            <label htmlFor="ta_depth_2">
                                 <input 
-                                    onChange={e => setTAType(e.target.value)}
+                                    onChange={e => setTADepth(e.target.value)}
                                     type="radio" 
-                                    id='ta_type_2' 
-                                    name="technical assistance type" 
+                                    id='ta_depth_2' 
+                                    name="technical assistance depth" 
                                     value="Expert Match"/>
                                 Expert Match
                            </label>
                         </li>
                         <li>
-                            <label htmlFor="ta_type_3">
+                            <label htmlFor="ta_depth_3">
                                 <input 
-                                    onChange={e => setTAType(e.target.value)}
+                                    onChange={e => setTADepth(e.target.value)}
                                     type="radio" 
-                                    id='ta_type_3' 
-                                    name="technical assistance type" 
+                                    id='ta_depth_3' 
+                                    name="technical assistance depth" 
                                     value="Unsure"/>
                                 Unsure
                            </label>
