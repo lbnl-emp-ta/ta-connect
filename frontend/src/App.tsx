@@ -14,27 +14,83 @@ interface State {
     abbreviation: string;
 }
 
-async function fetchStates() {
-    const url = "http://127.0.0.1:8000/states/";
-        try {
-            const response = await fetch(url);
-            if (!response.ok) {
-                throw Error(`Request status: ${response.status}`);
-            }
-            return await response.json() as State[]
-        } catch (error) {
-            console.log(error);
-        }
+interface OrganiztionType {
+    name: string;
+    description: string;
 }
+
+
 
 function IntakeForm() {
     const [states, setStates] = useState<State[]>([]);
+    const [orgTypes, setOrgTypes] = useState<OrganiztionType[]>([])
 
-    const [name, setName] = useState<string>('');
+    const [name, setName] = useState<string>("");
+    const [title, setTitle] = useState<string>("");
+    const [stateAbbr, setStateAbbr] = useState<string>("");
+    const [orgName, setOrgName] = useState<string>("");
+    const [email, setEmail] = useState<string>("");
+    const [phone, setPhone] = useState<string>("");
+    const [orgType, setOrgType] = useState<string>("");
+    const [TAType, setTAType] = useState<string>("");
+    const [desc, setDesc] = useState<string>("")
 
-    function handleNameChange(event: ChangeEvent<HTMLInputElement>) {
-        setName(event.target.value);
-        console.log(event.target.value)
+    async function handleSubmit(event: React.SyntheticEvent<HTMLFormElement>) {
+        event.preventDefault()
+        const url = "http://127.0.0.1:8000/process-intake-form/"
+        try {
+            const response = await fetch(url, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    name: name,
+                    email: email,
+                    phone: phone,
+                    title: title,
+                    state: stateAbbr,
+                    organization: orgName,
+                    organizationType: orgType,
+                    tatype: TAType,
+                    description: desc
+                })
+            });
+
+            if (!response.ok) {
+                throw Error(`Request status: ${response.status}`);
+            }
+
+            console.log(await response.json())
+        } catch (error) {
+            console.log(error);
+        }
+    }
+
+    async function fetchStates() {
+        const url = "http://127.0.0.1:8000/states/";
+            try {
+                const response = await fetch(url);
+                if (!response.ok) {
+                    throw Error(`Request status: ${response.status}`);
+                }
+                return await response.json() as State[]
+            } catch (error) {
+                console.log(error);
+            }
+    }
+    
+    async function fetchOrganizationTypes() {
+        const url = "http://127.0.0.1:8000/organization-types/";
+            try {
+                const response = await fetch(url);
+                if (!response.ok) {
+                    throw Error(`Request status: ${response.status}`);
+                }
+                return await response.json() as OrganiztionType[]
+            } catch (error) {
+                console.log(error);
+            }
     }
 
     useEffect(() => {
@@ -55,11 +111,24 @@ function IntakeForm() {
     }, []);
 
     useEffect(() => {
+        let ignore = false;
 
-    }, [name]);
+        async function startFetchingOrganizationTypes() {
+            const json = await fetchOrganizationTypes();
+            if(!ignore && json) {
+                setOrgTypes(json);
+            }
+        }
+
+        startFetchingOrganizationTypes()
+
+        return () => {
+            ignore = true;
+        }
+    }, []);
 
     return (
-        <form className="intake-form" action="">
+        <form className="intake-form" onSubmit={handleSubmit}>
             <h1>TA Request Form</h1>
             <p id="info">
                 Required fields are followed by <strong><span aria-label="required"> *</span></strong>
@@ -75,7 +144,7 @@ function IntakeForm() {
                     </label>
                     <input 
                         value={name}
-                        onChange={handleNameChange}
+                        onChange={e => setName(e.target.value)}
                         type="text" 
                         id="name" 
                         name="full name" 
@@ -88,7 +157,13 @@ function IntakeForm() {
                             <span>Title</span>
                         </strong>
                     </label>
-                    <input type="text" id="title" name="job title" required/>
+                    <input 
+                        value={title}
+                        onChange={e => setTitle(e.target.value)}
+                        type="text" 
+                        id="title" 
+                        name="job title" 
+                        required/>
                 </p>
                 <p>
                     <label htmlFor="state">
@@ -97,7 +172,7 @@ function IntakeForm() {
                             <span aria-label="required"> *</span>
                         </strong>
                     </label>
-                    <select id="state" name='state'>
+                    <select id="state" name='state' onChange={e => setStateAbbr(e.target.value)}>
                         <option value="none"></option>
                         {
                             states.map((state) => (
@@ -113,7 +188,7 @@ function IntakeForm() {
                             <span aria-label="required"> *</span>
                         </strong>
                     </label>
-                    <input type="text" id="org-name" name="organization name" required/>
+                    <input value={orgName} onChange={e => setOrgName(e.target.value)} type="text" id="org-name" name="organization name" required/>
                 </p>
                 <p>
                     <label htmlFor="email">
@@ -122,7 +197,13 @@ function IntakeForm() {
                             <span aria-label="required"> *</span>
                         </strong>
                     </label>
-                    <input type="text" id="email" name="email" required/>
+                    <input  
+                        value={email}
+                        onChange={e => setEmail(e.target.value)}
+                        type="text" 
+                        id="email" 
+                        name="email" 
+                        required/>
                 </p>
                 <p>
                     <label htmlFor="phone">
@@ -131,7 +212,13 @@ function IntakeForm() {
                             <span aria-label="required"> *</span>
                         </strong>
                     </label>
-                    <input type="text" id="phone" name="phone number" required/>
+                    <input 
+                        value={phone}
+                        onChange={e => setPhone(e.target.value)}
+                        type="text" 
+                        id="phone" 
+                        name="phone number" 
+                        required/>
                 </p>
                 <fieldset id="org-type-fieldset">
                     <legend>
@@ -141,27 +228,21 @@ function IntakeForm() {
                         </strong>
                     </legend>
                     <ul>
-                        <li>
-                            <label htmlFor="org_type_1">
-                                <input type="radio" id='org_type_1' name="organization type" value="1"/>
-                                Utility Commission
-                            </label>
-        
-                        </li>
-                        <li>
-                            <label htmlFor="org_type_2">
-                                <input type="radio" id='org_type_2' name="organization type" value="2"/>
-                                Energy Office
-                            </label>
-        
-                        </li>
-                        <li>
-                            <label htmlFor="org_type_3">
-                                <input type="radio" id='org_type_3' name="organization type" value="3"/>
-                                Regional State Organization
-                            </label>
-        
-                        </li>
+                        {
+                            orgTypes.map((type) => (
+                                <li key={type.name}>
+                                    <label htmlFor={`${type.name}-radio`}>
+                                        <input 
+                                            onChange={e => setOrgType(e.target.value)}
+                                            type="radio" 
+                                            id={`${type.name}-radio`} 
+                                            name="organization type" 
+                                            value={type.name}/>
+                                        {type.name}
+                                    </label>
+                                </li>
+                            ))
+                        }
                     </ul>
                 </fieldset>
             </section>
@@ -182,19 +263,34 @@ function IntakeForm() {
                     <ul>
                         <li>
                             <label htmlFor="ta_type_1">
-                                <input type="radio" id='ta_type_1' name="technical assistance type" value="1"/>
+                                <input 
+                                    onChange={e => setTAType(e.target.value)}
+                                    type="radio" 
+                                    id='ta_type_1' 
+                                    name="technical assistance type" 
+                                    value="Help Desk"/>
                                 Help Desk
                            </label>
                         </li>
                         <li>
                             <label htmlFor="ta_type_2">
-                                <input type="radio" id='ta_type_2' name="technical assistance type" value="1"/>
+                                <input 
+                                    onChange={e => setTAType(e.target.value)}
+                                    type="radio" 
+                                    id='ta_type_2' 
+                                    name="technical assistance type" 
+                                    value="Expert Match"/>
                                 Expert Match
                            </label>
                         </li>
                         <li>
                             <label htmlFor="ta_type_3">
-                                <input type="radio" id='ta_type_3' name="technical assistance type" value="1"/>
+                                <input 
+                                    onChange={e => setTAType(e.target.value)}
+                                    type="radio" 
+                                    id='ta_type_3' 
+                                    name="technical assistance type" 
+                                    value="Unsure"/>
                                 Unsure
                            </label>
                         </li>
@@ -256,7 +352,12 @@ function IntakeForm() {
                         <i>This field is limited to 4000 characters.</i>
                     </p>
                     <p>
-                        <textarea name="description" id="desc" maxLength={4000} required/>
+                        <textarea
+                            value={desc}
+                            onChange={e => setDesc(e.target.value)} 
+                            name="description" 
+                            id="desc" 
+                            maxLength={4000} required/>
                     </p>
                 </fieldset>
             </section>
