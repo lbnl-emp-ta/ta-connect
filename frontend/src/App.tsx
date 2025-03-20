@@ -1,3 +1,4 @@
+import {ChangeEvent, useEffect, useState} from 'react'
 import './App.css'
 
 function App() {
@@ -7,7 +8,56 @@ function App() {
   )
 }
 
+interface State {
+    id: number;
+    name: string;
+    abbreviation: string;
+}
+
+async function fetchStates() {
+    const url = "http://127.0.0.1:8000/states/";
+        try {
+            const response = await fetch(url);
+            if (!response.ok) {
+                throw Error(`Request status: ${response.status}`);
+            }
+            return await response.json() as State[]
+        } catch (error) {
+            console.log(error);
+        }
+}
+
 function IntakeForm() {
+    const [states, setStates] = useState<State[]>([]);
+
+    const [name, setName] = useState<string>('');
+
+    function handleNameChange(event: ChangeEvent<HTMLInputElement>) {
+        setName(event.target.value);
+        console.log(event.target.value)
+    }
+
+    useEffect(() => {
+        let ignore = false;
+
+        async function startFetchingStates() {
+            const json = await fetchStates();
+            if(!ignore && json) {
+                setStates(json);
+            }
+        }
+
+        startFetchingStates()
+
+        return () => {
+            ignore = true;
+        }
+    }, []);
+
+    useEffect(() => {
+
+    }, [name]);
+
     return (
         <form className="intake-form" action="">
             <h1>TA Request Form</h1>
@@ -23,7 +73,14 @@ function IntakeForm() {
                             <span aria-label="required"> *</span>
                         </strong>
                     </label>
-                    <input type="text" id="name" name="full name" required/>
+                    <input 
+                        value={name}
+                        onChange={handleNameChange}
+                        type="text" 
+                        id="name" 
+                        name="full name" 
+                        required
+                        />
                 </p>
                 <p>
                     <label htmlFor="title">
@@ -42,9 +99,11 @@ function IntakeForm() {
                     </label>
                     <select id="state" name='state'>
                         <option value="none"></option>
-                        <option value="test1">Test 1</option>
-                        <option value="test2">Test 2</option>
-                        <option value="test3">Test 3</option>
+                        {
+                            states.map((state) => (
+                                <option key={state.abbreviation} value={state.abbreviation}>{state.name}</option>
+                            ))
+                        }
                     </select>
                 </p>
                 <p>
@@ -75,7 +134,12 @@ function IntakeForm() {
                     <input type="text" id="phone" name="phone number" required/>
                 </p>
                 <fieldset id="org-type-fieldset">
-                    <legend><strong>Organization Type</strong></legend>
+                    <legend>
+                        <strong>
+                            <span>Organization Type</span>
+                            <span aria-label="required"> *</span>
+                        </strong>
+                    </legend>
                     <ul>
                         <li>
                             <label htmlFor="org_type_1">
