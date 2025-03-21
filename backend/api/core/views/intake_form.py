@@ -76,13 +76,14 @@ class ProcessIntakeForm(CreateAPIView):
             return Response({"message": str(e)}, status=status.HTTP_400_BAD_REQUEST)
         
         finally:
-            _request.delete()
+            _customer_request_relationship.delete()
             
-            if (_org_created):
-                _org.delete()
+            _request.delete()
             
             if (_customer_created):
                 _customer.delete()
+                
+            if (_org_created):
+                _org.delete() 
             
-            _customer_request_relationship.delete()
             
