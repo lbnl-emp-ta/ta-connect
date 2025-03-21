@@ -1,6 +1,5 @@
 import {useEffect, useState} from 'react'
 import './App.css'
-import { isNotEmittedStatement } from 'typescript';
 
 function App() {
   return (
