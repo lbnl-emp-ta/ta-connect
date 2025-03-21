@@ -1,26 +1,12 @@
 import {useEffect, useState} from 'react'
 import './App.css'
+import { isNotEmittedStatement } from 'typescript';
 
 function App() {
   return (
     <IntakeForm>
     </IntakeForm>
   )
-}
-
-interface State {
-    id: number;
-    name: string;
-    abbreviation: string;
-}
-
-interface OrganiztionType {
-    name: string;
-    description: string;
-}
-
-interface TransmissionPlanningRegion {
-    name: string;
 }
 
 function IntakeForm() {
@@ -39,6 +25,21 @@ function IntakeForm() {
     const [TADepth, setTADepth] = useState<string>("Help Desk");
     const [desc, setDesc] = useState<string>("test desc")
     const [tpr, setTPR] = useState<string>("TestTPR")
+
+    interface State {
+        id: number;
+        name: string;
+        abbreviation: string;
+    }
+    
+    interface OrganiztionType {
+        name: string;
+        description: string;
+    }
+    
+    interface TransmissionPlanningRegion {
+        name: string;
+    }
 
     async function handleSubmit(event: React.SyntheticEvent<HTMLFormElement>) {
         event.preventDefault()
@@ -70,98 +71,55 @@ function IntakeForm() {
 
             console.log(await response.json())
         } catch (error) {
-            console.log(error);
+            if(error instanceof Error) {
+                console.error(error.message);
+            }
         }
     }
 
-    async function fetchStates() {
-        const url = "http://127.0.0.1:8000/states/";
+    async function fetchListOf<T>(url: string): Promise<T[] | undefined> {
             try {
                 const response = await fetch(url);
                 if (!response.ok) {
                     throw Error(`Request status: ${response.status}`);
                 }
-                return await response.json() as State[]
+                return await response.json() as T[];
             } catch (error) {
-                console.log(error);
-            }
-    }
-    
-    async function fetchOrganizationTypes() {
-        const url = "http://127.0.0.1:8000/organization-types/";
-            try {
-                const response = await fetch(url);
-                if (!response.ok) {
-                    throw Error(`Request status: ${response.status}`);
+                if(error instanceof Error) {
+                    console.error("Error:", error.message);
+                } else {
+                    console.error("An unknown error has occured.");
                 }
-                return await response.json() as OrganiztionType[]
-            } catch (error) {
-                console.log(error);
             }
     }
 
-    async function fetchTPRs() {
-        const url = "http://127.0.0.1:8000/transmission-planning-regions/";
-            try {
-                const response = await fetch(url);
-                if (!response.ok) {
-                    throw Error(`Request status: ${response.status}`);
-                }
-                return await response.json() as TransmissionPlanningRegion[]
-            } catch (error) {
-                console.log(error);
-            }
-    }
-
-    useEffect(() => {
+    function updateEffectListOf<T>(withCallback: Function, fromURL: string) {
         let ignore = false;
 
-        async function startFetchingStates() {
-            const json = await fetchStates();
+        async function startFetchingData() {
+            const json = await fetchListOf<T>(fromURL);
             if(!ignore && json) {
-                setStates(json);
+                withCallback(json);
             }
         }
 
-        startFetchingStates()
+        startFetchingData()
 
         return () => {
             ignore = true;
         }
+    }
+
+    useEffect(() => {
+        updateEffectListOf<State>(setStates, "http://127.0.0.1:8000/states/")
     }, []);
 
     useEffect(() => {
-        let ignore = false;
-
-        async function startFetchingOrganizationTypes() {
-            const json = await fetchOrganizationTypes();
-            if(!ignore && json) {
-                setOrgTypes(json);
-            }
-        }
-
-        startFetchingOrganizationTypes()
-
-        return () => {
-            ignore = true;
-        }
+        updateEffectListOf<OrganiztionType>(setOrgTypes, "http://127.0.0.1:8000/organization-types/")
     }, []);
 
-    useEffect(() => {
-        let ignore = false;
-
-        async function startFetchingTPRs() {
-            const json = await fetchTPRs();
-            if(!ignore && json) {
-                setTPRs(json);
-            }
-        }
-
-        startFetchingTPRs()
-
-        return () => {
-            ignore = true;
-        }
+    useEffect(() => {``
+        updateEffectListOf<TransmissionPlanningRegion>(setTPRs, "http://127.0.0.1:8000/transmission-planning-regions/")
     }, []);
 
     return (
