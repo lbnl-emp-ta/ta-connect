@@ -10,7 +10,7 @@ class RequestCreateView(generics.CreateAPIView):
 
     
     def post(self, request):
-        imcoming_fields_to_keep = ["description"]
+        imcoming_fields_to_keep = ["description", "depth"]
         incoming_data = request.data.copy()
         
         # Filter incoming fields
@@ -24,7 +24,7 @@ class RequestCreateView(generics.CreateAPIView):
         self.perform_create(serializer)
         headers = self.get_success_headers(serializer.data)
         
-        outgoing_fields_to_keep = ["description", "date_created"]
+        outgoing_fields_to_keep = ["description", "depth", "date_created"]
         outgoing_data = serializer.data.copy()
         
         # Filter outgoing fields
