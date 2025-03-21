@@ -46,7 +46,7 @@ class TestRequestModel():
             request.save()
             
             
-    def test_can_set_proj_start_date_if_proj_completion_date_null(self):
+    def test_can_set_proj_start_date_if_proj_completion_date_null(self, test_depth):
         """
         The projected start date can be set if any valid future date
         if the projected completion date has not been set.
@@ -59,6 +59,7 @@ class TestRequestModel():
         try:
             Request.objects.create(
                 description="test",
+                depth=test_depth,
                 proj_start_date=arbitrary_future_date, 
                 proj_completion_date=None
             )
@@ -67,7 +68,7 @@ class TestRequestModel():
             
         assert not raised_validation_error
         
-    def test_can_set_proj_completion_date_if_proj_start_date_null(self):
+    def test_can_set_proj_completion_date_if_proj_start_date_null(self, test_depth):
         """
         The projected start date can be set if any valid future date
         if the projected completion date has not been set.
@@ -80,6 +81,7 @@ class TestRequestModel():
         try:
             Request.objects.create(
                 description="test",
+                depth=test_depth,
                 proj_start_date=None, 
                 proj_completion_date=arbitrary_future_date
             )

@@ -80,11 +80,12 @@ def test_request_status(django_db_blocker):
         return _test_request_status
 
 @pytest.fixture(scope="function")
-def test_request(django_db_blocker, test_request_status):
+def test_request(django_db_blocker, test_request_status, test_depth):
     with django_db_blocker.unblock():
         _test_request, _ = Request.objects.get_or_create(
             status=test_request_status,
-            description="for testing"
+            description="for testing",
+            depth=test_depth
         )
         
         return _test_request

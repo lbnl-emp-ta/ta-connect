@@ -25,14 +25,17 @@ class ProcessIntakeForm(CreateAPIView):
             )
             
             _org = Organization.objects.filter(name=organization).first()
+            _org_created = False
             if (not _org):
                 _org = Organization.objects.create(
                     name=organization, 
                     address=organization_address, 
                     type=OrganizationType.objects.filter(name=organization_type).first()
                 )
+                _org_created = True
             
-            _customer = Customer.objects.filter(email=email, name=name).first() 
+            _customer = Customer.objects.filter(email=email, name=name).first()
+            _customer_created = False
             if(not _customer):
                 _customer = Customer.objects.create(
                     org = _org,
@@ -43,15 +46,43 @@ class ProcessIntakeForm(CreateAPIView):
                     phone=phone,
                     title=title
                 )
+                _customer_created = True
             
-            CustomerRequestRelationship.objects.create(
+            _customer_request_relationship = CustomerRequestRelationship.objects.create(
                 request=_request,
                 customer=_customer,
                 customer_type = CustomerType.objects.get(name="Primary Contact")
             )
             
+            return Response(
+                {
+                    "name": _customer.name,
+                    "email": _customer.email,
+                    "pheone": _customer.phone,
+                    "title": _customer.title,
+                    "tpr": _customer.tpr.name,
+                    "state": _customer.state.abbreviation,
+                    "organization": _customer.org.name,
+                    "organizationAddress": _customer.org.address,
+                    "organizationType": _customer.org.type,
+                    "tadepth": _request.depth.name,
+                    "description": _request.description
+                }, 
+                status=status.HTTP_201_CREATED
+            )
+            
         except Exception as e:
-            print(e.__str__())
-            return Response({"message": e.__str__()}, status=status.HTTP_400_BAD_REQUEST)
+            print(str(e))
+            return Response({"message": str(e)}, status=status.HTTP_400_BAD_REQUEST)
         
-        return Response(request.data, status=status.HTTP_201_CREATED)
+        finally:
+            _request.delete()
+            
+            if (_org_created):
+                _org.delete()
+            
+            if (_customer_created):
+                _customer.delete()
+            
+            _customer_request_relationship.delete()
+            
