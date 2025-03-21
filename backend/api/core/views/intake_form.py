@@ -18,6 +18,13 @@ class ProcessIntakeForm(CreateAPIView):
         ta_depth = request.data.get("tadepth", None)
         desc = request.data.get("description", None)
         
+        
+        _customer_request_relationship = None
+        _request = None
+        _customer = None
+        _customer_created = False
+        _org = None
+        _org_created = False
         try:
             _request = Request.objects.create(
                 description=desc, 
@@ -58,13 +65,13 @@ class ProcessIntakeForm(CreateAPIView):
                 {
                     "name": _customer.name,
                     "email": _customer.email,
-                    "pheone": _customer.phone,
+                    "phone": _customer.phone,
                     "title": _customer.title,
                     "tpr": _customer.tpr.name,
                     "state": _customer.state.abbreviation,
                     "organization": _customer.org.name,
                     "organizationAddress": _customer.org.address,
-                    "organizationType": _customer.org.type,
+                    "organizationType": _customer.org.type.name,
                     "tadepth": _request.depth.name,
                     "description": _request.description
                 }, 
@@ -76,14 +83,16 @@ class ProcessIntakeForm(CreateAPIView):
             return Response({"message": str(e)}, status=status.HTTP_400_BAD_REQUEST)
         
         finally:
-            _customer_request_relationship.delete()
+            if(_customer_request_relationship):
+                _customer_request_relationship.delete()
             
-            _request.delete()
+            if(_request):
+                _request.delete()
             
-            if (_customer_created):
+            if (_customer_created and _customer):
                 _customer.delete()
                 
-            if (_org_created):
+            if (_org_created and _org):
                 _org.delete() 
             
             

@@ -8,7 +8,7 @@ class Customer(models.Model):
     tpr = models.ForeignKey(TransmissionPlanningRegion, on_delete=models.PROTECT, verbose_name="transmission planning region")
     email = models.EmailField(max_length=256, unique=True)
     name = models.CharField(max_length=256)
-    phone = models.CharField(max_length=64, verbose_name="phone number")
+    phone = models.CharField(max_length=64, verbose_name="phone number", default=None)
     title = models.CharField(max_length=256, verbose_name="job title")
     
     requests = models.ManyToManyField(Request, through='CustomerRequestRelationship', related_name="customers")
