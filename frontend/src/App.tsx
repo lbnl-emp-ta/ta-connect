@@ -1,5 +1,24 @@
 import {useEffect, useState} from 'react'
+
 import './App.css'
+import { MuiTelInput } from 'mui-tel-input'
+import { 
+        Autocomplete, 
+        Button, 
+        Divider, 
+        FormControl, 
+        FormControlLabel, 
+        FormLabel, 
+        InputLabel, 
+        MenuItem, 
+        Radio, 
+        RadioGroup, 
+        Select, 
+        Stack, 
+        Switch, 
+        TextField, 
+        Typography 
+    } from '@mui/material';
 
 function App() {
   return (
@@ -15,7 +34,7 @@ function IntakeForm() {
 
     const [name, setName] = useState<string>("test name");
     const [title, setTitle] = useState<string>("test title");
-    const [stateAbbr, setStateAbbr] = useState<string>("NY");
+    const [state, setState] = useState<State>({id:47 , name: "New York", abbreviation: "NY"});
     const [orgName, setOrgName] = useState<string>("test org name");
     const [orgAddress, setOrgAddress] = useState<string>("test org addr");
     const [email, setEmail] = useState<string>("test email");
@@ -55,7 +74,7 @@ function IntakeForm() {
                     phone: phone,
                     title: title,
                     tpr: tpr,
-                    state: stateAbbr,
+                    state: state.abbreviation,
                     organization: orgName,
                     organizationAddress: orgAddress,
                     organizationType: orgType,
@@ -92,7 +111,7 @@ function IntakeForm() {
             }
     }
 
-    function updateEffectListOf<T>(withCallback: Function, fromURL: string) {
+    function updateLocalListOf<T>(withCallback: Function, fromURL: string) {
         let ignore = false;
 
         async function startFetchingData() {
@@ -109,288 +128,195 @@ function IntakeForm() {
         }
     }
 
+    const handlePhoneChange = (newPhone: string) => {
+        setPhone(newPhone)
+    }
+
     useEffect(() => {
-        updateEffectListOf<State>(setStates, "http://127.0.0.1:8000/states/")
+        updateLocalListOf<State>(setStates, "http://127.0.0.1:8000/states/")
     }, []);
 
     useEffect(() => {
-        updateEffectListOf<OrganiztionType>(setOrgTypes, "http://127.0.0.1:8000/organization-types/")
+        updateLocalListOf<OrganiztionType>(setOrgTypes, "http://127.0.0.1:8000/organization-types/")
     }, []);
 
     useEffect(() => {``
-        updateEffectListOf<TransmissionPlanningRegion>(setTPRs, "http://127.0.0.1:8000/transmission-planning-regions/")
+        updateLocalListOf<TransmissionPlanningRegion>(setTPRs, "http://127.0.0.1:8000/transmission-planning-regions/")
     }, []);
 
     return (
         <form className="intake-form" onSubmit={handleSubmit}>
-            <h1>TA Request Form</h1>
-            <p id="info">
-                Required fields are followed by <strong><span aria-label="required"> *</span></strong>
-            </p>
-            <section>
-                <h2>Personal Information</h2>
-                <p>
-                    <label htmlFor="name">
-                        <strong>
-                            <span>First & Last Name</span>
-                            <span aria-label="required"> *</span>
-                        </strong>
-                    </label>
-                    <input 
-                        value={name}
+            <Stack spacing={2}>
+                <Typography variant="h2">TA Request Form</Typography>
+                <Typography id="info" variant="subtitle1">
+                    Required fields are followed by <strong><span aria-label="required"> *</span></strong>
+                </Typography>
+                <Divider/>
+                <Stack spacing={2}>
+                    <Typography variant='h4'>Personal Information</Typography>
+                    <TextField 
+                        variant='outlined' 
+                        label="First & Last Name" 
+                        fullWidth={true}
+                        required={true}
                         onChange={e => setName(e.target.value)}
-                        type="text" 
-                        id="name" 
-                        name="full name" 
-                        required
-                        />
-                </p>
-                <p>
-                    <label htmlFor="email">
-                        <strong>
-                            <span>Email</span>
-                            <span aria-label="required"> *</span>
-                        </strong>
-                    </label>
-                    <input  
-                        value={email}
+                        value={name}
+                    />
+                    <TextField 
+                        variant='outlined' 
+                        label="Email" 
+                        fullWidth={true}
+                        required={true}
                         onChange={e => setEmail(e.target.value)}
-                        type="text" 
-                        id="email" 
-                        name="email" 
-                        required/>
-                </p>
-                <p>
-                    <label htmlFor="phone">
-                        <strong>
-                            <span>Phone</span>
-                            <span aria-label="required"> *</span>
-                        </strong>
-                    </label>
-                    <input 
+                        value={email}
+                    />
+                    <MuiTelInput 
+                        variant='outlined' 
+                        label="Phone Number"
+                        defaultCountry="US"
+                        MenuProps={{ transitionDuration: 0}}
+                        focusOnSelectCountry={false}
+                        fullWidth={true}
+                        required={true}
                         value={phone}
-                        onChange={e => setPhone(e.target.value)}
-                        type="text" 
-                        id="phone" 
-                        name="phone number" 
-                        required/>
-                </p>
-                <p>
-                    <label htmlFor="title">
-                        <strong>
-                            <span>Title</span>
-                            <span aria-label="required"> *</span>
-                        </strong>
-                    </label>
-                    <input 
-                        value={title}
+                        onChange={handlePhoneChange}
+                    />
+                    <TextField 
+                        variant='outlined' 
+                        label="Title" 
+                        fullWidth={true}
+                        required={true}
                         onChange={e => setTitle(e.target.value)}
-                        type="text" 
-                        id="title" 
-                        name="job title" 
-                        required/>
-                </p>
-                <p>
-                    <label htmlFor="tpr">
-                        <strong>
-                            <span>Tramission Planning Region</span>
-                            <span aria-label="required"> *</span>
-                        </strong>
-                    </label>
-                    <select id="tpr" name='transmission planning region' onChange={e => setTPR(e.target.value)}>
-                        <option value="none"></option>
-                        {
-                            tprs.map((region) => (
-                                <option key={region.name} value={region.name}>{region.name}</option>
-                            ))
-                        }
-                    </select>
-                </p>
-                <p>
-                    <label htmlFor="state">
-                        <strong>
-                            <span>State</span>
-                            <span aria-label="required"> *</span>
-                        </strong>
-                    </label>
-                    <select id="state" name='state' onChange={e => setStateAbbr(e.target.value)}>
-                        <option value="none"></option>
-                        {
-                            states.map((state) => (
-                                <option key={state.abbreviation} value={state.abbreviation}>{state.name}</option>
-                            ))
-                        }
-                    </select>
-                </p>
-                <p>
-                    <label htmlFor="org-name">
-                        <strong>
-                            <span>Organization Name</span>
-                            <span aria-label="required"> *</span>
-                        </strong>
-                    </label>
-                    <input value={orgName} onChange={e => setOrgName(e.target.value)} type="text" id="org-name" name="organization name" required/>
-                </p>
-                <p>
-                    <label htmlFor="org-address">
-                        <strong>
-                            <span>Organization Address</span>
-                            <span aria-label="required"> *</span>
-                        </strong>
-                    </label>
-                    <input value={orgAddress} onChange={e => setOrgAddress(e.target.value)} type="text" id="org-address" name="organization address" required/>
-                </p>
-                <fieldset id="org-type-fieldset">
-                    <legend>
-                        <strong>
-                            <span>Organization Type</span>
-                            <span aria-label="required"> *</span>
-                        </strong>
-                    </legend>
-                    <ul>
-                        {
-                            orgTypes.map((type) => (
-                                <li key={type.name}>
-                                    <label htmlFor={`${type.name}-radio`}>
-                                        <input 
-                                            onChange={e => setOrgType(e.target.value)}
-                                            type="radio" 
-                                            id={`${type.name}-radio`} 
-                                            name="organization type" 
-                                            value={type.name}/>
-                                        {type.name}
-                                    </label>
-                                </li>
-                            ))
-                        }
-                    </ul>
-                </fieldset>
-            </section>
-            <hr />
-            <section>
-                <h2>Technical Assistance Information</h2>
-                <fieldset>
-                    <legend>
-                        <strong>
-                            <span>Technical Assistance Depth</span>
-                            <span aria-label="required"> *</span>
-                        </strong>
-                    </legend>
-                    <p>
-                        What kind of Technical Assistance are you looking for? 
-                        If you don't know select "Unsure".
-                    </p>
-                    <ul>
-                        <li>
-                            <label htmlFor="ta_depth_1">
-                                <input 
-                                    onChange={e => setTADepth(e.target.value)}
-                                    type="radio" 
-                                    id='ta_depth_1' 
-                                    name="technical assistance depth" 
-                                    value="Help Desk"/>
-                                Help Desk
-                           </label>
-                        </li>
-                        <li>
-                            <label htmlFor="ta_depth_2">
-                                <input 
-                                    onChange={e => setTADepth(e.target.value)}
-                                    type="radio" 
-                                    id='ta_depth_2' 
-                                    name="technical assistance depth" 
-                                    value="Expert Match"/>
-                                Expert Match
-                           </label>
-                        </li>
-                        <li>
-                            <label htmlFor="ta_depth_3">
-                                <input 
-                                    onChange={e => setTADepth(e.target.value)}
-                                    type="radio" 
-                                    id='ta_depth_3' 
-                                    name="technical assistance depth" 
-                                    value="Unsure"/>
-                                Unsure
-                           </label>
-                        </li>
-                    </ul>
-                </fieldset>
-                <fieldset>
-                    <legend><strong>Urgency</strong></legend>
-                    <p>
-                        How urgent is this request? Please note that this is not a guarantee 
-                        that Technical Assistance can be scheduled within a specific time frame.
-                    </p>
-                    <ul>
-                        <li>
-                            <label htmlFor="urgency_1">
-                                <input type="radio" id='urgency_1' name="urgency" value="1"/>
-                                Within 1 week
-                           </label>
-                        </li>
-                        <li>
-                            <label htmlFor="urgency_2">
-                                <input type="radio" id='urgency_2' name="urgency" value="2"/>
-                                Within 1 month
-                           </label>
-                        </li>
-                        <li>
-                            <label htmlFor="urgency_3">
-                                <input type="radio" id='urgency_3' name="urgency" value="3"/>
-                                Within 3 month
-                           </label>
-                        </li>
-                        <li>
-                            <label htmlFor="urgency_4">
-                                <input type="radio" id='urgency_4' name="urgency" value="4"/>
-                                Within 6 month
-                           </label>
-                        </li>
-                        <li>
-                            <label htmlFor="urgency_5">
-                                <input type="radio" id='urgency_5' name="urgency" value="5"/>
-                                Unsure
-                           </label>
-                        </li>
-                    </ul>
-                </fieldset>
-                <fieldset>
-                    <legend>
-                        <label htmlFor="desc">
-                        <strong>
-                            <span>Description</span>
-                            <span aria-label="required"> *</span>
-                        </strong>
-                    </label>
-                    </legend>
-                    <p>
-                        Please describe the Technical Assistance you are looking to receive. 
-                        Please provide as much detail as possible.
-                    </p>
-                    <p>
-                        <i>This field is limited to 4000 characters.</i>
-                    </p>
-                    <p>
-                        <textarea
-                            value={desc}
-                            onChange={e => setDesc(e.target.value)} 
-                            name="description" 
-                            id="desc" 
-                            maxLength={4000} required/>
-                    </p>
-                </fieldset>
-            </section>
-            <hr />
-            <section>
-                <label htmlFor="copy-email">
-                    <input type="checkbox" id='copy-email' name="send copy of email" value="1"/>
-                    Send me a copy of my responses
-                </label>
-                <p>
-                    <button type="submit">Submit</button>
-                </p>
-            </section>
+                        value={title}
+                    />
+                    <FormControl fullWidth required={true} >
+                        <InputLabel id="tpr-label">Tramission Planning Region</InputLabel>
+                        <Select 
+                            id="tpr-select"
+                            label="Tramission Planning Region"
+                            labelId="tpr-label"
+                            required={true}
+                            defaultValue=''
+                            value={
+                                (tpr === undefined ||
+                                tpr === null ||
+                                tprs.length === 0) ? '' : tpr}
+                            onChange={e => setTPR(e.target.value as React.SetStateAction<string>)}
+                        >
+                            {
+                                tprs.map((region) => (
+                                    <MenuItem key={region.name} value={region.name}>
+                                        {region.name}
+                                    </MenuItem>
+                                ))
+                            }
+                        </Select> 
+                    </FormControl>
+                    <Autocomplete
+                        disablePortal
+                        options={states}
+                        getOptionLabel={(option) => option.name}
+                        sx={{ width: 300 }}
+                        renderInput={(params) => <TextField {...params} required={true} label="State" />}
+                        value={state}
+                        onChange={(_: any, newValue: State | null) => {
+                            setState(newValue as React.SetStateAction<State>);
+                        }}
+                    />
+                    <TextField 
+                        variant='outlined' 
+                        label="Organization Name" 
+                        fullWidth={true}
+                        required={true}
+                        onChange={e => setOrgName(e.target.value)}
+                        value={orgName}
+                    />
+                    <TextField 
+                        variant='outlined' 
+                        label="Organization Address" 
+                        fullWidth={true}
+                        required={true}
+                        onChange={e => setOrgAddress(e.target.value)}
+                        value={orgAddress}
+                    />
+                    <FormControl>
+                        <FormLabel id="org-type-radio-group">Organization Type</FormLabel>
+                        <RadioGroup
+                            aria-labelledby="org-type-radio-group"
+                            value={orgType}
+                            onChange={e => setOrgType(e.target.value)}
+                            name="org-type-radio-group"
+                        >
+                            {
+                                orgTypes.map((type => (
+                                    <FormControlLabel key={type.name} value={type.name} control={<Radio />} label={type.name} />
+                                )))
+                            }
+                        </RadioGroup>
+                    </FormControl>
+                </Stack>
+                <Divider />
+                <Stack spacing={2}>
+                    <Typography variant='h4'>Technical Assistance Information</Typography>
+                    <FormControl>
+                        <Stack spacing={2}>
+                            <FormLabel id="ta-depth-radio-group">Techinical Assistance Depth</FormLabel>
+                            <Typography variant='body2'>
+                                What kind of Technical Assistance are you looking for? 
+                                If you don't know select "Unsure".
+                            </Typography> 
+                        </Stack>
+                        <RadioGroup
+                            aria-labelledby="ta-depth-radio-group"
+                            defaultValue={"Unsure"}
+                            value={TADepth}
+                            onChange={e => setTADepth(e.target.value)}
+                            name="ta-depth-radio-group"
+                        >
+                            <FormControlLabel value="Help Desk" control={<Radio />} label="Help Desk" />
+                            <FormControlLabel value="Expert Match" control={<Radio />} label="Expert Match" />
+                            <FormControlLabel value="Unsure" control={<Radio />} label="Unsure" />
+                        </RadioGroup>
+                    </FormControl>
+                    <FormControl>
+                        <Stack spacing={2}>
+                            <FormLabel id="urgency-radio-group">Urgency</FormLabel>
+                            <Typography variant='body2'>
+                                How urgent is this request? Please note that this is not a guarantee 
+                                that Technical Assistance can be scheduled within a specific time frame.
+                            </Typography> 
+                        </Stack>
+                        <RadioGroup
+                            aria-labelledby="urgency-radio-group"
+                            name="urgency-radio-group"
+                            defaultValue="Unsure"
+                        >
+                            <FormControlLabel value="1 week" control={<Radio />} label="Within 1 week" />
+                            <FormControlLabel value="1 month" control={<Radio />} label="Within 1 month" />
+                            <FormControlLabel value="3 months" control={<Radio />} label="Within 3 months" />
+                            <FormControlLabel value="6 months" control={<Radio />} label="Within 6 months" />
+                            <FormControlLabel value="Unsure" control={<Radio />} label="Unsure" />
+                        </RadioGroup>
+                    </FormControl>
+                    <TextField
+                        label="Description"
+                        placeholder='Please describe your request here (maximum of 4000 characters).'
+                        value={desc}
+                        onChange={e => setDesc(e.target.value)}
+                        multiline
+                        rows={10}
+                        required
+                        slotProps={{htmlInput: {maxLength: 4000}}}
+                    />
+                </Stack>
+                <Divider />
+                <Stack spacing={2}>
+                    <FormControl>
+                        <FormControlLabel control={<Switch />} label="Send me a copy of my responses" />
+                    </FormControl>
+                    <Button type="submit" variant="contained">Submit</Button>
+                </Stack>
+            </Stack>
         </form>
     )
 }

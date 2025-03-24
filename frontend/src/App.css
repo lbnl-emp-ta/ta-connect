@@ -34,20 +34,12 @@
     flex-direction: column;
 }
 
-.intake-form p#info{
-    display: inline-block;
-}
-
 .intake-form input {
     height: 1.7em;
 }
 
 .intake-form select {
     font: inherit;
-}
-
-.intake-form span[aria-label="required"] {
-    color: red;
 }
 
 .intake-form fieldset {
@@ -62,11 +54,6 @@
 .intake-form #desc {
     height: 20em;
     resize: none;
-}
-
-.intake-form button[type="submit"] {
-    width: fit-content;
-    background-color: lightblue;
 }
 
 hr {
