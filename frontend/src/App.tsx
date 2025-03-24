@@ -1,7 +1,7 @@
 import {useEffect, useState} from 'react'
 
 import './App.css'
-import { MuiTelInput } from 'mui-tel-input'
+import { MuiTelInput, matchIsValidTel } from 'mui-tel-input'
 import { 
         Autocomplete, 
         Button, 
@@ -21,10 +21,10 @@ import {
     } from '@mui/material';
 
 function App() {
-  return (
-    <IntakeForm>
-    </IntakeForm>
-  )
+    return (
+        <IntakeForm>
+        </IntakeForm>
+    )
 }
 
 function IntakeForm() {
@@ -32,17 +32,23 @@ function IntakeForm() {
     const [orgTypes, setOrgTypes] = useState<OrganiztionType[]>([])
     const [tprs, setTPRs] = useState<TransmissionPlanningRegion[]>([])
 
-    const [name, setName] = useState<string>("test name");
-    const [title, setTitle] = useState<string>("test title");
-    const [state, setState] = useState<State>({id:47 , name: "New York", abbreviation: "NY"});
-    const [orgName, setOrgName] = useState<string>("test org name");
-    const [orgAddress, setOrgAddress] = useState<string>("test org addr");
-    const [email, setEmail] = useState<string>("test email");
-    const [phone, setPhone] = useState<string>("999-999-9999");
-    const [orgType, setOrgType] = useState<string>("Utility Commission");
-    const [TADepth, setTADepth] = useState<string>("Help Desk");
-    const [desc, setDesc] = useState<string>("test desc")
-    const [tpr, setTPR] = useState<string>("TestTPR")
+    const [name, setName] = useState<string>("");
+    const [title, setTitle] = useState<string>("");
+    const [state, setState] = useState<State | null>(null);
+    const [orgName, setOrgName] = useState<string>("");
+    const [orgAddress, setOrgAddress] = useState<string>("");
+    const [email, setEmail] = useState<string>("");
+    const [phone, setPhone] = useState<string>("");
+    const [orgType, setOrgType] = useState<string>("");
+    const [TADepth, setTADepth] = useState<string>("");
+    const [desc, setDesc] = useState<string>("")
+    const [tpr, setTPR] = useState<string>("")
+
+    const [phoneError, setPhoneError] = useState<boolean>(false);
+    const [phoneHelperText, setPhoneHelperText] = useState<string>("");
+
+    const [emailError, setEmailError] = useState<boolean>(false);
+    const [emailHelperText, setEmailHelperText] = useState<string>("");
 
     interface State {
         id: number;
@@ -74,7 +80,7 @@ function IntakeForm() {
                     phone: phone,
                     title: title,
                     tpr: tpr,
-                    state: state.abbreviation,
+                    state: state?.abbreviation,
                     organization: orgName,
                     organizationAddress: orgAddress,
                     organizationType: orgType,
@@ -128,9 +134,40 @@ function IntakeForm() {
         }
     }
 
-    const handlePhoneChange = (newPhone: string) => {
+    function handlePhoneChange(newPhone: string) {
+        function validatePhoneNumber(phone: string) {
+            if (matchIsValidTel(phone)) {
+                setPhoneError(false);
+                setPhoneHelperText("");
+            } else {
+                setPhoneError(true);
+                setPhoneHelperText("Not a valid phone number.");
+            }
+        }
+
+        validatePhoneNumber(newPhone);
         setPhone(newPhone)
     }
+
+    function handleEmailChange(newEmail: string) {
+        function validateEmail(email: string) {
+            let re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+            if (re.test(email) || email === "") {
+                setEmailError(false);
+                setEmailHelperText("");
+            } else {
+                setEmailError(true);
+                setEmailHelperText("Not a valid email.");
+            }
+        }
+
+        validateEmail(newEmail);
+        setEmail(newEmail);
+    }
+
+    useEffect(() => {
+        document.title = "Intake Form"
+    }, []);
 
     useEffect(() => {
         updateLocalListOf<State>(setStates, "http://127.0.0.1:8000/states/")
@@ -167,7 +204,9 @@ function IntakeForm() {
                         label="Email" 
                         fullWidth={true}
                         required={true}
-                        onChange={e => setEmail(e.target.value)}
+                        error={emailError}
+                        helperText={emailHelperText}
+                        onChange={e => handleEmailChange(e.target.value)}
                         value={email}
                     />
                     <MuiTelInput 
@@ -179,6 +218,8 @@ function IntakeForm() {
                         fullWidth={true}
                         required={true}
                         value={phone}
+                        error={phoneError}
+                        helperText={phoneHelperText}
                         onChange={handlePhoneChange}
                     />
                     <TextField 
@@ -220,7 +261,7 @@ function IntakeForm() {
                         renderInput={(params) => <TextField {...params} required={true} label="State" />}
                         value={state}
                         onChange={(_: any, newValue: State | null) => {
-                            setState(newValue as React.SetStateAction<State>);
+                            setState(newValue);
                         }}
                     />
                     <TextField 
@@ -289,7 +330,6 @@ function IntakeForm() {
                         <RadioGroup
                             aria-labelledby="urgency-radio-group"
                             name="urgency-radio-group"
-                            defaultValue="Unsure"
                         >
                             <FormControlLabel value="1 week" control={<Radio />} label="Within 1 week" />
                             <FormControlLabel value="1 month" control={<Radio />} label="Within 1 month" />
