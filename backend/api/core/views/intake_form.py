@@ -21,8 +21,10 @@ class ProcessIntakeForm(CreateAPIView):
         
         _customer_request_relationship = None
         _request = None
+        
         _customer = None
         _customer_created = False
+        
         _org = None
         _org_created = False
         try:
@@ -41,7 +43,8 @@ class ProcessIntakeForm(CreateAPIView):
                 )
                 _org_created = True
             
-            _customer = Customer.objects.filter(email=email, name=name).first()
+            _customer = Customer.objects.filter(email=email).first()
+            
             _customer_created = False
             if(not _customer):
                 _customer = Customer.objects.create(
@@ -79,7 +82,6 @@ class ProcessIntakeForm(CreateAPIView):
             )
             
         except Exception as e:
-            print(str(e))
             return Response({"message": str(e)}, status=status.HTTP_400_BAD_REQUEST)
         
         finally:
