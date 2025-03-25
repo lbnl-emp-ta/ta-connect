@@ -67,41 +67,45 @@ function IntakeForm() {
         name: string;
     }
 
-    async function handleSubmit(event: React.SyntheticEvent<HTMLFormElement>) {
-        event.preventDefault()
-        const url = "http://127.0.0.1:8000/process-intake-form/"
-        try {
-            const response = await fetch(url, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify({
-                    name: name,
-                    email: email,
-                    phone: phone,
-                    title: title,
-                    tpr: tpr,
-                    state: state?.abbreviation,
-                    organization: orgName,
-                    organizationAddress: orgAddress,
-                    organizationType: orgType,
-                    taDepth: taDepth,
-                    description: desc
-                })
-            });
-
-            if (!response.ok) {
-                throw Error(`Request status: ${response.status}`);
-            }
-            
-            console.log(await response.json()); // for development only
-            setSubmitted(true);
-        } catch (error) {
-            if(error instanceof Error) {
-                console.error(error.message);
+    function handleSubmit(event: React.SyntheticEvent<HTMLFormElement>) {
+        async function _handleSubmit(event: React.SyntheticEvent<HTMLFormElement>) {
+            event.preventDefault()
+            const url = "http://127.0.0.1:8000/process-intake-form/"
+            try {
+                const response = await fetch(url, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        name: name,
+                        email: email,
+                        phone: phone,
+                        title: title,
+                        tpr: tpr,
+                        state: state?.abbreviation,
+                        organization: orgName,
+                        organizationAddress: orgAddress,
+                        organizationType: orgType,
+                        taDepth: taDepth,
+                        description: desc
+                    })
+                });
+    
+                if (!response.ok) {
+                    throw Error(`Request status: ${response.status}`);
+                }
+                
+                console.log(await response.json()); // for development only
+                setSubmitted(true);
+            } catch (error) {
+                if(error instanceof Error) {
+                    console.error(error.message);
+                }
             }
         }
+
+        void _handleSubmit(event);
     }
 
     async function fetchListOf<T>(url: string): Promise<T[] | undefined> {
@@ -190,7 +194,7 @@ function IntakeForm() {
         )
     } else {
         return (
-            <form className="intake-form" onSubmit={void handleSubmit}>
+            <form className="intake-form" onSubmit={handleSubmit}>
                 <Stack spacing={2}>
                     <Typography variant="h2">TA Request Form</Typography>
                     <Typography id="info" variant="subtitle1">
