@@ -1,4 +1,4 @@
-import {useEffect, useState} from 'react'
+import {useEffect, useState, useCallback} from 'react'
 
 import './App.css'
 import { MuiTelInput, matchIsValidTel } from 'mui-tel-input'
@@ -40,7 +40,7 @@ function IntakeForm() {
     const [email, setEmail] = useState<string>("");
     const [phone, setPhone] = useState<string>("");
     const [orgType, setOrgType] = useState<string>("");
-    const [TADepth, setTADepth] = useState<string>("");
+    const [taDepth, setTADepth] = useState<string>("");
     const [desc, setDesc] = useState<string>("")
     const [tpr, setTPR] = useState<string>("")
 
@@ -86,7 +86,7 @@ function IntakeForm() {
                     organization: orgName,
                     organizationAddress: orgAddress,
                     organizationType: orgType,
-                    tadepth: TADepth,
+                    taDepth: taDepth,
                     description: desc
                 })
             });
@@ -95,7 +95,7 @@ function IntakeForm() {
                 throw Error(`Request status: ${response.status}`);
             }
             
-            console.log(await response.json());
+            console.log(await response.json()); // for development only
             setSubmitted(true);
         } catch (error) {
             if(error instanceof Error) {
@@ -120,7 +120,7 @@ function IntakeForm() {
             }
     }
 
-    function updateLocalListOf<T>(withCallback: Function, fromURL: string) {
+    const updateLocalListOf = useCallback(<T,>(withCallback: React.Dispatch<React.SetStateAction<T[]>>, fromURL: string) => {
         let ignore = false;
 
         async function startFetchingData() {
@@ -130,12 +130,12 @@ function IntakeForm() {
             }
         }
 
-        startFetchingData()
+        void startFetchingData();
 
         return () => {
             ignore = true;
         }
-    }
+    }, []) 
 
     function handlePhoneChange(newPhone: string) {
         function validatePhoneNumber(phone: string) {
@@ -154,7 +154,7 @@ function IntakeForm() {
 
     function handleEmailChange(newEmail: string) {
         function validateEmail(email: string) {
-            let re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+            const re = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
             if (re.test(email) || email === "") {
                 setEmailError(false);
                 setEmailHelperText("");
@@ -169,20 +169,20 @@ function IntakeForm() {
     }
 
     useEffect(() => {
-        document.title = "Intake Form";
+        document.title = "TA CONNECT - Intake Form";
     }, []);
 
     useEffect(() => {
         updateLocalListOf<State>(setStates, "http://127.0.0.1:8000/states/");
-    }, []);
+    }, [updateLocalListOf]);
 
     useEffect(() => {
         updateLocalListOf<OrganiztionType>(setOrgTypes, "http://127.0.0.1:8000/organization-types/");
-    }, []);
+    }, [updateLocalListOf]);
 
-    useEffect(() => {``
+    useEffect(() => {
         updateLocalListOf<TransmissionPlanningRegion>(setTPRs, "http://127.0.0.1:8000/transmission-planning-regions/");
-    }, []);
+    }, [updateLocalListOf]);
 
     if (submitted) {
         return (
@@ -190,7 +190,7 @@ function IntakeForm() {
         )
     } else {
         return (
-            <form className="intake-form" onSubmit={handleSubmit}>
+            <form className="intake-form" onSubmit={void handleSubmit}>
                 <Stack spacing={2}>
                     <Typography variant="h2">TA Request Form</Typography>
                     <Typography id="info" variant="subtitle1">
@@ -268,7 +268,7 @@ function IntakeForm() {
                             sx={{ width: 300 }}
                             renderInput={(params) => <TextField {...params} required={true} label="State" />}
                             value={state}
-                            onChange={(_: any, newValue: State | null) => {
+                            onChange={(_, newValue: State | null) => {
                                 setState(newValue);
                             }}
                         />
@@ -318,7 +318,7 @@ function IntakeForm() {
                             <RadioGroup
                                 aria-labelledby="ta-depth-radio-group"
                                 defaultValue={"Unsure"}
-                                value={TADepth}
+                                value={taDepth}
                                 onChange={e => setTADepth(e.target.value)}
                                 name="ta-depth-radio-group"
                             >
