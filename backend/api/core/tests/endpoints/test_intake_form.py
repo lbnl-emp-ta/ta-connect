@@ -22,13 +22,13 @@ class TestProcessIntakeFormEndpoint:
             "organization": test_customer.org.name,
             "organizationAddress": test_customer.org.address,
             "organizationType": test_customer.org.type,
-            "tadepth": test_request.depth.name,
+            "taDepth": test_request.depth.name,
             "description": test_request.description
         }
         response = api_client.post("/process-intake-form/", data=data)
         assert response.status_code == status.HTTP_201_CREATED
     
-    def test_process_intake_endpoint_return_bad_request_when_missing_required_name_field(self, api_client, test_customer, test_request):
+    def test_process_intake_endpoint_return_bad_request_when_missing_required_email_field(self, api_client, test_customer, test_request):
         # Temporary while there is only one default CustomerType
         CustomerType.objects.create(
             name="Primary Contact", 
@@ -37,8 +37,8 @@ class TestProcessIntakeFormEndpoint:
         
         
         data = {
-            # "name": test_customer.name,
-            "email": test_customer.email,
+            "name": test_customer.name,
+            # "email": test_customer.email,
             "phone": test_customer.phone,
             "title": test_customer.title,
             "tpr": test_customer.tpr.name,
@@ -46,7 +46,7 @@ class TestProcessIntakeFormEndpoint:
             "organization": test_customer.org.name,
             "organizationAddress": test_customer.org.address,
             "organizationType": test_customer.org.type,
-            "tadepth": test_request.depth.name,
+            "taDepth": test_request.depth.name,
             "description": test_request.description
         }
         
