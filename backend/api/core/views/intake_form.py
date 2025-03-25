@@ -15,7 +15,7 @@ class ProcessIntakeForm(CreateAPIView):
         organization = request.data.get("organization", None)
         organization_address = request.data.get("organizationAddress", None)
         organization_type = request.data.get("organizationType", None)
-        ta_depth = request.data.get("tadepth", None)
+        ta_depth = request.data.get("taDepth", None)
         desc = request.data.get("description", None)
         
         
@@ -33,8 +33,8 @@ class ProcessIntakeForm(CreateAPIView):
                 depth=Depth.objects.filter(name=ta_depth).first()
             )
             
-            _org = Organization.objects.filter(name=organization).first()
             _org_created = False
+            _org = Organization.objects.filter(name=organization).first()
             if (not _org):
                 _org = Organization.objects.create(
                     name=organization, 
@@ -64,8 +64,7 @@ class ProcessIntakeForm(CreateAPIView):
                 customer_type = CustomerType.objects.get(name="Primary Contact")
             )
             
-            return Response(
-                {
+            return Response({
                     "name": _customer.name,
                     "email": _customer.email,
                     "phone": _customer.phone,
@@ -82,7 +81,7 @@ class ProcessIntakeForm(CreateAPIView):
             )
             
         except Exception as e:
-            return Response({"message": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
         
         finally:
             if(_customer_request_relationship):
