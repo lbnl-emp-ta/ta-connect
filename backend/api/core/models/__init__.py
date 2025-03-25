@@ -9,6 +9,7 @@ from .customer import Customer
 from .customer_type import CustomerType
 from .customer_request_relationship import CustomerRequestRelationship
 from .cohort import Cohort
+from .user import User
 
 __all__ = [
     "RequestStatus",
@@ -22,4 +23,5 @@ __all__ = [
     "CustomerType",
     "CustomerRequestRelationship",
     "Cohort",
+    "User",
 ]
