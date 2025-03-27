@@ -21,13 +21,15 @@ from core.views import *
 urlpatterns = [
     path('admin/', admin.site.urls),
     
-    # Even when using headless, the third-party provider endpoints are stil
+    # Even when using headless, the third-party provider endpoints are still
     # needed for handling e.g. the OAuth handshake. The account views
     # can be disabled using `HEADLESS_ONLY = True`.
     path("accounts/", include("allauth.urls")),
 
     # Include the API endpoints:
     path("_allauth/", include("allauth.headless.urls")),
+    
+    
     
     path('process-intake-form/', ProcessIntakeForm.as_view(), name="process-intake-form"),
     
