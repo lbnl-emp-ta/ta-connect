@@ -16,5 +16,5 @@ function PrivateRoute() {
         return <Outlet/>;
     }
 
-    return <Navigate to='/dashboard'/>
+    return <Navigate to='/login'/>
 }
