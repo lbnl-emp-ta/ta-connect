@@ -12,7 +12,7 @@ import {
 import Grid from "@mui/material/Grid2"
 
 
-export const Route = createFileRoute('/_public/signup')({
+export const Route = createFileRoute('/_public-only/signup')({
   component: SignupForm,
 })
 

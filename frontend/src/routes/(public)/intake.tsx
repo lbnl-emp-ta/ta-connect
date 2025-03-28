@@ -18,28 +18,44 @@ import {
         Typography } from "@mui/material";
         
 import { matchIsValidTel, MuiTelInput } from "mui-tel-input";
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
+import { IntakeFormData, type State} from "../../api/forms";
+import { 
+    organizationTypesQueryOptions, 
+    statesQueryOptions, 
+    transmissionPlanningRegionsQueryOptions, 
+    useSubmitIntakeMutation} from "../../utils/queryOptions";
+import { useSuspenseQuery } from "@tanstack/react-query";
 
-export const Route = createFileRoute('/_public/intake')({
+export const Route = createFileRoute('/(public)/intake')({
+    loader: (opts) => {
+        opts.context.queryClient.ensureQueryData(statesQueryOptions());
+        opts.context.queryClient.ensureQueryData(organizationTypesQueryOptions());
+        opts.context.queryClient.ensureQueryData(transmissionPlanningRegionsQueryOptions());
+    },
   component: IntakeForm,
 })
 
 function IntakeForm() {
-    const [states, setStates] = useState<State[]>([]);
-    const [orgTypes, setOrgTypes] = useState<OrganiztionType[]>([]);
-    const [tprs, setTPRs] = useState<TransmissionPlanningRegion[]>([]);
+    const { data: states } = useSuspenseQuery(statesQueryOptions());
+    const { data: orgTypes } = useSuspenseQuery(organizationTypesQueryOptions());
+    const { data: tprs } = useSuspenseQuery(transmissionPlanningRegionsQueryOptions());
 
     const [name, setName] = useState<string>("");
+    const [phone, setPhone] = useState<string>("");
+    const [email, setEmail] = useState<string>("");
     const [title, setTitle] = useState<string>("");
+
     const [state, setState] = useState<State | null>(null);
+
     const [orgName, setOrgName] = useState<string>("");
     const [orgAddress, setOrgAddress] = useState<string>("");
-    const [email, setEmail] = useState<string>("");
-    const [phone, setPhone] = useState<string>("");
-    const [orgType, setOrgType] = useState<string>("");
-    const [taDepth, setTADepth] = useState<string>("");
+    const [orgTypeName, setOrgTypeName] = useState<string>("");
+
     const [desc, setDesc] = useState<string>("")
-    const [tpr, setTPR] = useState<string>("")
+    const [taDepth, setTADepth] = useState<string>("");
+
+    const [tprName, setTPRName] = useState<string>("")
 
     const [phoneError, setPhoneError] = useState<boolean>(false);
     const [phoneHelperText, setPhoneHelperText] = useState<string>("");
@@ -47,96 +63,25 @@ function IntakeForm() {
     const [emailError, setEmailError] = useState<boolean>(false);
     const [emailHelperText, setEmailHelperText] = useState<string>("");
 
-    const [submitted, setSubmitted] = useState<boolean>(false);
-
-    interface State {
-        id: number;
-        name: string;
-        abbreviation: string;
-    }
-    
-    interface OrganiztionType {
-        name: string;
-        description: string;
-    }
-    
-    interface TransmissionPlanningRegion {
-        name: string;
-    }
+    const submitIntakeMutation = useSubmitIntakeMutation();
 
     function handleSubmit(event: React.SyntheticEvent<HTMLFormElement>) {
-        async function _handleSubmit(event: React.SyntheticEvent<HTMLFormElement>) {
-            event.preventDefault()
-            const url = `${import.meta.env.VITE_API_URL}/process-intake-form/`
-            try {
-                const response = await fetch(url, {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json"
-                    },
-                    body: JSON.stringify({
-                        name: name,
-                        email: email,
-                        phone: phone,
-                        title: title,
-                        tpr: tpr,
-                        state: state?.abbreviation,
-                        organization: orgName,
-                        organizationAddress: orgAddress,
-                        organizationType: orgType,
-                        taDepth: taDepth,
-                        description: desc
-                    })
-                });
-    
-                if (!response.ok) {
-                    throw Error(`Request status: ${response.status}`);
-                }
-                
-                console.log(await response.json()); // for development only
-                setSubmitted(true);
-            } catch (error) {
-                if(error instanceof Error) {
-                    console.error(error.message);
-                }
-            }
+        event.preventDefault()
+        const formData: IntakeFormData = {
+            name: name,
+            email: email,
+            phone: phone,
+            title: title,
+            tpr: tprName,
+            state: state?.abbreviation || "",
+            organization: orgName,
+            organizationAddress: orgAddress,
+            organizationType: orgTypeName,
+            taDepth: taDepth,
+            description: desc
         }
-
-        void _handleSubmit(event);
+        submitIntakeMutation.mutate(formData);
     }
-
-    async function fetchListOf<T>(url: string): Promise<T[] | undefined> {
-            try {
-                const response = await fetch(url);
-                if (!response.ok) {
-                    throw Error(`Request status: ${response.status}`);
-                }
-                return await response.json() as T[];
-            } catch (error) {
-                if(error instanceof Error) {
-                    console.error("Error:", error.message);
-                } else {
-                    console.error("An unknown error has occured.");
-                }
-            }
-    }
-
-    const updateLocalListOf = useCallback(<T,>(withCallback: React.Dispatch<React.SetStateAction<T[]>>, fromURL: string) => {
-        let ignore = false;
-
-        async function startFetchingData() {
-            const json = await fetchListOf<T>(fromURL);
-            if(!ignore && json) {
-                withCallback(json);
-            }
-        }
-
-        void startFetchingData();
-
-        return () => {
-            ignore = true;
-        }
-    }, []) 
 
     function handlePhoneChange(newPhone: string) {
         function validatePhoneNumber(phone: string) {
@@ -173,19 +118,7 @@ function IntakeForm() {
         document.title = "TA CONNECT - Intake Form";
     }, []);
 
-    useEffect(() => {
-        updateLocalListOf<State>(setStates, `${import.meta.env.VITE_API_URL}/states/`);
-    }, [updateLocalListOf]);
-
-    useEffect(() => {
-        updateLocalListOf<OrganiztionType>(setOrgTypes, `${import.meta.env.VITE_API_URL}/organization-types/`);
-    }, [updateLocalListOf]);
-
-    useEffect(() => {
-        updateLocalListOf<TransmissionPlanningRegion>(setTPRs, `${import.meta.env.VITE_API_URL}/transmission-planning-regions/`);
-    }, [updateLocalListOf]);
-
-    if (submitted) {
+    if (submitIntakeMutation.status !== "idle") {
         return (
             <Typography variant='h1'>Form was submitted!</Typography>
         )
@@ -248,10 +181,10 @@ function IntakeForm() {
                                 required={true}
                                 defaultValue=''
                                 value={
-                                    (tpr === undefined ||
-                                    tpr === null ||
-                                    tprs.length === 0) ? '' : tpr}
-                                onChange={e => setTPR(e.target.value as React.SetStateAction<string>)}
+                                    (tprName === undefined ||
+                                    tprName === null ||
+                                    tprs.length === 0) ? '' : tprName}
+                                onChange={e => setTPRName(e.target.value as React.SetStateAction<string>)}
                             >
                                 {
                                     tprs.map((region) => (
@@ -293,8 +226,8 @@ function IntakeForm() {
                             <FormLabel id="org-type-radio-group">Organization Type</FormLabel>
                             <RadioGroup
                                 aria-labelledby="org-type-radio-group"
-                                value={orgType}
-                                onChange={e => setOrgType(e.target.value)}
+                                value={orgTypeName}
+                                onChange={e => setOrgTypeName(e.target.value)}
                                 name="org-type-radio-group"
                             >
                                 {

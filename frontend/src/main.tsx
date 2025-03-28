@@ -14,7 +14,7 @@ import '@fontsource/roboto/700.css';
 import { routeTree } from './routeTree.gen'
 import { CircularProgress } from '@mui/material';
 
-const queryClient = new QueryClient()
+export const queryClient = new QueryClient()
 
 // Create a new router instance
 const router = createRouter({ 

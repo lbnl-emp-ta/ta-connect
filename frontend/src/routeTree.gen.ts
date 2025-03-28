@@ -11,18 +11,18 @@
 // Import Routes
 
 import { Route as rootRoute } from './routes/__root'
-import { Route as PublicRouteImport } from './routes/_public/route'
+import { Route as PublicOnlyRouteImport } from './routes/_public-only/route'
 import { Route as PrivateRouteImport } from './routes/_private/route'
 import { Route as IndexImport } from './routes/index'
-import { Route as PublicSignupImport } from './routes/_public/signup'
-import { Route as PublicLoginImport } from './routes/_public/login'
-import { Route as PublicIntakeImport } from './routes/_public/intake'
+import { Route as PublicOnlySignupImport } from './routes/_public-only/signup'
+import { Route as PublicOnlyLoginImport } from './routes/_public-only/login'
 import { Route as PrivateDashboardImport } from './routes/_private/dashboard'
+import { Route as publicIntakeImport } from './routes/(public)/intake'
 
 // Create/Update Routes
 
-const PublicRouteRoute = PublicRouteImport.update({
-  id: '/_public',
+const PublicOnlyRouteRoute = PublicOnlyRouteImport.update({
+  id: '/_public-only',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -37,28 +37,28 @@ const IndexRoute = IndexImport.update({
   getParentRoute: () => rootRoute,
 } as any)
 
-const PublicSignupRoute = PublicSignupImport.update({
+const PublicOnlySignupRoute = PublicOnlySignupImport.update({
   id: '/signup',
   path: '/signup',
-  getParentRoute: () => PublicRouteRoute,
+  getParentRoute: () => PublicOnlyRouteRoute,
 } as any)
 
-const PublicLoginRoute = PublicLoginImport.update({
+const PublicOnlyLoginRoute = PublicOnlyLoginImport.update({
   id: '/login',
   path: '/login',
-  getParentRoute: () => PublicRouteRoute,
-} as any)
-
-const PublicIntakeRoute = PublicIntakeImport.update({
-  id: '/intake',
-  path: '/intake',
-  getParentRoute: () => PublicRouteRoute,
+  getParentRoute: () => PublicOnlyRouteRoute,
 } as any)
 
 const PrivateDashboardRoute = PrivateDashboardImport.update({
   id: '/dashboard',
   path: '/dashboard',
   getParentRoute: () => PrivateRouteRoute,
+} as any)
+
+const publicIntakeRoute = publicIntakeImport.update({
+  id: '/(public)/intake',
+  path: '/intake',
+  getParentRoute: () => rootRoute,
 } as any)
 
 // Populate the FileRoutesByPath interface
@@ -79,11 +79,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PrivateRouteImport
       parentRoute: typeof rootRoute
     }
-    '/_public': {
-      id: '/_public'
+    '/_public-only': {
+      id: '/_public-only'
       path: ''
       fullPath: ''
-      preLoaderRoute: typeof PublicRouteImport
+      preLoaderRoute: typeof PublicOnlyRouteImport
+      parentRoute: typeof rootRoute
+    }
+    '/(public)/intake': {
+      id: '/(public)/intake'
+      path: '/intake'
+      fullPath: '/intake'
+      preLoaderRoute: typeof publicIntakeImport
       parentRoute: typeof rootRoute
     }
     '/_private/dashboard': {
@@ -93,26 +100,19 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PrivateDashboardImport
       parentRoute: typeof PrivateRouteImport
     }
-    '/_public/intake': {
-      id: '/_public/intake'
-      path: '/intake'
-      fullPath: '/intake'
-      preLoaderRoute: typeof PublicIntakeImport
-      parentRoute: typeof PublicRouteImport
-    }
-    '/_public/login': {
-      id: '/_public/login'
+    '/_public-only/login': {
+      id: '/_public-only/login'
       path: '/login'
       fullPath: '/login'
-      preLoaderRoute: typeof PublicLoginImport
-      parentRoute: typeof PublicRouteImport
+      preLoaderRoute: typeof PublicOnlyLoginImport
+      parentRoute: typeof PublicOnlyRouteImport
     }
-    '/_public/signup': {
-      id: '/_public/signup'
+    '/_public-only/signup': {
+      id: '/_public-only/signup'
       path: '/signup'
       fullPath: '/signup'
-      preLoaderRoute: typeof PublicSignupImport
-      parentRoute: typeof PublicRouteImport
+      preLoaderRoute: typeof PublicOnlySignupImport
+      parentRoute: typeof PublicOnlyRouteImport
     }
   }
 }
@@ -131,78 +131,78 @@ const PrivateRouteRouteWithChildren = PrivateRouteRoute._addFileChildren(
   PrivateRouteRouteChildren,
 )
 
-interface PublicRouteRouteChildren {
-  PublicIntakeRoute: typeof PublicIntakeRoute
-  PublicLoginRoute: typeof PublicLoginRoute
-  PublicSignupRoute: typeof PublicSignupRoute
+interface PublicOnlyRouteRouteChildren {
+  PublicOnlyLoginRoute: typeof PublicOnlyLoginRoute
+  PublicOnlySignupRoute: typeof PublicOnlySignupRoute
 }
 
-const PublicRouteRouteChildren: PublicRouteRouteChildren = {
-  PublicIntakeRoute: PublicIntakeRoute,
-  PublicLoginRoute: PublicLoginRoute,
-  PublicSignupRoute: PublicSignupRoute,
+const PublicOnlyRouteRouteChildren: PublicOnlyRouteRouteChildren = {
+  PublicOnlyLoginRoute: PublicOnlyLoginRoute,
+  PublicOnlySignupRoute: PublicOnlySignupRoute,
 }
 
-const PublicRouteRouteWithChildren = PublicRouteRoute._addFileChildren(
-  PublicRouteRouteChildren,
+const PublicOnlyRouteRouteWithChildren = PublicOnlyRouteRoute._addFileChildren(
+  PublicOnlyRouteRouteChildren,
 )
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '': typeof PublicRouteRouteWithChildren
+  '': typeof PublicOnlyRouteRouteWithChildren
+  '/intake': typeof publicIntakeRoute
   '/dashboard': typeof PrivateDashboardRoute
-  '/intake': typeof PublicIntakeRoute
-  '/login': typeof PublicLoginRoute
-  '/signup': typeof PublicSignupRoute
+  '/login': typeof PublicOnlyLoginRoute
+  '/signup': typeof PublicOnlySignupRoute
 }
 
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '': typeof PublicRouteRouteWithChildren
+  '': typeof PublicOnlyRouteRouteWithChildren
+  '/intake': typeof publicIntakeRoute
   '/dashboard': typeof PrivateDashboardRoute
-  '/intake': typeof PublicIntakeRoute
-  '/login': typeof PublicLoginRoute
-  '/signup': typeof PublicSignupRoute
+  '/login': typeof PublicOnlyLoginRoute
+  '/signup': typeof PublicOnlySignupRoute
 }
 
 export interface FileRoutesById {
   __root__: typeof rootRoute
   '/': typeof IndexRoute
   '/_private': typeof PrivateRouteRouteWithChildren
-  '/_public': typeof PublicRouteRouteWithChildren
+  '/_public-only': typeof PublicOnlyRouteRouteWithChildren
+  '/(public)/intake': typeof publicIntakeRoute
   '/_private/dashboard': typeof PrivateDashboardRoute
-  '/_public/intake': typeof PublicIntakeRoute
-  '/_public/login': typeof PublicLoginRoute
-  '/_public/signup': typeof PublicSignupRoute
+  '/_public-only/login': typeof PublicOnlyLoginRoute
+  '/_public-only/signup': typeof PublicOnlySignupRoute
 }
 
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '' | '/dashboard' | '/intake' | '/login' | '/signup'
+  fullPaths: '/' | '' | '/intake' | '/dashboard' | '/login' | '/signup'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '' | '/dashboard' | '/intake' | '/login' | '/signup'
+  to: '/' | '' | '/intake' | '/dashboard' | '/login' | '/signup'
   id:
     | '__root__'
     | '/'
     | '/_private'
-    | '/_public'
+    | '/_public-only'
+    | '/(public)/intake'
     | '/_private/dashboard'
-    | '/_public/intake'
-    | '/_public/login'
-    | '/_public/signup'
+    | '/_public-only/login'
+    | '/_public-only/signup'
   fileRoutesById: FileRoutesById
 }
 
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   PrivateRouteRoute: typeof PrivateRouteRouteWithChildren
-  PublicRouteRoute: typeof PublicRouteRouteWithChildren
+  PublicOnlyRouteRoute: typeof PublicOnlyRouteRouteWithChildren
+  publicIntakeRoute: typeof publicIntakeRoute
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   PrivateRouteRoute: PrivateRouteRouteWithChildren,
-  PublicRouteRoute: PublicRouteRouteWithChildren,
+  PublicOnlyRouteRoute: PublicOnlyRouteRouteWithChildren,
+  publicIntakeRoute: publicIntakeRoute,
 }
 
 export const routeTree = rootRoute
@@ -217,7 +217,8 @@ export const routeTree = rootRoute
       "children": [
         "/",
         "/_private",
-        "/_public"
+        "/_public-only",
+        "/(public)/intake"
       ]
     },
     "/": {
@@ -229,29 +230,27 @@ export const routeTree = rootRoute
         "/_private/dashboard"
       ]
     },
-    "/_public": {
-      "filePath": "_public/route.tsx",
+    "/_public-only": {
+      "filePath": "_public-only/route.tsx",
       "children": [
-        "/_public/intake",
-        "/_public/login",
-        "/_public/signup"
+        "/_public-only/login",
+        "/_public-only/signup"
       ]
+    },
+    "/(public)/intake": {
+      "filePath": "(public)/intake.tsx"
     },
     "/_private/dashboard": {
       "filePath": "_private/dashboard.tsx",
       "parent": "/_private"
     },
-    "/_public/intake": {
-      "filePath": "_public/intake.tsx",
-      "parent": "/_public"
+    "/_public-only/login": {
+      "filePath": "_public-only/login.tsx",
+      "parent": "/_public-only"
     },
-    "/_public/login": {
-      "filePath": "_public/login.tsx",
-      "parent": "/_public"
-    },
-    "/_public/signup": {
-      "filePath": "_public/signup.tsx",
-      "parent": "/_public"
+    "/_public-only/signup": {
+      "filePath": "_public-only/signup.tsx",
+      "parent": "/_public-only"
     }
   }
 }
