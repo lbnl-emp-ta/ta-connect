@@ -1,4 +1,4 @@
-async function getSession() {
+async function getSession(): Promise<{isAuthenticated: boolean}> {
     const response = await fetch (
         `${import.meta.env.VITE_API_URL}/_allauth/browser/v1/auth/session`,
         {

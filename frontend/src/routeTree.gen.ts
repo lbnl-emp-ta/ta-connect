@@ -11,14 +11,23 @@
 // Import Routes
 
 import { Route as rootRoute } from './routes/__root'
-import { Route as AboutImport } from './routes/about'
+import { Route as PublicRouteImport } from './routes/_public/route'
+import { Route as PrivateRouteImport } from './routes/_private/route'
 import { Route as IndexImport } from './routes/index'
+import { Route as PublicSignupImport } from './routes/_public/signup'
+import { Route as PublicLoginImport } from './routes/_public/login'
+import { Route as PublicIntakeImport } from './routes/_public/intake'
+import { Route as PrivateDashboardImport } from './routes/_private/dashboard'
 
 // Create/Update Routes
 
-const AboutRoute = AboutImport.update({
-  id: '/about',
-  path: '/about',
+const PublicRouteRoute = PublicRouteImport.update({
+  id: '/_public',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const PrivateRouteRoute = PrivateRouteImport.update({
+  id: '/_private',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -26,6 +35,30 @@ const IndexRoute = IndexImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRoute,
+} as any)
+
+const PublicSignupRoute = PublicSignupImport.update({
+  id: '/signup',
+  path: '/signup',
+  getParentRoute: () => PublicRouteRoute,
+} as any)
+
+const PublicLoginRoute = PublicLoginImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => PublicRouteRoute,
+} as any)
+
+const PublicIntakeRoute = PublicIntakeImport.update({
+  id: '/intake',
+  path: '/intake',
+  getParentRoute: () => PublicRouteRoute,
+} as any)
+
+const PrivateDashboardRoute = PrivateDashboardImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => PrivateRouteRoute,
 } as any)
 
 // Populate the FileRoutesByPath interface
@@ -39,51 +72,137 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexImport
       parentRoute: typeof rootRoute
     }
-    '/about': {
-      id: '/about'
-      path: '/about'
-      fullPath: '/about'
-      preLoaderRoute: typeof AboutImport
+    '/_private': {
+      id: '/_private'
+      path: ''
+      fullPath: ''
+      preLoaderRoute: typeof PrivateRouteImport
       parentRoute: typeof rootRoute
+    }
+    '/_public': {
+      id: '/_public'
+      path: ''
+      fullPath: ''
+      preLoaderRoute: typeof PublicRouteImport
+      parentRoute: typeof rootRoute
+    }
+    '/_private/dashboard': {
+      id: '/_private/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof PrivateDashboardImport
+      parentRoute: typeof PrivateRouteImport
+    }
+    '/_public/intake': {
+      id: '/_public/intake'
+      path: '/intake'
+      fullPath: '/intake'
+      preLoaderRoute: typeof PublicIntakeImport
+      parentRoute: typeof PublicRouteImport
+    }
+    '/_public/login': {
+      id: '/_public/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof PublicLoginImport
+      parentRoute: typeof PublicRouteImport
+    }
+    '/_public/signup': {
+      id: '/_public/signup'
+      path: '/signup'
+      fullPath: '/signup'
+      preLoaderRoute: typeof PublicSignupImport
+      parentRoute: typeof PublicRouteImport
     }
   }
 }
 
 // Create and export the route tree
 
+interface PrivateRouteRouteChildren {
+  PrivateDashboardRoute: typeof PrivateDashboardRoute
+}
+
+const PrivateRouteRouteChildren: PrivateRouteRouteChildren = {
+  PrivateDashboardRoute: PrivateDashboardRoute,
+}
+
+const PrivateRouteRouteWithChildren = PrivateRouteRoute._addFileChildren(
+  PrivateRouteRouteChildren,
+)
+
+interface PublicRouteRouteChildren {
+  PublicIntakeRoute: typeof PublicIntakeRoute
+  PublicLoginRoute: typeof PublicLoginRoute
+  PublicSignupRoute: typeof PublicSignupRoute
+}
+
+const PublicRouteRouteChildren: PublicRouteRouteChildren = {
+  PublicIntakeRoute: PublicIntakeRoute,
+  PublicLoginRoute: PublicLoginRoute,
+  PublicSignupRoute: PublicSignupRoute,
+}
+
+const PublicRouteRouteWithChildren = PublicRouteRoute._addFileChildren(
+  PublicRouteRouteChildren,
+)
+
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/about': typeof AboutRoute
+  '': typeof PublicRouteRouteWithChildren
+  '/dashboard': typeof PrivateDashboardRoute
+  '/intake': typeof PublicIntakeRoute
+  '/login': typeof PublicLoginRoute
+  '/signup': typeof PublicSignupRoute
 }
 
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/about': typeof AboutRoute
+  '': typeof PublicRouteRouteWithChildren
+  '/dashboard': typeof PrivateDashboardRoute
+  '/intake': typeof PublicIntakeRoute
+  '/login': typeof PublicLoginRoute
+  '/signup': typeof PublicSignupRoute
 }
 
 export interface FileRoutesById {
   __root__: typeof rootRoute
   '/': typeof IndexRoute
-  '/about': typeof AboutRoute
+  '/_private': typeof PrivateRouteRouteWithChildren
+  '/_public': typeof PublicRouteRouteWithChildren
+  '/_private/dashboard': typeof PrivateDashboardRoute
+  '/_public/intake': typeof PublicIntakeRoute
+  '/_public/login': typeof PublicLoginRoute
+  '/_public/signup': typeof PublicSignupRoute
 }
 
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/about'
+  fullPaths: '/' | '' | '/dashboard' | '/intake' | '/login' | '/signup'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/about'
-  id: '__root__' | '/' | '/about'
+  to: '/' | '' | '/dashboard' | '/intake' | '/login' | '/signup'
+  id:
+    | '__root__'
+    | '/'
+    | '/_private'
+    | '/_public'
+    | '/_private/dashboard'
+    | '/_public/intake'
+    | '/_public/login'
+    | '/_public/signup'
   fileRoutesById: FileRoutesById
 }
 
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  AboutRoute: typeof AboutRoute
+  PrivateRouteRoute: typeof PrivateRouteRouteWithChildren
+  PublicRouteRoute: typeof PublicRouteRouteWithChildren
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  AboutRoute: AboutRoute,
+  PrivateRouteRoute: PrivateRouteRouteWithChildren,
+  PublicRouteRoute: PublicRouteRouteWithChildren,
 }
 
 export const routeTree = rootRoute
@@ -97,14 +216,42 @@ export const routeTree = rootRoute
       "filePath": "__root.tsx",
       "children": [
         "/",
-        "/about"
+        "/_private",
+        "/_public"
       ]
     },
     "/": {
       "filePath": "index.tsx"
     },
-    "/about": {
-      "filePath": "about.tsx"
+    "/_private": {
+      "filePath": "_private/route.tsx",
+      "children": [
+        "/_private/dashboard"
+      ]
+    },
+    "/_public": {
+      "filePath": "_public/route.tsx",
+      "children": [
+        "/_public/intake",
+        "/_public/login",
+        "/_public/signup"
+      ]
+    },
+    "/_private/dashboard": {
+      "filePath": "_private/dashboard.tsx",
+      "parent": "/_private"
+    },
+    "/_public/intake": {
+      "filePath": "_public/intake.tsx",
+      "parent": "/_public"
+    },
+    "/_public/login": {
+      "filePath": "_public/login.tsx",
+      "parent": "/_public"
+    },
+    "/_public/signup": {
+      "filePath": "_public/signup.tsx",
+      "parent": "/_public"
     }
   }
 }

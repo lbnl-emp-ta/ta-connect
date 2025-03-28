@@ -1,11 +1,25 @@
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useState } from "react";
-import { signupMutation } from "../api/accounts/signup";
-import { Box, Button, Container, Divider, TextField, Typography } from "@mui/material";
+import { useMutation } from '@tanstack/react-query';
+import { createFileRoute } from '@tanstack/react-router'
+import { useState } from 'react';
+import { signupMutation } from '../../api/accounts/signup';
+import { 
+        Box, 
+        Button, 
+        Container, 
+        Divider, 
+        TextField, 
+        Typography } from '@mui/material';
 import Grid from "@mui/material/Grid2"
 
-export default function SignupForm() {
-    const queryClient = useQueryClient();
+
+export const Route = createFileRoute('/_public/signup')({
+  component: SignupForm,
+})
+
+function SignupForm() {
+    const queryClient = Route.useRouteContext({
+        select: (context) => context.queryClient,
+    });
     const [email, setEmail] = useState("");
     const [password1, setPassword1] = useState("");
     const [password2, setPassword2] = useState("");

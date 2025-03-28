@@ -1,8 +1,30 @@
-import { Autocomplete, Button, Divider, FormControl, FormControlLabel, FormLabel, InputLabel, MenuItem, Radio, RadioGroup, Select, Stack, Switch, TextField, Typography } from "@mui/material";
+import "../../styles.css";
+
+import { createFileRoute } from '@tanstack/react-router'
+import { 
+        Autocomplete, 
+        Button, Divider, 
+        FormControl, 
+        FormControlLabel, 
+        FormLabel, 
+        InputLabel, 
+        MenuItem, 
+        Radio, 
+        RadioGroup, 
+        Select, 
+        Stack, 
+        Switch, 
+        TextField, 
+        Typography } from "@mui/material";
+        
 import { matchIsValidTel, MuiTelInput } from "mui-tel-input";
 import { useCallback, useEffect, useState } from "react";
 
-export default function IntakeForm() {
+export const Route = createFileRoute('/_public/intake')({
+  component: IntakeForm,
+})
+
+function IntakeForm() {
     const [states, setStates] = useState<State[]>([]);
     const [orgTypes, setOrgTypes] = useState<OrganiztionType[]>([]);
     const [tprs, setTPRs] = useState<TransmissionPlanningRegion[]>([]);
