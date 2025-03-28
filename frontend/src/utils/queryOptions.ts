@@ -1,8 +1,10 @@
 import { queryOptions, useMutation } from "@tanstack/react-query";
 import { sessionsApi } from "../api/sessions";
-import { fetchListOf, IntakeFormData, submitIntake, type OrganiztionType, type State, type TransmissionPlanningRegion} from "../api/forms";
+import { fetchListOf, IntakeFormData, submitIntakeMutation, type OrganiztionType, type State, type TransmissionPlanningRegion} from "../api/forms";
 
 import { queryClient } from "../main"
+import { signupMutation } from "../api/accounts/signup";
+import { loginMutation } from "../api/accounts/login";
 
 export const authSessionQueryOptions = () => (
     queryOptions({
@@ -35,7 +37,21 @@ export const transmissionPlanningRegionsQueryOptions = () => (
 export const useSubmitIntakeMutation = () => {
     return useMutation({
         mutationKey: ["intake"],
-        mutationFn: (formData: IntakeFormData) => submitIntake(formData),
+        mutationFn: (formData: IntakeFormData) => submitIntakeMutation(formData),
         onSuccess: () => queryClient.invalidateQueries(),
     });
+}
+
+export const useSigupMutation = () => {
+    return useMutation ({
+        mutationFn: signupMutation,
+        onSuccess: () => queryClient.invalidateQueries({queryKey: ["authSession"]})
+    });
+}
+
+export const useLoginMutation = () => {
+    return useMutation ({
+        mutationFn: loginMutation,
+        onSuccess: () => queryClient.invalidateQueries({queryKey: ["authSession"]})
+    })
 }

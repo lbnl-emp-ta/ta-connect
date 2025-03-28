@@ -1,11 +1,8 @@
 import { getCSRFToken } from "../../../utils/cookies"
+import { SignupDetails } from "./types";
 
-export async function signupMutation(details: {
-    email: string;
-    password1: string;
-    password2: string;
-}) {
-    await fetch (
+export async function signupMutation(details: SignupDetails) {
+    const response = await fetch (
         `${import.meta.env.VITE_API_URL}/_allauth/browser/v1/auth/signup`,
         {
             method: "POST",
@@ -14,7 +11,15 @@ export async function signupMutation(details: {
                 'Content-Type': 'application/json',
                 "X-CSRFToken": getCSRFToken() || "",
             },
-            body: JSON.stringify(details),
+            body: JSON.stringify({...details}),
         },
     );
+
+    const responseData = await response.json();
+
+    if (!response.ok) {
+        throw Error(`Error: Status ${response.status}`);
+    }
+
+    return responseData;
 }

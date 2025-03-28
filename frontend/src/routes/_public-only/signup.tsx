@@ -1,7 +1,5 @@
-import { useMutation } from '@tanstack/react-query';
 import { createFileRoute } from '@tanstack/react-router'
 import { useState } from 'react';
-import { signupMutation } from '../../api/accounts/signup';
 import { 
         Box, 
         Button, 
@@ -10,6 +8,7 @@ import {
         TextField, 
         Typography } from '@mui/material';
 import Grid from "@mui/material/Grid2"
+import { useSigupMutation } from '../../utils/queryOptions';
 
 
 export const Route = createFileRoute('/_public-only/signup')({
@@ -17,22 +16,15 @@ export const Route = createFileRoute('/_public-only/signup')({
 })
 
 function SignupForm() {
-    const queryClient = Route.useRouteContext({
-        select: (context) => context.queryClient,
-    });
     const [email, setEmail] = useState("");
     const [password1, setPassword1] = useState("");
     const [password2, setPassword2] = useState("");
-    const { mutate } = useMutation({
-        mutationFn: signupMutation,
-        onSuccess: () => {
-            queryClient.invalidateQueries({queryKey: ["authSession"]});
-        },
-    });
+
+    const signupMutation = useSigupMutation();
 
     function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
         e.preventDefault();
-        mutate({ email, password1, password2 });
+        signupMutation.mutate({ email, password1, password2 });
     }
 
     return (
@@ -45,6 +37,7 @@ function SignupForm() {
                     display: "flex",
                     flexDirection: "column",
                     alignItems: "center",
+                    width: "auto",
                 }}
             >
                 <Typography component="h1" variant="h5">
