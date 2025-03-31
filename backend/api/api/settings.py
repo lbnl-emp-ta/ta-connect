@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.sites',
     'core.apps.CoreConfig',
     'corsheaders',
     'allauth.account',
@@ -50,9 +51,9 @@ INSTALLED_APPS = [
 
 
 MIDDLEWARE = [
+    "corsheaders.middleware.CorsMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
-    "corsheaders.middleware.CorsMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
@@ -61,12 +62,39 @@ MIDDLEWARE = [
     "allauth.account.middleware.AccountMiddleware",
 ]
 
-CORS_ALLOWED_ORIGINS = ["http://localhost:5173", "http://127.0.0.1:5173"]
-CSRF_TRUSTED_ORIGINS = ["http://localhost:5173", "http://127.0.0.1:5173"]
+CORS_ALLOWED_ORIGIN_REGEXES = [
+    # match localhost with any port
+    r"^http:\/\/localhost:*([0-9]+)?$",
+    r"^https:\/\/localhost:*([0-9]+)?$",
+]
+CORS_ALLOW_ALL_ORIGINS = True
+
+CSRF_TRUSTED_ORIGINS = ["http://localhost:5173", 
+                        "http://127.0.0.1:5173", 
+                        "http://localhost:8000", 
+                        "http://127.0.0.1:8000", 
+                        "https://owl-above-bluebird.ngrok-free.app"]
 
 CORS_ALLOW_CREDENTIALS = True
+# CSRF_COOKIE_SECURE = False
+# SESSION_COOKIE_SECURE = False
+# CSRF_COOKIE_SAMESITE = 'None'
+# SESSION_COOKIE_SAMESITE = 'None'
+# CSRF_USE_SESSIONS = True
 
-ALLOWED_HOSTS = ["localhost", "127.0.0.1", "localhost:5173"]
+CORS_ORIGIN_WHITELIST = ["http://localhost:5173", 
+                        "http://127.0.0.1:5173", 
+                        "http://localhost:8000", 
+                        "http://127.0.0.1:8000", 
+                        "https://owl-above-bluebird.ngrok-free.app"]
+
+SITE_ID = 2
+
+ALLOWED_HOSTS = ["localhost", 
+                 "127.0.0.1", 
+                 "localhost:5173", 
+                 "localhost:8000", 
+                 "owl-above-bluebird.ngrok-free.app"]
 
 ROOT_URLCONF = 'api.urls'
 
@@ -87,6 +115,8 @@ ACCOUNT_USER_MODEL_USERNAME_FIELD = None
 ACCOUNT_SIGNUP_FIELDS = ['email*', 'password1*', 'password2*']
 ACCOUNT_LOGIN_METHODS= {'email'}
 ACCOUNT_EMAIL_VERIFICATION = "none"
+
+
 
 
 # These are the URLs to be implemented by your single-page application.
