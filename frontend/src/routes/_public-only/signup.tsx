@@ -28,11 +28,18 @@ function SignupForm() {
     }
 
     return (
-        <Container component="section" maxWidth="xs">
+        <Container 
+            component="section" 
+            maxWidth="xs"
+            sx={{
+                display: "flex",
+                alignItems: "center",
+            }}
+        >
             <Box 
                 className="form"
                 sx={{ 
-                    marginTop: 8,
+                    marginTop: 0,
                     padding: 3,
                     display: "flex",
                     flexDirection: "column",

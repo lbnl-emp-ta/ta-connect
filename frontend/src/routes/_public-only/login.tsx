@@ -20,15 +20,23 @@ function RouteComponent() {
     }
 
     return (
-        <Container component="section" maxWidth="xs">
+        <Container 
+            sx={{
+                display: "flex",
+                alignItems: "center",
+            }} 
+            component="section" 
+            maxWidth="xs"
+        >
             <Box 
                 className="form"
                 sx={{ 
-                    marginTop: 8,
+                    marginTop: 0,
                     padding: 3,
                     display: "flex",
                     flexDirection: "column",
                     alignItems: "center",
+                    width: "auto",
                 }}
             >
                 <Typography component="h1" variant="h5">
