@@ -22,6 +22,7 @@ function SignupForm() {
 
     const signupMutation = useSigupMutation();
 
+
     function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
         e.preventDefault();
         signupMutation.mutate({ email, password1, password2 });

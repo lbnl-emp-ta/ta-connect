@@ -6,6 +6,8 @@ async function getSession(): Promise<{isAuthenticated: boolean}> {
         },
     );
 
+    console.log(response);
+
     const data = await response.json();
     const okCodes = [200, 401, 410];
     if (okCodes.indexOf(data.status) === -1) {
