@@ -67,9 +67,11 @@ CORS_ALLOWED_ORIGIN_REGEXES = [
     r"^http:\/\/localhost:*([0-9]+)?$",
     r"^https:\/\/localhost:*([0-9]+)?$",
 ]
-CORS_ALLOW_ALL_ORIGINS = True
 
-CSRF_TRUSTED_ORIGINS = ["http://localhost:5173", 
+CSRF_TRUSTED_ORIGINS = ["http://127.0.0.1",
+                        "http://127.0.0.1:80",
+                        "http://localhost",
+                        "http://localhost:5173", 
                         "http://127.0.0.1:5173", 
                         "http://localhost:8000", 
                         "http://127.0.0.1:8000", 
@@ -82,7 +84,10 @@ CORS_ALLOW_CREDENTIALS = True
 # SESSION_COOKIE_SAMESITE = 'None'
 # CSRF_USE_SESSIONS = True
 
-CORS_ORIGIN_WHITELIST = ["http://localhost:5173", 
+CORS_ORIGIN_WHITELIST = ["http://127.0.0.1",
+                        "http://127.0.0.1:80",
+                        "http://localhost",
+                        "http://localhost:5173", 
                         "http://127.0.0.1:5173", 
                         "http://localhost:8000", 
                         "http://127.0.0.1:8000", 

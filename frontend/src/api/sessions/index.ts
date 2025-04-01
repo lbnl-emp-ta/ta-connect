@@ -6,15 +6,13 @@ async function getSession(): Promise<{isAuthenticated: boolean}> {
         },
     );
 
-    console.log(response);
-
     const data = await response.json();
     const okCodes = [200, 401, 410];
     if (okCodes.indexOf(data.status) === -1) {
         throw new Error(JSON.stringify(data));
     }
 
-    return {isAuthenticated: data.meta.isAuthenticated}
+    return {isAuthenticated: data.meta.is_authenticated}
 }
 
 export const sessionsApi = { getSession };

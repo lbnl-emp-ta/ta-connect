@@ -19,13 +19,22 @@ function SignupForm() {
     const [email, setEmail] = useState("");
     const [password1, setPassword1] = useState("");
     const [password2, setPassword2] = useState("");
+    const [passwordError, setPasswordError] = useState(false);
+    const [passwordHelperText, setPasswordHelperText] = useState("");
 
     const signupMutation = useSigupMutation();
 
 
     function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
         e.preventDefault();
-        signupMutation.mutate({ email, password1, password2 });
+        if (password1 !== password2) {
+            setPasswordError(true);
+            setPasswordHelperText("Passwords must match!");
+            return
+        }
+        setPasswordError(false);
+        setPasswordHelperText("");
+        signupMutation.mutate({ email, password: password1 });
     }
 
     return (
@@ -82,6 +91,8 @@ function SignupForm() {
                                 id="password1"
                                 autoComplete="new-password"
                                 value={password1}
+                                error={passwordError}
+                                helperText={passwordHelperText}
                                 onChange={(e) => setPassword1(e.target.value)}
                             />
                         </Grid>
@@ -95,6 +106,8 @@ function SignupForm() {
                                 id="password2"
                                 autoComplete="new-password"
                                 value={password2}
+                                error={passwordError}
+                                helperText={passwordHelperText}
                                 onChange={(e) => setPassword2(e.target.value)}
                             />
                         </Grid>

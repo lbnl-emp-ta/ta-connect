@@ -1,4 +1,4 @@
-import { queryOptions, useMutation, useQueries, useQuery } from "@tanstack/react-query";
+import { queryOptions, useMutation } from "@tanstack/react-query";
 import { sessionsApi } from "../api/sessions";
 import { fetchListOf, IntakeFormData, submitIntakeMutation, type OrganiztionType, type State, type TransmissionPlanningRegion} from "../api/forms";
 
@@ -9,7 +9,7 @@ import { loginMutation } from "../api/accounts/login";
 export const authSessionQueryOptions = () => (
     queryOptions({
         queryKey: ["authSession"],
-        queryFn: sessionsApi.getSession,
+        queryFn: () => sessionsApi.getSession(),
     })
 );
 

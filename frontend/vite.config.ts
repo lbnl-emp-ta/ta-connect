@@ -9,7 +9,8 @@ export default defineConfig({
     react()
   ],
   server: {
-    allowedHosts: ["owl-above-bluebird.ngrok-free.app"]
-  }
+    port: 5173,
+  },
+  base: '/',
 })
 
