@@ -2,18 +2,32 @@ import { Link, Outlet } from '@tanstack/react-router'
 import { TanStackRouterDevtools } from '@tanstack/react-router-devtools'
 
 import { createRootRouteWithContext } from '@tanstack/react-router'
-import { type QueryClient } from '@tanstack/react-query'
-import { AppBar, Box, Toolbar } from '@mui/material'
+import { useSuspenseQuery, type QueryClient } from '@tanstack/react-query'
+import { AppBar, Box, Button, Toolbar } from '@mui/material'
+import { authSessionQueryOptions, useLogoutMutation } from '../utils/queryOptions'
 
 export interface MyRouterContext {
     queryClient: QueryClient
 }
 
 export const Route = createRootRouteWithContext<MyRouterContext>()({
+    loader: (opts) => (
+        opts.context.queryClient.ensureQueryData(authSessionQueryOptions())
+    ),
     component: Initializer,
 })
 
 function Initializer() {
+    const { data: {isAuthenticated} } = useSuspenseQuery(authSessionQueryOptions());
+
+    const logoutMutation = useLogoutMutation();
+
+    function handleLogout(e: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
+        e.preventDefault();
+        logoutMutation.mutate();
+        window.location.reload();
+    }
+
     return (
         <>
         <AppBar position="sticky">
@@ -28,12 +42,31 @@ function Initializer() {
                     Intake
                 </Link>
                 <Box sx={{margin: "auto"}}/>
-                <Link to="/login">
-                    Login
-                </Link>
-                <Link to="/signup">
-                    Signup
-                </Link>
+                    {
+                        isAuthenticated ? (
+                            <Button 
+                                variant="text"
+                                onClick={handleLogout}
+                                sx={{
+                                    color: "white"
+                                }}
+                            >
+                                Logout
+                            </Button>
+                        ) : (
+                            <Box sx={{
+                                display: "flex",
+                                gap: 5,
+                            }}>
+                                <Link to="/login">
+                                    Login
+                                </Link>
+                                <Link to="/signup">
+                                    Signup
+                                </Link>
+                            </Box>
+                        )
+                    }
             </Toolbar>
         </AppBar>
         <Box sx={{

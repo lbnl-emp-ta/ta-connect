@@ -5,6 +5,7 @@ import { fetchListOf, IntakeFormData, submitIntakeMutation, type OrganiztionType
 import { queryClient } from "../main"
 import { signupMutation } from "../api/accounts/signup";
 import { loginMutation } from "../api/accounts/login";
+import { logoutMutation } from "../api/accounts/logout";
 
 export const authSessionQueryOptions = () => (
     queryOptions({
@@ -52,6 +53,13 @@ export const useSigupMutation = () => {
 export const useLoginMutation = () => {
     return useMutation ({
         mutationFn: loginMutation,
+        onSuccess: () => queryClient.invalidateQueries({queryKey: ["authSession"]})
+    })
+}
+
+export const useLogoutMutation = () => {
+    return useMutation ({
+        mutationFn: logoutMutation,
         onSuccess: () => queryClient.invalidateQueries({queryKey: ["authSession"]})
     })
 }
