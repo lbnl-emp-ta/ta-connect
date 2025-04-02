@@ -64,6 +64,7 @@ MIDDLEWARE = [
 
 CORS_ALLOWED_ORIGIN_REGEXES = [
     # match localhost with any port
+    "https://owl-above-bluebird.ngrok-free.app"
     r"^http:\/\/localhost:*([0-9]+)?$",
     r"^https:\/\/localhost:*([0-9]+)?$",
 ]
@@ -96,10 +97,13 @@ CORS_ORIGIN_WHITELIST = ["http://127.0.0.1",
 SITE_ID = 2
 
 ALLOWED_HOSTS = ["localhost", 
-                 "127.0.0.1", 
+                 "localhost:80", 
+                 "127.0.0.1",
+                 "127.0.0.1:80", 
                  "localhost:5173", 
                  "localhost:8000", 
-                 "owl-above-bluebird.ngrok-free.app"]
+                 "owl-above-bluebird.ngrok-free.app",
+                 "owl-above-bluebird.ngrok-free.app/api/"]
 
 ROOT_URLCONF = 'api.urls'
 
@@ -122,23 +126,27 @@ ACCOUNT_LOGIN_METHODS= {'email'}
 ACCOUNT_EMAIL_VERIFICATION = "none"
 
 
-
-
-# These are the URLs to be implemented by your single-page application.
-# HEADLESS_FRONTEND_URLS = {
-#     "account_confirm_email": "/account/verify-email/{key}",
-#     "account_reset_password": "/account/password/reset",
-#     "account_reset_password_from_key": "/account/password/reset/key/{key}",
-#     "account_signup": "/account/signup",
-#     "socialaccount_login_error": "/account/provider/callback",
-# }
+SOCIALACCOUNT_PROVIDERS = {
+    'google': {
+        'SCOPE': [
+            'profile',
+            'email',
+        ],
+        'AUTH_PARAMS': {
+            'access_type': 'online',
+        },
+        'OAUTH_PKCE_ENABLED': True,
+    }
+}
 
 HEADLESS_FRONTEND_URLS = {
-    "account_confirm_email": "http://localhost:5173",
-    "account_reset_password_from_key": "http://localhost:5173",
-    "account_signup": "http://localhost:5173",
-    "socialaccount_login_error": "http://localhost:5173",
+    "account_confirm_email": "/account/verify-email/{key}",
+    "account_reset_password": "/account/password/reset",
+    "account_reset_password_from_key": "/account/password/reset/key/{key}",
+    "account_signup": "/account/signup",
+    "socialaccount_login_error": "/account/provider/callback",
 }
+
 
 TEMPLATES = [
     {
