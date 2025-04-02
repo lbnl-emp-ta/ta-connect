@@ -1,14 +1,22 @@
 import { Box, Button, Container, Divider, TextField, Typography } from '@mui/material';
 import Grid from "@mui/material/Grid2"
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute, useRouter, } from '@tanstack/react-router'
 import { useState } from 'react';
 import { useLoginMutation } from '../../utils/queryOptions';
 
 export const Route = createFileRoute('/_public-only/login')({
-  component: RouteComponent,
+    validateSearch: (search: Record<string, unknown>): {redirect: string} => {
+        return {
+            redirect: search.redirect as string || ""
+        }
+    },
+    component: RouteComponent,
 })
 
 function RouteComponent() {
+    const router = useRouter();
+    const search = Route.useSearch();
+
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
 
@@ -16,7 +24,9 @@ function RouteComponent() {
 
     function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
         e.preventDefault();
+``
         loginMutation.mutate({email, password});
+        router.history.push(search.redirect);
     }
 
     return (

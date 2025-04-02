@@ -58,7 +58,10 @@ function Initializer() {
                                 display: "flex",
                                 gap: 5,
                             }}>
-                                <Link to="/login">
+                                <Link 
+                                    to="/login"
+                                    search={{redirect: "/"}}
+                                >
                                     Login
                                 </Link>
                                 <Link to="/signup">
