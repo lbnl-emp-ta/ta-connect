@@ -53,13 +53,15 @@ export const useSigupMutation = () => {
 export const useLoginMutation = () => {
     return useMutation ({
         mutationFn: loginMutation,
-        onSuccess: () => queryClient.invalidateQueries({queryKey: ["authSession"]})
+        onSuccess: () => {
+            queryClient.invalidateQueries({queryKey: ["authSession"]})
+        },
     })
 }
 
 export const useLogoutMutation = () => {
     return useMutation ({
         mutationFn: logoutMutation,
-        onSuccess: () => queryClient.invalidateQueries({queryKey: ["authSession"]})
+        onSettled: () => queryClient.invalidateQueries({queryKey: ["authSession"]}),
     })
 }

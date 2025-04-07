@@ -1,8 +1,8 @@
-import { Link, Outlet } from '@tanstack/react-router'
+import { Link, Outlet, useRouter } from '@tanstack/react-router'
 import { TanStackRouterDevtools } from '@tanstack/react-router-devtools'
 
 import { createRootRouteWithContext } from '@tanstack/react-router'
-import { useSuspenseQuery, type QueryClient } from '@tanstack/react-query'
+import { type QueryClient } from '@tanstack/react-query'
 import { AppBar, Box, Button, Toolbar } from '@mui/material'
 import { authSessionQueryOptions, useLogoutMutation } from '../utils/queryOptions'
 
@@ -11,21 +11,25 @@ export interface MyRouterContext {
 }
 
 export const Route = createRootRouteWithContext<MyRouterContext>()({
-    loader: (opts) => (
-        opts.context.queryClient.ensureQueryData(authSessionQueryOptions())
-    ),
+    beforeLoad: async ({ context }) => {
+            const { isAuthenticated } = await context.queryClient.ensureQueryData(authSessionQueryOptions());
+            return {
+                isAuthenticated: isAuthenticated,
+            }
+    },
     component: Initializer,
 })
 
 function Initializer() {
-    const { data: {isAuthenticated} } = useSuspenseQuery(authSessionQueryOptions());
+    const router = useRouter();
+    const { isAuthenticated }  = Route.useRouteContext();
 
     const logoutMutation = useLogoutMutation();
 
     function handleLogout(e: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
         e.preventDefault();
         logoutMutation.mutate();
-        window.location.reload();
+        router.invalidate();
     }
 
     return (
