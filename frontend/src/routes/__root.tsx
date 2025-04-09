@@ -20,6 +20,7 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
     component: Initializer,
 })
 
+
 function Initializer() {
     const router = useRouter();
     const { isAuthenticated }  = Route.useRouteContext();
@@ -31,6 +32,7 @@ function Initializer() {
         logoutMutation.mutate();
         router.invalidate();
     }
+
 
     return (
         <>

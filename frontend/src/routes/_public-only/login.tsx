@@ -14,7 +14,6 @@ export const Route = createFileRoute('/_public-only/login')({
 })
 
 function RouteComponent() {
-    const search = Route.useSearch();
     const router = useRouter();
 
     const [email, setEmail] = useState("");

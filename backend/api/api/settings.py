@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     'allauth.headless',
     'allauth.socialaccount',
     'allauth.socialaccount.providers.google',
+    'rest_framework',
 ]
 
 
@@ -64,12 +65,15 @@ MIDDLEWARE = [
 
 CORS_ALLOWED_ORIGIN_REGEXES = [
     # match localhost with any port
-    "https://owl-above-bluebird.ngrok-free.app"
+    "https://owl-above-bluebird.ngrok-free.app",
+    "http://taconnect-local.lbl.gov",
     r"^http:\/\/localhost:*([0-9]+)?$",
     r"^https:\/\/localhost:*([0-9]+)?$",
 ]
 
-CSRF_TRUSTED_ORIGINS = ["http://127.0.0.1",
+CSRF_TRUSTED_ORIGINS = ["http://taconnect-local.lbl.gov:1337",
+                        "http://taconnect-local.lbl.gov",
+                        "http://127.0.0.1",
                         "http://127.0.0.1:80",
                         "http://localhost",
                         "http://localhost:5173", 
@@ -92,6 +96,8 @@ CORS_ORIGIN_WHITELIST = ["http://127.0.0.1",
                         "http://127.0.0.1:5173", 
                         "http://localhost:8000", 
                         "http://127.0.0.1:8000", 
+                        "http://taconnect-local.lbl.gov:1337",
+                        "http://taconnect-local.lbl.gov",
                         "https://owl-above-bluebird.ngrok-free.app"]
 
 SITE_ID = 2
@@ -103,7 +109,10 @@ ALLOWED_HOSTS = ["localhost",
                  "localhost:5173", 
                  "localhost:8000", 
                  "owl-above-bluebird.ngrok-free.app",
-                 "owl-above-bluebird.ngrok-free.app/api/"]
+                 "owl-above-bluebird.ngrok-free.app/api/",
+                 "taconnect-local.lbl.gov:1337",
+                 "taconnect-local.lbl.gov",
+                 ]
 
 ROOT_URLCONF = 'api.urls'
 
