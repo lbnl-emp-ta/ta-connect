@@ -13,7 +13,7 @@ function PrivateRoute() {
     if(!isAuthenticated) {
         return (
             <Navigate 
-                to="/dashboard" 
+                to="/login" 
                 search={{
                     redirect: location.href,
                 }}
