@@ -1,15 +1,10 @@
 import { Box, Button, Container, Divider, TextField, Typography } from '@mui/material';
 import Grid from "@mui/material/Grid2"
-import { createFileRoute, useRouter } from '@tanstack/react-router'
-import { useLayoutEffect, useState } from 'react';
-import { useLoginMutation } from '../../utils/queryOptions';
+import { createFileRoute, useRouter} from '@tanstack/react-router'
+import { useState } from 'react';
+import {  useLoginMutation } from '../../utils/queryOptions';
 
 export const Route = createFileRoute('/_public-only/login')({
-    validateSearch: (search: Record<string, unknown>): {redirect: string} => {
-        return {
-            redirect: search.redirect as string || ""
-        }
-    },
     component: RouteComponent,
 })
 
@@ -23,13 +18,10 @@ function RouteComponent() {
 
     function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
         e.preventDefault();
-        loginMutation.mutate({email, password});
+        loginMutation.mutate({email, password}); 
         router.invalidate();
     }
 
-    useLayoutEffect(() => {
-
-    });
 
     return (
         <Container 

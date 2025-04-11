@@ -1,18 +1,20 @@
-import { createFileRoute, Outlet, redirect } from '@tanstack/react-router'
+import { createFileRoute, Navigate, Outlet} from '@tanstack/react-router'
 import { authSessionQueryOptions } from '../../utils/queryOptions'
+import { useSuspenseQuery } from '@tanstack/react-query';
 
 export const Route = createFileRoute('/_public-only')({
-    beforeLoad: async ({ context }) => {
-            const { isAuthenticated } = await context.queryClient.ensureQueryData(authSessionQueryOptions());
-            if(isAuthenticated) {
-                throw redirect({
-                    to: "/dashboard",
-                });
-            }
-        },
-    component: PublicRoute,
+    component: PublicOnlyRoute,
 })
 
-function PublicRoute() {
+function PublicOnlyRoute() {
+    const {data: {isAuthenticated}} = useSuspenseQuery(authSessionQueryOptions());
+
+    // authenticated users should not access public-only routes
+    if(isAuthenticated) {
+        return (
+            <Navigate to="/dashboard" />
+        )
+    }
+
     return <Outlet/>
 }

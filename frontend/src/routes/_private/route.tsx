@@ -1,22 +1,24 @@
-import { createFileRoute, Outlet, redirect } from '@tanstack/react-router'
+import { createFileRoute, Navigate, Outlet} from '@tanstack/react-router'
 import { authSessionQueryOptions } from '../../utils/queryOptions'
+import { useSuspenseQuery } from '@tanstack/react-query';
 
 export const Route = createFileRoute('/_private')({
-    beforeLoad: async ({ location, context }) => {
-        const { isAuthenticated } = await context.queryClient.ensureQueryData(authSessionQueryOptions());
-        if(!isAuthenticated) {
-            throw redirect({
-                to: "/login",
-                search: {
-                    // used to redirect back after authenticated
-                    redirect: location.href, 
-                },
-            });
-        }
-    },
     component: PrivateRoute,
 })
 
 function PrivateRoute() {
+    const {data: {isAuthenticated}} = useSuspenseQuery(authSessionQueryOptions());
+
+    // non-authenticated users should not access private routes
+    if(!isAuthenticated) {
+        return (
+            <Navigate 
+                to="/dashboard" 
+                search={{
+                    redirect: location.href,
+                }}
+            />
+        )
+    }
     return <Outlet/>;
 }
