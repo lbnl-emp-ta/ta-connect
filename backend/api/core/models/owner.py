@@ -1,7 +1,7 @@
 from django.db import IntegrityError, models
 from django.db.models import CheckConstraint, Q
 
-from core.models import Reception, Program, Lab, Team
+from core.models import Reception, Program, Lab, Team, Request
 
 class Owner(models.Model):
     class DomainType(models.TextChoices):
@@ -10,6 +10,7 @@ class Owner(models.Model):
         Lab = "lab"
         Team = "team"
 
+    request = models.ForeignKey(Request, on_delete=models.PROTECT, unique=True)
     domain_type = models.CharField(max_length=16, choices=DomainType)
     reception = models.ForeignKey(Reception, on_delete=models.PROTECT, null=True, blank=True)
     program = models.ForeignKey(Program, on_delete=models.PROTECT, null=True, blank=True)
@@ -19,10 +20,10 @@ class Owner(models.Model):
     def clean(self):
         # Count how many fields are non-null
         non_null_fields = sum([
-            bool(self.a),
-            bool(self.b),
-            bool(self.c),
-            bool(self.d),
+            bool(self.reception),
+            bool(self.program),
+            bool(self.lab),
+            bool(self.team),
         ])
         if non_null_fields != 1:
             raise IntegrityError("Exactly one of reception, program, lab, or team must be set.")
