@@ -12,6 +12,7 @@ export default defineConfig({
     port: 5173,
     allowedHosts: [
 	    "taconnect-local.lbl.gov",
+      "taconnect.lbl.gov",
     ]
   },
   base: '/',

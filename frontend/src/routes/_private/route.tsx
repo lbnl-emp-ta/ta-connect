@@ -12,12 +12,7 @@ function PrivateRoute() {
     // non-authenticated users should not access private routes
     if(!isAuthenticated) {
         return (
-            <Navigate 
-                to="/login" 
-                search={{
-                    redirect: location.href,
-                }}
-            />
+            <Navigate to="/login" />
         )
     }
     return <Outlet/>;

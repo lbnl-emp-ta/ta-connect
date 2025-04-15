@@ -9,6 +9,7 @@ import { logoutMutation } from "../api/accounts/logout";
 
 export const authSessionQueryOptions = () => (
     queryOptions({
+        staleTime: 600_000, // stale after 10 minutes
         queryKey: ["authSession"],
         queryFn: () => sessionsApi.getSession(),
     })

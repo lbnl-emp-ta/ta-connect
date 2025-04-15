@@ -65,8 +65,8 @@ MIDDLEWARE = [
 
 CORS_ALLOWED_ORIGIN_REGEXES = [
     # match localhost with any port
-    "https://owl-above-bluebird.ngrok-free.app",
     "http://taconnect-local.lbl.gov",
+    "http://taconnect-local.lbl.gov:1337",
     r"^http:\/\/localhost:*([0-9]+)?$",
     r"^https:\/\/localhost:*([0-9]+)?$",
 ]
@@ -80,7 +80,7 @@ CSRF_TRUSTED_ORIGINS = ["http://taconnect-local.lbl.gov:1337",
                         "http://127.0.0.1:5173", 
                         "http://localhost:8000", 
                         "http://127.0.0.1:8000", 
-                        "https://owl-above-bluebird.ngrok-free.app"]
+                        ]
 
 CORS_ALLOW_CREDENTIALS = True
 # CSRF_COOKIE_SECURE = False
@@ -97,8 +97,7 @@ CORS_ORIGIN_WHITELIST = ["http://127.0.0.1",
                         "http://localhost:8000", 
                         "http://127.0.0.1:8000", 
                         "http://taconnect-local.lbl.gov:1337",
-                        "http://taconnect-local.lbl.gov",
-                        "https://owl-above-bluebird.ngrok-free.app"]
+                        "http://taconnect-local.lbl.gov"]
 
 SITE_ID = 2
 
@@ -108,8 +107,6 @@ ALLOWED_HOSTS = ["localhost",
                  "127.0.0.1:80", 
                  "localhost:5173", 
                  "localhost:8000", 
-                 "owl-above-bluebird.ngrok-free.app",
-                 "owl-above-bluebird.ngrok-free.app/api/",
                  "taconnect-local.lbl.gov:1337",
                  "taconnect-local.lbl.gov",
                  ]
@@ -127,27 +124,14 @@ AUTHENTICATION_BACKENDS = [
 ]
 
 # django-allauth settings
-HEADLESS_ONLY = True
-HEADLESS_SERVE_SPECIFICATION = True
 ACCOUNT_USER_MODEL_USERNAME_FIELD = None
 ACCOUNT_SIGNUP_FIELDS = ['email*', 'password1*', 'password2*']
 ACCOUNT_LOGIN_METHODS= {'email'}
 ACCOUNT_EMAIL_VERIFICATION = "none"
 
 
-SOCIALACCOUNT_PROVIDERS = {
-    'google': {
-        'SCOPE': [
-            'profile',
-            'email',
-        ],
-        'AUTH_PARAMS': {
-            'access_type': 'online',
-        },
-        'OAUTH_PKCE_ENABLED': True,
-    }
-}
-
+HEADLESS_ONLY = True
+HEADLESS_SERVE_SPECIFICATION = True
 HEADLESS_FRONTEND_URLS = {
     "account_confirm_email": "/account/verify-email/{key}",
     "account_reset_password": "/account/password/reset",
@@ -155,7 +139,6 @@ HEADLESS_FRONTEND_URLS = {
     "account_signup": "/account/signup",
     "socialaccount_login_error": "/account/provider/callback",
 }
-
 
 TEMPLATES = [
     {
