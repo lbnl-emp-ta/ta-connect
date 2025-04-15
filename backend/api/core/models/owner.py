@@ -31,7 +31,7 @@ class Owner(models.Model):
         constraints = [
             # Only one of the fields can be non-null
             CheckConstraint(
-                check=(
+                condition=(
                     (
                         (Q(reception__isnull=False) & Q(program__isnull=True) & Q(lab__isnull=True) & Q(team__isnull=True)) |
                         (Q(reception__isnull=True) & Q(program__isnull=False) & Q(lab__isnull=True) & Q(team__isnull=True)) |
