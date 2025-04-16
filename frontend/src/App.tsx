@@ -70,7 +70,7 @@ function IntakeForm() {
     function handleSubmit(event: React.SyntheticEvent<HTMLFormElement>) {
         async function _handleSubmit(event: React.SyntheticEvent<HTMLFormElement>) {
             event.preventDefault()
-            const url = "http://127.0.0.1:8000/process-intake-form/"
+            const url = `${import.meta.env.VITE_API_URL}/process-intake-form/`
             try {
                 const response = await fetch(url, {
                     method: "POST",
@@ -177,15 +177,15 @@ function IntakeForm() {
     }, []);
 
     useEffect(() => {
-        updateLocalListOf<State>(setStates, "http://127.0.0.1:8000/states/");
+        updateLocalListOf<State>(setStates, `${import.meta.env.VITE_API_URL}/states/`);
     }, [updateLocalListOf]);
 
     useEffect(() => {
-        updateLocalListOf<OrganiztionType>(setOrgTypes, "http://127.0.0.1:8000/organization-types/");
+        updateLocalListOf<OrganiztionType>(setOrgTypes, `${import.meta.env.VITE_API_URL}/organization-types/`);
     }, [updateLocalListOf]);
 
     useEffect(() => {
-        updateLocalListOf<TransmissionPlanningRegion>(setTPRs, "http://127.0.0.1:8000/transmission-planning-regions/");
+        updateLocalListOf<TransmissionPlanningRegion>(setTPRs, `${import.meta.env.VITE_API_URL}/transmission-planning-regions/`);
     }, [updateLocalListOf]);
 
     if (submitted) {
