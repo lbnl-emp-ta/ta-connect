@@ -45,7 +45,7 @@ function RouteComponent() {
                 }}
             >
                 <Typography component="h1" variant="h5">
-                    Log In
+                    Login
                 </Typography>
                 <Divider sx={{
                     marginTop: 2,
@@ -131,7 +131,10 @@ export default function LoginWithSocialButton({
     form.submit();
   }
   return (
-    <Button onClick={handleClick} variant="contained">
+    <Button 
+        onClick={handleClick} 
+        fullWidth 
+        variant="contained" >
       Login with {name}
     </Button>
   );
