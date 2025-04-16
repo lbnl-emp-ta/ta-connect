@@ -6,12 +6,20 @@ import { queryClient } from "../main"
 import { signupMutation } from "../api/accounts/signup";
 import { loginMutation } from "../api/accounts/login";
 import { logoutMutation } from "../api/accounts/logout";
+import { TARequest } from "../api/dashboard";
 
 export const authSessionQueryOptions = () => (
     queryOptions({
         staleTime: 600_000, // stale after 10 minutes
         queryKey: ["authSession"],
         queryFn: () => sessionsApi.getSession(),
+    })
+);
+
+export const requestsQueryOptions = () => (
+    queryOptions({
+        queryKey: ["requests"],
+        queryFn: () => fetchListOf<TARequest>(`${import.meta.env.VITE_API_URL}/requests/`)
     })
 );
 
