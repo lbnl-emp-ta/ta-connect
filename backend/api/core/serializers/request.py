@@ -1,13 +1,19 @@
 from rest_framework import serializers
 from django.utils import timezone
 
-from core.models import Request, RequestStatus
+from core.models import Request, RequestStatus, Depth
 
 class RequestSerializer(serializers.ModelSerializer):
     status = serializers.SlugRelatedField(
         slug_field="name", 
         required=False, 
         queryset=RequestStatus.objects.all()
+    )
+    
+    depth = serializers.SlugRelatedField(
+        slug_field="name",
+        required=False,
+        queryset=Depth.objects.all()
     )
     
     @classmethod

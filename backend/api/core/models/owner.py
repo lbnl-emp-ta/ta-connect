@@ -10,7 +10,7 @@ class Owner(models.Model):
         Lab = "lab"
         Team = "team"
 
-    request = models.ForeignKey(Request, on_delete=models.PROTECT, unique=True)
+    request = models.ForeignKey(Request, on_delete=models.PROTECT, unique=True, null=True)
     domain_type = models.CharField(max_length=16, choices=DomainType)
     reception = models.ForeignKey(Reception, on_delete=models.PROTECT, null=True, blank=True)
     program = models.ForeignKey(Program, on_delete=models.PROTECT, null=True, blank=True)
