@@ -33,7 +33,7 @@ urlpatterns = [
     
     path('process-intake-form/', ProcessIntakeForm.as_view(), name="process-intake-form"),
     
-    path('requests/', RequestCreateView.as_view(), name="request-create"),
+    path('requests/', RequestListCreateView.as_view(), name="request-list-create"),
     
     path('depths/', DepthListView.as_view(), name="depth-list"),
     path('depths/<int:pk>', DepthRetrieveView.as_view(), name="depth-retrieve"),

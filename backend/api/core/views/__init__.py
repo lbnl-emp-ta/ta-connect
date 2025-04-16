@@ -1,4 +1,4 @@
-from .request import RequestCreateView
+from .request import RequestListCreateView
 from .depth import DepthListView, DepthRetrieveView
 from .state import StateListView, StateRetrieveView
 from .organization_type import OrganizationTypeListView, OrganizationTypeRetrieveView
@@ -10,7 +10,7 @@ from .cohort import CohortCreateView, CohortAddCustomerView
 from .intake_form import ProcessIntakeForm
 
 __all__ = [
-    "RequestCreateView",
+    "RequestListCreateView",
     "DepthListView",
     "DepthRetrieveView",
     "StateListView",

@@ -3,9 +3,8 @@ from rest_framework.response import Response
 from core.serializers import RequestSerializer
 from core.models import Request
 
-
-class RequestCreateView(generics.CreateAPIView):
-    queryset = Request.objects.all()
+class RequestListCreateView(generics.ListCreateAPIView):
+    queryset = Request.objects.all()#.select_related("status", "depth")
     serializer_class = RequestSerializer
 
     

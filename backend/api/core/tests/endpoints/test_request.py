@@ -11,7 +11,7 @@ from django.utils import timezone
 class TestRequestCreateEndpoint():
     @classmethod
     def post_endpoint(cls):
-        return reverse("request-create")
+        return reverse("request-list-create")
     
     def test_create_request_endpoint_exists_at_desired_location(self, api_client):
         data = {
