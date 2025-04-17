@@ -41,13 +41,13 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.sites',
-    'core.apps.CoreConfig',
     'corsheaders',
     'allauth.account',
     'allauth.headless',
     'allauth.socialaccount',
     'allauth.socialaccount.providers.google',
     'rest_framework',
+    'core',
 ]
 
 

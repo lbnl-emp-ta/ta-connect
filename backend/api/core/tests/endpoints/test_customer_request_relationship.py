@@ -11,5 +11,5 @@ class TestCustomerRequestRelationshipCreateEndpoint():
             "customer_type": test_customer_type.pk
         }
         
-        response = api_client.post("/customer-request-relationships/", data=data)
+        response = api_client.post("/api/customer-request-relationships/", data=data)
         assert response.status_code == status.HTTP_201_CREATED

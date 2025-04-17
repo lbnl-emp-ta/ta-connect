@@ -18,7 +18,7 @@ class TestRequestCreateEndpoint():
             "description": "test",
         }
         
-        response = api_client.post("/requests/", data=data)
+        response = api_client.post("/api/requests/", data=data)
         assert response.status_code == status.HTTP_201_CREATED
     
     def test_create_request_is_successful_given_only_desc_and_depth(self, api_client):

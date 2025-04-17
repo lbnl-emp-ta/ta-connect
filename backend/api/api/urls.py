@@ -16,7 +16,6 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import include, path
-from core.views import *
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -25,32 +24,8 @@ urlpatterns = [
     # needed for handling e.g. the OAuth handshake. The account views
     # can be disabled using `HEADLESS_ONLY = True`.
     path("accounts/", include("allauth.urls")),
-
-    # Include the API endpoints:
     path("_allauth/", include("allauth.headless.urls")),
     
-    
-    
-    path('process-intake-form/', ProcessIntakeForm.as_view(), name="process-intake-form"),
-    
-    path('requests/', RequestListCreateView.as_view(), name="request-list-create"),
-    
-    path('depths/', DepthListView.as_view(), name="depth-list"),
-    path('depths/<int:pk>', DepthRetrieveView.as_view(), name="depth-retrieve"),
-    
-    path('states/', StateListView.as_view(), name="state-list"),
-    path('states/<int:pk>', StateRetrieveView.as_view(), name="state-retrieve"),
-    
-    path('organization-types/', OrganizationTypeListView.as_view(), name="organization-type-list"),
-    path('organization-types/<int:pk>', OrganizationTypeRetrieveView.as_view(), name="organization-type-retrieve"),
-    
-    path('organizations/', OrganizationListCreateView.as_view(), name="organization-list-create"),
-    
-    path('transmission-planning-regions/', TransmissionPlanningRegionListView.as_view(), name="transmission-planning-regions-list"),
-    
-    path('customers/', CustomerCreateView.as_view(), name="customer-create"),
-    path('customer-request-relationships/', CustomerRequestRelationshipCreateView.as_view(), name="customer-request-relationship-create"),
-    
-    path('cohorts/', CohortCreateView.as_view(), name="cohort-create"),
-    path('cohorts/add-customer/', CohortAddCustomerView.as_view(), name="cohort-customer-add"),
+
+    path("api/", include("core.urls")),
 ]

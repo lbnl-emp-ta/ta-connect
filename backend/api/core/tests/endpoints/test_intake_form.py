@@ -25,7 +25,7 @@ class TestProcessIntakeFormEndpoint:
             "taDepth": test_request.depth.name,
             "description": test_request.description
         }
-        response = api_client.post("/process-intake-form/", data=data)
+        response = api_client.post("/api/process-intake-form/", data=data)
         assert response.status_code == status.HTTP_201_CREATED
     
     def test_process_intake_endpoint_return_bad_request_when_missing_required_email_field(self, api_client, test_customer, test_request):
@@ -51,7 +51,7 @@ class TestProcessIntakeFormEndpoint:
         }
         
         
-        response = api_client.post("/process-intake-form/", data=data)
+        response = api_client.post("/api/process-intake-form/", data=data)
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         
         

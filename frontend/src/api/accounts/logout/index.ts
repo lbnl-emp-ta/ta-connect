@@ -1,8 +1,7 @@
 import { getCSRFToken } from "../../../utils/cookies";
 
 export async function logoutMutation() {
-    const response = await fetch(
-            `${import.meta.env.VITE_API_URL}/_allauth/browser/v1/auth/session`,
+    const response = await fetch("/_allauth/browser/v1/auth/session",
             {
                 method: "DELETE",
                 credentials: "include",
