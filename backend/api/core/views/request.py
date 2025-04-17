@@ -1,10 +1,10 @@
-from rest_framework import generics, status
+from rest_framework import generics, status, permissions
 from rest_framework.response import Response
 from core.serializers import RequestSerializer
 from core.models import Request
 
 class RequestListCreateView(generics.ListCreateAPIView):
-    queryset = Request.objects.all()#.select_related("status", "depth")
+    queryset = Request.objects.all().select_related("status", "depth")
     serializer_class = RequestSerializer
 
     
