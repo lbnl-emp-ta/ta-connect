@@ -1,3 +1,5 @@
+import { getCSRFToken } from "../../utils/cookies";
+
 export interface State {
     id: number;
     name: string;
@@ -29,7 +31,9 @@ export interface IntakeFormData {
 
 export async function fetchListOf<T>(url: string): Promise<T[]> {
     try {
-        const response = await fetch(url);
+        const response = await fetch(url, {
+            credentials: "include"
+        });
         if (!response.ok) {
             throw Error(`Request status: ${response.status}`);
         }
@@ -50,8 +54,10 @@ export async function submitIntakeMutation(formData: IntakeFormData) {
     try {
         const response = await fetch(url, {
             method: "POST",
+            credentials: "include",
             headers: {
-                "Content-Type": "application/json"
+                "Content-Type": "application/json",
+                "X-CSRFToken": getCSRFToken() || ""
             },
             body: JSON.stringify({...formData})
         });
