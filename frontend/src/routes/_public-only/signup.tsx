@@ -6,8 +6,9 @@ import {
         Container, 
         Divider, 
         TextField, 
-        Typography } from '@mui/material';
-import Grid from "@mui/material/Grid2"
+        Typography,
+        Grid 
+} from '@mui/material';
 import { useSigupMutation } from '../../utils/queryOptions';
 
 
