@@ -6,7 +6,7 @@ import { queryClient } from "../main"
 import { signupMutation } from "../api/accounts/signup";
 import { loginMutation } from "../api/accounts/login";
 import { logoutMutation } from "../api/accounts/logout";
-import { TARequest } from "../api/dashboard";
+import { CustomerRequestRelationship, TARequest } from "../api/dashboard";
 
 export const authSessionQueryOptions = () => (
     queryOptions({
@@ -15,6 +15,14 @@ export const authSessionQueryOptions = () => (
         queryFn: () => sessionsApi.getSession(),
     })
 );
+
+export const customerRequestRelationshipOptions = () => (
+    queryOptions({
+        staleTime: 120_000, // stale after 2 minutes
+        queryKey: ["customerRequestRelationships"],
+        queryFn: () => fetchListOf<CustomerRequestRelationship>(`${import.meta.env.VITE_API_URL}/customer-request-relationships/`),
+    })
+)
 
 export const requestsQueryOptions = () => (
     queryOptions({

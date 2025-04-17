@@ -1,19 +1,20 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { requestsQueryOptions } from '../../utils/queryOptions'
+import { customerRequestRelationshipOptions} from '../../utils/queryOptions'
 import { useSuspenseQuery } from '@tanstack/react-query'
 import { Box, Button, Collapse, IconButton, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from '@mui/material'
 import { dateDiffInDays } from '../../utils/datetimes'
 import { useState } from 'react'
 import { KeyboardArrowDown, KeyboardArrowUp } from '@mui/icons-material'
+import { CustomerRequestRelationship } from '../../api/dashboard'
 
 export const Route = createFileRoute('/_private/dashboard')({
     loader: ({ context }) => {
-        context.queryClient.ensureQueryData(requestsQueryOptions())
+        context.queryClient.ensureQueryData(customerRequestRelationshipOptions())
     },
     component: RequestTable, 
 })
 
-function RequestTableRow(props: {row: any}) {
+function RequestTableRow(props: {row: CustomerRequestRelationship & {age: number}}) {
     const { row } = props;
     const [open, setOpen] = useState(false);
 
@@ -33,11 +34,11 @@ function RequestTableRow(props: {row: any}) {
                     {row.id}
                 </TableCell>
                 <TableCell align="right">{row.age}</TableCell>
-                <TableCell align="right">{row.status}</TableCell>
-                <TableCell align="right">{row.depth}</TableCell>
-                <TableCell align="right">Placeholder Name</TableCell>
-                <TableCell align="right">Placeholder Email</TableCell>
-                <TableCell align="right">Placeholder Phone Number</TableCell>
+                <TableCell align="right">{row.request.status}</TableCell>
+                <TableCell align="right">{row.request.depth}</TableCell>
+                <TableCell align="right">{row.customer.name}</TableCell>
+                <TableCell align="right">{row.customer.email}</TableCell>
+                <TableCell align="right">{row.customer.phone}</TableCell>
             </TableRow>
             <TableRow>
                 <TableCell style={{paddingBottom: 0, paddingTop: 0}} colSpan={8}>
@@ -56,9 +57,9 @@ function RequestTableRow(props: {row: any}) {
                                 </TableHead>
                                 <TableBody>
                                     <TableRow>
-                                        <TableCell>{row.description}</TableCell>
-                                        <TableCell>{row.proj_start_date}</TableCell>
-                                        <TableCell>{row.proj_end_date}</TableCell>
+                                        <TableCell>{row.request.description}</TableCell>
+                                        <TableCell>{row.request.proj_start_date}</TableCell>
+                                        <TableCell>{row.request.proj_end_date}</TableCell>
                                     </TableRow>
                                 </TableBody>
                             </Table>
@@ -71,10 +72,10 @@ function RequestTableRow(props: {row: any}) {
 }
 
 function RequestTable() {
-    const { data: TARequests } = useSuspenseQuery(requestsQueryOptions())
-    const tableData = TARequests.map((request) => {
-        const ageInDays = dateDiffInDays(new Date(request.date_created), new Date());
-        return {...request, age: ageInDays}
+    const { data: customerRequestRelationships } = useSuspenseQuery(customerRequestRelationshipOptions())
+    const tableData = customerRequestRelationships.map((crr) => {
+        const ageInDays = dateDiffInDays(new Date(crr.request.date_created), new Date());
+        return {...crr, age: ageInDays}
     });
 
     return (
