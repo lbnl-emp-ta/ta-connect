@@ -18,6 +18,7 @@ export const authSessionQueryOptions = () => (
 
 export const requestsQueryOptions = () => (
     queryOptions({
+        staleTime: 120_000, // stale after 2 minutes
         queryKey: ["requests"],
         queryFn: () => fetchListOf<TARequest>(`${import.meta.env.VITE_API_URL}/requests/`)
     })
@@ -25,6 +26,7 @@ export const requestsQueryOptions = () => (
 
 export const statesQueryOptions = () => (
     queryOptions({
+        staleTime: 120_000, // stale after 2 minutes
         queryKey: ["states"],
         queryFn: () => fetchListOf<State>(`${import.meta.env.VITE_API_URL}/states/`)
     })
@@ -32,6 +34,7 @@ export const statesQueryOptions = () => (
 
 export const organizationTypesQueryOptions = () => (
     queryOptions({
+        staleTime: 120_000, // stale after 2 minutes
         queryKey: ["organizationTypes"],
         queryFn: () => fetchListOf<OrganiztionType>(`${import.meta.env.VITE_API_URL}/organization-types/`)
     })
@@ -39,6 +42,7 @@ export const organizationTypesQueryOptions = () => (
 
 export const transmissionPlanningRegionsQueryOptions = () => (
     queryOptions({
+        staleTime: 120_000, // stale after 2 minutes
         queryKey: ["transmissionPlanningRegions"],
         queryFn: () => fetchListOf<TransmissionPlanningRegion>(`${import.meta.env.VITE_API_URL}/transmission-planning-regions/`)
     })
