@@ -32,7 +32,11 @@ export interface IntakeFormData {
 export async function fetchListOf<T>(url: string): Promise<T[]> {
     try {
         const response = await fetch(url, {
-            credentials: "include"
+            credentials: "include",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRFToken": getCSRFToken() || ""
+            }
         });
         if (!response.ok) {
             throw Error(`Request status: ${response.status}`);
