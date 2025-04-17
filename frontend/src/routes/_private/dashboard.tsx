@@ -30,10 +30,10 @@ function RequestTableRow(props: {row: CustomerRequestRelationship & {age: number
                         {open ? <KeyboardArrowUp/> : <KeyboardArrowDown/>}
                     </IconButton>
                 </TableCell>
-                <TableCell component="th" scope="row">
+                <TableCell align="center" component="th" scope="row">
                     {row.id}
                 </TableCell>
-                <TableCell align="right">{row.age}</TableCell>
+                <TableCell align="center">{row.age}</TableCell>
                 <TableCell align="right">{row.request.status}</TableCell>
                 <TableCell align="right">{row.request.depth}</TableCell>
                 <TableCell align="right">{row.customer.name}</TableCell>
@@ -58,8 +58,8 @@ function RequestTableRow(props: {row: CustomerRequestRelationship & {age: number
                                 <TableBody>
                                     <TableRow>
                                         <TableCell>{row.request.description}</TableCell>
-                                        <TableCell>{row.request.proj_start_date}</TableCell>
-                                        <TableCell>{row.request.proj_end_date}</TableCell>
+                                        <TableCell>{row.request.proj_start_date || "Undetermined"}</TableCell>
+                                        <TableCell>{row.request.proj_end_date || "Undetermined"}</TableCell>
                                     </TableRow>
                                 </TableBody>
                             </Table>
