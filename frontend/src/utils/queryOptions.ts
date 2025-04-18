@@ -26,7 +26,7 @@ export const customerRequestRelationshipOptions = () => (
 
 export const requestsQueryOptions = () => (
     queryOptions({
-        staleTime: 120_000, 
+        staleTime: 120_000, // stale after 2 minutes 
         queryKey: ["requests"],
         queryFn: () => fetchListOf<TARequest>(`${import.meta.env.VITE_API_URL}/requests/`)
     })
