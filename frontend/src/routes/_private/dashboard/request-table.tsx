@@ -1,17 +1,17 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { customerRequestRelationshipOptions} from '../../utils/queryOptions'
 import { useSuspenseQuery } from '@tanstack/react-query'
 import { Box, Button, Collapse, IconButton, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from '@mui/material'
-import { dateDiffInDays } from '../../utils/datetimes'
+import { dateDiffInDays } from '../../../utils/datetimes'
 import { useState } from 'react'
 import { KeyboardArrowDown, KeyboardArrowUp } from '@mui/icons-material'
-import { CustomerRequestRelationship } from '../../api/dashboard/types'
+import { CustomerRequestRelationship } from '../../../api/dashboard/types'
+import { customerRequestRelationshipOptions } from '../../../utils/queryOptions'
 
-export const Route = createFileRoute('/_private/dashboard')({
+export const Route = createFileRoute('/_private/dashboard/request-table')({
     loader: async ({ context }) => {
         await context.queryClient.ensureQueryData(customerRequestRelationshipOptions())
     },
-    component: RequestTable, 
+    component: RequestTable,
 })
 
 function RequestTableRow(props: {row: CustomerRequestRelationship & {age: number}}) {
