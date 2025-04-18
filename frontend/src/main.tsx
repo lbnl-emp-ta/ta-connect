@@ -38,13 +38,6 @@ declare module '@tanstack/react-router' {
     }
 }
 
-// eslint-disable-next-line react-refresh/only-export-components
-function App() {
-    return (
-        <RouterProvider router={router} />
-    )
-}
-
 // Render the app
 const rootElement = document.getElementById('root')!
 if (!rootElement.innerHTML) {
@@ -52,7 +45,7 @@ if (!rootElement.innerHTML) {
     root.render(
     <StrictMode>
         <QueryClientProvider client={queryClient}>
-            <App/>
+            <RouterProvider router={router} />
         </QueryClientProvider>
     </StrictMode>,
   )
