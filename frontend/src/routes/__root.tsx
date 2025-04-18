@@ -28,10 +28,11 @@ function Initializer() {
         logoutMutation.mutate();
     }
 
-
     return (
         <>
-        <AppBar position="sticky">
+        <AppBar position="sticky" sx={{
+            zIndex: (theme) => theme.zIndex.drawer + 1,                
+        }}>
             <Toolbar sx={{
                 display: "flex",
                 gap: 5,

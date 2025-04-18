@@ -18,6 +18,7 @@ import { Route as PublicOnlySignupImport } from './routes/_public-only/signup'
 import { Route as PublicOnlyLoginImport } from './routes/_public-only/login'
 import { Route as publicIntakeImport } from './routes/(public)/intake'
 import { Route as PrivateDashboardRouteImport } from './routes/_private/dashboard/route'
+import { Route as PrivateDashboardTestTabImport } from './routes/_private/dashboard/test-tab'
 import { Route as PrivateDashboardRequestTableImport } from './routes/_private/dashboard/request-table'
 
 // Create/Update Routes
@@ -60,6 +61,12 @@ const PrivateDashboardRouteRoute = PrivateDashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
   getParentRoute: () => PrivateRouteRoute,
+} as any)
+
+const PrivateDashboardTestTabRoute = PrivateDashboardTestTabImport.update({
+  id: '/test-tab',
+  path: '/test-tab',
+  getParentRoute: () => PrivateDashboardRouteRoute,
 } as any)
 
 const PrivateDashboardRequestTableRoute =
@@ -129,6 +136,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PrivateDashboardRequestTableImport
       parentRoute: typeof PrivateDashboardRouteImport
     }
+    '/_private/dashboard/test-tab': {
+      id: '/_private/dashboard/test-tab'
+      path: '/test-tab'
+      fullPath: '/dashboard/test-tab'
+      preLoaderRoute: typeof PrivateDashboardTestTabImport
+      parentRoute: typeof PrivateDashboardRouteImport
+    }
   }
 }
 
@@ -136,10 +150,12 @@ declare module '@tanstack/react-router' {
 
 interface PrivateDashboardRouteRouteChildren {
   PrivateDashboardRequestTableRoute: typeof PrivateDashboardRequestTableRoute
+  PrivateDashboardTestTabRoute: typeof PrivateDashboardTestTabRoute
 }
 
 const PrivateDashboardRouteRouteChildren: PrivateDashboardRouteRouteChildren = {
   PrivateDashboardRequestTableRoute: PrivateDashboardRequestTableRoute,
+  PrivateDashboardTestTabRoute: PrivateDashboardTestTabRoute,
 }
 
 const PrivateDashboardRouteRouteWithChildren =
@@ -181,6 +197,7 @@ export interface FileRoutesByFullPath {
   '/login': typeof PublicOnlyLoginRoute
   '/signup': typeof PublicOnlySignupRoute
   '/dashboard/request-table': typeof PrivateDashboardRequestTableRoute
+  '/dashboard/test-tab': typeof PrivateDashboardTestTabRoute
 }
 
 export interface FileRoutesByTo {
@@ -191,6 +208,7 @@ export interface FileRoutesByTo {
   '/login': typeof PublicOnlyLoginRoute
   '/signup': typeof PublicOnlySignupRoute
   '/dashboard/request-table': typeof PrivateDashboardRequestTableRoute
+  '/dashboard/test-tab': typeof PrivateDashboardTestTabRoute
 }
 
 export interface FileRoutesById {
@@ -203,6 +221,7 @@ export interface FileRoutesById {
   '/_public-only/login': typeof PublicOnlyLoginRoute
   '/_public-only/signup': typeof PublicOnlySignupRoute
   '/_private/dashboard/request-table': typeof PrivateDashboardRequestTableRoute
+  '/_private/dashboard/test-tab': typeof PrivateDashboardTestTabRoute
 }
 
 export interface FileRouteTypes {
@@ -215,6 +234,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/signup'
     | '/dashboard/request-table'
+    | '/dashboard/test-tab'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -224,6 +244,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/signup'
     | '/dashboard/request-table'
+    | '/dashboard/test-tab'
   id:
     | '__root__'
     | '/'
@@ -234,6 +255,7 @@ export interface FileRouteTypes {
     | '/_public-only/login'
     | '/_public-only/signup'
     | '/_private/dashboard/request-table'
+    | '/_private/dashboard/test-tab'
   fileRoutesById: FileRoutesById
 }
 
@@ -287,7 +309,8 @@ export const routeTree = rootRoute
       "filePath": "_private/dashboard/route.tsx",
       "parent": "/_private",
       "children": [
-        "/_private/dashboard/request-table"
+        "/_private/dashboard/request-table",
+        "/_private/dashboard/test-tab"
       ]
     },
     "/(public)/intake": {
@@ -303,6 +326,10 @@ export const routeTree = rootRoute
     },
     "/_private/dashboard/request-table": {
       "filePath": "_private/dashboard/request-table.tsx",
+      "parent": "/_private/dashboard"
+    },
+    "/_private/dashboard/test-tab": {
+      "filePath": "_private/dashboard/test-tab.tsx",
       "parent": "/_private/dashboard"
     }
   }
