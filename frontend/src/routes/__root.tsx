@@ -1,4 +1,4 @@
-import { Link, Outlet, useRouter } from '@tanstack/react-router'
+import { Link, Outlet} from '@tanstack/react-router'
 import { TanStackRouterDevtools } from '@tanstack/react-router-devtools'
 
 import { createRootRouteWithContext } from '@tanstack/react-router'
@@ -11,15 +11,14 @@ export interface MyRouterContext {
 }
 
 export const Route = createRootRouteWithContext<MyRouterContext>()({
-    loader: ({ context }) => {
-        context.queryClient.ensureQueryData(authSessionQueryOptions());
+    loader: async ({ context }) => {
+        await context.queryClient.ensureQueryData(authSessionQueryOptions());
     },
     component: Initializer,
 })
 
 
 function Initializer() {
-    const router = useRouter();
     const {data: { isAuthenticated } } = useSuspenseQuery(authSessionQueryOptions());
 
     const logoutMutation = useLogoutMutation();
@@ -27,7 +26,6 @@ function Initializer() {
     function handleLogout(e: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
         e.preventDefault();
         logoutMutation.mutate();
-        router.invalidate();
     }
 
 

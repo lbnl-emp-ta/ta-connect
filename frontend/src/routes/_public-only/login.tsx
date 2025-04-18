@@ -1,5 +1,5 @@
 import { Grid, Box, Button, Container, Divider, TextField, Typography } from '@mui/material';
-import { createFileRoute, useRouter} from '@tanstack/react-router'
+import { createFileRoute } from '@tanstack/react-router'
 import { useState } from 'react';
 import {  useLoginMutation } from '../../utils/queryOptions';
 import { getCSRFToken } from '../../utils/cookies';
@@ -9,8 +9,6 @@ export const Route = createFileRoute('/_public-only/login')({
 })
 
 function RouteComponent() {
-    const router = useRouter();
-
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
 
@@ -19,7 +17,6 @@ function RouteComponent() {
     function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
         e.preventDefault();
         loginMutation.mutate({email, password}); 
-        router.invalidate();
     }
 
 

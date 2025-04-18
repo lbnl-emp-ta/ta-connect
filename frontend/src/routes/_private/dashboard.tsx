@@ -5,11 +5,11 @@ import { Box, Button, Collapse, IconButton, Paper, Table, TableBody, TableCell, 
 import { dateDiffInDays } from '../../utils/datetimes'
 import { useState } from 'react'
 import { KeyboardArrowDown, KeyboardArrowUp } from '@mui/icons-material'
-import { CustomerRequestRelationship } from '../../api/dashboard'
+import { CustomerRequestRelationship } from '../../api/dashboard/types'
 
 export const Route = createFileRoute('/_private/dashboard')({
-    loader: ({ context }) => {
-        context.queryClient.ensureQueryData(customerRequestRelationshipOptions())
+    loader: async ({ context }) => {
+        await context.queryClient.ensureQueryData(customerRequestRelationshipOptions())
     },
     component: RequestTable, 
 })

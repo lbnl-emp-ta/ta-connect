@@ -19,7 +19,7 @@ import {
         
 import { matchIsValidTel, MuiTelInput } from "mui-tel-input";
 import { useEffect, useState } from "react";
-import { IntakeFormData, type State} from "../../api/forms";
+import { IntakeFormData, OrganiztionType, State, TransmissionPlanningRegion} from "../../api/forms/types";
 import { 
     organizationTypesQueryOptions, 
     statesQueryOptions, 
@@ -28,12 +28,12 @@ import {
 import { useSuspenseQuery } from "@tanstack/react-query";
 
 export const Route = createFileRoute('/(public)/intake')({
-    loader: (opts) => {
-        opts.context.queryClient.ensureQueryData(statesQueryOptions());
-        opts.context.queryClient.ensureQueryData(organizationTypesQueryOptions());
-        opts.context.queryClient.ensureQueryData(transmissionPlanningRegionsQueryOptions());
+    loader: async ({ context }) => {
+        await context.queryClient.ensureQueryData(statesQueryOptions());
+        await context.queryClient.ensureQueryData(organizationTypesQueryOptions());
+        await context.queryClient.ensureQueryData(transmissionPlanningRegionsQueryOptions());
     },
-  component: IntakeForm,
+    component: IntakeForm,
 })
 
 function IntakeForm() {
@@ -187,7 +187,7 @@ function IntakeForm() {
                                 onChange={e => setTPRName(e.target.value as React.SetStateAction<string>)}
                             >
                                 {
-                                    tprs.map((region) => (
+                                    tprs.map((region: TransmissionPlanningRegion) => (
                                         <MenuItem key={region.name} value={region.name}>
                                             {region.name}
                                         </MenuItem>
@@ -198,7 +198,7 @@ function IntakeForm() {
                         <Autocomplete
                             disablePortal
                             options={states}
-                            getOptionLabel={(option) => option.name}
+                            getOptionLabel={(option: State) => option.name}
                             sx={{ width: 300 }}
                             renderInput={(params) => <TextField {...params} required={true} label="State" />}
                             value={state}
@@ -231,7 +231,7 @@ function IntakeForm() {
                                 name="org-type-radio-group"
                             >
                                 {
-                                    orgTypes.map((type => (
+                                    orgTypes.map(((type: OrganiztionType) => (
                                         <FormControlLabel key={type.name} value={type.name} control={<Radio />} label={type.name} />
                                     )))
                                 }

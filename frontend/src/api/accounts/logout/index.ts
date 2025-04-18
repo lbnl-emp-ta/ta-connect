@@ -1,4 +1,5 @@
 import { getCSRFToken } from "../../../utils/cookies";
+import { ErrorResponse, SessionUnauthenticatedResponse } from "../../types";
 
 export async function logoutMutation() {
     const response = await fetch("/_allauth/browser/v1/auth/session",
@@ -11,7 +12,7 @@ export async function logoutMutation() {
             },
         );
     
-        const responseData = await response.json();
+        const responseData = await response.json() as (SessionUnauthenticatedResponse | ErrorResponse);
     
         if (!response.ok) {
             throw Error(`Error: Status ${response.status}`);

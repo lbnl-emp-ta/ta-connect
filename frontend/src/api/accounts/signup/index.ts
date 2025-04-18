@@ -1,4 +1,5 @@
 import { getCSRFToken } from "../../../utils/cookies"
+import { ErrorResponse, SessionAuthenticatedResponse } from "../../types";
 import { SignupDetails } from "./types";
 
 export async function signupMutation(details: SignupDetails) {
@@ -14,7 +15,7 @@ export async function signupMutation(details: SignupDetails) {
         },
     );
 
-    const responseData = await response.json();
+    const responseData = await response.json() as (SessionAuthenticatedResponse | ErrorResponse);
 
     if (!response.ok) {
         throw Error(`Error: Status ${response.status}`);

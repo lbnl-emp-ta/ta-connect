@@ -1,12 +1,12 @@
 import { queryOptions, useMutation } from "@tanstack/react-query";
 import { sessionsApi } from "../api/sessions";
-import { fetchListOf, IntakeFormData, submitIntakeMutation, type OrganiztionType, type State, type TransmissionPlanningRegion} from "../api/forms";
-
+import { fetchListOf, submitIntakeMutation } from "../api/forms";
+import { IntakeFormData, OrganiztionType, State, TransmissionPlanningRegion } from "../api/forms/types"
 import { queryClient } from "../main"
 import { signupMutation } from "../api/accounts/signup";
 import { loginMutation } from "../api/accounts/login";
 import { logoutMutation } from "../api/accounts/logout";
-import { CustomerRequestRelationship, TARequest } from "../api/dashboard";
+import { CustomerRequestRelationship, TARequest } from "../api/dashboard/types";
 
 export const authSessionQueryOptions = () => (
     queryOptions({
@@ -74,9 +74,7 @@ export const useSigupMutation = () => {
 export const useLoginMutation = () => {
     return useMutation ({
         mutationFn: loginMutation,
-        onSuccess: () => {
-            queryClient.invalidateQueries({queryKey: ["authSession"]})
-        },
+        onSuccess: () => queryClient.invalidateQueries({queryKey: ["authSession"]}),
     })
 }
 
