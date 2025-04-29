@@ -1,0 +1,34 @@
+from django.db import models
+from django.db.models import CheckConstraint, Q, F
+from core.models import RequestStatus, Depth
+
+class Request(models.Model):
+    """
+    Represent the requests coming in from customers for technical assistance.
+    """
+    status = models.ForeignKey(RequestStatus, on_delete=models.PROTECT, default=RequestStatus.get_default_pk)
+    depth = models.ForeignKey(Depth, on_delete=models.PROTECT)
+    description = models.TextField()
+    date_created = models.DateTimeField(auto_now_add=True)
+    proj_start_date = models.DateField(blank=True, null=True, verbose_name="projected start date")
+    proj_completion_date = models.DateField(blank=True, null=True, verbose_name="projected completion date")
+    actual_completion_date = models.DateField(blank=True, null=True)
+
+    def __str__(self):
+        return f"Request #{self.pk}"
+
+    
+    class Meta:
+        db_table = "request"
+        constraints = [
+            CheckConstraint(
+                condition = Q(proj_completion_date__gt=F('proj_start_date')) | Q(proj_start_date__isnull=True),
+                name = "projected_completion_date_after_projected_start_date_or_null",
+                violation_error_message="The projected completion date must be after the projected start date"
+            ),
+            CheckConstraint(
+                condition = Q(proj_start_date__lt=F('proj_completion_date')) | Q(proj_completion_date__isnull=True),
+                name = "projected_start_date_before_projected_completion_date_or_null",
+                violation_error_message="The projected start date must be before the projected completion date"
+            )
+        ]
