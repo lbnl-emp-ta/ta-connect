@@ -13,7 +13,6 @@ from .user import User
 from .reception import Reception
 from .program import Program
 from .lab import Lab
-from .team import Team
 from .owner import Owner
 
 __all__ = [
@@ -32,6 +31,5 @@ __all__ = [
     "Reception",
     "Program",
     "Lab",
-    "Team",
     "Owner",
 ]

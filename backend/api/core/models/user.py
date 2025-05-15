@@ -26,6 +26,13 @@ class UserManager(BaseUserManager):
   def create_user(self, email, password, **extra_fields):
     return self._create_user(email, password, False, False, **extra_fields)
 
+  def get_or_create_user(self, email, password, **extra_fields):
+    maybe_user = User.objects.filter(email=email).first()
+    if (maybe_user):
+        return maybe_user, False
+
+    return self._create_user(email, password, False, False, **extra_fields), True
+
   def create_superuser(self, email, password, **extra_fields):
     user=self._create_user(email, password, True, True, **extra_fields)
     user.save(using=self._db)
