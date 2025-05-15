@@ -1,7 +1,7 @@
 from django.db import IntegrityError, models
 from django.db.models import CheckConstraint, Q
 
-from core.models import Reception, Program, Lab, User, Request
+from core.models import * 
 
 class Owner(models.Model):
     class DomainType(models.TextChoices):
@@ -10,7 +10,6 @@ class Owner(models.Model):
         Lab = "lab"
         Team = "team"
 
-    request = models.ForeignKey(Request, on_delete=models.PROTECT, unique=True, null=True)
     domain_type = models.CharField(max_length=16, choices=DomainType)
     reception = models.ForeignKey(Reception, on_delete=models.PROTECT, null=True, blank=True)
     program = models.ForeignKey(Program, on_delete=models.PROTECT, null=True, blank=True)
@@ -26,6 +25,21 @@ class Owner(models.Model):
         ])
         if non_null_fields != 1:
             raise IntegrityError("Exactly one of reception, program, or lab must be set.")
+
+    @classmethod 
+    def get_default_pk(cls):
+        owner, _ = cls.objects.get_or_create(
+            domain_type=Owner.DomainType.Reception,
+            reception=Reception.objects.get(pk=Reception.get_default_pk())
+        )
+
+        return owner.pk
+
+    def __str__(self):
+        if (self.pk == Reception.get_default_pk()):
+            return "Reception Owner"
+
+        return f"Owner #{self.pk}"
 
     class Meta:
         constraints = [

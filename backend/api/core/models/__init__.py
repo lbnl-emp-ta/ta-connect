@@ -1,5 +1,10 @@
 from .request_status import RequestStatus
 from .depth import Depth
+from .user import User
+from .reception import Reception
+from .program import Program
+from .lab import Lab
+from .owner import Owner
 from .request import Request
 from .state import State
 from .organization_type import OrganizationType
@@ -9,11 +14,6 @@ from .customer import Customer
 from .customer_type import CustomerType
 from .customer_request_relationship import CustomerRequestRelationship
 from .cohort import Cohort
-from .user import User
-from .reception import Reception
-from .program import Program
-from .lab import Lab
-from .owner import Owner
 
 __all__ = [
     "RequestStatus",
