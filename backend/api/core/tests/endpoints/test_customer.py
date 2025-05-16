@@ -17,5 +17,5 @@ class TestCustomerCreateEndpoint():
             "title": "Tester"
         }
         
-        response = api_client.post("/customers/", data=data)
+        response = api_client.post("/api/customers/", data=data)
         assert response.status_code == status.HTTP_201_CREATED

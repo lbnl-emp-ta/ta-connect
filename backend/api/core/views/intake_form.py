@@ -6,6 +6,8 @@ from core.models import *
 
 class ProcessIntakeForm(CreateAPIView):
     def post(self, request):
+        success = False
+
         name = request.data.get("name", None)
         email = request.data.get("email", None)
         phone = request.data.get("phone", None)
@@ -64,6 +66,7 @@ class ProcessIntakeForm(CreateAPIView):
                 customer_type = CustomerType.objects.get(name="Primary Contact")
             )
             
+            success = True
             return Response({
                     "name": _customer.name,
                     "email": _customer.email,
@@ -84,16 +87,21 @@ class ProcessIntakeForm(CreateAPIView):
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
         
         finally:
-            if(_customer_request_relationship):
-                _customer_request_relationship.delete()
-            
-            if(_request):
-                _request.delete()
-            
-            if (_customer_created and _customer):
-                _customer.delete()
+
+            # If the processing the intake form was successful,
+            # no need to delete aritfacts.
+            if (not success):
+                if(_customer_request_relationship):
+                    _customer_request_relationship.delete()
                 
-            if (_org_created and _org):
-                _org.delete() 
+                if(_request):
+                    _request.delete()
+                
+                if (_customer_created and _customer):
+                    _customer.delete()
+                    
+                if (_org_created and _org):
+                    _org.delete() 
+
             
             

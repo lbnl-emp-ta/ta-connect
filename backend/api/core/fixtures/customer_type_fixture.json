@@ -1,0 +1,10 @@
+[
+    {
+        "model": "core.CustomerType",
+        "pk": 1,
+        "fields": {
+            "name": "Primary Contact",
+            "description": "Should be sent all communications"
+        }
+    }
+]

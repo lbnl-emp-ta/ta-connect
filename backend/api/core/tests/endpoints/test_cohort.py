@@ -14,7 +14,7 @@ class TestCohortCreateViewEndpoint():
             "description": "for testing"
         }
         
-        response = api_client.post("/cohorts/", data)
+        response = api_client.post("/api/cohorts/", data)
         assert response.status_code == status.HTTP_201_CREATED
         
     
@@ -30,7 +30,7 @@ class TestCohortAddCustomerEndpoint():
             "cohort": test_cohort.pk
         }
         
-        response = api_client.post("/cohorts/add-customer/", data)
+        response = api_client.post("/api/cohorts/add-customer/", data)
         assert response.status_code == status.HTTP_201_CREATED
         
     def test_add_customer_to_cohort_endpoint_returns_bad_request_when_missing_cohort_field(self, api_client, test_customer):

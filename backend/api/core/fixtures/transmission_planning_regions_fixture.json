@@ -1,0 +1,100 @@
+[ 
+    {
+        "model": "core.TransmissionPlanningRegion",
+        "pk": 1,
+        "fields": {
+            "name": "California ISO (CAISO)"
+        }
+    },
+    {
+        "model": "core.TransmissionPlanningRegion",
+        "pk": 2,
+        "fields": {
+            "name": "Florida Reliability Coordinating Council (FRCC)"
+        }
+    },
+    {
+        "model": "core.TransmissionPlanningRegion",
+        "pk": 3,
+        "fields": {
+            "name": "ISO New England (ISONE)"
+        }
+    },
+    {
+        "model": "core.TransmissionPlanningRegion",
+        "pk": 4,
+        "fields": {
+            "name": "Midcontinent ISO (MISO)"
+        }
+    },
+    {
+        "model": "core.TransmissionPlanningRegion",
+        "pk": 5,
+        "fields": {
+            "name": "New York ISO (NYISO)"
+        }
+    },
+    {
+        "model": "core.TransmissionPlanningRegion",
+        "pk": 6,
+        "fields": {
+            "name": "Northern Grid"
+        }
+    },
+    {
+        "model": "core.TransmissionPlanningRegion",
+        "pk": 7,
+        "fields": {
+            "name": "Norther Grid Non-enrolled Members"
+        }
+    },
+    {
+        "model": "core.TransmissionPlanningRegion",
+        "pk": 8,
+        "fields": {
+            "name": "Not Part of Order No. 1000 Region"
+        }
+    },
+    {
+        "model": "core.TransmissionPlanningRegion",
+        "pk": 9,
+        "fields": {
+            "name": "PJM"
+        }
+    },
+    {
+        "model": "core.TransmissionPlanningRegion",
+        "pk": 10,
+        "fields": {
+            "name": "South Carolina Regional Transmission Planning (SCRTP)"
+        }
+    },
+    {
+        "model": "core.TransmissionPlanningRegion",
+        "pk": 11,
+        "fields": {
+            "name": "Southeastern Regional Transmission Planning (SERTP)"
+        }
+    },
+    {
+        "model": "core.TransmissionPlanningRegion",
+        "pk": 12,
+        "fields": {
+            "name": "Southwest Power Pool (SPP)"
+        }
+    },
+    {
+        "model": "core.TransmissionPlanningRegion",
+        "pk": 13,
+        "fields": {
+            "name": "WestConnect"
+        }
+    },
+    {
+        "model": "core.TransmissionPlanningRegion",
+        "pk": 14,
+        "fields": {
+            "name": "WestConnect Non-enrolled Members"
+        }
+    }
+]

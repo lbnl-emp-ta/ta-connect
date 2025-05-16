@@ -11,18 +11,19 @@ from django.utils import timezone
 class TestRequestCreateEndpoint():
     @classmethod
     def post_endpoint(cls):
-        return reverse("request-create")
+        return reverse("request-list-create")
     
-    def test_create_request_endpoint_exists_at_desired_location(self, api_client, test_depth):
+    def test_create_request_endpoint_exists_at_desired_location(self, api_client, test_user):
         data = {
             "description": "test",
-            "depth": test_depth.pk
         }
         
-        response = api_client.post("/requests/", data=data)
+        # Need to be authenticated for this endpoint
+        api_client.force_login(test_user)
+        response = api_client.post("/api/requests/", data=data)
         assert response.status_code == status.HTTP_201_CREATED
     
-    def test_create_request_is_successful_given_only_desc_and_depth(self, api_client, test_depth):
+    def test_create_request_is_successful_given_only_desc_and_depth(self, api_client, test_user):
         """
         The only required field for creating a Request is its
         description.
@@ -30,23 +31,25 @@ class TestRequestCreateEndpoint():
         
         data = {
             "description": "test",
-            "depth": test_depth.pk
         }
-        
+
+        api_client.force_login(test_user) 
         response = api_client.post(self.post_endpoint(), data=data)
         assert response.status_code == status.HTTP_201_CREATED
         
-    def test_create_request_fails_given_no_desc(self, api_client):
+    def test_create_request_fails_given_no_desc(self, api_client, test_user):
         """
         Description is a required field.
         """
         
         data = {}
+
+        api_client.force_login(test_user) 
         response = api_client.post(self.post_endpoint(), data=data)
         
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         
-    def test_create_request_is_succesful_and_ignores_given_date_created(self, api_client, test_depth):
+    def test_create_request_is_succesful_and_ignores_given_date_created(self, api_client, test_user):
         """
         Any given date created field should be ignored. Date 
         created should be the current date as of creating the 
@@ -57,9 +60,10 @@ class TestRequestCreateEndpoint():
         
         data = {
             "description": "test",
-            "depth": test_depth.pk,
             "date_created": given_date_created
         }
+
+        api_client.force_login(test_user) 
         response = api_client.post(self.post_endpoint(), data=data)
         
         received_date_created = dateutil.parser.parse(response.data.get("date_created"))

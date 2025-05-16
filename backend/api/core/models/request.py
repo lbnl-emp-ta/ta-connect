@@ -1,13 +1,14 @@
 from django.db import models
 from django.db.models import CheckConstraint, Q, F
-from core.models import RequestStatus, Depth
+from core.models import * 
 
 class Request(models.Model):
     """
     Represent the requests coming in from customers for technical assistance.
     """
+    owner = models.ForeignKey(Owner, on_delete=models.PROTECT, blank=True, null=True, default=Owner.get_default_pk)
     status = models.ForeignKey(RequestStatus, on_delete=models.PROTECT, default=RequestStatus.get_default_pk)
-    depth = models.ForeignKey(Depth, on_delete=models.PROTECT)
+    depth = models.ForeignKey(Depth, on_delete=models.PROTECT, default=Depth.get_default_pk)
     description = models.TextField()
     date_created = models.DateTimeField(auto_now_add=True)
     proj_start_date = models.DateField(blank=True, null=True, verbose_name="projected start date")

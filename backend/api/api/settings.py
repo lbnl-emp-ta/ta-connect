@@ -30,10 +30,6 @@ SECRET_KEY = os.getenv("SECRET_KEY")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = [
-    "taconnect-local.lbl.gov"
-]
-
 
 # Application definition
 
@@ -44,24 +40,105 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'core.apps.CoreConfig',
+    'django.contrib.sites',
     'corsheaders',
+    'allauth.account',
+    'allauth.headless',
+    'allauth.socialaccount',
+    'allauth.socialaccount.providers.google',
+    'rest_framework',
+    'core',
 ]
+
 
 MIDDLEWARE = [
-    'corsheaders.middleware.CorsMiddleware',
-    'django.middleware.security.SecurityMiddleware',
-    'django.contrib.sessions.middleware.SessionMiddleware',
-    'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
-    'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'django.contrib.messages.middleware.MessageMiddleware',
-    'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    "corsheaders.middleware.CorsMiddleware",
+    "django.middleware.security.SecurityMiddleware",
+    "django.contrib.sessions.middleware.SessionMiddleware",
+    "django.middleware.common.CommonMiddleware",
+    "django.middleware.csrf.CsrfViewMiddleware",
+    "django.contrib.auth.middleware.AuthenticationMiddleware",
+    "django.contrib.messages.middleware.MessageMiddleware",
+    "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "allauth.account.middleware.AccountMiddleware",
 ]
 
-CORS_ALLOW_ALL_ORIGINS = True
+CORS_ALLOWED_ORIGIN_REGEXES = [
+    # match localhost with any port
+    "http://taconnect-local.lbl.gov",
+    "http://taconnect-local.lbl.gov:1337",
+    r"^http:\/\/localhost:*([0-9]+)?$",
+    r"^https:\/\/localhost:*([0-9]+)?$",
+]
+
+CSRF_TRUSTED_ORIGINS = ["http://taconnect-local.lbl.gov:1337",
+                        "http://taconnect-local.lbl.gov",
+                        "http://127.0.0.1",
+                        "http://127.0.0.1:80",
+                        "http://localhost",
+                        "http://localhost:5173", 
+                        "http://127.0.0.1:5173", 
+                        "http://localhost:8000", 
+                        "http://127.0.0.1:8000", 
+                        ]
+
+CORS_ALLOW_CREDENTIALS = True
+# CSRF_COOKIE_SECURE = False
+# SESSION_COOKIE_SECURE = False
+# CSRF_COOKIE_SAMESITE = 'None'
+# SESSION_COOKIE_SAMESITE = 'None'
+# CSRF_USE_SESSIONS = True
+
+CORS_ORIGIN_WHITELIST = ["http://127.0.0.1",
+                        "http://127.0.0.1:80",
+                        "http://localhost",
+                        "http://localhost:5173", 
+                        "http://127.0.0.1:5173", 
+                        "http://localhost:8000", 
+                        "http://127.0.0.1:8000", 
+                        "http://taconnect-local.lbl.gov:1337",
+                        "http://taconnect-local.lbl.gov"]
+
+SITE_ID = 2
+
+ALLOWED_HOSTS = ["localhost", 
+                 "localhost:80", 
+                 "127.0.0.1",
+                 "127.0.0.1:80", 
+                 "localhost:5173", 
+                 "localhost:8000", 
+                 "taconnect-local.lbl.gov:1337",
+                 "taconnect-local.lbl.gov",
+                 ]
 
 ROOT_URLCONF = 'api.urls'
+
+AUTH_USER_MODEL = 'core.User'
+
+AUTHENTICATION_BACKENDS = [
+    # Needed to login by username in Django admin, regardless of `allauth`
+    'django.contrib.auth.backends.ModelBackend',
+
+    # `allauth` specific authentication methods, such as login by email
+    'allauth.account.auth_backends.AuthenticationBackend',
+]
+
+# django-allauth settings
+ACCOUNT_USER_MODEL_USERNAME_FIELD = None
+ACCOUNT_SIGNUP_FIELDS = ['email*', 'password1*', 'password2*']
+ACCOUNT_LOGIN_METHODS= {'email'}
+ACCOUNT_EMAIL_VERIFICATION = "none"
+
+
+HEADLESS_ONLY = True
+HEADLESS_SERVE_SPECIFICATION = True
+HEADLESS_FRONTEND_URLS = {
+    "account_confirm_email": "/account/verify-email/{key}",
+    "account_reset_password": "/account/password/reset",
+    "account_reset_password_from_key": "/account/password/reset/key/{key}",
+    "account_signup": "/account/signup",
+    "socialaccount_login_error": "/account/provider/callback",
+}
 
 TEMPLATES = [
     {
@@ -127,6 +204,7 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
+STATIC_ROOT = '/var/www/taconnect/static/'
 STATIC_URL = 'static/'
 
 # Default primary key field type
