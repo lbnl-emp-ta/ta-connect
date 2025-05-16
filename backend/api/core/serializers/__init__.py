@@ -8,8 +8,10 @@ from .customer import CustomerSerializer
 from .customer_type import CustomerTypeSerializer
 from .customer_request_relationship import CustomerRequestRelationshipSerializer
 from .cohort import CohortSerializer
+from .owner import OwnerSerializer
 
 __all__ = [
+    "OwnerSerializer",
     "RequestSerializer",
     "DepthSerializer",
     "StateSerializer",
