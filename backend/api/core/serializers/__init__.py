@@ -1,3 +1,4 @@
+from .owner import OwnerSerializer
 from .request import RequestSerializer
 from .depth import DepthSerializer
 from .state import StateSerializer
@@ -8,7 +9,6 @@ from .customer import CustomerSerializer
 from .customer_type import CustomerTypeSerializer
 from .customer_request_relationship import CustomerRequestRelationshipSerializer
 from .cohort import CohortSerializer
-from .owner import OwnerSerializer
 
 __all__ = [
     "OwnerSerializer",
