@@ -7,6 +7,10 @@ from allauth.headless.contrib.rest_framework.authentication import (
 )
 
 class CustomerRequestRelationshipSerializer(serializers.ModelSerializer):
+    customer = CustomerSerializer()
+    customer_type = CustomerTypeSerializer()
+    request = RequestSerializer()
+
     authentication_classes = [
         authentication.SessionAuthentication,
         XSessionTokenAuthentication,

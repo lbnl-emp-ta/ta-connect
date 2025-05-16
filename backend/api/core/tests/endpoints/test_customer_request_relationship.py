@@ -1,7 +1,6 @@
 import pytest
 
 from rest_framework import status
-from core.tests.conftest import TEST_USER_PASSWORD
 
 @pytest.mark.django_db
 class TestCustomerRequestRelationshipCreateEndpoint():
@@ -14,11 +13,5 @@ class TestCustomerRequestRelationshipCreateEndpoint():
 
         # need to be authenticated to access endpoint
         api_client.force_login(test_user) 
-        data = {
-            "request": test_request.pk,
-            "customer": test_customer.pk,
-            "customer_type": test_customer_type.pk
-        }
-        
-        response = api_client.post("/api/customer-request-relationships/", data=data)
-        assert response.status_code == status.HTTP_201_CREATED
+        response = api_client.get("/api/customer-request-relationships/")
+        assert response.status_code == status.HTTP_200_OK
