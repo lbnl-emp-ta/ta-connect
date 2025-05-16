@@ -18,8 +18,8 @@ import { Route as PublicOnlySignupImport } from './routes/_public-only/signup'
 import { Route as PublicOnlyLoginImport } from './routes/_public-only/login'
 import { Route as publicIntakeImport } from './routes/(public)/intake'
 import { Route as PrivateDashboardRouteImport } from './routes/_private/dashboard/route'
-import { Route as PrivateDashboardTestTabImport } from './routes/_private/dashboard/test-tab'
-import { Route as PrivateDashboardRequestTableImport } from './routes/_private/dashboard/request-table'
+import { Route as PrivateDashboardRequestsImport } from './routes/_private/dashboard/requests'
+import { Route as PrivateDashboardExpertsImport } from './routes/_private/dashboard/experts'
 
 // Create/Update Routes
 
@@ -63,18 +63,17 @@ const PrivateDashboardRouteRoute = PrivateDashboardRouteImport.update({
   getParentRoute: () => PrivateRouteRoute,
 } as any)
 
-const PrivateDashboardTestTabRoute = PrivateDashboardTestTabImport.update({
-  id: '/test-tab',
-  path: '/test-tab',
+const PrivateDashboardRequestsRoute = PrivateDashboardRequestsImport.update({
+  id: '/requests',
+  path: '/requests',
   getParentRoute: () => PrivateDashboardRouteRoute,
 } as any)
 
-const PrivateDashboardRequestTableRoute =
-  PrivateDashboardRequestTableImport.update({
-    id: '/request-table',
-    path: '/request-table',
-    getParentRoute: () => PrivateDashboardRouteRoute,
-  } as any)
+const PrivateDashboardExpertsRoute = PrivateDashboardExpertsImport.update({
+  id: '/experts',
+  path: '/experts',
+  getParentRoute: () => PrivateDashboardRouteRoute,
+} as any)
 
 // Populate the FileRoutesByPath interface
 
@@ -129,18 +128,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PublicOnlySignupImport
       parentRoute: typeof PublicOnlyRouteImport
     }
-    '/_private/dashboard/request-table': {
-      id: '/_private/dashboard/request-table'
-      path: '/request-table'
-      fullPath: '/dashboard/request-table'
-      preLoaderRoute: typeof PrivateDashboardRequestTableImport
+    '/_private/dashboard/experts': {
+      id: '/_private/dashboard/experts'
+      path: '/experts'
+      fullPath: '/dashboard/experts'
+      preLoaderRoute: typeof PrivateDashboardExpertsImport
       parentRoute: typeof PrivateDashboardRouteImport
     }
-    '/_private/dashboard/test-tab': {
-      id: '/_private/dashboard/test-tab'
-      path: '/test-tab'
-      fullPath: '/dashboard/test-tab'
-      preLoaderRoute: typeof PrivateDashboardTestTabImport
+    '/_private/dashboard/requests': {
+      id: '/_private/dashboard/requests'
+      path: '/requests'
+      fullPath: '/dashboard/requests'
+      preLoaderRoute: typeof PrivateDashboardRequestsImport
       parentRoute: typeof PrivateDashboardRouteImport
     }
   }
@@ -149,13 +148,13 @@ declare module '@tanstack/react-router' {
 // Create and export the route tree
 
 interface PrivateDashboardRouteRouteChildren {
-  PrivateDashboardRequestTableRoute: typeof PrivateDashboardRequestTableRoute
-  PrivateDashboardTestTabRoute: typeof PrivateDashboardTestTabRoute
+  PrivateDashboardExpertsRoute: typeof PrivateDashboardExpertsRoute
+  PrivateDashboardRequestsRoute: typeof PrivateDashboardRequestsRoute
 }
 
 const PrivateDashboardRouteRouteChildren: PrivateDashboardRouteRouteChildren = {
-  PrivateDashboardRequestTableRoute: PrivateDashboardRequestTableRoute,
-  PrivateDashboardTestTabRoute: PrivateDashboardTestTabRoute,
+  PrivateDashboardExpertsRoute: PrivateDashboardExpertsRoute,
+  PrivateDashboardRequestsRoute: PrivateDashboardRequestsRoute,
 }
 
 const PrivateDashboardRouteRouteWithChildren =
@@ -196,8 +195,8 @@ export interface FileRoutesByFullPath {
   '/intake': typeof publicIntakeRoute
   '/login': typeof PublicOnlyLoginRoute
   '/signup': typeof PublicOnlySignupRoute
-  '/dashboard/request-table': typeof PrivateDashboardRequestTableRoute
-  '/dashboard/test-tab': typeof PrivateDashboardTestTabRoute
+  '/dashboard/experts': typeof PrivateDashboardExpertsRoute
+  '/dashboard/requests': typeof PrivateDashboardRequestsRoute
 }
 
 export interface FileRoutesByTo {
@@ -207,8 +206,8 @@ export interface FileRoutesByTo {
   '/intake': typeof publicIntakeRoute
   '/login': typeof PublicOnlyLoginRoute
   '/signup': typeof PublicOnlySignupRoute
-  '/dashboard/request-table': typeof PrivateDashboardRequestTableRoute
-  '/dashboard/test-tab': typeof PrivateDashboardTestTabRoute
+  '/dashboard/experts': typeof PrivateDashboardExpertsRoute
+  '/dashboard/requests': typeof PrivateDashboardRequestsRoute
 }
 
 export interface FileRoutesById {
@@ -220,8 +219,8 @@ export interface FileRoutesById {
   '/(public)/intake': typeof publicIntakeRoute
   '/_public-only/login': typeof PublicOnlyLoginRoute
   '/_public-only/signup': typeof PublicOnlySignupRoute
-  '/_private/dashboard/request-table': typeof PrivateDashboardRequestTableRoute
-  '/_private/dashboard/test-tab': typeof PrivateDashboardTestTabRoute
+  '/_private/dashboard/experts': typeof PrivateDashboardExpertsRoute
+  '/_private/dashboard/requests': typeof PrivateDashboardRequestsRoute
 }
 
 export interface FileRouteTypes {
@@ -233,8 +232,8 @@ export interface FileRouteTypes {
     | '/intake'
     | '/login'
     | '/signup'
-    | '/dashboard/request-table'
-    | '/dashboard/test-tab'
+    | '/dashboard/experts'
+    | '/dashboard/requests'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -243,8 +242,8 @@ export interface FileRouteTypes {
     | '/intake'
     | '/login'
     | '/signup'
-    | '/dashboard/request-table'
-    | '/dashboard/test-tab'
+    | '/dashboard/experts'
+    | '/dashboard/requests'
   id:
     | '__root__'
     | '/'
@@ -254,8 +253,8 @@ export interface FileRouteTypes {
     | '/(public)/intake'
     | '/_public-only/login'
     | '/_public-only/signup'
-    | '/_private/dashboard/request-table'
-    | '/_private/dashboard/test-tab'
+    | '/_private/dashboard/experts'
+    | '/_private/dashboard/requests'
   fileRoutesById: FileRoutesById
 }
 
@@ -309,8 +308,8 @@ export const routeTree = rootRoute
       "filePath": "_private/dashboard/route.tsx",
       "parent": "/_private",
       "children": [
-        "/_private/dashboard/request-table",
-        "/_private/dashboard/test-tab"
+        "/_private/dashboard/experts",
+        "/_private/dashboard/requests"
       ]
     },
     "/(public)/intake": {
@@ -324,12 +323,12 @@ export const routeTree = rootRoute
       "filePath": "_public-only/signup.tsx",
       "parent": "/_public-only"
     },
-    "/_private/dashboard/request-table": {
-      "filePath": "_private/dashboard/request-table.tsx",
+    "/_private/dashboard/experts": {
+      "filePath": "_private/dashboard/experts.tsx",
       "parent": "/_private/dashboard"
     },
-    "/_private/dashboard/test-tab": {
-      "filePath": "_private/dashboard/test-tab.tsx",
+    "/_private/dashboard/requests": {
+      "filePath": "_private/dashboard/requests.tsx",
       "parent": "/_private/dashboard"
     }
   }

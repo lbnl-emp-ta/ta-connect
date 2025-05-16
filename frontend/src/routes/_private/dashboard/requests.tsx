@@ -1,17 +1,17 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { useSuspenseQuery } from '@tanstack/react-query'
-import { Box, Button, Collapse, IconButton, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from '@mui/material'
+import { Box, Button, Collapse, Grid, IconButton, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from '@mui/material'
 import { dateDiffInDays } from '../../../utils/datetimes'
 import { useState } from 'react'
 import { KeyboardArrowDown, KeyboardArrowUp } from '@mui/icons-material'
 import { CustomerRequestRelationship } from '../../../api/dashboard/types'
 import { customerRequestRelationshipOptions } from '../../../utils/queryOptions'
 
-export const Route = createFileRoute('/_private/dashboard/request-table')({
+export const Route = createFileRoute('/_private/dashboard/requests')({
     loader: async ({ context }) => {
         await context.queryClient.ensureQueryData(customerRequestRelationshipOptions())
     },
-    component: RequestTable,
+    component: RequestsPage,
 })
 
 function RequestTableRow(props: {row: CustomerRequestRelationship & {age: number}}) {
@@ -108,5 +108,46 @@ function RequestTable() {
             </Table>
         </TableContainer>
 
+    )
+}
+
+function RequestsPage() {
+    return (
+        <>
+        <Grid container spacing={4}>
+            <Grid container size={12}>
+                <Grid>
+                    <Button>Show Previous</Button>
+                </Grid>
+                <Grid>
+                    <Button>Show Next</Button>
+                </Grid>
+                <Grid size={"grow"} display="flex" justifyContent="center" alignItems="center">
+                    <Typography variant='h4' display={"inline"} >
+                            View: Request #?
+                    </Typography>
+                </Grid>
+                <Button>More Actions</Button>
+                <Button>Assign</Button>
+            </Grid>
+            <Grid size={6} sx={{height: 550}}>
+                <Button sx={{height: "stretch", width: "stretch", bgcolor: "blue"}}>
+                </Button>
+            </Grid>
+            <Grid container size={6}>
+                <Grid size={12}>
+                    <Button sx={{height: "stretch", width: "stretch", bgcolor: "blue"}}>
+                    </Button>
+                </Grid>
+                <Grid size={12}>
+                    <Button sx={{height: "stretch", width: "stretch", bgcolor: "blue"}}>
+                    </Button>
+                </Grid>
+            </Grid>
+            <Grid size={12}>
+                <RequestTable/>
+            </Grid>
+        </Grid>
+        </>
     )
 }

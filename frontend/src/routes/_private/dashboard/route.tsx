@@ -1,12 +1,13 @@
-import { Box, Drawer, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Toolbar} from '@mui/material'
+import { Box, Drawer, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Select, Toolbar} from '@mui/material'
 import { createFileRoute,  Outlet, redirect, useNavigate,} from '@tanstack/react-router'
-import FeaturedPlayList from '@mui/icons-material/FeaturedPlayList';
+import PeopleIcon from '@mui/icons-material/People';
+import AssignmentIcon from '@mui/icons-material/Assignment';
 
 export const Route = createFileRoute('/_private/dashboard')({
     beforeLoad ({ location }) {
         if (location.pathname === "/dashboard" || location.pathname ==="/dashboard/")
             // eslint-disable-next-line @typescript-eslint/only-throw-error
-            throw redirect({ to: "/dashboard/request-table" })
+            throw redirect({ to: "/dashboard/requests" })
     },
     component: DashboardComponent, 
 })
@@ -30,20 +31,31 @@ function DashboardComponent() {
         >
             <Toolbar/>
             <List>
+                <ListItem>
+                    <ListItemText primary={"Viewing as:"}>
+                    </ListItemText>
+                </ListItem>
+                <ListItem>
+                   <Select
+                        sx={{
+                            width: "stretch",
+                        }}
+                   />
+                </ListItem>
                 <ListItem key={"Requests"} disablePadding>
-                    <ListItemButton onClick={() => { void navigate({to: "/dashboard/request-table"}); }}> 
+                    <ListItemButton onClick={() => { void navigate({to: "/dashboard/requests"}); }}> 
                         <ListItemIcon>
-                            <FeaturedPlayList/>
+                            <AssignmentIcon/>
                         </ListItemIcon>
                         <ListItemText primary={"Requests"} />
                     </ListItemButton>
                 </ListItem>
-                <ListItem key={"Test"} disablePadding>
-                    <ListItemButton onClick={() => { void navigate({to: "/dashboard/test-tab"}); }}> 
+                <ListItem key={"Experts"} disablePadding>
+                    <ListItemButton onClick={() => { void navigate({to: "/dashboard/experts"}); }}> 
                         <ListItemIcon>
-                            <FeaturedPlayList/>
+                            <PeopleIcon/>
                         </ListItemIcon>
-                        <ListItemText primary={"Test"} />
+                        <ListItemText primary={"Experts"} />
                     </ListItemButton>
                 </ListItem>
             </List>
