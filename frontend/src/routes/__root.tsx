@@ -3,8 +3,10 @@ import { TanStackRouterDevtools } from '@tanstack/react-router-devtools'
 
 import { createRootRouteWithContext } from '@tanstack/react-router'
 import { useSuspenseQuery, type QueryClient } from '@tanstack/react-query'
-import { AppBar, Box, Button, Toolbar } from '@mui/material'
+import { AppBar, Box, Button, Toolbar, Typography } from '@mui/material'
 import { authSessionQueryOptions, useLogoutMutation } from '../utils/queryOptions'
+import COLORS from '../styles/colors'
+
 
 export interface MyRouterContext {
     queryClient: QueryClient
@@ -36,12 +38,14 @@ function Initializer() {
             <Toolbar sx={{
                 display: "flex",
                 gap: 5,
+                color: COLORS.lblGreen,
+                bgcolor: "white"
             }}>
                 <Link to="/dashboard">
-                    Dashboard
+                    <Typography display="inline" sx={{color: COLORS.lblGreen}}>Dashboard</Typography>
                 </Link>
                 <Link to="/intake">
-                    Intake
+                    <Typography display="inline" sx={{color: COLORS.lblGreen}}>Intake</Typography>
                 </Link>
                 <Box sx={{margin: "auto"}}/>
                     {
@@ -50,7 +54,7 @@ function Initializer() {
                                 variant="text"
                                 onClick={handleLogout}
                                 sx={{
-                                    color: "white"
+                                    color: COLORS.lblGreen 
                                 }}
                             >
                                 Logout

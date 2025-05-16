@@ -114,7 +114,7 @@ function RequestTable() {
 function RequestsPage() {
     return (
         <>
-        <Grid container spacing={4}>
+        <Grid container spacing={4} display="flex" justifyContent="center" sx={{width: 1000}}>
             <Grid container size={12}>
                 <Grid>
                     <Button>Show Previous</Button>

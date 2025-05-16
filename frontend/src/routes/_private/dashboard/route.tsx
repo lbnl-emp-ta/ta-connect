@@ -1,7 +1,8 @@
-import { Box, Drawer, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Select, Toolbar} from '@mui/material'
+import { Drawer, Grid, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Select, Toolbar} from '@mui/material'
 import { createFileRoute,  Outlet, redirect, useNavigate,} from '@tanstack/react-router'
 import PeopleIcon from '@mui/icons-material/People';
 import AssignmentIcon from '@mui/icons-material/Assignment';
+import COLORS from '../../../styles/colors'
 
 export const Route = createFileRoute('/_private/dashboard')({
     beforeLoad ({ location }) {
@@ -24,13 +25,14 @@ function DashboardComponent() {
                 '& .MuiDrawer-paper': {
                     width: 240,
                     boxSizing: 'border-box',
+                    bgcolor: COLORS.lblGreen,
                 },
             }}
             variant="permanent"
             anchor="left"
         >
             <Toolbar/>
-            <List>
+            <List sx={{bgcolor: COLORS.lblGreen, color: "white"}}>
                 <ListItem>
                     <ListItemText primary={"Viewing as:"}>
                     </ListItemText>
@@ -39,6 +41,7 @@ function DashboardComponent() {
                    <Select
                         sx={{
                             width: "stretch",
+                            bgcolor: "white"
                         }}
                    />
                 </ListItem>
@@ -60,12 +63,9 @@ function DashboardComponent() {
                 </ListItem>
             </List>
         </Drawer>
-        <Box
-            component="main"
-            sx={{ flexGrow: 1, bgcolor: 'background.default', p: 3 }}
-        >
+        <Grid>
             <Outlet/>
-        </Box>
+        </Grid>
         </>
     )
 }
