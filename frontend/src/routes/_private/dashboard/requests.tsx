@@ -3,9 +3,12 @@ import { useSuspenseQuery } from '@tanstack/react-query'
 import { Box, Button, Collapse, Grid, IconButton, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from '@mui/material'
 import { dateDiffInDays } from '../../../utils/datetimes'
 import { useState } from 'react'
-import { KeyboardArrowDown, KeyboardArrowUp } from '@mui/icons-material'
+import { KeyboardArrowDown, KeyboardArrowUp} from '@mui/icons-material'
 import { CustomerRequestRelationship } from '../../../api/dashboard/types'
 import { customerRequestRelationshipOptions } from '../../../utils/queryOptions'
+import WestIcon from '@mui/icons-material/West';
+import EastIcon from '@mui/icons-material/East';
+import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 
 export const Route = createFileRoute('/_private/dashboard/requests')({
     loader: async ({ context }) => {
@@ -117,18 +120,18 @@ function RequestsPage() {
         <Grid container spacing={4} display="flex" justifyContent="center" sx={{width: 1000}}>
             <Grid container size={12}>
                 <Grid>
-                    <Button>Show Previous</Button>
+                    <Button><WestIcon/>Show Previous</Button>
                 </Grid>
                 <Grid>
-                    <Button>Show Next</Button>
+                    <Button>Show Next<EastIcon/></Button>
                 </Grid>
                 <Grid size={"grow"} display="flex" justifyContent="center" alignItems="center">
                     <Typography variant='h4' display={"inline"} >
                             View: Request #?
                     </Typography>
                 </Grid>
-                <Button>More Actions</Button>
-                <Button>Assign</Button>
+                <Button>More Actions<ArrowDropDownIcon/></Button>
+                <Button>Assign<EastIcon/></Button>
             </Grid>
             <Grid size={6} sx={{height: 550}}>
                 <Button sx={{height: "stretch", width: "stretch", bgcolor: "blue"}}>
