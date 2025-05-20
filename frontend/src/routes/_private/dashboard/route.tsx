@@ -24,6 +24,7 @@ function DashboardComponent() {
                 flexShrink: 0,
                 '& .MuiDrawer-paper': {
                     width: 240,
+                    marginTop: 5, 
                     boxSizing: 'border-box',
                     bgcolor: COLORS.lblGreen,
                 },

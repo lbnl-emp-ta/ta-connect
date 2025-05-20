@@ -39,13 +39,15 @@ function Initializer() {
                 display: "flex",
                 gap: 5,
                 color: COLORS.lblGreen,
-                bgcolor: "white"
+                bgcolor: "white",
+                minHeight: 100,
+                height: 100,
             }}>
                 <Link to="/dashboard">
-                    <Typography display="inline" sx={{color: COLORS.lblGreen}}>Dashboard</Typography>
+                    <Typography variant='h6' display="inline" sx={{color: COLORS.lblGreen}}>Dashboard</Typography>
                 </Link>
                 <Link to="/intake">
-                    <Typography display="inline" sx={{color: COLORS.lblGreen}}>Intake</Typography>
+                    <Typography variant='h6' display="inline" sx={{color: COLORS.lblGreen}}>Intake</Typography>
                 </Link>
                 <Box sx={{margin: "auto"}}/>
                     {
@@ -68,10 +70,10 @@ function Initializer() {
                                     to="/login"
                                     search={{redirect: "/"}}
                                 >
-                                    Login
+                                    <Typography variant='h6' color={COLORS.lblGreen}>Login</Typography>
                                 </Link>
                                 <Link to="/signup">
-                                    Signup
+                                    <Typography variant='h6' color={COLORS.lblGreen}>Signup</Typography>
                                 </Link>
                             </Box>
                         )

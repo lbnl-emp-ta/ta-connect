@@ -1,14 +1,15 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { useSuspenseQuery } from '@tanstack/react-query'
-import { Box, Button, Collapse, Grid, IconButton, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from '@mui/material'
+import { Button, Grid, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from '@mui/material'
 import { dateDiffInDays } from '../../../utils/datetimes'
-import { useState } from 'react'
-import { KeyboardArrowDown, KeyboardArrowUp} from '@mui/icons-material'
+// import { useState } from 'react'
+// import { KeyboardArrowDown, KeyboardArrowUp} from '@mui/icons-material'
 import { CustomerRequestRelationship } from '../../../api/dashboard/types'
 import { customerRequestRelationshipOptions } from '../../../utils/queryOptions'
 import WestIcon from '@mui/icons-material/West';
 import EastIcon from '@mui/icons-material/East';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
+import COLORS from '../../../styles/colors'
 
 export const Route = createFileRoute('/_private/dashboard/requests')({
     loader: async ({ context }) => {
@@ -19,12 +20,12 @@ export const Route = createFileRoute('/_private/dashboard/requests')({
 
 function RequestTableRow(props: {row: CustomerRequestRelationship & {age: number}}) {
     const { row } = props;
-    const [open, setOpen] = useState(false);
+    // const [open, setOpen] = useState(false);
 
     return (
         <>
             <TableRow>
-                <TableCell>
+                {/* <TableCell>
                     <IconButton
                         aria-label="expand row"
                         size="small"
@@ -32,7 +33,7 @@ function RequestTableRow(props: {row: CustomerRequestRelationship & {age: number
                     >
                         {open ? <KeyboardArrowUp/> : <KeyboardArrowDown/>}
                     </IconButton>
-                </TableCell>
+                </TableCell> */}
                 <TableCell align="center" component="th" scope="row">
                     {row.id}
                 </TableCell>
@@ -41,9 +42,9 @@ function RequestTableRow(props: {row: CustomerRequestRelationship & {age: number
                 <TableCell align="right">{row.request.depth}</TableCell>
                 <TableCell align="right">{row.customer.name}</TableCell>
                 <TableCell align="right">{row.customer.email}</TableCell>
-                <TableCell align="right">{row.customer.phone}</TableCell>
+                <TableCell align="right">N/A</TableCell>
             </TableRow>
-            <TableRow>
+            {/* <TableRow>
                 <TableCell style={{paddingBottom: 0, paddingTop: 0}} colSpan={8}>
                     <Collapse in={open} timeout="auto" unmountOnExit>
                         <Box sx={{margin: 1}}>
@@ -69,7 +70,7 @@ function RequestTableRow(props: {row: CustomerRequestRelationship & {age: number
                         </Box>
                     </Collapse>
                 </TableCell>
-            </TableRow>
+            </TableRow> */}
         </>
     )
 }
@@ -82,25 +83,52 @@ function RequestTable() {
     });
 
     return (
-        <TableContainer component={Paper}>
-            <Table aria-label="collapsible table" size="small">
+        <>
+        <Button 
+            disableRipple 
+            sx={{
+                bgcolor: COLORS.lblGreen, 
+                color: "white", 
+                borderRadius: 0, 
+                paddingLeft: 5, 
+                paddingRight: 5,
+                borderTopLeftRadius: 5,
+                borderTopRightRadius: 5
+            }}>
+                Actionable Requests
+        </Button>
+        <Button 
+            disableRipple 
+            sx={{
+                bgcolor: "#274047", 
+                color: "white",
+                borderRadius: 0, 
+                paddingLeft: 5, 
+                paddingRight: 5,
+                borderTopLeftRadius: 5,
+                borderTopRightRadius: 5
+            }}>
+                Downstream Requests
+        </Button>
+        <TableContainer 
+            component={Paper}
+            sx={{
+                borderWidth: 10,
+                borderStyle: "solid",
+                borderColor: COLORS.lblGreen,
+                borderRadius: 0
+            }}
+        >
+            <Table aria-label="table" size="small">
                 <TableHead>
-                    <TableRow sx={{backgroundColor: "#426ED6"}}>
-                        <TableCell align="left" colSpan={8}>
-                           <Button variant="outlined" sx={{color: "white"}}>
-                               Assign 
-                            </Button> 
-                        </TableCell>
-                    </TableRow>
-                    <TableRow>
-                        <TableCell />
-                        <TableCell>Request ID</TableCell>
+                    <TableRow sx={{bgcolor: "#EFEFEF"}}>
+                        <TableCell align="center">ID</TableCell>
                         <TableCell align="right">Age (in days)</TableCell>
                         <TableCell align="right">Status</TableCell>
                         <TableCell align="right">Depth</TableCell>
                         <TableCell align="right">Customer Name</TableCell>
                         <TableCell align="right">Customer Email</TableCell>
-                        <TableCell align="right">Customer Phone Number</TableCell>
+                        <TableCell align="right">Assigned Expert</TableCell>
                     </TableRow>
                 </TableHead>
                 <TableBody>
@@ -110,32 +138,97 @@ function RequestTable() {
                 </TableBody>
             </Table>
         </TableContainer>
+        </>
+    )
+}
 
+function RequestInfoTable() {
+    return (
+        <TableContainer 
+            sx={{
+                height: "stretch", 
+                width: "stretch", 
+                borderWidth: 10,
+                borderStyle: "solid",
+                borderColor: COLORS.lblGreen,
+                borderRadius: 0,
+                borderTopLeftRadius: 5,
+                borderTopRightRadius: 5
+            }}>
+            <Table>
+                <TableHead>
+                    <TableRow 
+                        sx={{
+                            bgcolor: COLORS.lblGreen,
+                            display: "flex",
+                            justifyContent: "center",
+                            textAlign: "center",
+                            paddingBottom: 1,
+                        }}
+                    >
+                        <Typography variant='h6' color="white">
+                            Request Information 
+                        </Typography>
+                    </TableRow>
+                </TableHead>
+
+            </Table>
+        </TableContainer>
     )
 }
 
 function RequestsPage() {
     return (
         <>
-        <Grid container spacing={4} display="flex" justifyContent="center" sx={{width: 1000}}>
+        <Typography
+            variant='h5'
+            sx={{
+                marginLeft: -23, 
+                fontWeight: 80,
+                opacity: 20
+            }}
+            
+        >
+           Dashboard / Requests 
+        </Typography>
+        <br/>
+        <Grid 
+            container 
+            spacing={4} 
+            display="flex" 
+            justifyContent="center" 
+            sx= {{
+                width: 1000
+            }}
+        >
             <Grid container size={12}>
                 <Grid>
-                    <Button><WestIcon/>Show Previous</Button>
+                    <Button variant='contained' sx={{bgcolor: "white", color: COLORS.lblGreen, borderWidth: 1, borderStyle: "solid", borderRadius: 3}} startIcon={<WestIcon/>}>Show Previous</Button>
                 </Grid>
                 <Grid>
-                    <Button>Show Next<EastIcon/></Button>
+                    <Button variant='contained' sx={{bgcolor: "white", color: COLORS.lblGreen, borderWidth: 1, borderStyle: "solid", borderRadius: 3}} endIcon={<EastIcon/>}>Show Next</Button>
                 </Grid>
-                <Grid size={"grow"} display="flex" justifyContent="center" alignItems="center">
-                    <Typography variant='h4' display={"inline"} >
-                            View: Request #?
+                <Grid 
+                    size={"grow"} 
+                    display="flex" 
+                    justifyContent="center" 
+                    alignItems="center"
+                >
+                    <Typography 
+                        variant='h4' 
+                        display={"inline"} 
+                        sx={{
+                            color: COLORS.lblGreen 
+                        }}
+                    >
+                        View: Request #?
                     </Typography>
                 </Grid>
-                <Button>More Actions<ArrowDropDownIcon/></Button>
-                <Button>Assign<EastIcon/></Button>
+                <Button variant='contained' sx={{bgcolor: "white", color: COLORS.lblGreen, borderWidth: 1, borderStyle: "solid", borderRadius: 3}} endIcon={<ArrowDropDownIcon/>}>More Actions</Button>
+                <Button variant='contained' sx={{bgcolor: COLORS.lblGreen, color: "white", borderRadius: 3}} endIcon={<EastIcon/>}>Assign</Button>
             </Grid>
             <Grid size={6} sx={{height: 550}}>
-                <Button sx={{height: "stretch", width: "stretch", bgcolor: "blue"}}>
-                </Button>
+                <RequestInfoTable/>
             </Grid>
             <Grid container size={6}>
                 <Grid size={12}>
