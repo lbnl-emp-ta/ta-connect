@@ -31,7 +31,8 @@ SECRET_KEY = os.getenv("SECRET_KEY")
 DEBUG = True
 
 ALLOWED_HOSTS = [
-    "taconnect-local.lbl.gov"
+    "taconnect-local.lbl.gov",
+    "127.0.0.1"
 ]
 
 
