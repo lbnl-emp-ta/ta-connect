@@ -109,10 +109,10 @@ export default function LoginWithSocialButton({
     const form = document.createElement("form");
     form.style.display = "none";
     form.method = "POST";
-    form.action = `${import.meta.env.VITE_API_URL}/_allauth/browser/v1/auth/provider/redirect`;
+    form.action = `http://taconnect-local.lbl.gov:1337/_allauth/browser/v1/auth/provider/redirect`;
     const data = {
       provider: id,
-      callback_url: "http://taconnect-local.lbl.gov:1337/api/account/provider/callback",
+      callback_url: "http://taconnect-local.lbl.gov:1337/account/provider/callback",
       csrfmiddlewaretoken: getCSRFToken() || "",
       process: "login",
     };
