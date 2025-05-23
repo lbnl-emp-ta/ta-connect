@@ -16,6 +16,7 @@ from .customer_request_relationship import CustomerRequestRelationship
 from .cohort import Cohort
 from .role import Role
 from .system_role_assignment import SystemRoleAssignment
+from .lab_role_assignment import LabRoleAssignment
 
 __all__ = [
     "RequestStatus",
@@ -36,4 +37,5 @@ __all__ = [
     "Owner",
     "Role",
     "SystemRoleAssignment",
+    "LabRoleAssignment",
 ]
