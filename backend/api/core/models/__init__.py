@@ -17,6 +17,7 @@ from .cohort import Cohort
 from .role import Role
 from .system_role_assignment import SystemRoleAssignment
 from .lab_role_assignment import LabRoleAssignment
+from .program_role_assignment import ProgramRoleAssignment
 
 __all__ = [
     "RequestStatus",
@@ -38,4 +39,5 @@ __all__ = [
     "Role",
     "SystemRoleAssignment",
     "LabRoleAssignment",
+    "ProgramRoleAssignment",
 ]
