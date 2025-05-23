@@ -15,6 +15,7 @@ class LabRoleAssignment(models.Model):
     #   resource that may be shared among different Programs
     #   (in this case it would not make sense to specify Program)
     program = models.ForeignKey(Program, blank=True, null=True, on_delete=models.PROTECT) 
+    date_assigned = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         db_table = "lab_role_assignment"
