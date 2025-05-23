@@ -8,7 +8,7 @@ from allauth.headless.contrib.rest_framework.authentication import (
 )
 
 class RequestListCreateView(generics.ListCreateAPIView):
-    queryset = Request.objects.all().select_related("status", "depth")
+    queryset = Request.objects.all().select_related("status", "depth", "owner")
     serializer_class = RequestSerializer
 
     authentication_classes = [

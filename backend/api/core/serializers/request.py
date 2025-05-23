@@ -17,7 +17,7 @@ class RequestSerializer(serializers.ModelSerializer):
         queryset=Depth.objects.all()
     )
 
-    owner = OwnerSerializer()
+    owner = OwnerSerializer(required=False)
     
     @classmethod
     def date_in_past(cls, date):
