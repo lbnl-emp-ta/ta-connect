@@ -46,12 +46,12 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django.contrib.sites',
     'corsheaders',
+    'core',
     'allauth.account',
     'allauth.headless',
     'allauth.socialaccount',
     'allauth.socialaccount.providers.google',
     'rest_framework',
-    'core',
 ]
 
 
