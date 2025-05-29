@@ -2,7 +2,7 @@ import { SessionAuthenticatedResponse, SessionUnauthenticatedResponse } from "..
 
 async function getSession(): Promise<{isAuthenticated: boolean}> {
     const response = await fetch (
-        `${import.meta.env.VITE_API_URL}/_allauth/browser/v1/auth/session`,
+        `${import.meta.env.VITE_BACKEND_URL}/_allauth/browser/v1/auth/session`,
         {
             credentials: "include",
         },

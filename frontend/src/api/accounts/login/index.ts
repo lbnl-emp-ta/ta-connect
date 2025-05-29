@@ -4,7 +4,7 @@ import { LoginCredentials} from "./types";
 
 export async function loginMutation(credentials: LoginCredentials) {
     const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/_allauth/browser/v1/auth/login`,
+        `${import.meta.env.VITE_BACKEND_URL}/_allauth/browser/v1/auth/login`,
         {
             method: "POST",
             credentials: "include",

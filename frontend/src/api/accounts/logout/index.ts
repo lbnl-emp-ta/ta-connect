@@ -3,7 +3,7 @@ import { ErrorResponse, SessionUnauthenticatedResponse } from "../../types";
 
 export async function logoutMutation() {
     const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/_allauth/browser/v1/auth/session`,
+        `${import.meta.env.VITE_BACKEND_URL}/_allauth/browser/v1/auth/session`,
             {
                 method: "DELETE",
                 credentials: "include",

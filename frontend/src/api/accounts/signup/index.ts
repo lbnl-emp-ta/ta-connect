@@ -4,7 +4,7 @@ import { SignupDetails } from "./types";
 
 export async function signupMutation(details: SignupDetails) {
     const response = await fetch (
-        `${import.meta.env.VITE_API_URL}/_allauth/browser/v1/auth/signup`,
+        `${import.meta.env.VITE_BACKEND_URL}/_allauth/browser/v1/auth/signup`,
         {
             method: "POST",
             credentials: "include",
