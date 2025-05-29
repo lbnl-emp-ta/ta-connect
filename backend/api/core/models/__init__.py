@@ -18,6 +18,7 @@ from .role import Role
 from .system_role_assignment import SystemRoleAssignment
 from .lab_role_assignment import LabRoleAssignment
 from .program_role_assignment import ProgramRoleAssignment
+from .reception_role_assignment import ReceptionRoleAssignment
 
 __all__ = [
     "RequestStatus",
@@ -40,4 +41,5 @@ __all__ = [
     "SystemRoleAssignment",
     "LabRoleAssignment",
     "ProgramRoleAssignment",
+    "ReceptionRoleAssignment",
 ]
