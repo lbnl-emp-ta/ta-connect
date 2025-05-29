@@ -30,10 +30,6 @@ SECRET_KEY = os.getenv("SECRET_KEY")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = [
-    "taconnect-local.lbl.gov",
-    "127.0.0.1"
-]
 
 # Application definition
 
@@ -46,12 +42,12 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django.contrib.sites',
     'corsheaders',
-    'core',
     'allauth.account',
     'allauth.headless',
     'allauth.socialaccount',
     'allauth.socialaccount.providers.google',
     'rest_framework',
+    'core',
 ]
 
 
