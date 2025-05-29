@@ -2,7 +2,8 @@ import { getCSRFToken } from "../../../utils/cookies";
 import { ErrorResponse, SessionUnauthenticatedResponse } from "../../types";
 
 export async function logoutMutation() {
-    const response = await fetch("/_allauth/browser/v1/auth/session",
+    const response = await fetch(
+        `${import.meta.env.VITE_BACKEND_URL}/_allauth/browser/v1/auth/session`,
             {
                 method: "DELETE",
                 credentials: "include",
