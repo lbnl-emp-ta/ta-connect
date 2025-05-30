@@ -212,7 +212,6 @@ function RequestsPage() {
       >
         Dashboard / Requests
       </Typography>
-      <br />
       <Grid
         container
         spacing={4}
