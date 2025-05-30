@@ -7,6 +7,7 @@ import {
   TableRow,
   TableCell,
   TableBody,
+  Box,
 } from '@mui/material';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import COLORS from '../../styles/colors';
@@ -15,10 +16,8 @@ import { customerRequestRelationshipOptions } from '../../utils/queryOptions';
 import { RequestTableRow } from './RequestsTableRow';
 
 export const RequestTable: React.FC = () => {
-  const { data: customerRequestRelationships } = useSuspenseQuery(
-    customerRequestRelationshipOptions()
-  );
-  const tableData = customerRequestRelationships.map((crr) => {
+  const { data } = useSuspenseQuery(customerRequestRelationshipOptions());
+  const tableData = data.map((crr) => {
     const ageInDays = dateDiffInDays(
       new Date(crr.request.date_created),
       new Date()
@@ -27,7 +26,7 @@ export const RequestTable: React.FC = () => {
   });
 
   return (
-    <>
+    <Box>
       <Button
         disableRipple
         sx={{
@@ -84,6 +83,6 @@ export const RequestTable: React.FC = () => {
           </TableBody>
         </Table>
       </TableContainer>
-    </>
+    </Box>
   );
 };

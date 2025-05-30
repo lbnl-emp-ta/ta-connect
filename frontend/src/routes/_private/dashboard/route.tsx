@@ -1,6 +1,6 @@
 import {
+  Box,
   Drawer,
-  Grid,
   List,
   ListItem,
   ListItemButton,
@@ -89,9 +89,9 @@ function DashboardComponent() {
           </ListItem>
         </List>
       </Drawer>
-      <Grid>
+      <Box component="main">
         <Outlet />
-      </Grid>
+      </Box>
     </>
   );
 }

@@ -1,4 +1,4 @@
-import { Button, Grid, Typography } from '@mui/material';
+import { Button, Container, Grid, Stack, Typography } from '@mui/material';
 import { createFileRoute } from '@tanstack/react-router';
 // import { useState } from 'react'
 // import { KeyboardArrowDown, KeyboardArrowUp} from '@mui/icons-material'
@@ -21,73 +21,47 @@ export const Route = createFileRoute('/_private/dashboard/requests')({
 
 function RequestsPage() {
   return (
-    <>
-      <Typography
-        variant="h5"
-        sx={{
-          marginLeft: -23,
-          fontWeight: 80,
-          opacity: 20,
-        }}
-      >
-        Dashboard / Requests
-      </Typography>
-      <Grid
-        container
-        spacing={4}
-        display="flex"
-        justifyContent="center"
-        sx={{
-          width: 1000,
-        }}
-      >
-        <Grid container size={12}>
-          <Grid>
-            <Button
-              variant="contained"
-              sx={{
-                bgcolor: 'white',
-                color: COLORS.lblGreen,
-                borderWidth: 1,
-                borderStyle: 'solid',
-                borderRadius: 3,
-              }}
-              startIcon={<WestIcon />}
-            >
-              Show Previous
-            </Button>
-          </Grid>
-          <Grid>
-            <Button
-              variant="contained"
-              sx={{
-                bgcolor: 'white',
-                color: COLORS.lblGreen,
-                borderWidth: 1,
-                borderStyle: 'solid',
-                borderRadius: 3,
-              }}
-              endIcon={<EastIcon />}
-            >
-              Show Next
-            </Button>
-          </Grid>
-          <Grid
-            size={'grow'}
-            display="flex"
-            justifyContent="center"
-            alignItems="center"
+    <Container maxWidth="xl">
+      <Stack>
+        <Typography variant="h5" component="h1">
+          Dashboard / Requests
+        </Typography>
+        <Stack direction="row">
+          <Button
+            variant="contained"
+            sx={{
+              bgcolor: 'white',
+              color: COLORS.lblGreen,
+              borderWidth: 1,
+              borderStyle: 'solid',
+              borderRadius: 3,
+            }}
+            startIcon={<WestIcon />}
           >
-            <Typography
-              variant="h4"
-              display={'inline'}
-              sx={{
-                color: COLORS.lblGreen,
-              }}
-            >
-              View: Request #?
-            </Typography>
-          </Grid>
+            Show Previous
+          </Button>
+          <Button
+            variant="contained"
+            sx={{
+              bgcolor: 'white',
+              color: COLORS.lblGreen,
+              borderWidth: 1,
+              borderStyle: 'solid',
+              borderRadius: 3,
+            }}
+            endIcon={<EastIcon />}
+          >
+            Show Next
+          </Button>
+          <Typography
+            variant="h4"
+            sx={{
+              flex: 1,
+              color: COLORS.lblGreen,
+            }}
+          >
+            View: Request #?
+          </Typography>
           <Button
             variant="contained"
             sx={{
@@ -108,26 +82,24 @@ function RequestsPage() {
           >
             Assign
           </Button>
-        </Grid>
-        <Grid size={6} sx={{ height: 550 }}>
-          <RequestInfoTable />
-        </Grid>
-        <Grid container size={6}>
-          <Grid size={12}>
-            <Button
-              sx={{ height: 'stretch', width: 'stretch', bgcolor: 'blue' }}
-            ></Button>
+        </Stack>
+        <Grid container>
+          <Grid size={6} sx={{ height: 550 }}>
+            <RequestInfoTable />
           </Grid>
-          <Grid size={12}>
-            <Button
-              sx={{ height: 'stretch', width: 'stretch', bgcolor: 'blue' }}
-            ></Button>
+          <Grid size={6}>
+            <Stack>
+              <Button
+                sx={{ height: 'stretch', width: 'stretch', bgcolor: 'blue' }}
+              ></Button>
+              <Button
+                sx={{ height: 'stretch', width: 'stretch', bgcolor: 'blue' }}
+              ></Button>
+            </Stack>
           </Grid>
         </Grid>
-        <Grid size={12}>
-          <RequestTable />
-        </Grid>
-      </Grid>
-    </>
+        <RequestTable />
+      </Stack>
+    </Container>
   );
 }

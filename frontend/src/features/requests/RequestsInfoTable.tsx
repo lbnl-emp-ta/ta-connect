@@ -1,10 +1,4 @@
-import {
-  TableContainer,
-  Table,
-  TableHead,
-  TableRow,
-  Typography,
-} from '@mui/material';
+import { TableContainer, Table, TableHead, TableRow } from '@mui/material';
 import COLORS from '../../styles/colors';
 
 export const RequestInfoTable: React.FC = () => {
@@ -32,9 +26,7 @@ export const RequestInfoTable: React.FC = () => {
               paddingBottom: 1,
             }}
           >
-            <Typography variant="h6" color="white">
-              Request Information
-            </Typography>
+            Request Information
           </TableRow>
         </TableHead>
       </Table>
