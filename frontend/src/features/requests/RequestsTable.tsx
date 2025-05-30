@@ -10,7 +10,6 @@ import {
   Box,
 } from '@mui/material';
 import { useSuspenseQuery } from '@tanstack/react-query';
-import COLORS from '../../styles/colors';
 import { dateDiffInDays } from '../../utils/datetimes';
 import { customerRequestRelationshipOptions } from '../../utils/queryOptions';
 import { RequestTableRow } from './RequestsTableRow';
@@ -30,7 +29,7 @@ export const RequestTable: React.FC = () => {
       <Button
         disableRipple
         sx={{
-          bgcolor: COLORS.lblGreen,
+          bgcolor: 'primary.main',
           color: 'white',
           borderRadius: 0,
           paddingLeft: 5,
@@ -60,7 +59,7 @@ export const RequestTable: React.FC = () => {
         sx={{
           borderWidth: 10,
           borderStyle: 'solid',
-          borderColor: COLORS.lblGreen,
+          borderColor: 'primary.main',
           borderRadius: 0,
         }}
       >

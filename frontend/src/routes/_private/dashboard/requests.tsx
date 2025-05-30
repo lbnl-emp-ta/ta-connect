@@ -7,7 +7,6 @@ import EastIcon from '@mui/icons-material/East';
 import WestIcon from '@mui/icons-material/West';
 import { RequestInfoTable } from '../../../features/requests/RequestsInfoTable';
 import { RequestTable } from '../../../features/requests/RequestsTable';
-import COLORS from '../../../styles/colors';
 import { customerRequestRelationshipOptions } from '../../../utils/queryOptions';
 
 export const Route = createFileRoute('/_private/dashboard/requests')({
@@ -31,7 +30,7 @@ function RequestsPage() {
             variant="contained"
             sx={{
               bgcolor: 'white',
-              color: COLORS.lblGreen,
+              color: 'primary.main',
               borderWidth: 1,
               borderStyle: 'solid',
               borderRadius: 3,
@@ -44,7 +43,7 @@ function RequestsPage() {
             variant="contained"
             sx={{
               bgcolor: 'white',
-              color: COLORS.lblGreen,
+              color: 'primary.main',
               borderWidth: 1,
               borderStyle: 'solid',
               borderRadius: 3,
@@ -57,7 +56,7 @@ function RequestsPage() {
             variant="h4"
             sx={{
               flex: 1,
-              color: COLORS.lblGreen,
+              color: 'primary.main',
             }}
           >
             View: Request #?
@@ -66,7 +65,7 @@ function RequestsPage() {
             variant="contained"
             sx={{
               bgcolor: 'white',
-              color: COLORS.lblGreen,
+              color: 'primary.main',
               borderWidth: 1,
               borderStyle: 'solid',
               borderRadius: 3,
@@ -77,7 +76,7 @@ function RequestsPage() {
           </Button>
           <Button
             variant="contained"
-            sx={{ bgcolor: COLORS.lblGreen, color: 'white', borderRadius: 3 }}
+            sx={{ bgcolor: 'primary.main', color: 'white', borderRadius: 3 }}
             endIcon={<EastIcon />}
           >
             Assign

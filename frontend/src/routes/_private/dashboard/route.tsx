@@ -44,14 +44,14 @@ function DashboardComponent() {
             width: 240,
             marginTop: 5,
             boxSizing: 'border-box',
-            bgcolor: COLORS.lblGreen,
+            bgcolor: 'primary.main',
           },
         }}
         variant="permanent"
         anchor="left"
       >
         <Toolbar />
-        <List sx={{ bgcolor: COLORS.lblGreen, color: 'white' }}>
+        <List sx={{ bgcolor: 'primary.main', color: 'white' }}>
           <ListItem>
             <ListItemText primary={'Viewing as:'}></ListItemText>
           </ListItem>

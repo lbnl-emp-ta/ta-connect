@@ -1,5 +1,4 @@
 import { TableContainer, Table, TableHead, TableRow } from '@mui/material';
-import COLORS from '../../styles/colors';
 
 export const RequestInfoTable: React.FC = () => {
   return (
@@ -9,7 +8,7 @@ export const RequestInfoTable: React.FC = () => {
         width: 'stretch',
         borderWidth: 10,
         borderStyle: 'solid',
-        borderColor: COLORS.lblGreen,
+        borderColor: 'primary.main',
         borderRadius: 0,
         borderTopLeftRadius: 5,
         borderTopRightRadius: 5,
@@ -19,7 +18,7 @@ export const RequestInfoTable: React.FC = () => {
         <TableHead>
           <TableRow
             sx={{
-              bgcolor: COLORS.lblGreen,
+              bgcolor: 'primary.main',
               display: 'flex',
               justifyContent: 'center',
               textAlign: 'center',
