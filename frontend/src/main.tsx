@@ -16,7 +16,8 @@ import '@fontsource/roboto/700.css';
 
 // Import the generated route tree
 import { routeTree } from './routeTree.gen';
-import { CircularProgress } from '@mui/material';
+import { CircularProgress, CssBaseline, ThemeProvider } from '@mui/material';
+import { theme } from './theme';
 
 export const queryClient = new QueryClient();
 
@@ -49,7 +50,10 @@ if (!rootElement.innerHTML) {
   root.render(
     <StrictMode>
       <QueryClientProvider client={queryClient}>
-        <RouterProvider router={router} />
+        <ThemeProvider theme={theme}>
+          <CssBaseline />
+          <RouterProvider router={router} />
+        </ThemeProvider>
       </QueryClientProvider>
     </StrictMode>
   );
