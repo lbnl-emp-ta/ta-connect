@@ -1,14 +1,14 @@
 import {
   SessionAuthenticatedResponse,
   SessionUnauthenticatedResponse,
-} from "../types";
+} from '../types';
 
 async function getSession(): Promise<{ isAuthenticated: boolean }> {
-  console.log("Fetching session");
+  console.log('Fetching session');
   const response = await fetch(
     `${import.meta.env.VITE_BACKEND_URL}/_allauth/browser/v1/auth/session`,
     {
-      credentials: "include",
+      credentials: 'include',
     }
   );
 
