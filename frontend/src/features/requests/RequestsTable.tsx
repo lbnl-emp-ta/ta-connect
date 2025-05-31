@@ -1,18 +1,8 @@
-import {
-  Button,
-  TableContainer,
-  Paper,
-  Table,
-  TableHead,
-  TableRow,
-  TableCell,
-  TableBody,
-  Box,
-} from '@mui/material';
+import { Box, Button } from '@mui/material';
+import { DataGrid } from '@mui/x-data-grid';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { dateDiffInDays } from '../../utils/datetimes';
 import { customerRequestRelationshipOptions } from '../../utils/queryOptions';
-import { RequestTableRow } from './RequestsTableRow';
 
 export const RequestTable: React.FC = () => {
   const { data } = useSuspenseQuery(customerRequestRelationshipOptions());
@@ -54,34 +44,47 @@ export const RequestTable: React.FC = () => {
       >
         Downstream Requests
       </Button>
-      <TableContainer
-        component={Paper}
-        sx={{
-          borderWidth: 10,
-          borderStyle: 'solid',
-          borderColor: 'primary.main',
-          borderRadius: 0,
-        }}
-      >
-        <Table aria-label="table" size="small">
-          <TableHead>
-            <TableRow sx={{ bgcolor: '#EFEFEF' }}>
-              <TableCell align="center">ID</TableCell>
-              <TableCell align="right">Age (in days)</TableCell>
-              <TableCell align="right">Status</TableCell>
-              <TableCell align="right">Depth</TableCell>
-              <TableCell align="right">Customer Name</TableCell>
-              <TableCell align="right">Customer Email</TableCell>
-              <TableCell align="right">Assigned Expert</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {tableData.map((row) => (
-              <RequestTableRow key={row.id} row={row} />
-            ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
+      <DataGrid
+        rows={tableData}
+        columns={[
+          { field: 'id', headerName: 'ID', width: 90, align: 'center' },
+          {
+            field: 'age',
+            headerName: 'Age (in days)',
+            type: 'number',
+            width: 150,
+          },
+          {
+            field: 'request.status',
+            valueGetter: (_value, row) => row.request.status,
+            headerName: 'Status',
+            width: 150,
+          },
+          {
+            field: 'request.depth',
+            valueGetter: (_value, row) => row.request.depth,
+            headerName: 'Depth',
+            width: 150,
+          },
+          {
+            field: 'customer.name',
+            valueGetter: (_value, row) => row.customer.name,
+            headerName: 'Customer Name',
+            width: 200,
+          },
+          {
+            field: 'customer.email',
+            valueGetter: (_value, row) => row.customer.email,
+            headerName: 'Customer Email',
+            width: 200,
+          },
+          {
+            field: 'assignedExpert',
+            headerName: 'Assigned Expert',
+            width: 200,
+          },
+        ]}
+      />
     </Box>
   );
 };
