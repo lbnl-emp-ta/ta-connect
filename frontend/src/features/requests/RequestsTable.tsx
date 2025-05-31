@@ -1,10 +1,17 @@
 import { Box, Button } from '@mui/material';
-import { DataGrid } from '@mui/x-data-grid';
+import { DataGrid, GridEventListener } from '@mui/x-data-grid';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { dateDiffInDays } from '../../utils/datetimes';
 import { customerRequestRelationshipOptions } from '../../utils/queryOptions';
+import { CustomerRequestRelationship } from '../../api/dashboard/types';
 
-export const RequestTable: React.FC = () => {
+interface RequestTableProps {
+  setSelectedRequest: (request: CustomerRequestRelationship) => void;
+}
+
+export const RequestTable: React.FC<RequestTableProps> = ({
+  setSelectedRequest,
+}) => {
   const { data } = useSuspenseQuery(customerRequestRelationshipOptions());
   const tableData = data.map((crr) => {
     const ageInDays = dateDiffInDays(
@@ -13,6 +20,10 @@ export const RequestTable: React.FC = () => {
     );
     return { ...crr, age: ageInDays };
   });
+
+  const handleRowClick: GridEventListener<'rowClick'> = (params) => {
+    setSelectedRequest(params.row as CustomerRequestRelationship);
+  };
 
   return (
     <Box>
@@ -84,6 +95,7 @@ export const RequestTable: React.FC = () => {
             width: 200,
           },
         ]}
+        onRowClick={handleRowClick}
       />
     </Box>
   );

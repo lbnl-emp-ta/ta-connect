@@ -23,6 +23,7 @@ import CancelIcon from '@mui/icons-material/Cancel';
 import { RequestInfoTable } from '../../../features/requests/RequestsInfoTable';
 import { RequestTable } from '../../../features/requests/RequestsTable';
 import { customerRequestRelationshipOptions } from '../../../utils/queryOptions';
+import { CustomerRequestRelationship } from '../../../api/dashboard/types';
 
 export const Route = createFileRoute('/_private/dashboard/requests')({
   loader: async ({ context }) => {
@@ -38,6 +39,8 @@ function RequestsPage() {
     null
   );
   const actionsMenuOpen = Boolean(actionsAnchorEl);
+  const [selectedRequest, setSelectedRequest] =
+    useState<CustomerRequestRelationship>();
 
   const handleClickActionsMenu = (
     event: React.MouseEvent<HTMLButtonElement>
@@ -135,7 +138,7 @@ function RequestsPage() {
         </Stack>
         <Grid container>
           <Grid size={6} sx={{ height: 550 }}>
-            <RequestInfoTable />
+            <RequestInfoTable request={selectedRequest} />
           </Grid>
           <Grid size={6}>
             <Stack>
@@ -148,7 +151,7 @@ function RequestsPage() {
             </Stack>
           </Grid>
         </Grid>
-        <RequestTable />
+        <RequestTable setSelectedRequest={setSelectedRequest} />
       </Stack>
     </Container>
   );
