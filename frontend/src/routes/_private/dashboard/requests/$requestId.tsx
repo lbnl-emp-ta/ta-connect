@@ -16,7 +16,6 @@ export const Route = createFileRoute('/_private/dashboard/requests/$requestId')(
 );
 
 function SelectedRequest() {
-  console.log('RequestPage loaded');
   const params = Route.useParams();
   const { data: requests } = useSuspenseQuery(
     customerRequestRelationshipOptions()

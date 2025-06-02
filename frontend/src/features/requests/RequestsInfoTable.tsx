@@ -39,12 +39,12 @@ export const RequestInfoTable: React.FC<RequestInfoTableProps> = ({
               paddingBottom: 1,
             }}
           >
-            Request Information
+            <TableCell>Request Information</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
           <TableRow>
-            <TableCell align="center" component="th" scope="row">
+            <TableCell align="center" scope="row">
               {request?.id}
             </TableCell>
           </TableRow>
