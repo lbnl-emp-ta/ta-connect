@@ -24,6 +24,7 @@ from .available_program_role import AvailableProgramRole
 from .available_lab_role import AvailableLabRole
 from .available_reception_role import AvailableReceptionRole
 from .topic import Topic
+from .expertise import Expertise
 
 __all__ = [
     "RequestStatus",
@@ -52,4 +53,5 @@ __all__ = [
     "AvailableLabRole",
     "AvailableReceptionRole",
     "Topic",
+    "Expertise",
 ]
