@@ -7,7 +7,7 @@ export const Route = createFileRoute('/_private/dashboard/requests/')({
 
 function NoSelectedRequest() {
   return (
-    <Stack sx={{ height: 550, justifyContent: 'center', alignItems: 'center' }}>
+    <Stack sx={{ height: 600, justifyContent: 'center', alignItems: 'center' }}>
       <Typography>Select a request from the table below.</Typography>
     </Stack>
   );

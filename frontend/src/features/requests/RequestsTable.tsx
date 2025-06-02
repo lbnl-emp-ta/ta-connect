@@ -6,19 +6,19 @@ import {
   useGridApiRef,
 } from '@mui/x-data-grid';
 import { useNavigate } from '@tanstack/react-router';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { CustomerRequestRelationship } from '../../api/dashboard/types';
 import { TabPanel } from '../../components/TabPanel';
 import { dateDiffInDays } from '../../utils/datetimes';
 import { a11yProps } from '../../utils/utils';
+import { useRequestsContext } from './RequestsContext';
+import { useSuspenseQuery } from '@tanstack/react-query';
+import { customerRequestRelationshipOptions } from '../../utils/queryOptions';
 
-interface RequestTableProps {
-  data: CustomerRequestRelationship[];
-  setSortedRequests: (requests: CustomerRequestRelationship[]) => void;
-}
-
-export const RequestTable: React.FC<RequestTableProps> = ({ data, setSortedRequests }) => {
+export const RequestTable: React.FC = () => {
   const navigate = useNavigate();
+  const { setSortedRequests } = useRequestsContext();
+  const { data } = useSuspenseQuery(customerRequestRelationshipOptions());
   const tableData = data.map((crr) => {
     const ageInDays = dateDiffInDays(new Date(crr.request.date_created), new Date());
     return { ...crr, age: ageInDays };
@@ -49,9 +49,17 @@ export const RequestTable: React.FC<RequestTableProps> = ({ data, setSortedReque
   };
 
   const handleSortChange = () => {
-    const sortedRowEntries = gridSortedRowEntriesSelector(apiRef);
-    setSortedRequests(sortedRowEntries.map((row) => row.model as CustomerRequestRelationship));
+    // The sort model changes before the rows are set,
+    // so this forces a delay to ensure the rows are sorted
+    setTimeout(() => {
+      const sortedRowEntries = gridSortedRowEntriesSelector(apiRef);
+      setSortedRequests(sortedRowEntries.map((row) => row.model as CustomerRequestRelationship));
+    }, 500);
   };
+
+  useEffect(() => {
+    setSortedRequests(data);
+  }, [setSortedRequests, data]);
 
   return (
     <Box>
