@@ -1,14 +1,13 @@
 import { Link, Outlet } from '@tanstack/react-router';
 import { TanStackRouterDevtools } from '@tanstack/react-router-devtools';
 
-import { createRootRouteWithContext } from '@tanstack/react-router';
+import { AppBar, Box, Button, Stack, Toolbar, Typography } from '@mui/material';
 import { useSuspenseQuery, type QueryClient } from '@tanstack/react-query';
-import { AppBar, Box, Button, Toolbar, Typography } from '@mui/material';
+import { createRootRouteWithContext } from '@tanstack/react-router';
 import {
   authSessionQueryOptions,
   useLogoutMutation,
 } from '../utils/queryOptions';
-import COLORS from '../styles/colors';
 
 export interface MyRouterContext {
   queryClient: QueryClient;
@@ -34,7 +33,7 @@ function Initializer() {
   }
 
   return (
-    <>
+    <Stack spacing={0} sx={{ minHeight: '100vh' }}>
       <AppBar
         position="sticky"
         sx={{
@@ -101,17 +100,10 @@ function Initializer() {
           )}
         </Toolbar>
       </AppBar>
-      <Box
-        sx={{
-          display: 'flex',
-          justifyContent: 'center',
-          minHeight: '80vh',
-          padding: 2,
-        }}
-      >
+      <Box sx={{ display: 'flex', flex: 1 }}>
         <Outlet />
         <TanStackRouterDevtools />
       </Box>
-    </>
+    </Stack>
   );
 }
