@@ -21,6 +21,9 @@ import {
 import { useState } from 'react';
 import { RequestTable } from '../../../../features/requests/RequestsTable';
 import { customerRequestRelationshipOptions } from '../../../../utils/queryOptions';
+import { useSuspenseQuery } from '@tanstack/react-query';
+import { Route as RequestIdRoute } from './$requestId';
+import { AppLink } from '../../../../components/AppLink';
 
 export const Route = createFileRoute('/_private/dashboard/requests')({
   loader: async ({ context }) => {
@@ -32,6 +35,19 @@ export const Route = createFileRoute('/_private/dashboard/requests')({
 });
 
 function RequestsPage() {
+  const params = RequestIdRoute.useParams();
+  const { data: requests } = useSuspenseQuery(
+    customerRequestRelationshipOptions()
+  );
+  const [sortedRequests, setSortedRequests] = useState(requests);
+  const currentIndex = sortedRequests.findIndex(
+    (request) => request.id === parseInt(params.requestId)
+  );
+  console.log('sortedRequests', sortedRequests);
+  console.log('currentIndex', currentIndex);
+  const nextIndex =
+    currentIndex < sortedRequests.length - 1 ? currentIndex + 1 : null;
+  const previousIndex = currentIndex > 0 ? currentIndex - 1 : null;
   const [actionsAnchorEl, setActionsAnchorEl] = useState<null | HTMLElement>(
     null
   );
@@ -53,12 +69,56 @@ function RequestsPage() {
           Dashboard / Requests
         </Typography>
         <Stack direction="row">
-          <Button variant="outlined" color="primary" startIcon={<WestIcon />}>
-            Show Previous
-          </Button>
-          <Button variant="outlined" color="primary" endIcon={<EastIcon />}>
-            Show Next
-          </Button>
+          {previousIndex !== null && (
+            <AppLink
+              to={'/dashboard/requests/$requestId'}
+              params={{
+                requestId: sortedRequests[previousIndex].id.toString(),
+              }}
+            >
+              <Button
+                variant="outlined"
+                color="primary"
+                startIcon={<WestIcon />}
+              >
+                Previous Request
+              </Button>
+            </AppLink>
+          )}
+          {previousIndex === null && (
+            <Button
+              variant="outlined"
+              color="primary"
+              startIcon={<WestIcon />}
+              disabled
+            >
+              Previous Request
+            </Button>
+          )}
+          {nextIndex !== null && (
+            <AppLink
+              to={'/dashboard/requests/$requestId'}
+              params={{ requestId: sortedRequests[nextIndex].id.toString() }}
+            >
+              <Button
+                variant="outlined"
+                color="primary"
+                startIcon={<EastIcon />}
+              >
+                Next Request
+              </Button>
+            </AppLink>
+          )}
+          {nextIndex === null && (
+            <Button
+              variant="outlined"
+              color="primary"
+              startIcon={<EastIcon />}
+              disabled
+            >
+              Next Request
+            </Button>
+          )}
           <Typography
             variant="h4"
             color="primary"
@@ -131,7 +191,7 @@ function RequestsPage() {
           </Button>
         </Stack>
         <Outlet />
-        <RequestTable />
+        <RequestTable data={requests} setSortedRequests={setSortedRequests} />
       </Stack>
     </Container>
   );

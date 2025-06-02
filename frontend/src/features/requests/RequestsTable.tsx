@@ -1,16 +1,27 @@
 import { Box, Tab, Tabs } from '@mui/material';
-import { DataGrid, GridRowSelectionModel } from '@mui/x-data-grid';
-import { useSuspenseQuery } from '@tanstack/react-query';
+import {
+  DataGrid,
+  GridRowSelectionModel,
+  gridSortedRowEntriesSelector,
+  useGridApiRef,
+} from '@mui/x-data-grid';
 import { useNavigate } from '@tanstack/react-router';
 import { useState } from 'react';
+import { CustomerRequestRelationship } from '../../api/dashboard/types';
 import { TabPanel } from '../../components/TabPanel';
 import { dateDiffInDays } from '../../utils/datetimes';
-import { customerRequestRelationshipOptions } from '../../utils/queryOptions';
 import { a11yProps } from '../../utils/utils';
 
-export const RequestTable: React.FC = () => {
+interface RequestTableProps {
+  data: CustomerRequestRelationship[];
+  setSortedRequests: (requests: CustomerRequestRelationship[]) => void;
+}
+
+export const RequestTable: React.FC<RequestTableProps> = ({
+  data,
+  setSortedRequests,
+}) => {
   const navigate = useNavigate();
-  const { data } = useSuspenseQuery(customerRequestRelationshipOptions());
   const tableData = data.map((crr) => {
     const ageInDays = dateDiffInDays(
       new Date(crr.request.date_created),
@@ -26,6 +37,7 @@ export const RequestTable: React.FC = () => {
       type: 'include',
       ids: new Set<string | number>(),
     });
+  const apiRef = useGridApiRef();
 
   const handleChangeTab = (
     _event: React.SyntheticEvent,
@@ -50,6 +62,13 @@ export const RequestTable: React.FC = () => {
     setRowSelectionModel(newSelection);
   };
 
+  const handleSortChange = () => {
+    const sortedRowEntries = gridSortedRowEntriesSelector(apiRef);
+    setSortedRequests(
+      sortedRowEntries.map((row) => row.model as CustomerRequestRelationship)
+    );
+  };
+
   return (
     <Box>
       <Tabs
@@ -70,6 +89,7 @@ export const RequestTable: React.FC = () => {
       </Tabs>
       <TabPanel value={tabValue} index="actionable-requests">
         <DataGrid
+          apiRef={apiRef}
           rows={tableData}
           columns={[
             { field: 'id', headerName: 'ID', width: 90, align: 'center' },
@@ -111,6 +131,7 @@ export const RequestTable: React.FC = () => {
           ]}
           onRowSelectionModelChange={handleRowSelectionModelChange}
           rowSelectionModel={rowSelectionModel}
+          onSortModelChange={handleSortChange}
         />
       </TabPanel>
       <TabPanel value={tabValue} index="downstream-requests">
