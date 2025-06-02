@@ -1,9 +1,12 @@
-import { Box, Button } from '@mui/material';
+import { Box, Tab, Tabs } from '@mui/material';
 import { DataGrid, GridEventListener } from '@mui/x-data-grid';
 import { useSuspenseQuery } from '@tanstack/react-query';
+import { useState } from 'react';
+import { CustomerRequestRelationship } from '../../api/dashboard/types';
+import { TabPanel } from '../../components/TabPanel';
 import { dateDiffInDays } from '../../utils/datetimes';
 import { customerRequestRelationshipOptions } from '../../utils/queryOptions';
-import { CustomerRequestRelationship } from '../../api/dashboard/types';
+import { a11yProps } from '../../utils/utils';
 
 interface RequestTableProps {
   setSelectedRequest: (request: CustomerRequestRelationship) => void;
@@ -20,6 +23,16 @@ export const RequestTable: React.FC<RequestTableProps> = ({
     );
     return { ...crr, age: ageInDays };
   });
+  const [tabValue, setTabValue] = useState<string | number>(
+    'actionable-requests'
+  );
+
+  const handleChangeTab = (
+    _event: React.SyntheticEvent,
+    newValue: string | number
+  ) => {
+    setTabValue(newValue);
+  };
 
   const handleRowClick: GridEventListener<'rowClick'> = (params) => {
     setSelectedRequest(params.row as CustomerRequestRelationship);
@@ -27,76 +40,69 @@ export const RequestTable: React.FC<RequestTableProps> = ({
 
   return (
     <Box>
-      <Button
-        disableRipple
-        sx={{
-          bgcolor: 'primary.main',
-          color: 'white',
-          borderRadius: 0,
-          paddingLeft: 5,
-          paddingRight: 5,
-          borderTopLeftRadius: 5,
-          borderTopRightRadius: 5,
-        }}
+      <Tabs
+        value={tabValue}
+        onChange={handleChangeTab}
+        aria-label="requests tabs"
       >
-        Actionable Requests
-      </Button>
-      <Button
-        disableRipple
-        sx={{
-          bgcolor: '#274047',
-          color: 'white',
-          borderRadius: 0,
-          paddingLeft: 5,
-          paddingRight: 5,
-          borderTopLeftRadius: 5,
-          borderTopRightRadius: 5,
-        }}
-      >
-        Downstream Requests
-      </Button>
-      <DataGrid
-        rows={tableData}
-        columns={[
-          { field: 'id', headerName: 'ID', width: 90, align: 'center' },
-          {
-            field: 'age',
-            headerName: 'Age (in days)',
-            type: 'number',
-            width: 150,
-          },
-          {
-            field: 'request.status',
-            valueGetter: (_value, row) => row.request.status,
-            headerName: 'Status',
-            width: 150,
-          },
-          {
-            field: 'request.depth',
-            valueGetter: (_value, row) => row.request.depth,
-            headerName: 'Depth',
-            width: 150,
-          },
-          {
-            field: 'customer.name',
-            valueGetter: (_value, row) => row.customer.name,
-            headerName: 'Customer Name',
-            width: 200,
-          },
-          {
-            field: 'customer.email',
-            valueGetter: (_value, row) => row.customer.email,
-            headerName: 'Customer Email',
-            width: 200,
-          },
-          {
-            field: 'assignedExpert',
-            headerName: 'Assigned Expert',
-            width: 200,
-          },
-        ]}
-        onRowClick={handleRowClick}
-      />
+        <Tab
+          label="My Actionable Requests"
+          value="actionable-requests"
+          {...a11yProps('actionable-requests')}
+        />
+        <Tab
+          label="Downstream Requests"
+          value="downstream-requests"
+          {...a11yProps('downstream-requests')}
+        />
+      </Tabs>
+      <TabPanel value={tabValue} index="actionable-requests">
+        <DataGrid
+          rows={tableData}
+          columns={[
+            { field: 'id', headerName: 'ID', width: 90, align: 'center' },
+            {
+              field: 'age',
+              headerName: 'Age (in days)',
+              type: 'number',
+              width: 150,
+            },
+            {
+              field: 'request.status',
+              valueGetter: (_value, row) => row.request.status,
+              headerName: 'Status',
+              width: 150,
+            },
+            {
+              field: 'request.depth',
+              valueGetter: (_value, row) => row.request.depth,
+              headerName: 'Depth',
+              width: 150,
+            },
+            {
+              field: 'customer.name',
+              valueGetter: (_value, row) => row.customer.name,
+              headerName: 'Customer Name',
+              width: 200,
+            },
+            {
+              field: 'customer.email',
+              valueGetter: (_value, row) => row.customer.email,
+              headerName: 'Customer Email',
+              width: 200,
+            },
+            {
+              field: 'assignedExpert',
+              headerName: 'Assigned Expert',
+              width: 200,
+            },
+          ]}
+          onRowClick={handleRowClick}
+        />
+      </TabPanel>
+      <TabPanel value={tabValue} index="downstream-requests">
+        Downstream
+      </TabPanel>
     </Box>
   );
 };
