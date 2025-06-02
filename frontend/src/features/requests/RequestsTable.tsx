@@ -1,20 +1,15 @@
 import { Box, Tab, Tabs } from '@mui/material';
-import { DataGrid, GridEventListener } from '@mui/x-data-grid';
+import { DataGrid, GridRowSelectionModel } from '@mui/x-data-grid';
 import { useSuspenseQuery } from '@tanstack/react-query';
+import { useNavigate } from '@tanstack/react-router';
 import { useState } from 'react';
-import { CustomerRequestRelationship } from '../../api/dashboard/types';
 import { TabPanel } from '../../components/TabPanel';
 import { dateDiffInDays } from '../../utils/datetimes';
 import { customerRequestRelationshipOptions } from '../../utils/queryOptions';
 import { a11yProps } from '../../utils/utils';
 
-interface RequestTableProps {
-  setSelectedRequest: (request: CustomerRequestRelationship) => void;
-}
-
-export const RequestTable: React.FC<RequestTableProps> = ({
-  setSelectedRequest,
-}) => {
+export const RequestTable: React.FC = () => {
+  const navigate = useNavigate();
   const { data } = useSuspenseQuery(customerRequestRelationshipOptions());
   const tableData = data.map((crr) => {
     const ageInDays = dateDiffInDays(
@@ -26,6 +21,11 @@ export const RequestTable: React.FC<RequestTableProps> = ({
   const [tabValue, setTabValue] = useState<string | number>(
     'actionable-requests'
   );
+  const [rowSelectionModel, setRowSelectionModel] =
+    useState<GridRowSelectionModel>({
+      type: 'include',
+      ids: new Set<string | number>(),
+    });
 
   const handleChangeTab = (
     _event: React.SyntheticEvent,
@@ -34,8 +34,20 @@ export const RequestTable: React.FC<RequestTableProps> = ({
     setTabValue(newValue);
   };
 
-  const handleRowClick: GridEventListener<'rowClick'> = (params) => {
-    setSelectedRequest(params.row as CustomerRequestRelationship);
+  const handleRowSelectionModelChange = (
+    newSelection: GridRowSelectionModel
+  ) => {
+    if (newSelection.ids.size > 0) {
+      const selectedId = newSelection.ids.values().next().value;
+      void navigate({
+        to: `/dashboard/requests/${selectedId}`,
+      });
+    } else {
+      void navigate({
+        to: `/dashboard/requests`,
+      });
+    }
+    setRowSelectionModel(newSelection);
   };
 
   return (
@@ -97,7 +109,8 @@ export const RequestTable: React.FC<RequestTableProps> = ({
               width: 200,
             },
           ]}
-          onRowClick={handleRowClick}
+          onRowSelectionModelChange={handleRowSelectionModelChange}
+          rowSelectionModel={rowSelectionModel}
         />
       </TabPanel>
       <TabPanel value={tabValue} index="downstream-requests">

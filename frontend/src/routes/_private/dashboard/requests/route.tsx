@@ -1,7 +1,16 @@
+import { createFileRoute, Outlet } from '@tanstack/react-router';
+// import { KeyboardArrowDown, KeyboardArrowUp} from '@mui/icons-material'
+import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
+import ArticleIcon from '@mui/icons-material/Article';
+import AssignmentTurnedInIcon from '@mui/icons-material/AssignmentTurnedIn';
+import CancelIcon from '@mui/icons-material/Cancel';
+import DateRangeIcon from '@mui/icons-material/DateRange';
+import EastIcon from '@mui/icons-material/East';
+import EditIcon from '@mui/icons-material/Edit';
+import WestIcon from '@mui/icons-material/West';
 import {
   Button,
   Container,
-  Grid,
   ListItemIcon,
   ListItemText,
   Menu,
@@ -9,21 +18,9 @@ import {
   Stack,
   Typography,
 } from '@mui/material';
-import { createFileRoute } from '@tanstack/react-router';
 import { useState } from 'react';
-// import { KeyboardArrowDown, KeyboardArrowUp} from '@mui/icons-material'
-import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
-import EastIcon from '@mui/icons-material/East';
-import WestIcon from '@mui/icons-material/West';
-import EditIcon from '@mui/icons-material/Edit';
-import DateRangeIcon from '@mui/icons-material/DateRange';
-import AssignmentTurnedInIcon from '@mui/icons-material/AssignmentTurnedIn';
-import ArticleIcon from '@mui/icons-material/Article';
-import CancelIcon from '@mui/icons-material/Cancel';
-import { RequestInfoTable } from '../../../features/requests/RequestsInfoTable';
-import { RequestTable } from '../../../features/requests/RequestsTable';
-import { customerRequestRelationshipOptions } from '../../../utils/queryOptions';
-import { CustomerRequestRelationship } from '../../../api/dashboard/types';
+import { RequestTable } from '../../../../features/requests/RequestsTable';
+import { customerRequestRelationshipOptions } from '../../../../utils/queryOptions';
 
 export const Route = createFileRoute('/_private/dashboard/requests')({
   loader: async ({ context }) => {
@@ -39,8 +36,6 @@ function RequestsPage() {
     null
   );
   const actionsMenuOpen = Boolean(actionsAnchorEl);
-  const [selectedRequest, setSelectedRequest] =
-    useState<CustomerRequestRelationship>();
 
   const handleClickActionsMenu = (
     event: React.MouseEvent<HTMLButtonElement>
@@ -51,7 +46,6 @@ function RequestsPage() {
   const handleCloseActionsMenu = () => {
     setActionsAnchorEl(null);
   };
-
   return (
     <Container maxWidth="xl">
       <Stack>
@@ -136,22 +130,8 @@ function RequestsPage() {
             Assign
           </Button>
         </Stack>
-        <Grid container>
-          <Grid size={6} sx={{ height: 550 }}>
-            <RequestInfoTable request={selectedRequest} />
-          </Grid>
-          <Grid size={6}>
-            <Stack>
-              <Button
-                sx={{ height: 'stretch', width: 'stretch', bgcolor: 'blue' }}
-              ></Button>
-              <Button
-                sx={{ height: 'stretch', width: 'stretch', bgcolor: 'blue' }}
-              ></Button>
-            </Stack>
-          </Grid>
-        </Grid>
-        <RequestTable setSelectedRequest={setSelectedRequest} />
+        <Outlet />
+        <RequestTable />
       </Stack>
     </Container>
   );
