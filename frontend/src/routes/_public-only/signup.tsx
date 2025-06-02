@@ -1,14 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { useState } from 'react';
-import {
-  Box,
-  Button,
-  Container,
-  Divider,
-  TextField,
-  Typography,
-  Grid,
-} from '@mui/material';
+import { Box, Button, Container, Divider, TextField, Typography, Grid } from '@mui/material';
 import { useSigupMutation } from '../../utils/queryOptions';
 
 export const Route = createFileRoute('/_public-only/signup')({

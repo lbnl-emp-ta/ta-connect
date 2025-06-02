@@ -16,9 +16,7 @@ export async function signupMutation(details: SignupDetails) {
     }
   );
 
-  const responseData = (await response.json()) as
-    | SessionAuthenticatedResponse
-    | ErrorResponse;
+  const responseData = (await response.json()) as SessionAuthenticatedResponse | ErrorResponse;
 
   if (!response.ok) {
     throw Error(`Error: Status ${response.status}`);

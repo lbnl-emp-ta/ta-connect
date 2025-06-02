@@ -1,12 +1,4 @@
-import {
-  Grid,
-  Box,
-  Button,
-  Container,
-  Divider,
-  TextField,
-  Typography,
-} from '@mui/material';
+import { Grid, Box, Button, Container, Divider, TextField, Typography } from '@mui/material';
 import { createFileRoute } from '@tanstack/react-router';
 import { useState } from 'react';
 import { useLoginMutation } from '../../utils/queryOptions';
@@ -107,10 +99,7 @@ interface LoginWithSocialButtonProps {
   id: string;
 }
 
-export default function LoginWithSocialButton({
-  name,
-  id,
-}: LoginWithSocialButtonProps) {
+export default function LoginWithSocialButton({ name, id }: LoginWithSocialButtonProps) {
   function handleClick() {
     const form = document.createElement('form');
     form.style.display = 'none';
@@ -118,8 +107,7 @@ export default function LoginWithSocialButton({
     form.action = `${import.meta.env.VITE_API_URL}/_allauth/browser/v1/auth/provider/redirect`;
     const data = {
       provider: id,
-      callback_url:
-        'http://taconnect-local.lbl.gov:1337/api/account/provider/callback',
+      callback_url: 'http://taconnect-local.lbl.gov:1337/api/account/provider/callback',
       csrfmiddlewaretoken: getCSRFToken() || '',
       process: 'login',
     };

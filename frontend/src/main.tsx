@@ -1,11 +1,7 @@
 import { StrictMode } from 'react';
 import ReactDOM from 'react-dom/client';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import {
-  ErrorComponent,
-  RouterProvider,
-  createRouter,
-} from '@tanstack/react-router';
+import { ErrorComponent, RouterProvider, createRouter } from '@tanstack/react-router';
 
 import './index.css';
 

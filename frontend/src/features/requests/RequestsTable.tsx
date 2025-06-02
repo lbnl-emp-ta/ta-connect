@@ -17,38 +17,24 @@ interface RequestTableProps {
   setSortedRequests: (requests: CustomerRequestRelationship[]) => void;
 }
 
-export const RequestTable: React.FC<RequestTableProps> = ({
-  data,
-  setSortedRequests,
-}) => {
+export const RequestTable: React.FC<RequestTableProps> = ({ data, setSortedRequests }) => {
   const navigate = useNavigate();
   const tableData = data.map((crr) => {
-    const ageInDays = dateDiffInDays(
-      new Date(crr.request.date_created),
-      new Date()
-    );
+    const ageInDays = dateDiffInDays(new Date(crr.request.date_created), new Date());
     return { ...crr, age: ageInDays };
   });
-  const [tabValue, setTabValue] = useState<string | number>(
-    'actionable-requests'
-  );
-  const [rowSelectionModel, setRowSelectionModel] =
-    useState<GridRowSelectionModel>({
-      type: 'include',
-      ids: new Set<string | number>(),
-    });
+  const [tabValue, setTabValue] = useState<string | number>('actionable-requests');
+  const [rowSelectionModel, setRowSelectionModel] = useState<GridRowSelectionModel>({
+    type: 'include',
+    ids: new Set<string | number>(),
+  });
   const apiRef = useGridApiRef();
 
-  const handleChangeTab = (
-    _event: React.SyntheticEvent,
-    newValue: string | number
-  ) => {
+  const handleChangeTab = (_event: React.SyntheticEvent, newValue: string | number) => {
     setTabValue(newValue);
   };
 
-  const handleRowSelectionModelChange = (
-    newSelection: GridRowSelectionModel
-  ) => {
+  const handleRowSelectionModelChange = (newSelection: GridRowSelectionModel) => {
     if (newSelection.ids.size > 0) {
       const selectedId = newSelection.ids.values().next().value;
       void navigate({
@@ -64,18 +50,12 @@ export const RequestTable: React.FC<RequestTableProps> = ({
 
   const handleSortChange = () => {
     const sortedRowEntries = gridSortedRowEntriesSelector(apiRef);
-    setSortedRequests(
-      sortedRowEntries.map((row) => row.model as CustomerRequestRelationship)
-    );
+    setSortedRequests(sortedRowEntries.map((row) => row.model as CustomerRequestRelationship));
   };
 
   return (
     <Box>
-      <Tabs
-        value={tabValue}
-        onChange={handleChangeTab}
-        aria-label="requests tabs"
-      >
+      <Tabs value={tabValue} onChange={handleChangeTab} aria-label="requests tabs">
         <Tab
           label="My Actionable Requests"
           value="actionable-requests"

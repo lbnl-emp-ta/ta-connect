@@ -39,9 +39,7 @@ export const Route = createFileRoute('/(public)/intake')({
   loader: async ({ context }) => {
     await context.queryClient.ensureQueryData(statesQueryOptions());
     await context.queryClient.ensureQueryData(organizationTypesQueryOptions());
-    await context.queryClient.ensureQueryData(
-      transmissionPlanningRegionsQueryOptions()
-    );
+    await context.queryClient.ensureQueryData(transmissionPlanningRegionsQueryOptions());
   },
   component: IntakeForm,
 });
@@ -49,9 +47,7 @@ export const Route = createFileRoute('/(public)/intake')({
 function IntakeForm() {
   const { data: states } = useSuspenseQuery(statesQueryOptions());
   const { data: orgTypes } = useSuspenseQuery(organizationTypesQueryOptions());
-  const { data: tprs } = useSuspenseQuery(
-    transmissionPlanningRegionsQueryOptions()
-  );
+  const { data: tprs } = useSuspenseQuery(transmissionPlanningRegionsQueryOptions());
 
   const [name, setName] = useState<string>('');
   const [phone, setPhone] = useState<string>('');
@@ -189,13 +185,9 @@ function IntakeForm() {
                 required={true}
                 defaultValue=""
                 value={
-                  tprName === undefined || tprName === null || tprs.length === 0
-                    ? ''
-                    : tprName
+                  tprName === undefined || tprName === null || tprs.length === 0 ? '' : tprName
                 }
-                onChange={(e) =>
-                  setTPRName(e.target.value as React.SetStateAction<string>)
-                }
+                onChange={(e) => setTPRName(e.target.value as React.SetStateAction<string>)}
               >
                 {tprs.map((region: TransmissionPlanningRegion) => (
                   <MenuItem key={region.name} value={region.name}>
@@ -209,9 +201,7 @@ function IntakeForm() {
               options={states}
               getOptionLabel={(option: State) => option.name}
               sx={{ width: 300 }}
-              renderInput={(params) => (
-                <TextField {...params} required={true} label="State" />
-              )}
+              renderInput={(params) => <TextField {...params} required={true} label="State" />}
               value={state}
               onChange={(_, newValue: State | null) => {
                 setState(newValue);
@@ -254,17 +244,13 @@ function IntakeForm() {
           </Stack>
           <Divider />
           <Stack spacing={2}>
-            <Typography variant="h4">
-              Technical Assistance Information
-            </Typography>
+            <Typography variant="h4">Technical Assistance Information</Typography>
             <FormControl>
               <Stack spacing={2}>
-                <FormLabel id="ta-depth-radio-group">
-                  Techinical Assistance Depth
-                </FormLabel>
+                <FormLabel id="ta-depth-radio-group">Techinical Assistance Depth</FormLabel>
                 <Typography variant="body2">
-                  What kind of Technical Assistance are you looking for? If you
-                  don't know select "Unsure".
+                  What kind of Technical Assistance are you looking for? If you don't know select
+                  "Unsure".
                 </Typography>
               </Stack>
               <RadioGroup
@@ -274,61 +260,25 @@ function IntakeForm() {
                 onChange={(e) => setTADepth(e.target.value)}
                 name="ta-depth-radio-group"
               >
-                <FormControlLabel
-                  value="Help Desk"
-                  control={<Radio />}
-                  label="Help Desk"
-                />
-                <FormControlLabel
-                  value="Expert Match"
-                  control={<Radio />}
-                  label="Expert Match"
-                />
-                <FormControlLabel
-                  value="Unsure"
-                  control={<Radio />}
-                  label="Unsure"
-                />
+                <FormControlLabel value="Help Desk" control={<Radio />} label="Help Desk" />
+                <FormControlLabel value="Expert Match" control={<Radio />} label="Expert Match" />
+                <FormControlLabel value="Unsure" control={<Radio />} label="Unsure" />
               </RadioGroup>
             </FormControl>
             <FormControl>
               <Stack spacing={2}>
                 <FormLabel id="urgency-radio-group">Urgency</FormLabel>
                 <Typography variant="body2">
-                  How urgent is this request? Please note that this is not a
-                  guarantee that Technical Assistance can be scheduled within a
-                  specific time frame.
+                  How urgent is this request? Please note that this is not a guarantee that
+                  Technical Assistance can be scheduled within a specific time frame.
                 </Typography>
               </Stack>
-              <RadioGroup
-                aria-labelledby="urgency-radio-group"
-                name="urgency-radio-group"
-              >
-                <FormControlLabel
-                  value="1 week"
-                  control={<Radio />}
-                  label="Within 1 week"
-                />
-                <FormControlLabel
-                  value="1 month"
-                  control={<Radio />}
-                  label="Within 1 month"
-                />
-                <FormControlLabel
-                  value="3 months"
-                  control={<Radio />}
-                  label="Within 3 months"
-                />
-                <FormControlLabel
-                  value="6 months"
-                  control={<Radio />}
-                  label="Within 6 months"
-                />
-                <FormControlLabel
-                  value="Unsure"
-                  control={<Radio />}
-                  label="Unsure"
-                />
+              <RadioGroup aria-labelledby="urgency-radio-group" name="urgency-radio-group">
+                <FormControlLabel value="1 week" control={<Radio />} label="Within 1 week" />
+                <FormControlLabel value="1 month" control={<Radio />} label="Within 1 month" />
+                <FormControlLabel value="3 months" control={<Radio />} label="Within 3 months" />
+                <FormControlLabel value="6 months" control={<Radio />} label="Within 6 months" />
+                <FormControlLabel value="Unsure" control={<Radio />} label="Unsure" />
               </RadioGroup>
             </FormControl>
             <TextField
@@ -345,10 +295,7 @@ function IntakeForm() {
           <Divider />
           <Stack spacing={2}>
             <FormControl>
-              <FormControlLabel
-                control={<Switch />}
-                label="Send me a copy of my responses"
-              />
+              <FormControlLabel control={<Switch />} label="Send me a copy of my responses" />
             </FormControl>
             <Button type="submit" variant="contained">
               Submit

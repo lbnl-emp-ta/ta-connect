@@ -10,19 +10,11 @@ import {
   Select,
   Stack,
 } from '@mui/material';
-import {
-  createFileRoute,
-  Outlet,
-  redirect,
-  useNavigate,
-} from '@tanstack/react-router';
+import { createFileRoute, Outlet, redirect, useNavigate } from '@tanstack/react-router';
 
 export const Route = createFileRoute('/_private/dashboard')({
   beforeLoad({ location }) {
-    if (
-      location.pathname === '/dashboard' ||
-      location.pathname === '/dashboard/'
-    )
+    if (location.pathname === '/dashboard' || location.pathname === '/dashboard/')
       // eslint-disable-next-line @typescript-eslint/only-throw-error
       throw redirect({ to: '/dashboard/requests' });
   },

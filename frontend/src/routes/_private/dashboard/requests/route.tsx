@@ -27,35 +27,26 @@ import { AppLink } from '../../../../components/AppLink';
 
 export const Route = createFileRoute('/_private/dashboard/requests')({
   loader: async ({ context }) => {
-    await context.queryClient.ensureQueryData(
-      customerRequestRelationshipOptions()
-    );
+    await context.queryClient.ensureQueryData(customerRequestRelationshipOptions());
   },
   component: RequestsPage,
 });
 
 function RequestsPage() {
   const params = RequestIdRoute.useParams();
-  const { data: requests } = useSuspenseQuery(
-    customerRequestRelationshipOptions()
-  );
+  const { data: requests } = useSuspenseQuery(customerRequestRelationshipOptions());
   const [sortedRequests, setSortedRequests] = useState(requests);
   const currentIndex = sortedRequests.findIndex(
     (request) => request.id === parseInt(params.requestId)
   );
   console.log('sortedRequests', sortedRequests);
   console.log('currentIndex', currentIndex);
-  const nextIndex =
-    currentIndex < sortedRequests.length - 1 ? currentIndex + 1 : null;
+  const nextIndex = currentIndex < sortedRequests.length - 1 ? currentIndex + 1 : null;
   const previousIndex = currentIndex > 0 ? currentIndex - 1 : null;
-  const [actionsAnchorEl, setActionsAnchorEl] = useState<null | HTMLElement>(
-    null
-  );
+  const [actionsAnchorEl, setActionsAnchorEl] = useState<null | HTMLElement>(null);
   const actionsMenuOpen = Boolean(actionsAnchorEl);
 
-  const handleClickActionsMenu = (
-    event: React.MouseEvent<HTMLButtonElement>
-  ) => {
+  const handleClickActionsMenu = (event: React.MouseEvent<HTMLButtonElement>) => {
     setActionsAnchorEl(event.currentTarget);
   };
 
@@ -76,22 +67,13 @@ function RequestsPage() {
                 requestId: sortedRequests[previousIndex].id.toString(),
               }}
             >
-              <Button
-                variant="outlined"
-                color="primary"
-                startIcon={<WestIcon />}
-              >
+              <Button variant="outlined" color="primary" startIcon={<WestIcon />}>
                 Previous Request
               </Button>
             </AppLink>
           )}
           {previousIndex === null && (
-            <Button
-              variant="outlined"
-              color="primary"
-              startIcon={<WestIcon />}
-              disabled
-            >
+            <Button variant="outlined" color="primary" startIcon={<WestIcon />} disabled>
               Previous Request
             </Button>
           )}
@@ -100,22 +82,13 @@ function RequestsPage() {
               to={'/dashboard/requests/$requestId'}
               params={{ requestId: sortedRequests[nextIndex].id.toString() }}
             >
-              <Button
-                variant="outlined"
-                color="primary"
-                startIcon={<EastIcon />}
-              >
+              <Button variant="outlined" color="primary" startIcon={<EastIcon />}>
                 Next Request
               </Button>
             </AppLink>
           )}
           {nextIndex === null && (
-            <Button
-              variant="outlined"
-              color="primary"
-              startIcon={<EastIcon />}
-              disabled
-            >
+            <Button variant="outlined" color="primary" startIcon={<EastIcon />} disabled>
               Next Request
             </Button>
           )}

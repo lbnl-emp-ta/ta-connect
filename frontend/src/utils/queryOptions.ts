@@ -34,16 +34,14 @@ export const requestsQueryOptions = () =>
   queryOptions({
     staleTime: 120_000, // stale after 2 minutes
     queryKey: ['requests'],
-    queryFn: () =>
-      fetchListOf<TARequest>(`${import.meta.env.VITE_API_URL}/requests/`),
+    queryFn: () => fetchListOf<TARequest>(`${import.meta.env.VITE_API_URL}/requests/`),
   });
 
 export const statesQueryOptions = () =>
   queryOptions({
     staleTime: 120_000, // stale after 2 minutes
     queryKey: ['states'],
-    queryFn: () =>
-      fetchListOf<State>(`${import.meta.env.VITE_API_URL}/states/`),
+    queryFn: () => fetchListOf<State>(`${import.meta.env.VITE_API_URL}/states/`),
   });
 
 export const organizationTypesQueryOptions = () =>
@@ -51,9 +49,7 @@ export const organizationTypesQueryOptions = () =>
     staleTime: 120_000, // stale after 2 minutes
     queryKey: ['organizationTypes'],
     queryFn: () =>
-      fetchListOf<OrganiztionType>(
-        `${import.meta.env.VITE_API_URL}/organization-types/`
-      ),
+      fetchListOf<OrganiztionType>(`${import.meta.env.VITE_API_URL}/organization-types/`),
   });
 
 export const transmissionPlanningRegionsQueryOptions = () =>
@@ -77,23 +73,20 @@ export const useSubmitIntakeMutation = () => {
 export const useSigupMutation = () => {
   return useMutation({
     mutationFn: signupMutation,
-    onSuccess: () =>
-      queryClient.invalidateQueries({ queryKey: ['authSession'] }),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['authSession'] }),
   });
 };
 
 export const useLoginMutation = () => {
   return useMutation({
     mutationFn: loginMutation,
-    onSuccess: () =>
-      queryClient.invalidateQueries({ queryKey: ['authSession'] }),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['authSession'] }),
   });
 };
 
 export const useLogoutMutation = () => {
   return useMutation({
     mutationFn: logoutMutation,
-    onSettled: () =>
-      queryClient.invalidateQueries({ queryKey: ['authSession'] }),
+    onSettled: () => queryClient.invalidateQueries({ queryKey: ['authSession'] }),
   });
 };
