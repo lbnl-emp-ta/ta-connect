@@ -10,221 +10,221 @@
 
 // Import Routes
 
-import { Route as rootRoute } from './routes/__root'
-import { Route as PublicOnlyRouteImport } from './routes/_public-only/route'
-import { Route as PrivateRouteImport } from './routes/_private/route'
-import { Route as IndexImport } from './routes/index'
-import { Route as PublicOnlySignupImport } from './routes/_public-only/signup'
-import { Route as PublicOnlyLoginImport } from './routes/_public-only/login'
-import { Route as publicIntakeImport } from './routes/(public)/intake'
-import { Route as PrivateDashboardRouteImport } from './routes/_private/dashboard/route'
-import { Route as PrivateDashboardRequestsImport } from './routes/_private/dashboard/requests'
-import { Route as PrivateDashboardExpertsImport } from './routes/_private/dashboard/experts'
+import { Route as rootRoute } from './routes/__root';
+import { Route as PublicOnlyRouteImport } from './routes/_public-only/route';
+import { Route as PrivateRouteImport } from './routes/_private/route';
+import { Route as IndexImport } from './routes/index';
+import { Route as PublicOnlySignupImport } from './routes/_public-only/signup';
+import { Route as PublicOnlyLoginImport } from './routes/_public-only/login';
+import { Route as publicIntakeImport } from './routes/(public)/intake';
+import { Route as PrivateDashboardRouteImport } from './routes/_private/dashboard/route';
+import { Route as PrivateDashboardRequestsImport } from './routes/_private/dashboard/requests';
+import { Route as PrivateDashboardExpertsImport } from './routes/_private/dashboard/experts';
 
 // Create/Update Routes
 
 const PublicOnlyRouteRoute = PublicOnlyRouteImport.update({
   id: '/_public-only',
   getParentRoute: () => rootRoute,
-} as any)
+} as any);
 
 const PrivateRouteRoute = PrivateRouteImport.update({
   id: '/_private',
   getParentRoute: () => rootRoute,
-} as any)
+} as any);
 
 const IndexRoute = IndexImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRoute,
-} as any)
+} as any);
 
 const PublicOnlySignupRoute = PublicOnlySignupImport.update({
   id: '/signup',
   path: '/signup',
   getParentRoute: () => PublicOnlyRouteRoute,
-} as any)
+} as any);
 
 const PublicOnlyLoginRoute = PublicOnlyLoginImport.update({
   id: '/login',
   path: '/login',
   getParentRoute: () => PublicOnlyRouteRoute,
-} as any)
+} as any);
 
 const publicIntakeRoute = publicIntakeImport.update({
   id: '/(public)/intake',
   path: '/intake',
   getParentRoute: () => rootRoute,
-} as any)
+} as any);
 
 const PrivateDashboardRouteRoute = PrivateDashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
   getParentRoute: () => PrivateRouteRoute,
-} as any)
+} as any);
 
 const PrivateDashboardRequestsRoute = PrivateDashboardRequestsImport.update({
   id: '/requests',
   path: '/requests',
   getParentRoute: () => PrivateDashboardRouteRoute,
-} as any)
+} as any);
 
 const PrivateDashboardExpertsRoute = PrivateDashboardExpertsImport.update({
   id: '/experts',
   path: '/experts',
   getParentRoute: () => PrivateDashboardRouteRoute,
-} as any)
+} as any);
 
 // Populate the FileRoutesByPath interface
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
     '/': {
-      id: '/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof IndexImport
-      parentRoute: typeof rootRoute
-    }
+      id: '/';
+      path: '/';
+      fullPath: '/';
+      preLoaderRoute: typeof IndexImport;
+      parentRoute: typeof rootRoute;
+    };
     '/_private': {
-      id: '/_private'
-      path: ''
-      fullPath: ''
-      preLoaderRoute: typeof PrivateRouteImport
-      parentRoute: typeof rootRoute
-    }
+      id: '/_private';
+      path: '';
+      fullPath: '';
+      preLoaderRoute: typeof PrivateRouteImport;
+      parentRoute: typeof rootRoute;
+    };
     '/_public-only': {
-      id: '/_public-only'
-      path: ''
-      fullPath: ''
-      preLoaderRoute: typeof PublicOnlyRouteImport
-      parentRoute: typeof rootRoute
-    }
+      id: '/_public-only';
+      path: '';
+      fullPath: '';
+      preLoaderRoute: typeof PublicOnlyRouteImport;
+      parentRoute: typeof rootRoute;
+    };
     '/_private/dashboard': {
-      id: '/_private/dashboard'
-      path: '/dashboard'
-      fullPath: '/dashboard'
-      preLoaderRoute: typeof PrivateDashboardRouteImport
-      parentRoute: typeof PrivateRouteImport
-    }
+      id: '/_private/dashboard';
+      path: '/dashboard';
+      fullPath: '/dashboard';
+      preLoaderRoute: typeof PrivateDashboardRouteImport;
+      parentRoute: typeof PrivateRouteImport;
+    };
     '/(public)/intake': {
-      id: '/(public)/intake'
-      path: '/intake'
-      fullPath: '/intake'
-      preLoaderRoute: typeof publicIntakeImport
-      parentRoute: typeof rootRoute
-    }
+      id: '/(public)/intake';
+      path: '/intake';
+      fullPath: '/intake';
+      preLoaderRoute: typeof publicIntakeImport;
+      parentRoute: typeof rootRoute;
+    };
     '/_public-only/login': {
-      id: '/_public-only/login'
-      path: '/login'
-      fullPath: '/login'
-      preLoaderRoute: typeof PublicOnlyLoginImport
-      parentRoute: typeof PublicOnlyRouteImport
-    }
+      id: '/_public-only/login';
+      path: '/login';
+      fullPath: '/login';
+      preLoaderRoute: typeof PublicOnlyLoginImport;
+      parentRoute: typeof PublicOnlyRouteImport;
+    };
     '/_public-only/signup': {
-      id: '/_public-only/signup'
-      path: '/signup'
-      fullPath: '/signup'
-      preLoaderRoute: typeof PublicOnlySignupImport
-      parentRoute: typeof PublicOnlyRouteImport
-    }
+      id: '/_public-only/signup';
+      path: '/signup';
+      fullPath: '/signup';
+      preLoaderRoute: typeof PublicOnlySignupImport;
+      parentRoute: typeof PublicOnlyRouteImport;
+    };
     '/_private/dashboard/experts': {
-      id: '/_private/dashboard/experts'
-      path: '/experts'
-      fullPath: '/dashboard/experts'
-      preLoaderRoute: typeof PrivateDashboardExpertsImport
-      parentRoute: typeof PrivateDashboardRouteImport
-    }
+      id: '/_private/dashboard/experts';
+      path: '/experts';
+      fullPath: '/dashboard/experts';
+      preLoaderRoute: typeof PrivateDashboardExpertsImport;
+      parentRoute: typeof PrivateDashboardRouteImport;
+    };
     '/_private/dashboard/requests': {
-      id: '/_private/dashboard/requests'
-      path: '/requests'
-      fullPath: '/dashboard/requests'
-      preLoaderRoute: typeof PrivateDashboardRequestsImport
-      parentRoute: typeof PrivateDashboardRouteImport
-    }
+      id: '/_private/dashboard/requests';
+      path: '/requests';
+      fullPath: '/dashboard/requests';
+      preLoaderRoute: typeof PrivateDashboardRequestsImport;
+      parentRoute: typeof PrivateDashboardRouteImport;
+    };
   }
 }
 
 // Create and export the route tree
 
 interface PrivateDashboardRouteRouteChildren {
-  PrivateDashboardExpertsRoute: typeof PrivateDashboardExpertsRoute
-  PrivateDashboardRequestsRoute: typeof PrivateDashboardRequestsRoute
+  PrivateDashboardExpertsRoute: typeof PrivateDashboardExpertsRoute;
+  PrivateDashboardRequestsRoute: typeof PrivateDashboardRequestsRoute;
 }
 
 const PrivateDashboardRouteRouteChildren: PrivateDashboardRouteRouteChildren = {
   PrivateDashboardExpertsRoute: PrivateDashboardExpertsRoute,
   PrivateDashboardRequestsRoute: PrivateDashboardRequestsRoute,
-}
+};
 
 const PrivateDashboardRouteRouteWithChildren =
   PrivateDashboardRouteRoute._addFileChildren(
-    PrivateDashboardRouteRouteChildren,
-  )
+    PrivateDashboardRouteRouteChildren
+  );
 
 interface PrivateRouteRouteChildren {
-  PrivateDashboardRouteRoute: typeof PrivateDashboardRouteRouteWithChildren
+  PrivateDashboardRouteRoute: typeof PrivateDashboardRouteRouteWithChildren;
 }
 
 const PrivateRouteRouteChildren: PrivateRouteRouteChildren = {
   PrivateDashboardRouteRoute: PrivateDashboardRouteRouteWithChildren,
-}
+};
 
 const PrivateRouteRouteWithChildren = PrivateRouteRoute._addFileChildren(
-  PrivateRouteRouteChildren,
-)
+  PrivateRouteRouteChildren
+);
 
 interface PublicOnlyRouteRouteChildren {
-  PublicOnlyLoginRoute: typeof PublicOnlyLoginRoute
-  PublicOnlySignupRoute: typeof PublicOnlySignupRoute
+  PublicOnlyLoginRoute: typeof PublicOnlyLoginRoute;
+  PublicOnlySignupRoute: typeof PublicOnlySignupRoute;
 }
 
 const PublicOnlyRouteRouteChildren: PublicOnlyRouteRouteChildren = {
   PublicOnlyLoginRoute: PublicOnlyLoginRoute,
   PublicOnlySignupRoute: PublicOnlySignupRoute,
-}
+};
 
 const PublicOnlyRouteRouteWithChildren = PublicOnlyRouteRoute._addFileChildren(
-  PublicOnlyRouteRouteChildren,
-)
+  PublicOnlyRouteRouteChildren
+);
 
 export interface FileRoutesByFullPath {
-  '/': typeof IndexRoute
-  '': typeof PublicOnlyRouteRouteWithChildren
-  '/dashboard': typeof PrivateDashboardRouteRouteWithChildren
-  '/intake': typeof publicIntakeRoute
-  '/login': typeof PublicOnlyLoginRoute
-  '/signup': typeof PublicOnlySignupRoute
-  '/dashboard/experts': typeof PrivateDashboardExpertsRoute
-  '/dashboard/requests': typeof PrivateDashboardRequestsRoute
+  '/': typeof IndexRoute;
+  '': typeof PublicOnlyRouteRouteWithChildren;
+  '/dashboard': typeof PrivateDashboardRouteRouteWithChildren;
+  '/intake': typeof publicIntakeRoute;
+  '/login': typeof PublicOnlyLoginRoute;
+  '/signup': typeof PublicOnlySignupRoute;
+  '/dashboard/experts': typeof PrivateDashboardExpertsRoute;
+  '/dashboard/requests': typeof PrivateDashboardRequestsRoute;
 }
 
 export interface FileRoutesByTo {
-  '/': typeof IndexRoute
-  '': typeof PublicOnlyRouteRouteWithChildren
-  '/dashboard': typeof PrivateDashboardRouteRouteWithChildren
-  '/intake': typeof publicIntakeRoute
-  '/login': typeof PublicOnlyLoginRoute
-  '/signup': typeof PublicOnlySignupRoute
-  '/dashboard/experts': typeof PrivateDashboardExpertsRoute
-  '/dashboard/requests': typeof PrivateDashboardRequestsRoute
+  '/': typeof IndexRoute;
+  '': typeof PublicOnlyRouteRouteWithChildren;
+  '/dashboard': typeof PrivateDashboardRouteRouteWithChildren;
+  '/intake': typeof publicIntakeRoute;
+  '/login': typeof PublicOnlyLoginRoute;
+  '/signup': typeof PublicOnlySignupRoute;
+  '/dashboard/experts': typeof PrivateDashboardExpertsRoute;
+  '/dashboard/requests': typeof PrivateDashboardRequestsRoute;
 }
 
 export interface FileRoutesById {
-  __root__: typeof rootRoute
-  '/': typeof IndexRoute
-  '/_private': typeof PrivateRouteRouteWithChildren
-  '/_public-only': typeof PublicOnlyRouteRouteWithChildren
-  '/_private/dashboard': typeof PrivateDashboardRouteRouteWithChildren
-  '/(public)/intake': typeof publicIntakeRoute
-  '/_public-only/login': typeof PublicOnlyLoginRoute
-  '/_public-only/signup': typeof PublicOnlySignupRoute
-  '/_private/dashboard/experts': typeof PrivateDashboardExpertsRoute
-  '/_private/dashboard/requests': typeof PrivateDashboardRequestsRoute
+  __root__: typeof rootRoute;
+  '/': typeof IndexRoute;
+  '/_private': typeof PrivateRouteRouteWithChildren;
+  '/_public-only': typeof PublicOnlyRouteRouteWithChildren;
+  '/_private/dashboard': typeof PrivateDashboardRouteRouteWithChildren;
+  '/(public)/intake': typeof publicIntakeRoute;
+  '/_public-only/login': typeof PublicOnlyLoginRoute;
+  '/_public-only/signup': typeof PublicOnlySignupRoute;
+  '/_private/dashboard/experts': typeof PrivateDashboardExpertsRoute;
+  '/_private/dashboard/requests': typeof PrivateDashboardRequestsRoute;
 }
 
 export interface FileRouteTypes {
-  fileRoutesByFullPath: FileRoutesByFullPath
+  fileRoutesByFullPath: FileRoutesByFullPath;
   fullPaths:
     | '/'
     | ''
@@ -233,8 +233,8 @@ export interface FileRouteTypes {
     | '/login'
     | '/signup'
     | '/dashboard/experts'
-    | '/dashboard/requests'
-  fileRoutesByTo: FileRoutesByTo
+    | '/dashboard/requests';
+  fileRoutesByTo: FileRoutesByTo;
   to:
     | '/'
     | ''
@@ -243,7 +243,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/signup'
     | '/dashboard/experts'
-    | '/dashboard/requests'
+    | '/dashboard/requests';
   id:
     | '__root__'
     | '/'
@@ -254,15 +254,15 @@ export interface FileRouteTypes {
     | '/_public-only/login'
     | '/_public-only/signup'
     | '/_private/dashboard/experts'
-    | '/_private/dashboard/requests'
-  fileRoutesById: FileRoutesById
+    | '/_private/dashboard/requests';
+  fileRoutesById: FileRoutesById;
 }
 
 export interface RootRouteChildren {
-  IndexRoute: typeof IndexRoute
-  PrivateRouteRoute: typeof PrivateRouteRouteWithChildren
-  PublicOnlyRouteRoute: typeof PublicOnlyRouteRouteWithChildren
-  publicIntakeRoute: typeof publicIntakeRoute
+  IndexRoute: typeof IndexRoute;
+  PrivateRouteRoute: typeof PrivateRouteRouteWithChildren;
+  PublicOnlyRouteRoute: typeof PublicOnlyRouteRouteWithChildren;
+  publicIntakeRoute: typeof publicIntakeRoute;
 }
 
 const rootRouteChildren: RootRouteChildren = {
@@ -270,11 +270,11 @@ const rootRouteChildren: RootRouteChildren = {
   PrivateRouteRoute: PrivateRouteRouteWithChildren,
   PublicOnlyRouteRoute: PublicOnlyRouteRouteWithChildren,
   publicIntakeRoute: publicIntakeRoute,
-}
+};
 
 export const routeTree = rootRoute
   ._addFileChildren(rootRouteChildren)
-  ._addFileTypes<FileRouteTypes>()
+  ._addFileTypes<FileRouteTypes>();
 
 /* ROUTE_MANIFEST_START
 {

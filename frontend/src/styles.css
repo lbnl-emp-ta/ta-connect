@@ -1,66 +1,68 @@
 .a {
-    text-decoration: none;
+  text-decoration: none;
 }
 
 .intake-form {
-    display: flex;
-    flex-direction: column;
-    width: 35em;
-    height: auto;
-    text-align: left;
-    padding: 2em;
+  display: flex;
+  flex-direction: column;
+  width: 35em;
+  height: auto;
+  text-align: left;
+  padding: 2em;
 }
 
 .form {
-    padding: 100;
-    border: solid black 1px;
-    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+  padding: 100;
+  border: solid black 1px;
+  box-shadow:
+    0 4px 8px 0 rgba(0, 0, 0, 0.2),
+    0 6px 20px 0 rgba(0, 0, 0, 0.19);
 }
 
 .intake-form ul {
-    margin: 0;
-    padding: 0;
-    list-style: none;
+  margin: 0;
+  padding: 0;
+  list-style: none;
 }
 
-.intake-form input[type="radio"],
-.intake-form input[type="checkbox"] {
-    margin: -3px 5px 0 0;
-    vertical-align: middle;
+.intake-form input[type='radio'],
+.intake-form input[type='checkbox'] {
+  margin: -3px 5px 0 0;
+  vertical-align: middle;
 }
 
 .intake-form p {
-    display: flex;
-    flex-direction: column;
+  display: flex;
+  flex-direction: column;
 }
 
 .intake-form input {
-    height: 1.7em;
+  height: 1.7em;
 }
 
 .intake-form select {
-    font: inherit;
+  font: inherit;
 }
 
 .intake-form fieldset {
-    margin: 0 0 10px 0;
+  margin: 0 0 10px 0;
 }
 
 #org-type-fieldset {
-    border-color: gray;
-    border: solid 1px gray;
+  border-color: gray;
+  border: solid 1px gray;
 }
 
 .intake-form #desc {
-    height: 20em;
-    resize: none;
+  height: 20em;
+  resize: none;
 }
 
 hr {
-    height: 2px;
-    width: 100%;
-    margin: 10px 0;
-    opacity: 50%;
-    background-color: grey;
-    border: none;
-  }
+  height: 2px;
+  width: 100%;
+  margin: 10px 0;
+  opacity: 50%;
+  background-color: grey;
+  border: none;
+}

@@ -6,19 +6,19 @@ import {
   Divider,
   TextField,
   Typography,
-} from "@mui/material";
-import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
-import { useLoginMutation } from "../../utils/queryOptions";
-import { getCSRFToken } from "../../utils/cookies";
+} from '@mui/material';
+import { createFileRoute } from '@tanstack/react-router';
+import { useState } from 'react';
+import { useLoginMutation } from '../../utils/queryOptions';
+import { getCSRFToken } from '../../utils/cookies';
 
-export const Route = createFileRoute("/_public-only/login")({
+export const Route = createFileRoute('/_public-only/login')({
   component: RouteComponent,
 });
 
 function RouteComponent() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
 
   const loginMutation = useLoginMutation();
 
@@ -30,8 +30,8 @@ function RouteComponent() {
   return (
     <Container
       sx={{
-        display: "flex",
-        alignItems: "center",
+        display: 'flex',
+        alignItems: 'center',
       }}
       component="section"
       maxWidth="xs"
@@ -41,10 +41,10 @@ function RouteComponent() {
         sx={{
           marginTop: 0,
           padding: 3,
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          width: "auto",
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          width: 'auto',
         }}
       >
         <Typography component="h1" variant="h5">
@@ -112,20 +112,20 @@ export default function LoginWithSocialButton({
   id,
 }: LoginWithSocialButtonProps) {
   function handleClick() {
-    const form = document.createElement("form");
-    form.style.display = "none";
-    form.method = "POST";
+    const form = document.createElement('form');
+    form.style.display = 'none';
+    form.method = 'POST';
     form.action = `${import.meta.env.VITE_API_URL}/_allauth/browser/v1/auth/provider/redirect`;
     const data = {
       provider: id,
       callback_url:
-        "http://taconnect-local.lbl.gov:1337/api/account/provider/callback",
-      csrfmiddlewaretoken: getCSRFToken() || "",
-      process: "login",
+        'http://taconnect-local.lbl.gov:1337/api/account/provider/callback',
+      csrfmiddlewaretoken: getCSRFToken() || '',
+      process: 'login',
     };
 
     Object.entries(data).forEach(([k, v]) => {
-      const input = document.createElement("input");
+      const input = document.createElement('input');
       input.name = k;
       input.value = v;
       form.appendChild(input);
