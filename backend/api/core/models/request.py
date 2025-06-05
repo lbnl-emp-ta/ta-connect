@@ -7,6 +7,7 @@ class Request(models.Model):
     Represent the requests coming in from customers for technical assistance.
     """
     owner = models.ForeignKey(Owner, on_delete=models.PROTECT, blank=True, null=True, default=Owner.get_default_pk)
+    expert = models.ForeignKey(User, on_delete=models.PROTECT, blank=True, null=True)
     status = models.ForeignKey(RequestStatus, on_delete=models.PROTECT, default=RequestStatus.get_default_pk)
     depth = models.ForeignKey(Depth, on_delete=models.PROTECT, default=Depth.get_default_pk)
     description = models.TextField()

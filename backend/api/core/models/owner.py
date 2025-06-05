@@ -8,13 +8,11 @@ class Owner(models.Model):
         Reception = "reception"
         Program = "program"    
         Lab = "lab"
-        Team = "team"
 
     domain_type = models.CharField(max_length=16, choices=DomainType)
     reception = models.OneToOneField(Reception, on_delete=models.PROTECT, null=True, blank=True)
     program = models.OneToOneField(Program, on_delete=models.PROTECT, null=True, blank=True)
     lab = models.OneToOneField(Lab, on_delete=models.PROTECT, null=True, blank=True)
-    expert = models.OneToOneField(User, on_delete=models.PROTECT, null=True, blank=True)
 
     def clean(self):
         # Count how many fields are non-null
