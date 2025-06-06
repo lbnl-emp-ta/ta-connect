@@ -4,7 +4,7 @@ from core.models import *
 class LabRoleAssignment(models.Model):
     user = models.ForeignKey(User, on_delete=models.PROTECT)
     role = models.ForeignKey(Role, on_delete=models.PROTECT)
-    Lab = models.ForeignKey(Lab, on_delete=models.PROTECT)
+    instance = models.ForeignKey(Lab, on_delete=models.PROTECT)
 
     #   Sometimes the role is not specific to a Program.
     #
