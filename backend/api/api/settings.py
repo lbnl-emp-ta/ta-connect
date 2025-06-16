@@ -71,6 +71,12 @@ CORS_ALLOWED_ORIGIN_REGEXES = [
     r"^https:\/\/localhost:*([0-9]+)?$",
 ]
 
+CORS_ALLOW_HEADERS = (
+    "Content-Type",
+    "X-CSRFToken",
+    "context",
+)
+
 CSRF_TRUSTED_ORIGINS = ["http://taconnect-local.lbl.gov:1337",
                         "http://taconnect-local.lbl.gov",
                         "http://127.0.0.1",

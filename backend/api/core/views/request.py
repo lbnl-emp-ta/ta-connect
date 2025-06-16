@@ -2,6 +2,7 @@ from rest_framework import generics, status, permissions, authentication
 from rest_framework.response import Response
 from core.serializers import * 
 from core.models import Request
+from core.permissions import *
 
 from allauth.headless.contrib.rest_framework.authentication import (
     XSessionTokenAuthentication,
@@ -18,6 +19,7 @@ class RequestListCreateView(generics.ListCreateAPIView):
 
     permission_classes = [
         permissions.IsAuthenticated,
+        IsAdmin
     ]
 
     

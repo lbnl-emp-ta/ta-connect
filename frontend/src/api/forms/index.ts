@@ -7,8 +7,14 @@ export async function fetchListOf<T>(url: string): Promise<T[]> {
             credentials: "include",
             headers: {
                 "Content-Type": "application/json",
-                "X-CSRFToken": getCSRFToken() || ""
-            }
+                "X-CSRFToken": getCSRFToken() || "",
+                "context": JSON.stringify({
+                    "user": "1",
+                    "role": "1",
+                    "location": "system",
+                    "instance": "1", 
+                })
+            },
         });
         if (!response.ok) {
             throw Error(`Request status: ${response.status}`);
