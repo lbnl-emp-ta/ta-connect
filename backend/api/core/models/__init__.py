@@ -1,5 +1,10 @@
 from .request_status import RequestStatus
 from .depth import Depth
+from .user import User
+from .reception import Reception
+from .program import Program
+from .lab import Lab
+from .owner import Owner
 from .request import Request
 from .state import State
 from .organization_type import OrganizationType
@@ -22,4 +27,9 @@ __all__ = [
     "CustomerType",
     "CustomerRequestRelationship",
     "Cohort",
+    "User",
+    "Reception",
+    "Program",
+    "Lab",
+    "Owner",
 ]

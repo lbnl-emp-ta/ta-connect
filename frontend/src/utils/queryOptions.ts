@@ -1,0 +1,99 @@
+import { queryOptions, useMutation } from '@tanstack/react-query';
+import { sessionsApi } from '../api/sessions';
+import { fetchListOf, submitIntakeMutation } from '../api/forms';
+import {
+  IntakeFormData,
+  OrganiztionType,
+  State,
+  TransmissionPlanningRegion,
+} from '../api/forms/types';
+import { queryClient } from '../main';
+import { signupMutation } from '../api/accounts/signup';
+import { loginMutation } from '../api/accounts/login';
+import { logoutMutation } from '../api/accounts/logout';
+import { CustomerRequestRelationship, TARequest } from '../api/dashboard/types';
+
+export const authSessionQueryOptions = () =>
+  queryOptions({
+    staleTime: 300_000, // stale after 5 minutes
+    queryKey: ['authSession'],
+    queryFn: () => sessionsApi.getSession(),
+  });
+
+export const customerRequestRelationshipOptions = () =>
+  queryOptions({
+    staleTime: 120_000, // stale after 2 minutes
+    queryKey: ['customerRequestRelationships'],
+    queryFn: () =>
+      fetchListOf<CustomerRequestRelationship>(
+        `${import.meta.env.VITE_API_URL}/customer-request-relationships/`
+      ),
+  });
+
+export const requestsQueryOptions = () =>
+  queryOptions({
+    staleTime: 120_000, // stale after 2 minutes
+    queryKey: ['requests'],
+    queryFn: () =>
+      fetchListOf<TARequest>(`${import.meta.env.VITE_API_URL}/requests/`),
+  });
+
+export const statesQueryOptions = () =>
+  queryOptions({
+    staleTime: 120_000, // stale after 2 minutes
+    queryKey: ['states'],
+    queryFn: () =>
+      fetchListOf<State>(`${import.meta.env.VITE_API_URL}/states/`),
+  });
+
+export const organizationTypesQueryOptions = () =>
+  queryOptions({
+    staleTime: 120_000, // stale after 2 minutes
+    queryKey: ['organizationTypes'],
+    queryFn: () =>
+      fetchListOf<OrganiztionType>(
+        `${import.meta.env.VITE_API_URL}/organization-types/`
+      ),
+  });
+
+export const transmissionPlanningRegionsQueryOptions = () =>
+  queryOptions({
+    staleTime: 120_000, // stale after 2 minutes
+    queryKey: ['transmissionPlanningRegions'],
+    queryFn: () =>
+      fetchListOf<TransmissionPlanningRegion>(
+        `${import.meta.env.VITE_API_URL}/transmission-planning-regions/`
+      ),
+  });
+
+export const useSubmitIntakeMutation = () => {
+  return useMutation({
+    mutationKey: ['intake'],
+    mutationFn: (formData: IntakeFormData) => submitIntakeMutation(formData),
+    onSuccess: () => queryClient.invalidateQueries(),
+  });
+};
+
+export const useSigupMutation = () => {
+  return useMutation({
+    mutationFn: signupMutation,
+    onSuccess: () =>
+      queryClient.invalidateQueries({ queryKey: ['authSession'] }),
+  });
+};
+
+export const useLoginMutation = () => {
+  return useMutation({
+    mutationFn: loginMutation,
+    onSuccess: () =>
+      queryClient.invalidateQueries({ queryKey: ['authSession'] }),
+  });
+};
+
+export const useLogoutMutation = () => {
+  return useMutation({
+    mutationFn: logoutMutation,
+    onSettled: () =>
+      queryClient.invalidateQueries({ queryKey: ['authSession'] }),
+  });
+};

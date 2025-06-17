@@ -1,7 +1,8 @@
 from rest_framework import serializers
 from django.utils import timezone
 
-from core.models import Request, RequestStatus
+from core.serializers import * 
+from core.models import * 
 
 class RequestSerializer(serializers.ModelSerializer):
     status = serializers.SlugRelatedField(
@@ -9,6 +10,14 @@ class RequestSerializer(serializers.ModelSerializer):
         required=False, 
         queryset=RequestStatus.objects.all()
     )
+    
+    depth = serializers.SlugRelatedField(
+        slug_field="name",
+        required=False,
+        queryset=Depth.objects.all()
+    )
+
+    owner = OwnerSerializer()
     
     @classmethod
     def date_in_past(cls, date):

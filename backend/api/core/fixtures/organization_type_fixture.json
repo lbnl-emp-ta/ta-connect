@@ -1,0 +1,23 @@
+[
+    {
+        "model": "core.OrganizationType",
+        "pk": 1,
+        "fields": {
+            "name": "Utility Commission"
+        }
+    },
+    {
+        "model": "core.OrganizationType",
+        "pk": 2,
+        "fields": {
+            "name": "Energy Office"
+        }
+    },
+    {
+        "model": "core.OrganizationType",
+        "pk": 3,
+        "fields": {
+            "name": "Regional State Organization"
+        }
+    }
+]

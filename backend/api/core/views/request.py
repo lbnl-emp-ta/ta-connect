@@ -1,12 +1,24 @@
-from rest_framework import generics, status
+from rest_framework import generics, status, permissions, authentication
 from rest_framework.response import Response
-from core.serializers import RequestSerializer
+from core.serializers import * 
 from core.models import Request
 
+from allauth.headless.contrib.rest_framework.authentication import (
+    XSessionTokenAuthentication,
+)
 
-class RequestCreateView(generics.CreateAPIView):
-    queryset = Request.objects.all()
+class RequestListCreateView(generics.ListCreateAPIView):
+    queryset = Request.objects.all().select_related("status", "depth")
     serializer_class = RequestSerializer
+
+    authentication_classes = [
+        authentication.SessionAuthentication,
+        XSessionTokenAuthentication,
+    ]
+
+    permission_classes = [
+        permissions.IsAuthenticated,
+    ]
 
     
     def post(self, request):

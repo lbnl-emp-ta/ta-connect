@@ -1,11 +1,26 @@
 import pytest
 from rest_framework.test import APIClient
+from allauth.account.forms import SignupForm
 
 from core.models import *
+
+TEST_USER_PASSWORD = "Password123?"
+
 
 @pytest.fixture(scope="session")
 def api_client():
     return APIClient()
+
+@pytest.fixture(scope="function")
+def test_user(django_db_blocker):
+    with django_db_blocker.unblock():
+        _test_user, _ = User.objects.get_or_create_user(
+            email="testuser@gmail.com",
+            password=TEST_USER_PASSWORD
+        )
+
+        return _test_user
+    
 
 @pytest.fixture(scope="function")
 def test_state(django_db_blocker):
