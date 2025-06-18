@@ -19,3 +19,6 @@ class LabRoleAssignment(models.Model):
 
     class Meta:
         db_table = "lab_role_assignment"
+
+
+# model.date_assigned

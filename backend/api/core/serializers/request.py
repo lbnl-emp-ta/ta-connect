@@ -4,6 +4,24 @@ from django.utils import timezone
 from core.serializers import * 
 from core.models import * 
 
+class RequestListSerializer(serializers.Serializer):
+    id = serializers.IntegerField()
+    date_created = serializers.DateTimeField()
+
+    status = serializers.SlugRelatedField(
+        slug_field="name", 
+        required=False, 
+        queryset=RequestStatus.objects.all()
+    )
+
+    depth = serializers.SlugRelatedField(
+        slug_field="name",
+        required=False,
+        queryset=Depth.objects.all()
+    )
+    
+    expert = serializers.IntegerField()
+
 class RequestSerializer(serializers.ModelSerializer):
     status = serializers.SlugRelatedField(
         slug_field="name", 

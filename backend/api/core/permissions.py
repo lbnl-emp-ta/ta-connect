@@ -36,17 +36,14 @@ def has_role(context, role_name, location_name=""):
 
         user = User.objects.filter(id=context.get("user")).first()
         if (not user):
-            print("NOT USER")
             return False
 
         role = Role.objects.filter(name=role_name).first()
         if (not role):
-            print("NOT ROLE")
             return False
             
         location_role_assignment_class = get_location_role_assignment_class(context.get("location"))
         if (not location_role_assignment_class):
-            print("NOT LOCATION")
             return False
 
         assignments = location_role_assignment_class.objects.filter(user=user, role=role, id=context.get("instance"))
@@ -55,7 +52,6 @@ def has_role(context, role_name, location_name=""):
             assignments = assignments.filter(program=context.get("program"))
 
         if(not assignments):
-            print("NOT ASSIGNMETNS")
             return False
         
         return True 
@@ -63,6 +59,10 @@ def has_role(context, role_name, location_name=""):
 class IsAdmin(permissions.BasePermission):
     def has_permission(self, request, view):
         return has_role(json.loads(request.headers.get("Context")), role_name="Admin", location_name="System")
+
+class IsCoordinator(permissions.BasePermission):
+    def has_permission(self, request, view):
+        return has_role(json.loads(request.headers.get("Context")), "Coordinator")
 
 class IsProgramLead(permissions.BasePermission):
     def has_permission(self, request, view):
