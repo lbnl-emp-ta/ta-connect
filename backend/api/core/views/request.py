@@ -52,7 +52,7 @@ class RequestListView(views.APIView):
             
             if location_filter is not None:
                 queryset = queryset.filter(owner__domain_type=location_filter)
-            
+
             if instance is not None:
                 reception_queryset = queryset.filter(owner__reception=Reception.objects.get(instance))
                 program_queryset = queryset.filter(owner__program=Program.objects.get(instance))
@@ -81,6 +81,9 @@ class RequestListView(views.APIView):
             return queryset
 
         context = json.loads(self.request.headers.get("Context"))
+
+        if not context:
+            return queryset.none()
 
         if not (context.get("user") == self.request.user.id): # user is trying to impersonate another user
             return queryset.none()
