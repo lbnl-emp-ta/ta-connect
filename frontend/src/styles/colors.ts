@@ -1,5 +1,5 @@
 const COLORS = {
-    lblGreen: '#345a64'
-}
+  lblGreen: '#345a64',
+};
 
-export default COLORS 
+export default COLORS;

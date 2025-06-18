@@ -106,19 +106,20 @@ export default function LoginWithSocialButton({
   id,
 }: LoginWithSocialButtonProps) {
   function handleClick() {
-    const form = document.createElement("form");
-    form.style.display = "none";
-    form.method = "POST";
+    const form = document.createElement('form');
+    form.style.display = 'none';
+    form.method = 'POST';
     form.action = `${import.meta.env.VITE_API_URL}/_allauth/browser/v1/auth/provider/redirect`;
     const data = {
       provider: id,
-      callback_url: "http://taconnect-local.lbl.gov:1337/api/account/provider/callback",
-      csrfmiddlewaretoken: getCSRFToken() || "",
-      process: "login",
+      callback_url:
+        'http://taconnect-local.lbl.gov:1337/api/account/provider/callback',
+      csrfmiddlewaretoken: getCSRFToken() || '',
+      process: 'login',
     };
 
     Object.entries(data).forEach(([k, v]) => {
-      const input = document.createElement("input");
+      const input = document.createElement('input');
       input.name = k;
       input.value = v;
       form.appendChild(input);
