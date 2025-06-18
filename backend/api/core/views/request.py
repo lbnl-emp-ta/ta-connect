@@ -8,6 +8,23 @@ from allauth.headless.contrib.rest_framework.authentication import (
     XSessionTokenAuthentication,
 )
 
+class RequestDetailView(generics.RetrieveAPIView):
+    serializer = RequestDetailSerializer() 
+    
+    authentication_classes = [
+        authentication.SessionAuthentication,
+        XSessionTokenAuthentication,
+    ]
+    
+    permission_classes = [
+        permissions.IsAuthenticated,
+    ]
+
+    # TODO filter request base on user (extract common functionality for request list view)
+    def get_queryset(self):
+         return super().get_queryset()
+
+
 class RequestListView(views.APIView):
     serializer = RequestSerializer
 

@@ -1,6 +1,6 @@
 from .customer import CustomerSerializer
 from .owner import OwnerSerializer
-from .request import RequestSerializer, RequestListSerializer
+from .request import RequestSerializer, RequestListSerializer, RequestDetailSerializer
 from .depth import DepthSerializer
 from .state import StateSerializer
 from .organization_type import OrganizationTypeSerializer
@@ -15,6 +15,7 @@ __all__ = [
     "RequestSerializer",
     "CustomerSerializer",
     "RequestListSerializer",
+    "RequestDetailSerializer",
     "DepthSerializer",
     "StateSerializer",
     "OrganizationTypeSerializer",
