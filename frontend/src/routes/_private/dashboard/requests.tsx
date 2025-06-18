@@ -15,21 +15,20 @@ import {
 import { dateDiffInDays } from '../../../utils/datetimes';
 // import { useState } from 'react'
 // import { KeyboardArrowDown, KeyboardArrowUp} from '@mui/icons-material'
-import { CustomerRequestRelationship } from '../../../api/dashboard/types';
-import { customerRequestRelationshipOptions } from '../../../utils/queryOptions';
+import { CustomerRequestRelationship } from '../../../api/dashboard/types'
+import { customerRequestRelationshipOptions} from '../../../utils/queryOptions'
 import WestIcon from '@mui/icons-material/West';
 import EastIcon from '@mui/icons-material/East';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import COLORS from '../../../styles/colors';
 
 export const Route = createFileRoute('/_private/dashboard/requests')({
-  loader: async ({ context }) => {
-    await context.queryClient.ensureQueryData(
-      customerRequestRelationshipOptions()
-    );
-  },
-  component: RequestsPage,
-});
+    loader: async ({ context }) => {
+        // FOR CODY: you should switch to request endpoint using context when you get that sorted, leaving this for compatibility until then
+        await context.queryClient.ensureQueryData(customerRequestRelationshipOptions()) 
+    },
+    component: RequestsPage,
+})
 
 function RequestTableRow(props: {
   row: CustomerRequestRelationship & { age: number };

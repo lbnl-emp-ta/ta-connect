@@ -14,6 +14,17 @@ from .customer import Customer
 from .customer_type import CustomerType
 from .customer_request_relationship import CustomerRequestRelationship
 from .cohort import Cohort
+from .role import Role
+from .system_role_assignment import SystemRoleAssignment
+from .lab_role_assignment import LabRoleAssignment
+from .program_role_assignment import ProgramRoleAssignment
+from .reception_role_assignment import ReceptionRoleAssignment
+from .available_system_role import AvailableSystemRole
+from .available_program_role import AvailableProgramRole
+from .available_lab_role import AvailableLabRole
+from .available_reception_role import AvailableReceptionRole
+from .topic import Topic
+from .expertise import Expertise
 
 __all__ = [
     "RequestStatus",
@@ -32,4 +43,15 @@ __all__ = [
     "Program",
     "Lab",
     "Owner",
+    "Role",
+    "SystemRoleAssignment",
+    "LabRoleAssignment",
+    "ProgramRoleAssignment",
+    "ReceptionRoleAssignment",
+    "AvailableSystemRole",
+    "AvailableProgramRole",
+    "AvailableLabRole",
+    "AvailableReceptionRole",
+    "Topic",
+    "Expertise",
 ]
