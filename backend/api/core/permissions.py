@@ -30,11 +30,13 @@ def get_location_role_assignment_class(location):
             return False 
 
 
-def has_role(context, role_name, location_name=""):
+def has_role(request, role_name):
+        context = json.loads(request.headers.get("Context"))
+
         if(not validate_context(context)):
             return False
 
-        user = User.objects.filter(id=context.get("user")).first()
+        user = User.objects.get(pk=request.user.id)
         if (not user):
             return False
 
@@ -58,22 +60,22 @@ def has_role(context, role_name, location_name=""):
 
 class IsAdmin(permissions.BasePermission):
     def has_permission(self, request, view):
-        return has_role(json.loads(request.headers.get("Context")), role_name="Admin", location_name="System")
+        return has_role(request, "Admin")
 
 class IsCoordinator(permissions.BasePermission):
     def has_permission(self, request, view):
-        return has_role(json.loads(request.headers.get("Context")), "Coordinator")
+        return has_role(request, "Coordinator")
 
 class IsProgramLead(permissions.BasePermission):
     def has_permission(self, request, view):
-        return has_role(json.loads(request.headers.get("Context")), "Program Lead")
+        return has_role(request, "Program Lead")
 
 class IsLabLead(permissions.BasePermission):
     def has_permission(self, request, view):
-        return has_role(json.loads(request.headers.get("Context")), "Lab Lead")
+        return has_role(request, "Lab Lead")
     
 class IsExpert(permissions.BasePermission):
     def has_permission(self, request, view):
-        return has_role(json.loads(request.headers.get("Context")), "Expert")
+        return has_role(request, "Expert")
     
         
