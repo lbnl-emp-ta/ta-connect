@@ -48,6 +48,12 @@ class RequestListSerializer(serializers.Serializer):
     expert = serializers.IntegerField()
 
 class RequestSerializer(serializers.ModelSerializer):
+    owner = OwnerSerializer(required=False)
+    expert = serializers.SlugRelatedField(
+        slug_field="email",
+        required=False,
+        queryset=User.objects.all()
+    ) 
     status = serializers.SlugRelatedField(
         slug_field="name", 
         required=False, 
@@ -60,7 +66,6 @@ class RequestSerializer(serializers.ModelSerializer):
         queryset=Depth.objects.all()
     )
 
-    owner = OwnerSerializer(required=False)
     
     @classmethod
     def date_in_past(cls, date):

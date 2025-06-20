@@ -31,7 +31,11 @@ def get_location_role_assignment_class(location):
 
 
 def has_role(request, role_name):
-        context = json.loads(request.headers.get("Context"))
+        maybe_context = request.headers.get("Context")
+        if maybe_context is None:
+            return False
+
+        context = json.loads(maybe_context)
 
         if(not validate_context(context)):
             return False
@@ -55,6 +59,7 @@ def has_role(request, role_name):
 
         if(not assignments):
             return False
+
         
         return True 
 
