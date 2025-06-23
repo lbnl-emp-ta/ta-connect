@@ -8,8 +8,10 @@ from .customer import CustomerCreateView
 from .customer_request_relationship import CustomerRequestRelationshipListCreateView
 from .cohort import CohortCreateView, CohortAddCustomerView
 from .intake_form import ProcessIntakeForm
+from .identity import IdentityListView
 
 __all__ = [
+    "IdentityListView",
     "RequestListView",
     "RequestDetailView",
     "DepthListView",
