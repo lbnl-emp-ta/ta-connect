@@ -13,6 +13,10 @@ from .request_status import RequestStatusSerializer
 
 __all__ = [
     "RequestStatusSerializer",
+    "RoleSerializer",
+    "LabSerializer",
+    "ProgramSerializer",
+    "ReceptionSerializer",
     "OwnerSerializer",
     "RequestSerializer",
     "CustomerSerializer",

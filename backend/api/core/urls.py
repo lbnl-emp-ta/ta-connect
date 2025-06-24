@@ -6,6 +6,8 @@ urlpatterns = [
     
     path('requests/', RequestListView.as_view(), name="request-list"),
     path('requests/<int:id>', RequestDetailView.as_view(), name="request-detail"),
+
+    path('identities/', IdentityListView.as_view(), name="identities-list"),
     
     path('depths/', DepthListView.as_view(), name="depth-list"),
     path('depths/<int:pk>', DepthRetrieveView.as_view(), name="depth-retrieve"),
