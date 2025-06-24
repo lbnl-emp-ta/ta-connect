@@ -29,7 +29,7 @@ class StatusListView(views.APIView):
 
         context = json.loads(maybe_context)
 
-        if not (request.user.id == context.get("user").id):
+        if not (request.user.id == context.get("user")):
             return Response(data={"message": "User mismatch. Given user does not match logged in user."}, status=status.HTTP_400_BAD_REQUEST)
 
         if context.get("role") is None:
@@ -43,7 +43,9 @@ class StatusListView(views.APIView):
 
         if not has_role(request, role.name):
             return Response(data={"message": "User has not been assigned given role."}, status=status.HTTP_400_BAD_REQUEST)
-        
+
         available_statuses = role.statuses
+        if role.name == "Admin":
+            available_statuses = RequestStatus.objects.all()    
 
         return Response(data=RequestStatusSerializer(available_statuses, many=True).data, status=status.HTTP_200_OK)
