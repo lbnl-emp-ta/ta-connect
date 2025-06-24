@@ -9,8 +9,10 @@ from .transmission_planning_region import TransmissionPlanningRegionSerializer
 from .customer_type import CustomerTypeSerializer
 from .customer_request_relationship import CustomerRequestRelationshipSerializer
 from .cohort import CohortSerializer
+from .request_status import RequestStatusSerializer
 
 __all__ = [
+    "RequestStatusSerializer",
     "OwnerSerializer",
     "RequestSerializer",
     "CustomerSerializer",
