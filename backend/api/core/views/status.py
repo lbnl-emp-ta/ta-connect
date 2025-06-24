@@ -46,4 +46,4 @@ class StatusListView(views.APIView):
         
         available_statuses = role.statuses
 
-        return Response(data=RequestStatusSerializer(available_statuses, many=True).data, status=status.HTTP_405_METHOD_NOT_ALLOWED)
+        return Response(data=RequestStatusSerializer(available_statuses, many=True).data, status=status.HTTP_200_OK)

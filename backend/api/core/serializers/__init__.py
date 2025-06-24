@@ -1,4 +1,8 @@
 from .customer import CustomerSerializer
+from .lab import LabSerializer
+from .program import ProgramSerializer
+from .reception import ReceptionSerializer
+from .role import RoleSerializer
 from .owner import OwnerSerializer
 from .request import RequestSerializer, RequestListSerializer, RequestDetailSerializer
 from .depth import DepthSerializer
