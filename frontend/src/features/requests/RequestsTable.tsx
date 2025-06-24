@@ -13,12 +13,15 @@ import { dateDiffInDays } from '../../utils/datetimes';
 import { a11yProps } from '../../utils/utils';
 import { useRequestsContext } from './RequestsContext';
 import { useSuspenseQuery } from '@tanstack/react-query';
-import { customerRequestRelationshipOptions } from '../../utils/queryOptions';
+import { requestsQueryOptions } from '../../utils/queryOptions';
+import { useIdentityContext } from '../identity/IdentityContext';
 
 export const RequestTable: React.FC = () => {
   const navigate = useNavigate();
   const { setSortedRequests } = useRequestsContext();
-  const { data } = useSuspenseQuery(customerRequestRelationshipOptions());
+  const { identity } = useIdentityContext();
+  const { data } = useSuspenseQuery(requestsQueryOptions(identity));
+  console.log('RequestTable data', data);
   const tableData = data.map((crr) => {
     const ageInDays = dateDiffInDays(new Date(crr.request.date_created), new Date());
     return { ...crr, age: ageInDays };

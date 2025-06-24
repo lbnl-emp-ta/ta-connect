@@ -1,13 +1,14 @@
 import { Link, Outlet } from '@tanstack/react-router';
 import { TanStackRouterDevtools } from '@tanstack/react-router-devtools';
-
 import { AppBar, Box, Button, Stack, Toolbar, Typography } from '@mui/material';
 import { useSuspenseQuery, type QueryClient } from '@tanstack/react-query';
 import { createRootRouteWithContext } from '@tanstack/react-router';
 import { authSessionQueryOptions, useLogoutMutation } from '../utils/queryOptions';
+import { Identity } from '../features/identity/IdentityContext';
 
 export interface MyRouterContext {
   queryClient: QueryClient;
+  identity: Identity;
 }
 
 export const Route = createRootRouteWithContext<MyRouterContext>()({

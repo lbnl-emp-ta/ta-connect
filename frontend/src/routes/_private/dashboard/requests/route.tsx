@@ -2,11 +2,11 @@ import { createFileRoute, Outlet } from '@tanstack/react-router';
 import { Container, Stack, Typography } from '@mui/material';
 import { RequestsProvider } from '../../../../features/requests/RequestsContext';
 import { RequestTable } from '../../../../features/requests/RequestsTable';
-import { customerRequestRelationshipOptions } from '../../../../utils/queryOptions';
+import { requestsQueryOptions } from '../../../../utils/queryOptions';
 
 export const Route = createFileRoute('/_private/dashboard/requests')({
   loader: async ({ context }) => {
-    await context.queryClient.ensureQueryData(customerRequestRelationshipOptions());
+    await context.queryClient.ensureQueryData(requestsQueryOptions(context.identity));
   },
   component: RequestsPage,
 });

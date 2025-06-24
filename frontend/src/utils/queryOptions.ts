@@ -7,11 +7,12 @@ import {
   State,
   TransmissionPlanningRegion,
 } from '../api/forms/types';
-import { queryClient } from '../main';
 import { signupMutation } from '../api/accounts/signup';
 import { loginMutation } from '../api/accounts/login';
 import { logoutMutation } from '../api/accounts/logout';
 import { CustomerRequestRelationship, TARequest } from '../api/dashboard/types';
+import { queryClient } from '../App';
+import { Identity } from '../features/identity/IdentityContext';
 
 export const authSessionQueryOptions = () =>
   queryOptions({
@@ -30,11 +31,11 @@ export const customerRequestRelationshipOptions = () =>
       ),
   });
 
-export const requestsQueryOptions = () =>
+export const requestsQueryOptions = (identity: Identity) =>
   queryOptions({
     staleTime: 120_000, // stale after 2 minutes
-    queryKey: ['requests'],
-    queryFn: () => fetchListOf<TARequest>(`${import.meta.env.VITE_API_URL}/requests/`),
+    queryKey: ['requests', identity],
+    queryFn: () => fetchListOf<TARequest>(`${import.meta.env.VITE_API_URL}/requests/`, identity),
   });
 
 export const statesQueryOptions = () =>
