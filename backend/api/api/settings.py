@@ -30,10 +30,6 @@ SECRET_KEY = os.getenv("SECRET_KEY")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = [
-    "taconnect-local.lbl.gov",
-    "127.0.0.1"
-]
 
 # Application definition
 
@@ -46,12 +42,12 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django.contrib.sites',
     'corsheaders',
-    'core',
     'allauth.account',
     'allauth.headless',
     'allauth.socialaccount',
     'allauth.socialaccount.providers.google',
     'rest_framework',
+    'core',
 ]
 
 
@@ -74,6 +70,12 @@ CORS_ALLOWED_ORIGIN_REGEXES = [
     r"^http:\/\/localhost:*([0-9]+)?$",
     r"^https:\/\/localhost:*([0-9]+)?$",
 ]
+
+CORS_ALLOW_HEADERS = (
+    "Content-Type",
+    "X-CSRFToken",
+    "context",
+)
 
 CSRF_TRUSTED_ORIGINS = ["http://taconnect-local.lbl.gov:1337",
                         "http://taconnect-local.lbl.gov",

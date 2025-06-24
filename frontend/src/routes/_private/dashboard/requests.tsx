@@ -26,13 +26,12 @@ import { customerRequestRelationshipOptions } from '../../../utils/queryOptions'
 import { CustomerRequestRelationship } from '../../../api/dashboard/types';
 
 export const Route = createFileRoute('/_private/dashboard/requests')({
-  loader: async ({ context }) => {
-    await context.queryClient.ensureQueryData(
-      customerRequestRelationshipOptions()
-    );
-  },
-  component: RequestsPage,
-});
+    loader: async ({ context }) => {
+        // FOR CODY: you should switch to request endpoint using context when you get that sorted, leaving this for compatibility until then
+        await context.queryClient.ensureQueryData(customerRequestRelationshipOptions()) 
+    },
+    component: RequestsPage,
+})
 
 function RequestsPage() {
   const [actionsAnchorEl, setActionsAnchorEl] = useState<null | HTMLElement>(
