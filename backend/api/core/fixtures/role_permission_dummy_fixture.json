@@ -1,0 +1,188 @@
+[
+    {
+        "model": "core.Request",
+        "pk": 1,
+        "fields": {
+            "depth": 1,
+            "expert": 1,
+            "date_created": "2025-06-02T20:17:46.384Z",
+            "description": "Test request. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum"
+        }
+    },
+    {
+        "model": "core.Organization",
+        "pk": 1,
+        "fields": {
+            "name": "New York Energy Office",
+            "address": "123 main street, 11746 NY",
+            "type": 2
+        }
+    },
+    {
+        "model": "core.Customer",
+        "pk": 1,
+        "fields": {
+            "org": 1,
+            "state": 47,
+            "tpr": 5,
+            "email": "jwalker@gmail.com",
+            "name": "Jonathan Walker",
+            "phone": "631-889-8894",
+            "title": "Energy Policy Commissioner"
+        }
+    },
+    {
+        "model": "core.CustomerRequestRelationship",
+        "pk": 1,
+        "fields": {
+            "request": 1,
+            "customer": 1,
+            "customer_type": 1
+        }
+    },
+    {
+        "model": "core.Request",
+        "pk": 2,
+        "fields": {
+            "expert": 1,
+            "depth": 2,
+            "date_created": "2025-05-02T20:17:46.384Z",
+            "description": "Test request. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum"
+        }
+    },
+    {
+        "model": "core.Organization",
+        "pk": 2,
+        "fields": {
+            "name": "California Energy Office",
+            "address": "123 berkley street, 11746 CA",
+            "type": 2
+        }
+    },
+    {
+        "model": "core.Customer",
+        "pk": 2,
+        "fields": {
+            "org": 2,
+            "state": 16,
+            "tpr": 1,
+            "email": "ehumming@gmail.com",
+            "name": "Elizibeth Hummings",
+            "phone": "541-997-5567",
+            "title": "Energy Policy Maker"
+        }
+    },
+    {
+        "model": "core.CustomerRequestRelationship",
+        "pk": 2,
+        "fields": {
+            "request": 2,
+            "customer": 2,
+            "customer_type": 1
+        }
+    },
+    {
+        "model": "core.Program",
+        "pk": 1,
+        "fields": {
+            "name": "RASOR",
+            "description": "RASOR TA Program"
+        }
+    },
+    {
+        "model": "core.Owner",
+        "pk": 2,
+        "fields": {
+            "domain_type": "program",
+            "program": 1
+        }
+    },
+    {
+        "model": "core.Lab",
+        "pk": 1,
+        "fields": {
+            "name": "LBNL",
+            "description": "Lawrence Berkley National Laboratory"
+        }
+    },
+    {
+        "model": "core.Owner",
+        "pk": 3,
+        "fields": {
+            "domain_type": "lab",
+            "lab": 1
+        }
+    },
+    {
+        "model": "core.Role",
+        "pk": 1,
+        "fields": {
+            "name": "Admin",
+            "description": "Administrator of TA CONNECT"
+        }
+    },
+    {
+        "model": "core.Role",
+        "pk": 2,
+        "fields": {
+            "name": "Coordinator",
+            "description": "Direct request traffic in reception to applicable programs"
+        }
+    },
+    {
+        "model": "core.Role",
+        "pk": 3,
+        "fields": {
+            "name": "Program Lead",
+            "description": "Point of contact for a program"
+        }
+    },
+    {
+        "model": "core.Role",
+        "pk": 4,
+        "fields": {
+            "name": "Lab Lead",
+            "description": "A labs point of contact for a specific program"
+        }
+    },
+    {
+        "model": "core.SystemRoleAssignment",
+        "pk": 1,
+        "fields": {
+            "user": 1,
+            "role": 1,
+            "date_assigned": "2025-06-18T20:17:46.384Z"
+        }
+    },
+    {
+        "model": "core.ReceptionRoleAssignment",
+        "pk": 1,
+        "fields": {
+            "user": 1,
+            "role": 2,
+            "instance": 1,
+            "date_assigned": "2025-06-18T20:17:46.384Z"
+        }
+    },
+    {
+        "model": "core.ProgramRoleAssignment",
+        "pk": 1,
+        "fields": {
+            "user": 1,
+            "role": 3,
+            "instance": 1,
+            "date_assigned": "2025-06-18T20:17:46.384Z"
+        }
+    },
+    {
+        "model": "core.LabRoleAssignment",
+        "pk": 1,
+        "fields": {
+            "user": 1,
+            "role": 4,
+            "instance": 1,
+            "program": 1,
+            "date_assigned": "2025-06-18T20:17:46.384Z"
+        }
+    }
+]
