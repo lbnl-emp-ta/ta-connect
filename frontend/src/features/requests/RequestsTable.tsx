@@ -7,9 +7,8 @@ import {
 } from '@mui/x-data-grid';
 import { useNavigate } from '@tanstack/react-router';
 import { useEffect, useState } from 'react';
-import { CustomerRequestRelationship } from '../../api/dashboard/types';
+import { TARequest } from '../../api/dashboard/types';
 import { TabPanel } from '../../components/TabPanel';
-import { dateDiffInDays } from '../../utils/datetimes';
 import { a11yProps } from '../../utils/utils';
 import { useRequestsContext } from './RequestsContext';
 import { useSuspenseQuery } from '@tanstack/react-query';
@@ -22,10 +21,6 @@ export const RequestTable: React.FC = () => {
   const { identity } = useIdentityContext();
   const { data } = useSuspenseQuery(requestsQueryOptions(identity));
   console.log('RequestTable data', data);
-  const tableData = data.map((crr) => {
-    const ageInDays = dateDiffInDays(new Date(crr.request.date_created), new Date());
-    return { ...crr, age: ageInDays };
-  });
   const [tabValue, setTabValue] = useState<string | number>('actionable-requests');
   const [rowSelectionModel, setRowSelectionModel] = useState<GridRowSelectionModel>({
     type: 'include',
@@ -56,7 +51,7 @@ export const RequestTable: React.FC = () => {
     // so this forces a delay to ensure the rows are sorted
     setTimeout(() => {
       const sortedRowEntries = gridSortedRowEntriesSelector(apiRef);
-      setSortedRequests(sortedRowEntries.map((row) => row.model as CustomerRequestRelationship));
+      setSortedRequests(sortedRowEntries.map((row) => row.model as TARequest));
     }, 500);
   };
 
@@ -81,36 +76,32 @@ export const RequestTable: React.FC = () => {
       <TabPanel value={tabValue} index="actionable-requests">
         <DataGrid
           apiRef={apiRef}
-          rows={tableData}
+          rows={data}
           columns={[
             { field: 'id', headerName: 'ID', width: 90, align: 'center' },
+            // {
+            //   field: 'age',
+            //   headerName: 'Age (in days)',
+            //   type: 'number',
+            //   width: 150,
+            // },
             {
-              field: 'age',
-              headerName: 'Age (in days)',
-              type: 'number',
-              width: 150,
-            },
-            {
-              field: 'request.status',
-              valueGetter: (_value, row) => row.request.status,
+              field: 'status',
               headerName: 'Status',
               width: 150,
             },
             {
-              field: 'request.depth',
-              valueGetter: (_value, row) => row.request.depth,
+              field: 'depth',
               headerName: 'Depth',
               width: 150,
             },
             {
-              field: 'customer.name',
-              valueGetter: (_value, row) => row.customer.name,
+              field: 'customer_name',
               headerName: 'Customer Name',
               width: 200,
             },
             {
-              field: 'customer.email',
-              valueGetter: (_value, row) => row.customer.email,
+              field: 'customer_email',
               headerName: 'Customer Email',
               width: 200,
             },

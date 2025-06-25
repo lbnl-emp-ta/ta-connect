@@ -7,10 +7,17 @@ import {
   ListItemButton,
   ListItemIcon,
   ListItemText,
+  MenuItem,
   Select,
+  SelectChangeEvent,
   Stack,
 } from '@mui/material';
 import { createFileRoute, Outlet, redirect, useNavigate } from '@tanstack/react-router';
+import { identitiesQueryOptions } from '../../../utils/queryOptions';
+import { useSuspenseQuery } from '@tanstack/react-query';
+import { useEffect, useState } from 'react';
+import { TAIdentity } from '../../../api/dashboard/types';
+import { useIdentityContext } from '../../../features/identity/IdentityContext';
 
 export const Route = createFileRoute('/_private/dashboard')({
   beforeLoad({ location }) {
@@ -18,11 +25,34 @@ export const Route = createFileRoute('/_private/dashboard')({
       // eslint-disable-next-line @typescript-eslint/only-throw-error
       throw redirect({ to: '/dashboard/requests' });
   },
+  loader: async ({ context }) => {
+    await context.queryClient.ensureQueryData(identitiesQueryOptions());
+  },
   component: DashboardComponent,
 });
 
 function DashboardComponent() {
   const navigate = useNavigate();
+  const { setIdentity } = useIdentityContext();
+  const { data: identities } = useSuspenseQuery(identitiesQueryOptions());
+  const [fullIdentity, setFullIdentity] = useState(identities[0]);
+
+  const handleIdentityChange = (event: SelectChangeEvent<TAIdentity>) => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    setFullIdentity(event.target.value as any);
+  };
+
+  useEffect(() => {
+    if (fullIdentity) {
+      setIdentity({
+        user: fullIdentity.user.id,
+        role: fullIdentity.role.id,
+        location: fullIdentity.location,
+        // Right now instance can't be undefined, even for admins, so we default to 1
+        instance: fullIdentity.instance ? fullIdentity.instance.id : 1,
+      });
+    }
+  }, [fullIdentity, setIdentity]);
 
   return (
     <Stack direction="row" spacing={0} sx={{ width: '100%' }}>
@@ -34,7 +64,7 @@ function DashboardComponent() {
       >
         <List sx={{ bgcolor: 'primary.main', color: 'white' }}>
           <ListItem>
-            <ListItemText primary={'Viewing as:'}></ListItemText>
+            <ListItemText>Viewing as:</ListItemText>
           </ListItem>
           <ListItem>
             <Select
@@ -42,7 +72,25 @@ function DashboardComponent() {
                 width: 'stretch',
                 bgcolor: 'white',
               }}
-            />
+              value={fullIdentity}
+              onChange={handleIdentityChange}
+            >
+              {identities.map((identity) => (
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-explicit-any
+                <MenuItem key={identity.role.id} value={identity as any}>
+                  <Stack direction="row" spacing={1}>
+                    {identity.location === 'Reception' && <span>{identity.location}</span>}
+                    <span>{identity.role.name}</span>
+                    {identity.instance && (
+                      <>
+                        <span>|</span>
+                        <span>{identity.instance.name}</span>
+                      </>
+                    )}
+                  </Stack>
+                </MenuItem>
+              ))}
+            </Select>
           </ListItem>
           <ListItem key={'Requests'} disablePadding>
             <ListItemButton

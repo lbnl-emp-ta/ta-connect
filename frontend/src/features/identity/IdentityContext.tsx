@@ -1,26 +1,21 @@
 import React, { createContext, use, useMemo, useState } from 'react';
 
 export interface Identity {
-  user?: string;
-  program?: string;
+  user?: number;
+  role?: number;
   location?: string;
-  instance?: string;
+  instance?: number;
 }
 
 interface IdentityContextType {
-  identity: Identity;
-  setIdentity: React.Dispatch<React.SetStateAction<Identity>>;
+  identity: Identity | object;
+  setIdentity: React.Dispatch<React.SetStateAction<Identity | object>>;
 }
 
 const IdentityContext = createContext<IdentityContextType | undefined>(undefined);
 
 export const IdentityProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [identity, setIdentity] = useState<Identity>({
-    user: 'ctodonnell@lbl.gov',
-    program: undefined,
-    location: 'reception',
-    instance: undefined,
-  });
+  const [identity, setIdentity] = useState<Identity>({});
 
   const value = useMemo(() => {
     return { identity, setIdentity };

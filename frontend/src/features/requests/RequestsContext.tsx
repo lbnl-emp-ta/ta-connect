@@ -1,15 +1,15 @@
 import React, { createContext, use, useMemo, useState } from 'react';
-import { CustomerRequestRelationship } from '../../api/dashboard/types';
+import { TARequest } from '../../api/dashboard/types';
 
 interface RequestsContextType {
-  sortedRequests: CustomerRequestRelationship[];
-  setSortedRequests: React.Dispatch<React.SetStateAction<CustomerRequestRelationship[]>>;
+  sortedRequests: TARequest[];
+  setSortedRequests: React.Dispatch<React.SetStateAction<TARequest[]>>;
 }
 
 const RequestsContext = createContext<RequestsContextType | undefined>(undefined);
 
 export const RequestsProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [sortedRequests, setSortedRequests] = useState<CustomerRequestRelationship[]>([]);
+  const [sortedRequests, setSortedRequests] = useState<TARequest[]>([]);
   const value = useMemo(() => {
     return { sortedRequests, setSortedRequests };
   }, [sortedRequests]);

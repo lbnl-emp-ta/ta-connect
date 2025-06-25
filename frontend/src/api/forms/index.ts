@@ -9,11 +9,15 @@ export async function fetchListOf<T>(url: string, identity?: Identity): Promise<
       headers: {
         'Content-Type': 'application/json',
         'X-CSRFToken': getCSRFToken() || '',
-        Context: JSON.stringify(identity),
+        Context: identity ? JSON.stringify(identity) : '',
       },
     });
     if (!response.ok) {
       throw Error(`Request status: ${response.status}`);
+    }
+    // Handle 204 when no content is returned
+    if (response.status === 204) {
+      return [];
     }
     return (await response.json()) as T[];
   } catch (error) {

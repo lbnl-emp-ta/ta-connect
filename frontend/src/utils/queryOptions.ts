@@ -10,7 +10,7 @@ import {
 import { signupMutation } from '../api/accounts/signup';
 import { loginMutation } from '../api/accounts/login';
 import { logoutMutation } from '../api/accounts/logout';
-import { CustomerRequestRelationship, TARequest } from '../api/dashboard/types';
+import { CustomerRequestRelationship, TAIdentity, TARequest } from '../api/dashboard/types';
 import { queryClient } from '../App';
 import { Identity } from '../features/identity/IdentityContext';
 
@@ -31,10 +31,17 @@ export const customerRequestRelationshipOptions = () =>
       ),
   });
 
-export const requestsQueryOptions = (identity: Identity) =>
+export const identitiesQueryOptions = () =>
   queryOptions({
     staleTime: 120_000, // stale after 2 minutes
-    queryKey: ['requests', identity],
+    queryKey: ['identities'],
+    queryFn: () => fetchListOf<TAIdentity>(`${import.meta.env.VITE_API_URL}/identities/`),
+  });
+
+export const requestsQueryOptions = (identity?: Identity) =>
+  queryOptions({
+    staleTime: 120_000, // stale after 2 minutes
+    queryKey: ['requests', identity?.user, identity?.role, identity?.location, identity?.instance],
     queryFn: () => fetchListOf<TARequest>(`${import.meta.env.VITE_API_URL}/requests/`, identity),
   });
 
