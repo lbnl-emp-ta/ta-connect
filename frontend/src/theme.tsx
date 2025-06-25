@@ -15,11 +15,11 @@ export const theme = createTheme({
       paper: '#fff',
     },
     primary: {
-      main: '#1976d2',
+      main: '#345a64',
       // Exclude light, dark, or contrastText to have them
       // calculated automatically based on the main color.
-      light: '#42a5f5',
-      dark: '#1565c0',
+      // light: '#42a5f5',
+      // dark: '#1565c0',
       contrastText: '#fff',
     },
     secondary: {

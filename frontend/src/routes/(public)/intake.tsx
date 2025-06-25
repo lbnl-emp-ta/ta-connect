@@ -19,8 +19,7 @@ import {
   Typography,
 } from '@mui/material';
 
-import { matchIsValidTel, MuiTelInput } from 'mui-tel-input';
-import { useEffect, useState } from 'react';
+import { ChangeEventHandler, useEffect, useState } from 'react';
 import {
   IntakeFormData,
   OrganiztionType,
@@ -34,6 +33,7 @@ import {
   useSubmitIntakeMutation,
 } from '../../utils/queryOptions';
 import { useSuspenseQuery } from '@tanstack/react-query';
+import { isValidUSTelephone } from '../../utils/utils';
 
 export const Route = createFileRoute('/(public)/intake')({
   loader: async ({ context }) => {
@@ -95,20 +95,17 @@ function IntakeForm() {
     submitIntakeMutation.mutate(formData);
   }
 
-  function handlePhoneChange(newPhone: string) {
-    function validatePhoneNumber(phone: string) {
-      if (matchIsValidTel(phone)) {
-        setPhoneError(false);
-        setPhoneHelperText('');
-      } else {
-        setPhoneError(true);
-        setPhoneHelperText('Not a valid phone number.');
-      }
+  const handlePhoneChange: ChangeEventHandler<HTMLInputElement> = (e) => {
+    if (isValidUSTelephone(e.target.value)) {
+      setPhoneError(false);
+      setPhoneHelperText('');
+    } else {
+      setPhoneError(true);
+      setPhoneHelperText('Not a valid phone number.');
     }
 
-    validatePhoneNumber(newPhone);
-    setPhone(newPhone);
-  }
+    setPhone(e.target.value);
+  };
 
   function handleEmailChange(newEmail: string) {
     function validateEmail(email: string) {
@@ -165,12 +162,9 @@ function IntakeForm() {
               onChange={(e) => handleEmailChange(e.target.value)}
               value={email}
             />
-            <MuiTelInput
+            <TextField
               variant="outlined"
               label="Phone Number"
-              defaultCountry="US"
-              MenuProps={{ transitionDuration: 0 }}
-              focusOnSelectCountry={false}
               fullWidth={true}
               required={true}
               value={phone}
