@@ -1,13 +1,14 @@
+import AssignmentIcon from '@mui/icons-material/Assignment';
+import PeopleIcon from '@mui/icons-material/People';
 import {
-  Drawer,
-  Grid,
+  Box,
   List,
   ListItem,
   ListItemButton,
   ListItemIcon,
   ListItemText,
   Select,
-  Toolbar,
+  Stack,
 } from '@mui/material';
 import {
   createFileRoute,
@@ -15,9 +16,6 @@ import {
   redirect,
   useNavigate,
 } from '@tanstack/react-router';
-import PeopleIcon from '@mui/icons-material/People';
-import AssignmentIcon from '@mui/icons-material/Assignment';
-import COLORS from '../../../styles/colors';
 
 export const Route = createFileRoute('/_private/dashboard')({
   beforeLoad({ location }) {
@@ -35,23 +33,14 @@ function DashboardComponent() {
   const navigate = useNavigate();
 
   return (
-    <>
-      <Drawer
+    <Stack direction="row" spacing={0} sx={{ width: '100%' }}>
+      <Box
         sx={{
+          bgcolor: 'primary.main',
           width: 240,
-          flexShrink: 0,
-          '& .MuiDrawer-paper': {
-            width: 240,
-            marginTop: 5,
-            boxSizing: 'border-box',
-            bgcolor: COLORS.lblGreen,
-          },
         }}
-        variant="permanent"
-        anchor="left"
       >
-        <Toolbar />
-        <List sx={{ bgcolor: COLORS.lblGreen, color: 'white' }}>
+        <List sx={{ bgcolor: 'primary.main', color: 'white' }}>
           <ListItem>
             <ListItemText primary={'Viewing as:'}></ListItemText>
           </ListItem>
@@ -88,10 +77,10 @@ function DashboardComponent() {
             </ListItemButton>
           </ListItem>
         </List>
-      </Drawer>
-      <Grid>
+      </Box>
+      <Box component="main" sx={{ flex: 1, overflow: 'hidden' }}>
         <Outlet />
-      </Grid>
-    </>
+      </Box>
+    </Stack>
   );
 }

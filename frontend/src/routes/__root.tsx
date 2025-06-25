@@ -1,14 +1,13 @@
 import { Link, Outlet } from '@tanstack/react-router';
 import { TanStackRouterDevtools } from '@tanstack/react-router-devtools';
 
-import { createRootRouteWithContext } from '@tanstack/react-router';
+import { AppBar, Box, Button, Stack, Toolbar, Typography } from '@mui/material';
 import { useSuspenseQuery, type QueryClient } from '@tanstack/react-query';
-import { AppBar, Box, Button, Toolbar, Typography } from '@mui/material';
+import { createRootRouteWithContext } from '@tanstack/react-router';
 import {
   authSessionQueryOptions,
   useLogoutMutation,
 } from '../utils/queryOptions';
-import COLORS from '../styles/colors';
 
 export interface MyRouterContext {
   queryClient: QueryClient;
@@ -34,7 +33,7 @@ function Initializer() {
   }
 
   return (
-    <>
+    <Stack spacing={0} sx={{ minHeight: '100vh' }}>
       <AppBar
         position="sticky"
         sx={{
@@ -45,7 +44,7 @@ function Initializer() {
           sx={{
             display: 'flex',
             gap: 5,
-            color: COLORS.lblGreen,
+            color: 'primary.main',
             bgcolor: 'white',
             minHeight: 100,
             height: 100,
@@ -55,7 +54,7 @@ function Initializer() {
             <Typography
               variant="h6"
               display="inline"
-              sx={{ color: COLORS.lblGreen }}
+              sx={{ color: 'primary.main' }}
             >
               Dashboard
             </Typography>
@@ -64,7 +63,7 @@ function Initializer() {
             <Typography
               variant="h6"
               display="inline"
-              sx={{ color: COLORS.lblGreen }}
+              sx={{ color: 'primary.main' }}
             >
               Intake
             </Typography>
@@ -75,7 +74,7 @@ function Initializer() {
               variant="text"
               onClick={handleLogout}
               sx={{
-                color: COLORS.lblGreen,
+                color: 'primary.main',
               }}
             >
               Logout
@@ -88,12 +87,12 @@ function Initializer() {
               }}
             >
               <Link to="/login" search={{ redirect: '/' }}>
-                <Typography variant="h6" color={COLORS.lblGreen}>
+                <Typography variant="h6" color={'primary.main'}>
                   Login
                 </Typography>
               </Link>
               <Link to="/signup">
-                <Typography variant="h6" color={COLORS.lblGreen}>
+                <Typography variant="h6" color={'primary.main'}>
                   Signup
                 </Typography>
               </Link>
@@ -101,17 +100,10 @@ function Initializer() {
           )}
         </Toolbar>
       </AppBar>
-      <Box
-        sx={{
-          display: 'flex',
-          justifyContent: 'center',
-          minHeight: '80vh',
-          padding: 2,
-        }}
-      >
+      <Box sx={{ display: 'flex', flex: 1 }}>
         <Outlet />
         <TanStackRouterDevtools />
       </Box>
-    </>
+    </Stack>
   );
 }
