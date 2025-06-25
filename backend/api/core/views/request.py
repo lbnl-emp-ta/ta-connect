@@ -97,6 +97,26 @@ class RequestDetailView(BaseUserAwareRequest):
 
         return Response(data=response_data, status=status.HTTP_200_OK)
 
+    def patch(self, request, id=None):
+        queryset = self.get_queryset()
+
+        if id is None:
+            return Response(data={"message": "Please provide a Request ID"}, status=status.HTTP_400_BAD_REQUEST)
+        
+        found_request = None
+        try:
+            found_request = queryset.get(pk=id)        
+        except:
+            return Response(data={"message": "Request with given ID does not exist"}, status=status.HTTP_404_NOT_FOUND)
+
+        body = json.loads(request.body)
+
+        if not body:
+            return Response(data={"message": "Missing request body"}, status=status.HTTP_404_NOT_FOUND)
+        
+        # Need privilege heirachy. Admin -> (Reception | Program -> Lab -> Expert)
+
+        return Response(data={"message": "Not implemented yet"}, status=status.HTTP_400_BAD_REQUEST)
 
 class RequestListView(BaseUserAwareRequest):
     serializer = RequestSerializer
