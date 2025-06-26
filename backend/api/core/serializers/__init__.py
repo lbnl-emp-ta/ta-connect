@@ -18,7 +18,7 @@ from .request_status import RequestStatusSerializer
 
 __all__ = [
     "UserLeanSerializer",
-    "RequestStatusSerializer"
+    "RequestStatusSerializer",
     "RoleSerializer",
     "LabSerializer",
     "ProgramSerializer",
