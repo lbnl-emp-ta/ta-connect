@@ -45,7 +45,7 @@ class RequestListSerializer(serializers.Serializer):
         queryset=Depth.objects.all()
     )
     
-    expert = serializers.IntegerField()
+    expert = UserLeanSerializer(required=False) 
 
 class RequestSerializer(serializers.ModelSerializer):
     owner = OwnerSerializer(required=False)
