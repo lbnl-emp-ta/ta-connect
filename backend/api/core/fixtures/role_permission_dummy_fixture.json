@@ -126,7 +126,8 @@
         "pk": 2,
         "fields": {
             "name": "Coordinator",
-            "description": "Direct request traffic in reception to applicable programs"
+            "description": "Direct request traffic in reception to applicable programs",
+            "statuses": [1, 2, 9]
         }
     },
     {
@@ -134,7 +135,8 @@
         "pk": 3,
         "fields": {
             "name": "Program Lead",
-            "description": "Point of contact for a program"
+            "description": "Point of contact for a program",
+            "statuses": [10, 8]
         }
     },
     {
@@ -142,7 +144,17 @@
         "pk": 4,
         "fields": {
             "name": "Lab Lead",
-            "description": "A labs point of contact for a specific program"
+            "description": "A labs point of contact for a specific program",
+            "statuses": [11]
+        }
+    },
+    {
+        "model": "core.Role",
+        "pk": 5,
+        "fields": {
+            "name": "Expert",
+            "description": "Subject matter expert who fulfills technical assistance",
+            "statuses": [6, 7]
         }
     },
     {
