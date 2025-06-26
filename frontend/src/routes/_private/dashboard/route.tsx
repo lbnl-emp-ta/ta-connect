@@ -35,9 +35,9 @@ function DashboardComponent() {
   const navigate = useNavigate();
   const { setIdentity } = useIdentityContext();
   const { data: identities } = useSuspenseQuery(identitiesQueryOptions());
-  const [fullIdentity, setFullIdentity] = useState(identities[0]);
+  const [fullIdentity, setFullIdentity] = useState(identities ? identities[0] : null);
 
-  const handleIdentityChange = (event: SelectChangeEvent<TAIdentity>) => {
+  const handleIdentityChange = (event: SelectChangeEvent<TAIdentity | null>) => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     setFullIdentity(event.target.value as any);
   };
@@ -74,7 +74,7 @@ function DashboardComponent() {
               value={fullIdentity}
               onChange={handleIdentityChange}
             >
-              {identities.map((identity) => (
+              {identities?.map((identity) => (
                 // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-explicit-any
                 <MenuItem key={identity.role.id} value={identity as any}>
                   <Stack direction="row" spacing={1}>

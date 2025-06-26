@@ -1,8 +1,8 @@
 import { TableContainer, Table, TableHead, TableRow, TableBody, TableCell } from '@mui/material';
-import { CustomerRequestRelationship } from '../../api/dashboard/types';
+import { TARequest } from '../../api/dashboard/types';
 
 interface RequestInfoTableProps {
-  request?: CustomerRequestRelationship;
+  request?: TARequest;
 }
 
 export const RequestInfoTable: React.FC<RequestInfoTableProps> = ({ request }) => {

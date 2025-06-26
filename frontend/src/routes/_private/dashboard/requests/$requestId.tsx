@@ -19,22 +19,28 @@ import WestIcon from '@mui/icons-material/West';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { createFileRoute } from '@tanstack/react-router';
 import { RequestInfoTable } from '../../../../features/requests/RequestsInfoTable';
-import { customerRequestRelationshipOptions } from '../../../../utils/queryOptions';
+import { requestDetailQueryOptions } from '../../../../utils/queryOptions';
 import { AppLink } from '../../../../components/AppLink';
 import { useState } from 'react';
 import { useRequestsContext } from '../../../../features/requests/RequestsContext';
+import { useIdentityContext } from '../../../../features/identity/IdentityContext';
 
 export const Route = createFileRoute('/_private/dashboard/requests/$requestId')({
-  loader: async ({ context }) => {
-    await context.queryClient.ensureQueryData(customerRequestRelationshipOptions());
+  loader: async ({ context, params }) => {
+    await context.queryClient.ensureQueryData(
+      requestDetailQueryOptions(params.requestId, context.identity)
+    );
   },
   component: SelectedRequest,
 });
 
 function SelectedRequest() {
   const params = Route.useParams();
-  const { data: requests } = useSuspenseQuery(customerRequestRelationshipOptions());
-  const selectedRequest = requests.find((request) => request.id === parseInt(params.requestId));
+  const { identity } = useIdentityContext();
+  const { data: selectedRequest } = useSuspenseQuery(
+    requestDetailQueryOptions(params.requestId, identity)
+  );
+  console.log('Selected Request:', selectedRequest);
   const { sortedRequests } = useRequestsContext();
   const currentIndex = sortedRequests.findIndex((request) => {
     if (params?.requestId) {
@@ -161,7 +167,7 @@ function SelectedRequest() {
       </Stack>
       <Grid container>
         <Grid size={6} sx={{ height: 550 }}>
-          <RequestInfoTable request={selectedRequest} />
+          <RequestInfoTable request={selectedRequest!} />
         </Grid>
         <Grid size={6}>
           <Stack>
