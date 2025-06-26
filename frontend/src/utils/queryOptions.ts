@@ -41,6 +41,13 @@ export const identitiesQueryOptions = () =>
 export const requestsQueryOptions = (identity?: Identity) =>
   queryOptions({
     staleTime: 120_000, // stale after 2 minutes
+    queryKey: ['requests', identity],
+    queryFn: () => fetchListOf<TARequest>(`${import.meta.env.VITE_API_URL}/requests/`, identity),
+  });
+
+export const requestDetailQueryOptions = (requestId: number, identity?: Identity) =>
+  queryOptions({
+    staleTime: 120_000, // stale after 2 minutes
     queryKey: ['requests', identity?.user, identity?.role, identity?.location, identity?.instance],
     queryFn: () => fetchListOf<TARequest>(`${import.meta.env.VITE_API_URL}/requests/`, identity),
   });
