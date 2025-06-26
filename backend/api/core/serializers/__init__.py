@@ -1,3 +1,4 @@
+from .user import UserLeanSerializer
 from .customer import CustomerSerializer
 from .owner import OwnerSerializer
 from .request import RequestSerializer, RequestListSerializer, RequestDetailSerializer
@@ -15,6 +16,7 @@ from .lab import LabSerializer
 from .role import RoleSerializer
 
 __all__ = [
+    "UserLeanSerializer",
     "RoleSerializer",
     "LabSerializer",
     "ProgramSerializer",
