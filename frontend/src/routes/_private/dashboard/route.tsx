@@ -48,8 +48,7 @@ function DashboardComponent() {
         user: fullIdentity.user.id,
         role: fullIdentity.role.id,
         location: fullIdentity.location,
-        // Right now instance can't be undefined, even for admins, so we default to 1
-        instance: fullIdentity.instance ? fullIdentity.instance.id : 1,
+        instance: fullIdentity.instance?.id,
       });
     }
   }, [fullIdentity, setIdentity]);
