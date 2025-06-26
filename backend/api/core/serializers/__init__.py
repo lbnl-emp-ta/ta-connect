@@ -1,4 +1,8 @@
 from .customer import CustomerSerializer
+from .lab import LabSerializer
+from .program import ProgramSerializer
+from .reception import ReceptionSerializer
+from .role import RoleSerializer
 from .owner import OwnerSerializer
 from .request import RequestSerializer, RequestListSerializer, RequestDetailSerializer
 from .depth import DepthSerializer
@@ -9,12 +13,10 @@ from .transmission_planning_region import TransmissionPlanningRegionSerializer
 from .customer_type import CustomerTypeSerializer
 from .customer_request_relationship import CustomerRequestRelationshipSerializer
 from .cohort import CohortSerializer
-from .reception import ReceptionSerializer
-from .program import ProgramSerializer
-from .lab import LabSerializer
-from .role import RoleSerializer
+from .request_status import RequestStatusSerializer
 
 __all__ = [
+    "RequestStatusSerializer",
     "RoleSerializer",
     "LabSerializer",
     "ProgramSerializer",
