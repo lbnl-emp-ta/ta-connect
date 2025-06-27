@@ -1,3 +1,4 @@
+from .user import UserLeanSerializer
 from .customer import CustomerSerializer
 from .lab import LabSerializer
 from .program import ProgramSerializer
@@ -16,6 +17,7 @@ from .cohort import CohortSerializer
 from .request_status import RequestStatusSerializer
 
 __all__ = [
+    "UserLeanSerializer",
     "RequestStatusSerializer",
     "RoleSerializer",
     "LabSerializer",
