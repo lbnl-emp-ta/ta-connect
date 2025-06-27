@@ -4,42 +4,20 @@ import {
   TableRow,
   TableBody,
   TableCell,
-  Paper,
   Typography,
   Stack,
 } from '@mui/material';
 import { TARequestDetail } from '../../api/dashboard/types';
 import { capitalize, formatDate } from '../../utils/utils';
+import { InfoPanel } from '../../components/InfoPanel';
 
-interface RequestInfoTableProps {
+interface RequestInfoPanelProps {
   request?: TARequestDetail;
 }
 
-export const RequestInfoTable: React.FC<RequestInfoTableProps> = ({ request }) => {
+export const RequestInfoPanel: React.FC<RequestInfoPanelProps> = ({ request }) => {
   return (
-    <Paper
-      sx={{
-        height: 'stretch',
-        width: 'stretch',
-        borderWidth: 10,
-        borderStyle: 'solid',
-        borderColor: 'primary.main',
-        borderRadius: 0,
-        borderTopLeftRadius: 5,
-        borderTopRightRadius: 5,
-      }}
-    >
-      <Typography
-        component="h3"
-        sx={{
-          textAlign: 'center',
-          backgroundColor: 'primary.main',
-          color: 'primary.contrastText',
-          paddingBottom: 1,
-        }}
-      >
-        Request Information
-      </Typography>
+    <InfoPanel header="Request Information">
       <TableContainer>
         <Table size="small">
           <TableBody>
@@ -107,6 +85,6 @@ export const RequestInfoTable: React.FC<RequestInfoTableProps> = ({ request }) =
           {request?.description || 'No description for this request.'}
         </Typography>
       </Stack>
-    </Paper>
+    </InfoPanel>
   );
 };
