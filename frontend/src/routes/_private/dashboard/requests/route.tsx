@@ -1,7 +1,7 @@
 import { createFileRoute, Outlet } from '@tanstack/react-router';
 import { Container, Stack, Typography } from '@mui/material';
 import { RequestsProvider } from '../../../../features/requests/RequestsContext';
-import { RequestTable } from '../../../../features/requests/RequestsTable';
+import { RequestsTable } from '../../../../features/requests/RequestsTable';
 import { requestsQueryOptions } from '../../../../utils/queryOptions';
 
 export const Route = createFileRoute('/_private/dashboard/requests')({
@@ -20,7 +20,7 @@ function RequestsPage() {
             Dashboard / Requests
           </Typography>
           <Outlet />
-          <RequestTable />
+          <RequestsTable />
         </Stack>
       </Container>
     </RequestsProvider>

@@ -166,7 +166,7 @@ function SelectedRequest() {
         </Button>
       </Stack>
       <Grid container>
-        <Grid size={6} sx={{ height: 550 }}>
+        <Grid size={6} sx={{ minHeight: 550 }}>
           <RequestInfoTable request={selectedRequest!} />
         </Grid>
         <Grid size={6}>

@@ -15,7 +15,7 @@ import { useSuspenseQuery } from '@tanstack/react-query';
 import { requestsQueryOptions } from '../../utils/queryOptions';
 import { useIdentityContext } from '../identity/IdentityContext';
 
-export const RequestTable: React.FC = () => {
+export const RequestsTable: React.FC = () => {
   const navigate = useNavigate();
   const { setSortedRequests } = useRequestsContext();
   const { identity } = useIdentityContext();
@@ -56,7 +56,9 @@ export const RequestTable: React.FC = () => {
   };
 
   useEffect(() => {
-    setSortedRequests(data);
+    if (data) {
+      setSortedRequests(data);
+    }
   }, [setSortedRequests, data]);
 
   return (
@@ -76,7 +78,7 @@ export const RequestTable: React.FC = () => {
       <TabPanel value={tabValue} index="actionable-requests">
         <DataGrid
           apiRef={apiRef}
-          rows={data}
+          rows={data || []}
           columns={[
             { field: 'id', headerName: 'ID', width: 90, align: 'center' },
             // {

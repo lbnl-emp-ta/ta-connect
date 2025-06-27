@@ -101,8 +101,12 @@ export const RequestInfoTable: React.FC<RequestInfoTableProps> = ({ request }) =
           </TableBody>
         </Table>
       </TableContainer>
-      <Typography>Description</Typography>
-      <Typography>{request?.description || 'No description for this request.'}</Typography>
+      <Stack sx={{ padding: 2 }}>
+        <Typography fontSize="0.875rem">Description</Typography>
+        <Typography fontSize="0.875rem">
+          {request?.description || 'No description for this request.'}
+        </Typography>
+      </Stack>
     </Paper>
   );
 };
