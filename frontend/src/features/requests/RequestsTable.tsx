@@ -1,50 +1,69 @@
 import { Box, Tab, Tabs } from '@mui/material';
-import { DataGrid, GridEventListener } from '@mui/x-data-grid';
-import { useSuspenseQuery } from '@tanstack/react-query';
-import { useState } from 'react';
-import { CustomerRequestRelationship } from '../../api/dashboard/types';
+import {
+  DataGrid,
+  GridRowSelectionModel,
+  gridSortedRowEntriesSelector,
+  useGridApiRef,
+} from '@mui/x-data-grid';
+import { useNavigate } from '@tanstack/react-router';
+import { useEffect, useState } from 'react';
+import { TARequest } from '../../api/dashboard/types';
 import { TabPanel } from '../../components/TabPanel';
-import { dateDiffInDays } from '../../utils/datetimes';
-import { customerRequestRelationshipOptions } from '../../utils/queryOptions';
 import { a11yProps } from '../../utils/utils';
+import { useRequestsContext } from './RequestsContext';
+import { useSuspenseQuery } from '@tanstack/react-query';
+import { requestsQueryOptions } from '../../utils/queryOptions';
+import { useIdentityContext } from '../identity/IdentityContext';
 
-interface RequestTableProps {
-  setSelectedRequest: (request: CustomerRequestRelationship) => void;
-}
-
-export const RequestTable: React.FC<RequestTableProps> = ({
-  setSelectedRequest,
-}) => {
-  const { data } = useSuspenseQuery(customerRequestRelationshipOptions());
-  const tableData = data.map((crr) => {
-    const ageInDays = dateDiffInDays(
-      new Date(crr.request.date_created),
-      new Date()
-    );
-    return { ...crr, age: ageInDays };
+export const RequestsTable: React.FC = () => {
+  const navigate = useNavigate();
+  const { setSortedRequests } = useRequestsContext();
+  const { identity } = useIdentityContext();
+  const { data } = useSuspenseQuery(requestsQueryOptions(identity));
+  console.log('RequestTable data', data);
+  const [tabValue, setTabValue] = useState<string | number>('actionable-requests');
+  const [rowSelectionModel, setRowSelectionModel] = useState<GridRowSelectionModel>({
+    type: 'include',
+    ids: new Set<string | number>(),
   });
-  const [tabValue, setTabValue] = useState<string | number>(
-    'actionable-requests'
-  );
+  const apiRef = useGridApiRef();
 
-  const handleChangeTab = (
-    _event: React.SyntheticEvent,
-    newValue: string | number
-  ) => {
+  const handleChangeTab = (_event: React.SyntheticEvent, newValue: string | number) => {
     setTabValue(newValue);
   };
 
-  const handleRowClick: GridEventListener<'rowClick'> = (params) => {
-    setSelectedRequest(params.row as CustomerRequestRelationship);
+  const handleRowSelectionModelChange = (newSelection: GridRowSelectionModel) => {
+    if (newSelection.ids.size > 0) {
+      const selectedId = newSelection.ids.values().next().value;
+      void navigate({
+        to: `/dashboard/requests/${selectedId}`,
+      });
+    } else {
+      void navigate({
+        to: `/dashboard/requests`,
+      });
+    }
+    setRowSelectionModel(newSelection);
   };
+
+  const handleSortChange = () => {
+    // The sort model changes before the rows are set,
+    // so this forces a delay to ensure the rows are sorted
+    setTimeout(() => {
+      const sortedRowEntries = gridSortedRowEntriesSelector(apiRef);
+      setSortedRequests(sortedRowEntries.map((row) => row.model as TARequest));
+    }, 500);
+  };
+
+  useEffect(() => {
+    if (data) {
+      setSortedRequests(data);
+    }
+  }, [setSortedRequests, data]);
 
   return (
     <Box>
-      <Tabs
-        value={tabValue}
-        onChange={handleChangeTab}
-        aria-label="requests tabs"
-      >
+      <Tabs value={tabValue} onChange={handleChangeTab} aria-label="requests tabs">
         <Tab
           label="My Actionable Requests"
           value="actionable-requests"
@@ -58,36 +77,33 @@ export const RequestTable: React.FC<RequestTableProps> = ({
       </Tabs>
       <TabPanel value={tabValue} index="actionable-requests">
         <DataGrid
-          rows={tableData}
+          apiRef={apiRef}
+          rows={data || []}
           columns={[
             { field: 'id', headerName: 'ID', width: 90, align: 'center' },
+            // {
+            //   field: 'age',
+            //   headerName: 'Age (in days)',
+            //   type: 'number',
+            //   width: 150,
+            // },
             {
-              field: 'age',
-              headerName: 'Age (in days)',
-              type: 'number',
-              width: 150,
-            },
-            {
-              field: 'request.status',
-              valueGetter: (_value, row) => row.request.status,
+              field: 'status',
               headerName: 'Status',
               width: 150,
             },
             {
-              field: 'request.depth',
-              valueGetter: (_value, row) => row.request.depth,
+              field: 'depth',
               headerName: 'Depth',
               width: 150,
             },
             {
-              field: 'customer.name',
-              valueGetter: (_value, row) => row.customer.name,
+              field: 'customer_name',
               headerName: 'Customer Name',
               width: 200,
             },
             {
-              field: 'customer.email',
-              valueGetter: (_value, row) => row.customer.email,
+              field: 'customer_email',
               headerName: 'Customer Email',
               width: 200,
             },
@@ -97,7 +113,9 @@ export const RequestTable: React.FC<RequestTableProps> = ({
               width: 200,
             },
           ]}
-          onRowClick={handleRowClick}
+          onRowSelectionModelChange={handleRowSelectionModelChange}
+          rowSelectionModel={rowSelectionModel}
+          onSortModelChange={handleSortChange}
         />
       </TabPanel>
       <TabPanel value={tabValue} index="downstream-requests">

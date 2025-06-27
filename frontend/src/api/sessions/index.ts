@@ -1,4 +1,4 @@
-import { SessionAuthenticatedResponse, SessionUnauthenticatedResponse } from "../types";
+import { SessionAuthenticatedResponse, SessionUnauthenticatedResponse } from '../types';
 
 async function getSession(): Promise<{isAuthenticated: boolean}> {
     const response = await fetch (
