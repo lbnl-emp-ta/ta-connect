@@ -1,5 +1,6 @@
 import {
   Box,
+  Paper,
   Table,
   TableBody,
   TableCell,
@@ -8,15 +9,36 @@ import {
   Typography,
 } from '@mui/material';
 import { TACustomer } from '../../api/dashboard/types';
-import { InfoPanel } from '../../components/InfoPanel';
 
 interface RequestInfoTableProps {
   customer?: TACustomer;
 }
 
-export const RequestCustomerPanel: React.FC<RequestInfoTableProps> = ({ customer }) => {
+export const RequestAttachments: React.FC<RequestInfoTableProps> = ({ customer }) => {
   return (
-    <InfoPanel header="Customer Information">
+    <Paper
+      sx={{
+        height: 'stretch',
+        width: 'stretch',
+        borderWidth: 10,
+        borderStyle: 'solid',
+        borderColor: 'primary.main',
+        borderRadius: 0,
+        borderTopLeftRadius: 5,
+        borderTopRightRadius: 5,
+      }}
+    >
+      <Typography
+        component="h3"
+        sx={{
+          textAlign: 'center',
+          backgroundColor: 'primary.main',
+          color: 'primary.contrastText',
+          paddingBottom: 1,
+        }}
+      >
+        Customer Information
+      </Typography>
       {!customer && (
         <Box>
           <Typography>No customer data to show.</Typography>
@@ -61,6 +83,6 @@ export const RequestCustomerPanel: React.FC<RequestInfoTableProps> = ({ customer
           </Table>
         </TableContainer>
       )}
-    </InfoPanel>
+    </Paper>
   );
 };

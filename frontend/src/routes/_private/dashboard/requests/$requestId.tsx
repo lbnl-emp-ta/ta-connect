@@ -6,6 +6,8 @@ import {
   Menu,
   MenuItem,
   Stack,
+  Tab,
+  Tabs,
   Typography,
 } from '@mui/material';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
@@ -25,6 +27,8 @@ import { useState } from 'react';
 import { useRequestsContext } from '../../../../features/requests/RequestsContext';
 import { useIdentityContext } from '../../../../features/identity/IdentityContext';
 import { RequestCustomerPanel } from '../../../../features/requests/RequestCustomerPanel';
+import { InfoPanel } from '../../../../components/InfoPanel';
+import { TabPanel } from '../../../../components/TabPanel';
 
 export const Route = createFileRoute('/_private/dashboard/requests/$requestId')({
   loader: async ({ context, params }) => {
@@ -52,6 +56,7 @@ function SelectedRequest() {
   const previousIndex = currentIndex > 0 ? currentIndex - 1 : null;
   const [actionsAnchorEl, setActionsAnchorEl] = useState<null | HTMLElement>(null);
   const actionsMenuOpen = Boolean(actionsAnchorEl);
+  const [tabValue, setTabValue] = useState<string | number>('attachments');
 
   const handleClickActionsMenu = (event: React.MouseEvent<HTMLButtonElement>) => {
     setActionsAnchorEl(event.currentTarget);
@@ -60,6 +65,11 @@ function SelectedRequest() {
   const handleCloseActionsMenu = () => {
     setActionsAnchorEl(null);
   };
+
+  const handleChangeTab = (_event: React.SyntheticEvent, newValue: string | number) => {
+    setTabValue(newValue);
+  };
+
   return (
     <Stack>
       <Stack direction="row">
@@ -173,7 +183,34 @@ function SelectedRequest() {
         <Grid size={6}>
           <Stack>
             <RequestCustomerPanel customer={selectedRequest?.customers[0]} />
-            <Button sx={{ height: 'stretch', width: 'stretch', bgcolor: 'blue' }}></Button>
+            <InfoPanel
+              header={
+                <Tabs
+                  onChange={handleChangeTab}
+                  value={tabValue}
+                  textColor="inherit"
+                  indicatorColor="primary"
+                >
+                  <Tab
+                    label="Attachments"
+                    value="attachments"
+                    onClick={(event) => handleChangeTab(event, 'attachments')}
+                  />
+                  <Tab
+                    label="Audit History"
+                    value="audit-history"
+                    onClick={(event) => handleChangeTab(event, 'audit-history')}
+                  />
+                </Tabs>
+              }
+            >
+              <TabPanel value={tabValue} index="attachments">
+                Attachments
+              </TabPanel>
+              <TabPanel value={tabValue} index="audit-history">
+                Audit history
+              </TabPanel>
+            </InfoPanel>
           </Stack>
         </Grid>
       </Grid>
