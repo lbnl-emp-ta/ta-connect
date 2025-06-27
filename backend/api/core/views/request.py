@@ -1,4 +1,4 @@
-from rest_framework import views, generics, status, permissions, authentication
+from rest_framework import views, status, permissions, authentication
 from rest_framework.response import Response
 from core.serializers import * 
 from core.models import * 
@@ -49,25 +49,25 @@ class BaseUserAwareRequest(views.APIView):
             COORDINATOR_ROLE = Role.objects.get(name="Coordinator")
             coordinator_assignments = reception_assignments.filter(role=COORDINATOR_ROLE)
             for assignment in coordinator_assignments:
-                    visible_requests.union(assignment.instance.owner.request_set.all())
+                    visible_requests = visible_requests.union(assignment.instance.owner.request_set.all())
 
         elif IsProgramLead().has_permission(self.request, self):
             PROGRAM_LEAD_ROLE = Role.objects.get(name="Program Lead")
             program_lead_assignments = program_assignments.filter(role=PROGRAM_LEAD_ROLE)
             for assignment in program_lead_assignments:
-                    visible_requests.union(assignment.instance.owner.request_set.all())
+                    visible_requests = visible_requests.union(assignment.instance.owner.request_set.all())
 
         elif IsLabLead().has_permission(self.request, self):
             LAB_LEAD_ROLE = Role.objects.get(name="Lab Lead")
             lab_lead_assignments = lab_assignments.filter(role=LAB_LEAD_ROLE)
             for assignment in lab_lead_assignments:
-                    visible_requests.union(assignment.instance.owner.request_set.all())
+                    visible_requests = visible_requests.union(assignment.instance.owner.request_set.all())
 
         elif IsExpert().has_permission(self.request, self):
             EXPERT_ROLE = Role.objects.get(name="Expert")
             expert_assignments = lab_assignments.filter(role=EXPERT_ROLE)
             for assignment in expert_assignments:
-                    visible_requests.union(assignment.instance.owner.request_set.all())
+                    visible_requests = visible_requests.union(assignment.instance.owner.request_set.all())
 
         return visible_requests 
 
@@ -127,39 +127,40 @@ class RequestListView(BaseUserAwareRequest):
         queryset = self.get_queryset()
 
         # filter requests based on search params
-        user = self.kwargs.get("user")
-        role = self.kwargs.get("role")
-        location = self.kwargs.get("location")
-        instance = self.kwargs.get("instance")
+        # user = self.kwargs.get("user")
+        # role = self.kwargs.get("role")
+        # location = self.kwargs.get("location")
+        # instance = self.kwargs.get("instance")
 
-        if user is not None:
-            queryset = queryset.filter(user=User.objects.get(user))
+        # Unused for now
+        # if user is not None:
+        #     queryset = queryset.filter(user=User.objects.get(user))
         
-        if role is not None:
-            queryset = queryset.filter(role=Role.objects.get(name=role.lower().capitalize()))
+        # if role is not None:
+        #     queryset = queryset.filter(role=Role.objects.get(name=role.lower().capitalize()))
         
-        if location is not None:
-            location_filter = None
-            match location.lower():
-                case "reception":
-                    location_filter = "Reception"
-                    pass
-                case "program":
-                    location_filter = "Program"
-                    pass
-                case "lab":
-                    location_filter = "Lab"
-                    pass
+        # if location is not None:
+        #     location_filter = None
+        #     match location.lower():
+        #         case "reception":
+        #             location_filter = "Reception"
+        #             pass
+        #         case "program":
+        #             location_filter = "Program"
+        #             pass
+        #         case "lab":
+        #             location_filter = "Lab"
+        #             pass
             
-            if location_filter is not None:
-                queryset = queryset.filter(owner__domain_type=location_filter)
+        #     if location_filter is not None:
+        #         queryset = queryset.filter(owner__domain_type=location_filter)
 
-            if instance is not None:
-                reception_queryset = queryset.filter(owner__reception=Reception.objects.get(instance))
-                program_queryset = queryset.filter(owner__program=Program.objects.get(instance))
-                lab_queryset = queryset.filter(owner__lab=Lab.objects.get(instance))
+        #     if instance is not None:
+        #         reception_queryset = queryset.filter(owner__reception=Reception.objects.get(instance))
+        #         program_queryset = queryset.filter(owner__program=Program.objects.get(instance))
+        #         lab_queryset = queryset.filter(owner__lab=Lab.objects.get(instance))
 
-                queryset = reception_queryset | program_queryset | lab_queryset
+        #         queryset = reception_queryset | program_queryset | lab_queryset
             
                 
         

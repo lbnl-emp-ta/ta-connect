@@ -1,0 +1,92 @@
+[
+    {
+        "model": "core.RequestStatus",
+        "pk": 2,
+        "fields": {
+            "name": "Scoping",
+            "description": "The scope of the request is being determined"
+        }
+
+    },
+    {
+        "model": "core.RequestStatus",
+        "pk": 3,
+        "fields": {
+            "name": "Assigned to Program",
+            "description": "Request had been assigned to a program by reception"
+        }
+
+    },
+    {
+        "model": "core.RequestStatus",
+        "pk": 10,
+        "fields": {
+            "name": "Rejected by Program",
+            "description": "The request was rejected by the assigned program"
+        }
+
+    },
+    {
+        "model": "core.RequestStatus",
+        "pk": 4,
+        "fields": {
+            "name": "Assigned to Lab",
+            "description": "Request had been assigned to a lab by a program"
+        }
+
+    },
+    {
+        "model": "core.RequestStatus",
+        "pk": 11,
+        "fields": {
+            "name": "Reassignment Requested",
+            "description": "The assigned lab would like the request to be reassigned"
+        }
+
+    },
+    {
+        "model": "core.RequestStatus",
+        "pk": 5,
+        "fields": {
+            "name": "Assigned to Expert",
+            "description": "Request had been assigned to an expert by a lab"
+        }
+
+    },
+    {
+        "model": "core.RequestStatus",
+        "pk": 6,
+        "fields": {
+            "name": "Providing TA",
+            "description": "Expert is currently providing technical assistance to the customer"
+        }
+
+    },
+    {
+        "model": "core.RequestStatus",
+        "pk": 7,
+        "fields": {
+            "name": "Close out",
+            "description": "Expert is providing close out information"
+        }
+
+    },
+    {
+        "model": "core.RequestStatus",
+        "pk": 8,
+        "fields": {
+            "name": "Completed",
+            "description": "Technical assistance assiciated with the request has been fulfilled"
+        }
+
+    },
+    {
+        "model": "core.RequestStatus",
+        "pk": 9,
+        "fields": {
+            "name": "Unable to address",
+            "description": "Request was not able to be serviced by any available program."
+        }
+
+    }
+]

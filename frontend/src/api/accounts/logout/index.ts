@@ -13,9 +13,7 @@ export async function logoutMutation() {
     }
   );
 
-  const responseData = (await response.json()) as
-    | SessionUnauthenticatedResponse
-    | ErrorResponse;
+  const responseData = (await response.json()) as SessionUnauthenticatedResponse | ErrorResponse;
 
   if (!response.ok) {
     throw Error(`Error: Status ${response.status}`);

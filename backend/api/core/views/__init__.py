@@ -9,8 +9,10 @@ from .customer_request_relationship import CustomerRequestRelationshipListCreate
 from .cohort import CohortCreateView, CohortAddCustomerView
 from .intake_form import ProcessIntakeForm
 from .identity import IdentityListView
+from .status import StatusListView
 
 __all__ = [
+    "StatusListView",
     "IdentityListView",
     "RequestListView",
     "RequestDetailView",
