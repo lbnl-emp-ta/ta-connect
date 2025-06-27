@@ -48,7 +48,13 @@ export const requestsQueryOptions = (identity?: Identity) =>
   queryOptions({
     staleTime: 120_000, // stale after 2 minutes
     queryKey: ['requests', identity],
-    queryFn: () => fetchData<TARequest[]>(`${import.meta.env.VITE_API_URL}/requests/`, identity),
+    queryFn: () => {
+      if (identity) {
+        return fetchData<TARequest[]>(`${import.meta.env.VITE_API_URL}/requests/`, identity);
+      } else {
+        return [];
+      }
+    },
   });
 
 export const requestDetailQueryOptions = (requestId: string, identity?: Identity) =>
@@ -56,8 +62,16 @@ export const requestDetailQueryOptions = (requestId: string, identity?: Identity
     staleTime: 120_000, // stale after 2 minutes
     // Does identity need to be included in the query key for request detail?
     queryKey: ['request', identity, `requestId:${requestId}`],
-    queryFn: () =>
-      fetchData<TARequestDetail>(`${import.meta.env.VITE_API_URL}/requests/${requestId}`, identity),
+    queryFn: () => {
+      if (identity) {
+        return fetchData<TARequestDetail>(
+          `${import.meta.env.VITE_API_URL}/requests/${requestId}`,
+          identity
+        );
+      } else {
+        return null;
+      }
+    },
   });
 
 export const statesQueryOptions = () =>

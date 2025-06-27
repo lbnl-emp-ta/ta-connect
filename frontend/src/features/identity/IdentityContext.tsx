@@ -8,14 +8,14 @@ export interface Identity {
 }
 
 interface IdentityContextType {
-  identity: Identity | object;
-  setIdentity: React.Dispatch<React.SetStateAction<Identity | object>>;
+  identity?: Identity;
+  setIdentity: React.Dispatch<React.SetStateAction<Identity | undefined>>;
 }
 
 const IdentityContext = createContext<IdentityContextType | undefined>(undefined);
 
 export const IdentityProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [identity, setIdentity] = useState<Identity>({});
+  const [identity, setIdentity] = useState<Identity>();
 
   const value = useMemo(() => {
     return { identity, setIdentity };
