@@ -10,7 +10,12 @@ import {
 import { signupMutation } from '../api/accounts/signup';
 import { loginMutation } from '../api/accounts/login';
 import { logoutMutation } from '../api/accounts/logout';
-import { CustomerRequestRelationship, TAIdentity, TARequest } from '../api/dashboard/types';
+import {
+  CustomerRequestRelationship,
+  TAIdentity,
+  TARequest,
+  TARequestDetail,
+} from '../api/dashboard/types';
 import { queryClient } from '../App';
 import { Identity } from '../features/identity/IdentityContext';
 import { fetchData } from './utils';
@@ -52,7 +57,7 @@ export const requestDetailQueryOptions = (requestId: string, identity?: Identity
     // Does identity need to be included in the query key for request detail?
     queryKey: ['request', identity, `requestId:${requestId}`],
     queryFn: () =>
-      fetchData<TARequest>(`${import.meta.env.VITE_API_URL}/requests/${requestId}`, identity),
+      fetchData<TARequestDetail>(`${import.meta.env.VITE_API_URL}/requests/${requestId}`, identity),
   });
 
 export const statesQueryOptions = () =>

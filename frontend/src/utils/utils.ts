@@ -53,3 +53,25 @@ export async function fetchData<T>(url: string, identity?: Identity): Promise<T 
     throw Error(`Error: ${message}`);
   }
 }
+
+/**
+ * Captilize the first letter of a string.
+ */
+export const capitalize = (str: string): string => {
+  if (!str) return '';
+  return str.charAt(0).toUpperCase() + str.slice(1);
+};
+
+/**
+ * Format a date string to a more readable format.
+ */
+export const formatDate = (dateString: string): string => {
+  const date = new Date(dateString);
+  return date.toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+  });
+};

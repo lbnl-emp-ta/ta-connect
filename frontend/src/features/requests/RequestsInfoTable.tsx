@@ -1,13 +1,23 @@
-import { TableContainer, Table, TableHead, TableRow, TableBody, TableCell } from '@mui/material';
-import { TARequest } from '../../api/dashboard/types';
+import {
+  TableContainer,
+  Table,
+  TableRow,
+  TableBody,
+  TableCell,
+  Paper,
+  Typography,
+  Stack,
+} from '@mui/material';
+import { TARequestDetail } from '../../api/dashboard/types';
+import { capitalize, formatDate } from '../../utils/utils';
 
 interface RequestInfoTableProps {
-  request?: TARequest;
+  request?: TARequestDetail;
 }
 
 export const RequestInfoTable: React.FC<RequestInfoTableProps> = ({ request }) => {
   return (
-    <TableContainer
+    <Paper
       sx={{
         height: 'stretch',
         width: 'stretch',
@@ -19,28 +29,80 @@ export const RequestInfoTable: React.FC<RequestInfoTableProps> = ({ request }) =
         borderTopRightRadius: 5,
       }}
     >
-      <Table>
-        <TableHead>
-          <TableRow
-            sx={{
-              bgcolor: 'primary.main',
-              display: 'flex',
-              justifyContent: 'center',
-              textAlign: 'center',
-              paddingBottom: 1,
-            }}
-          >
-            <TableCell>Request Information</TableCell>
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          <TableRow>
-            <TableCell align="center" scope="row">
-              {request?.id}
-            </TableCell>
-          </TableRow>
-        </TableBody>
-      </Table>
-    </TableContainer>
+      <Typography
+        component="h3"
+        sx={{
+          textAlign: 'center',
+          backgroundColor: 'primary.main',
+          color: 'primary.contrastText',
+          paddingBottom: 1,
+        }}
+      >
+        Request Information
+      </Typography>
+      <TableContainer>
+        <Table size="small">
+          <TableBody>
+            <TableRow>
+              <TableCell>ID</TableCell>
+              <TableCell>{request?.id}</TableCell>
+            </TableRow>
+            <TableRow>
+              <TableCell>Assignment Location</TableCell>
+              <TableCell>
+                <Stack direction="row" spacing={1}>
+                  <span>
+                    {request?.owner.domain_type ? capitalize(request.owner.domain_type) : 'Unknown'}
+                  </span>
+                  <span>|</span>
+                  <span>{request?.owner.program ? request.owner.program : 'Unknown'}</span>
+                </Stack>
+              </TableCell>
+            </TableRow>
+            <TableRow>
+              <TableCell>Status</TableCell>
+              <TableCell>{request?.status || 'Unknown'}</TableCell>
+            </TableRow>
+            <TableRow>
+              <TableCell>Depth</TableCell>
+              <TableCell>{request?.depth || 'Unknown'}</TableCell>
+            </TableRow>
+            <TableRow>
+              <TableCell>Date Submitted</TableCell>
+              <TableCell>
+                {request?.date_created ? formatDate(request.date_created) : 'Unknown'}
+              </TableCell>
+            </TableRow>
+            <TableRow>
+              <TableCell>Project Start Date</TableCell>
+              <TableCell>
+                {request?.proj_start_date ? formatDate(request.proj_start_date) : 'Unknown'}
+              </TableCell>
+            </TableRow>
+            <TableRow>
+              <TableCell>Project Completion Date</TableCell>
+              <TableCell>
+                {request?.proj_end_date ? formatDate(request.proj_end_date) : 'Unknown'}
+              </TableCell>
+            </TableRow>
+            <TableRow>
+              <TableCell>Actual Completion Date</TableCell>
+              <TableCell>
+                {request?.actual_completion_date
+                  ? formatDate(request.actual_completion_date)
+                  : 'Unknown'}
+              </TableCell>
+            </TableRow>
+            <TableRow>
+              <TableCell>Topics</TableCell>
+              {/* TODO: Implement topics in the API and display */}
+              <TableCell>Unknown</TableCell>
+            </TableRow>
+          </TableBody>
+        </Table>
+      </TableContainer>
+      <Typography>Description</Typography>
+      <Typography>{request?.description || 'No description for this request.'}</Typography>
+    </Paper>
   );
 };
