@@ -18,12 +18,13 @@ import EditIcon from '@mui/icons-material/Edit';
 import WestIcon from '@mui/icons-material/West';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { createFileRoute } from '@tanstack/react-router';
-import { RequestInfoTable } from '../../../../features/requests/RequestsInfoTable';
+import { RequestInfoPanel } from '../../../../features/requests/RequestInfoPanel';
 import { requestDetailQueryOptions } from '../../../../utils/queryOptions';
 import { AppLink } from '../../../../components/AppLink';
 import { useState } from 'react';
 import { useRequestsContext } from '../../../../features/requests/RequestsContext';
 import { useIdentityContext } from '../../../../features/identity/IdentityContext';
+import { RequestCustomerPanel } from '../../../../features/requests/RequestCustomerPanel';
 
 export const Route = createFileRoute('/_private/dashboard/requests/$requestId')({
   loader: async ({ context, params }) => {
@@ -165,13 +166,13 @@ function SelectedRequest() {
           Assign
         </Button>
       </Stack>
-      <Grid container>
+      <Grid container spacing={2}>
         <Grid size={6} sx={{ minHeight: 550 }}>
-          <RequestInfoTable request={selectedRequest!} />
+          <RequestInfoPanel request={selectedRequest!} />
         </Grid>
         <Grid size={6}>
           <Stack>
-            <Button sx={{ height: 'stretch', width: 'stretch', bgcolor: 'blue' }}></Button>
+            <RequestCustomerPanel customer={selectedRequest?.customers[0]} />
             <Button sx={{ height: 'stretch', width: 'stretch', bgcolor: 'blue' }}></Button>
           </Stack>
         </Grid>

@@ -11,11 +11,11 @@ import {
 import { TARequestDetail } from '../../api/dashboard/types';
 import { capitalize, formatDate } from '../../utils/utils';
 
-interface RequestInfoTableProps {
+interface RequestInfoPanelProps {
   request?: TARequestDetail;
 }
 
-export const RequestInfoTable: React.FC<RequestInfoTableProps> = ({ request }) => {
+export const RequestInfoPanel: React.FC<RequestInfoPanelProps> = ({ request }) => {
   return (
     <Paper
       sx={{
