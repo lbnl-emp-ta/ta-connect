@@ -19,17 +19,21 @@ import WestIcon from '@mui/icons-material/West';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { createFileRoute } from '@tanstack/react-router';
 import { RequestInfoTable } from '../../../../features/requests/RequestsInfoTable';
-import { requestDetailQueryOptions } from '../../../../utils/queryOptions';
+import { requestDetailQueryOptions, testRequestDetailQueryOptions } from '../../../../utils/queryOptions';
 import { AppLink } from '../../../../components/AppLink';
 import { useState } from 'react';
 import { useRequestsContext } from '../../../../features/requests/RequestsContext';
 import { useIdentityContext } from '../../../../features/identity/IdentityContext';
+import { fetchData, TestPostData } from '../../../../utils/utils';
+import { TARequestDetail } from '../../../../api/dashboard/types';
 
 export const Route = createFileRoute('/_private/dashboard/requests/$requestId')({
   loader: async ({ context, params }) => {
     await context.queryClient.ensureQueryData(
       requestDetailQueryOptions(params.requestId, context.identity)
     );
+
+
   },
   component: SelectedRequest,
 });
@@ -54,6 +58,10 @@ function SelectedRequest() {
 
   const handleClickActionsMenu = (event: React.MouseEvent<HTMLButtonElement>) => {
     setActionsAnchorEl(event.currentTarget);
+    TestPostData<TARequestDetail>(
+        `${import.meta.env.VITE_API_URL}/requests/${1}`,
+        identity
+    );
   };
 
   const handleCloseActionsMenu = () => {

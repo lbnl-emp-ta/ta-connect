@@ -41,7 +41,7 @@ class StatusListView(views.APIView):
         except:
             return Response(data={"message": "Given role does not exist"}, status=status.HTTP_400_BAD_REQUEST)
 
-        if not has_role(request, role.name):
+        if not has_role(request, request.user.id, role.name):
             return Response(data={"message": "User has not been assigned given role."}, status=status.HTTP_400_BAD_REQUEST)
 
         available_statuses = role.statuses

@@ -20,14 +20,14 @@ def get_location_role_assignment_class(location):
             return False 
 
 
-def has_role(request, role_name):
+def has_role(request, user_id, role_name):
         maybe_context = request.headers.get("Context")
         if maybe_context is None:
             return False
 
         context = json.loads(maybe_context)
 
-        user = User.objects.get(pk=request.user.id)
+        user = User.objects.get(pk=user_id)
         if (not user):
             return False
 
@@ -60,22 +60,22 @@ def has_role(request, role_name):
 
 class IsAdmin(permissions.BasePermission):
     def has_permission(self, request, view):
-        return has_role(request, "Admin")
+        return has_role(request, request.user.id, "Admin")
 
 class IsCoordinator(permissions.BasePermission):
     def has_permission(self, request, view):
-        return has_role(request, "Coordinator")
+        return has_role(request, request.user.id, "Coordinator")
 
 class IsProgramLead(permissions.BasePermission):
     def has_permission(self, request, view):
-        return has_role(request, "Program Lead")
+        return has_role(request, request.user.id, "Program Lead")
 
 class IsLabLead(permissions.BasePermission):
     def has_permission(self, request, view):
-        return has_role(request, "Lab Lead")
+        return has_role(request, request.user.id, "Lab Lead")
     
 class IsExpert(permissions.BasePermission):
     def has_permission(self, request, view):
-        return has_role(request, "Expert")
+        return has_role(request, request.user.id, "Expert")
     
         

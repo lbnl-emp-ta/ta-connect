@@ -100,21 +100,111 @@ class RequestDetailView(BaseUserAwareRequest):
     def patch(self, request, id=None):
         queryset = self.get_queryset()
 
+        maybe_context = self.request.headers.get("Context")
+        if maybe_context is None:
+            return Response(data={"message": "Please provide context object header with request"}, status=status.HTTP_400_BAD_REQUEST)
+            
+        context = json.loads(maybe_context)
+
         if id is None:
             return Response(data={"message": "Please provide a Request ID"}, status=status.HTTP_400_BAD_REQUEST)
         
         found_request = None
         try:
             found_request = queryset.get(pk=id)        
-        except:
+        except Request.DoesNotExist:
             return Response(data={"message": "Request with given ID does not exist"}, status=status.HTTP_404_NOT_FOUND)
 
         body = json.loads(request.body)
 
+        patch_data = dict()
+
         if not body:
             return Response(data={"message": "Missing request body"}, status=status.HTTP_404_NOT_FOUND)
         
+        if body.get("description"):
+            if not (IsAdmin().has_permission(request, None) or IsProgramLead().has_permission(request, None) or IsCoordinator().has_permission(request, None)):
+                return Response(data={"message": "Insufficient privillege to update 'description' field"}, status=status.HTTP_401_UNAUTHORIZED)
+
+            patch_data["description"] = body.get("description")
+
+        if body.get("depth"):
+            if not (IsAdmin().has_permission(request, None) or IsProgramLead().has_permission(request, None)):
+                return Response(data={"message": "Insufficient privillege to update 'depth' field"}, status=status.HTTP_401_UNAUTHORIZED)
+            
+            try:
+                Depth.objects.get(body.get("depth"))
+            except Depth.DoesNotExist:
+                return Response(data={"message": "Provided depth does not exist."}, status=status.HTTP_400_BAD_REQUEST)
+
+            patch_data["depth"] = body.get("depth")
+
+        if body.get("actual_completion_date"):
+            if not (IsAdmin().has_permission(request, None) or IsProgramLead().has_permission(request, None)):
+                return Response(data={"message": "Insufficient privillege to update 'depth' field"}, status=status.HTTP_401_UNAUTHORIZED)
+
+            patch_data["actual_completion_date"] = body.get("actual_completion_date")
+
+        if body.get("expert"):
+            if not(IsAdmin().has_object_permission(request, None) or IsLabLead().has_permission(request, None)):
+                return Response(data={"message": "Insufficient privillege to update 'expert' field"}, status=status.HTTP_401_UNAUTHORIZED)
+
+            try:
+                User.objects.get(body.get("expert"))
+            except User.DoesNotExist:
+                return Response(data={"message": "Provided expert user does not exist."}, status=status.HTTP_400_BAD_REQUEST)
+            
+            # Need to check provided user has expert role
+
+            patch_data["expert"] = body.get("expert")
+        
+        if body.get("proj_start_date"):
+            if not(IsAdmin().has_object_permission(request, None) or IsProgramLead().has_permission(request, None) or IsLabLead().has_permission(request, None) or IsExpert().has_permission(request, None)):
+                return Response(data={"message": "Insufficient privillege to update 'expert' field"}, status=status.HTTP_401_UNAUTHORIZED)
+
+            patch_data["proj_start_date"] = body.get("proj_start_date")
+
+        if body.get("proj_completion_date"):
+            if not(IsAdmin().has_object_permission(request, None) or IsProgramLead().has_permission(request, None) or IsLabLead().has_permission(request, None) or IsExpert().has_permission(request, None)):
+                return Response(data={"message": "Insufficient privillege to update 'expert' field"}, status=status.HTTP_401_UNAUTHORIZED)
+
+            patch_data["proj_completion_date"] = body.get("proj_completion_date")
+
+        if body.get("owner"):
+            try:
+                Owner.objects.get(body.get("owner"))
+            except Owner.DoesNotExist:
+                return Response(data={"message": "Provided owner does not exist."}, status=status.HTTP_400_BAD_REQUEST)
+
+            # Need to check if can actually assign to that owner
+
+            patch_data["owner"] = body.get("owner")
+        
+            
+        if body.get("status"):
+            try:
+                RequestStatus.objects.get(body.get("owner"))
+            except RequestStatus.DoesNotExist:
+                return Response(data={"message": "Provided owner does not exist."}, status=status.HTTP_400_BAD_REQUEST)
+
+            patch_data["status"] = body.get("status")
+    
+        
+        
+       # do partial save with accumulated patch 
+        
+        
+
         # Need privilege heirachy. Admin -> (Reception | Program -> Lab -> Expert)
+        #
+        # Owner -> Expert+ via assignment
+        # expert -> Lab+ via assignment
+        # status -> Expert+ but in the own lane
+        # depth -> Program or Admin
+        # description -> Program or Admin
+        # proj dates -> Expert+
+        # actual comp date -> Program or Admin
+        
 
         return Response(data={"message": "Not implemented yet"}, status=status.HTTP_400_BAD_REQUEST)
 
