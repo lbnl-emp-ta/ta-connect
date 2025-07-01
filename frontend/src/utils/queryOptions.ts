@@ -18,7 +18,7 @@ import {
 } from '../api/dashboard/types';
 import { queryClient } from '../App';
 import { Identity } from '../features/identity/IdentityContext';
-import { fetchData, TestPostData } from './utils';
+import { fetchData } from './utils';
 
 export const authSessionQueryOptions = () =>
   queryOptions({
@@ -65,23 +65,6 @@ export const requestDetailQueryOptions = (requestId: string, identity?: Identity
     queryFn: () => {
       if (identity) {
         return fetchData<TARequestDetail>(
-          `${import.meta.env.VITE_API_URL}/requests/${requestId}`,
-          identity
-        );
-      } else {
-        return null;
-      }
-    },
-  });
-
-export const testRequestDetailQueryOptions = (requestId: string, identity?: Identity) =>
-  queryOptions({
-    staleTime: 120_000, // stale after 2 minutes
-    // Does identity need to be included in the query key for request detail?
-    queryKey: ['testrequest', identity, `requestId:${requestId}`],
-    queryFn: () => {
-      if (identity) {
-        return TestPostData<TARequestDetail>(
           `${import.meta.env.VITE_API_URL}/requests/${requestId}`,
           identity
         );

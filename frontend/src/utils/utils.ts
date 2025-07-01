@@ -21,39 +21,6 @@ export const a11yProps = (index: number | string) => {
   };
 };
 
-export async function TestPostData<T>(url: string, identity?: Identity): Promise<T | null> {
-  try {
-    const response = await fetch(url, {
-      credentials: 'include',
-      method: "PATCH",
-      headers: {
-        'Content-Type': 'application/json',
-        'X-CSRFToken': getCSRFToken() || '',
-        Context: identity ? JSON.stringify(identity) : '',
-      },
-      body: JSON.stringify({
-        "description": "new description!"
-      })
-    });
-    if (!response.ok) {
-      throw Error(`Request status: ${response.status}`);
-    }
-    // Handle 204 when no content is returned
-    if (response.status === 204) {
-      return null;
-    }
-    return (await response.json()) as T;
-  } catch (error) {
-    let message;
-    if (error instanceof Error) {
-      message = error.message;
-    } else {
-      message = 'An unknown error has occured.';
-    }
-    throw Error(`Error: ${message}`);
-  }
-}
-
 /**
  *
  * Generic wrapper for fetch requests that injects the user CSRF token and identity context.
