@@ -16,9 +16,16 @@ class Request(models.Model):
     proj_completion_date = models.DateField(blank=True, null=True, verbose_name="projected completion date")
     actual_completion_date = models.DateField(blank=True, null=True)
 
+    receipt = models.OneToOneField(Receipt, blank=True, null=True, on_delete=models.PROTECT)
+
     def __str__(self):
         return f"Request #{self.pk}"
 
+    def save(self, *args, **kwargs):
+        if not (self.receipt):
+            self.receipt, _ = Receipt.objects.get_or_create()
+
+        super(Request, self).save(*args, **kwargs)
     
     class Meta:
         db_table = "request"
