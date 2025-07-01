@@ -14,7 +14,10 @@ class Receipt(models.Model):
     expert = models.ForeignKey(User, blank=True, null=True, on_delete=models.PROTECT)
 
     def __str__(self):
-        return f"Receipt for Request #{self.request.pk}"
+        # if (self.request):
+        #     return f"Receipt for Request #{self.request.pk}"
+        
+        return f"Receipt #{self.pk}"
 
     class Meta:
         db_table = "receipt"

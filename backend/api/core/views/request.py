@@ -109,8 +109,9 @@ class RequestDetailView(BaseUserAwareRequest):
         if id is None:
             return Response(data={"message": "Please provide a Request ID"}, status=status.HTTP_400_BAD_REQUEST)
         
+        maybe_request = None
         try:
-            queryset.get(pk=id)        
+            maybe_request = queryset.get(pk=id)        
         except Request.DoesNotExist:
             return Response(data={"message": "Request with given ID does not exist"}, status=status.HTTP_404_NOT_FOUND)
 
@@ -131,12 +132,13 @@ class RequestDetailView(BaseUserAwareRequest):
             if not (IsAdmin().has_permission(request, None) or IsProgramLead().has_permission(request, None)):
                 return Response(data={"message": "Insufficient privillege to update 'depth' field"}, status=status.HTTP_401_UNAUTHORIZED)
             
+            maybe_depth = None
             try:
-                Depth.objects.get(body.get("depth"))
+                maybe_depth = Depth.objects.get(pk=body.get("depth"))
             except Depth.DoesNotExist:
                 return Response(data={"message": "Provided depth does not exist."}, status=status.HTTP_400_BAD_REQUEST)
 
-            patch_data["depth"] = body.get("depth")
+            patch_data["depth"] = maybe_depth.name
 
         if body.get("actual_completion_date"):
             if not (IsAdmin().has_permission(request, None) or IsProgramLead().has_permission(request, None)):
@@ -145,12 +147,12 @@ class RequestDetailView(BaseUserAwareRequest):
             patch_data["actual_completion_date"] = body.get("actual_completion_date")
 
         if body.get("expert"):
-            if not(IsAdmin().has_object_permission(request, None) or IsLabLead().has_permission(request, None)):
+            if not(IsAdmin().has_permission(request, None) or IsLabLead().has_permission(request, None)):
                 return Response(data={"message": "Insufficient privillege to update 'expert' field"}, status=status.HTTP_401_UNAUTHORIZED)
 
             maybe_expert = None
             try:
-                maybe_expert = User.objects.get(body.get("expert"))
+                maybe_expert = User.objects.get(pk=body.get("expert"))
             except User.DoesNotExist:
                 return Response(data={"message": "Provided user in expert field does not exist."}, status=status.HTTP_400_BAD_REQUEST)
             
@@ -165,12 +167,13 @@ class RequestDetailView(BaseUserAwareRequest):
                     LabRoleAssignment.objects.get(user=maybe_expert, role=Role.objects.get(name="Expert"))
 
             except LabRoleAssignment.DoesNotExist:
-                return Response(data={"message": "Provided user in expert field does not not have expert role exist."}, status=status.HTTP_400_BAD_REQUEST)
+                return Response(data={"message": "Provided user in expert field does not not have expert role."}, status=status.HTTP_400_BAD_REQUEST)
 
             except Lab.DoesNotExist:
                 return Response(data={"message": "Provided expert does not reside in your lab role exist."}, status=status.HTTP_400_BAD_REQUEST)
+            
 
-            patch_data["expert"] = body.get("expert")
+            patch_data["expert"] = maybe_expert.email 
         
         if body.get("proj_start_date"):
             if not(IsAdmin().has_object_permission(request, None) or IsProgramLead().has_permission(request, None) or IsLabLead().has_permission(request, None) or IsExpert().has_permission(request, None)):
@@ -185,25 +188,28 @@ class RequestDetailView(BaseUserAwareRequest):
             patch_data["proj_completion_date"] = body.get("proj_completion_date")
 
         if body.get("owner"):
+            
+            maybe_owner = None
             try:
-                Owner.objects.get(body.get("owner"))
+                maybe_owner = Owner.objects.get(pk=body.get("owner"))
             except Owner.DoesNotExist:
                 return Response(data={"message": "Provided owner does not exist."}, status=status.HTTP_400_BAD_REQUEST)
 
-            patch_data["owner"] = body.get("owner")
+            patch_data["owner"] = maybe_owner.pk 
         
             
         if body.get("status"):
+            maybe_status = None
             try:
-                RequestStatus.objects.get(body.get("owner"))
+                maybe_status = RequestStatus.objects.get(pk=body.get("status"))
             except RequestStatus.DoesNotExist:
-                return Response(data={"message": "Provided owner does not exist."}, status=status.HTTP_400_BAD_REQUEST)
+                return Response(data={"message": "Provided status does not exist."}, status=status.HTTP_400_BAD_REQUEST)
 
-            patch_data["status"] = body.get("status")
+            patch_data["status"] = maybe_status.name 
     
         
        # do partial save with accumulated patch 
-        patch_serializer = RequestDetailSerializer(patch_data, partial=True)
+        patch_serializer = RequestSerializer(instance=maybe_request, data=patch_data, partial=True)
         if(patch_serializer.is_valid()):
             patch_serializer.save() 
         else:
