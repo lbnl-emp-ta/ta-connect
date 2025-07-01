@@ -5,6 +5,10 @@ interface InfoPanelProps {
   children: React.ReactNode;
 }
 
+/**
+ * Consistently styled panel for informational content.
+ * The header can be plain text or a more complex React node.
+ */
 export const InfoPanel: React.FC<InfoPanelProps> = ({ header, children }) => {
   return (
     <Paper
