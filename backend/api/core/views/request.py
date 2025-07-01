@@ -109,9 +109,8 @@ class RequestDetailView(BaseUserAwareRequest):
         if id is None:
             return Response(data={"message": "Please provide a Request ID"}, status=status.HTTP_400_BAD_REQUEST)
         
-        found_request = None
         try:
-            found_request = queryset.get(pk=id)        
+            queryset.get(pk=id)        
         except Request.DoesNotExist:
             return Response(data={"message": "Request with given ID does not exist"}, status=status.HTTP_404_NOT_FOUND)
 
@@ -120,7 +119,7 @@ class RequestDetailView(BaseUserAwareRequest):
         patch_data = dict()
 
         if not body:
-            return Response(data={"message": "Missing request body"}, status=status.HTTP_404_NOT_FOUND)
+            return Response(data={"message": "Missing request body"}, status=status.HTTP_204_NO_CONTENT)
         
         if body.get("description"):
             if not (IsAdmin().has_permission(request, None) or IsProgramLead().has_permission(request, None) or IsCoordinator().has_permission(request, None)):
@@ -149,12 +148,27 @@ class RequestDetailView(BaseUserAwareRequest):
             if not(IsAdmin().has_object_permission(request, None) or IsLabLead().has_permission(request, None)):
                 return Response(data={"message": "Insufficient privillege to update 'expert' field"}, status=status.HTTP_401_UNAUTHORIZED)
 
+            maybe_expert = None
             try:
-                User.objects.get(body.get("expert"))
+                maybe_expert = User.objects.get(body.get("expert"))
             except User.DoesNotExist:
-                return Response(data={"message": "Provided expert user does not exist."}, status=status.HTTP_400_BAD_REQUEST)
+                return Response(data={"message": "Provided user in expert field does not exist."}, status=status.HTTP_400_BAD_REQUEST)
             
             # Need to check provided user has expert role
+            try:
+                # if they are lab lead, check to see if expert is in their lab
+                if IsLabLead().has_permission(request, None):
+                    LabRoleAssignment.objects.get(user=maybe_expert, role=Role.objects.get(name="Expert"), instance=Lab.objects.get(pk=context.get("instance")))
+
+                # if they are admin best we can do is check if they are an expert
+                else:
+                    LabRoleAssignment.objects.get(user=maybe_expert, role=Role.objects.get(name="Expert"))
+
+            except LabRoleAssignment.DoesNotExist:
+                return Response(data={"message": "Provided user in expert field does not not have expert role exist."}, status=status.HTTP_400_BAD_REQUEST)
+
+            except Lab.DoesNotExist:
+                return Response(data={"message": "Provided expert does not reside in your lab role exist."}, status=status.HTTP_400_BAD_REQUEST)
 
             patch_data["expert"] = body.get("expert")
         
@@ -176,8 +190,6 @@ class RequestDetailView(BaseUserAwareRequest):
             except Owner.DoesNotExist:
                 return Response(data={"message": "Provided owner does not exist."}, status=status.HTTP_400_BAD_REQUEST)
 
-            # Need to check if can actually assign to that owner
-
             patch_data["owner"] = body.get("owner")
         
             
@@ -190,23 +202,16 @@ class RequestDetailView(BaseUserAwareRequest):
             patch_data["status"] = body.get("status")
     
         
-        
        # do partial save with accumulated patch 
-        
-        
+        patch_serializer = RequestDetailSerializer(patch_data, partial=True)
+        if(patch_serializer.is_valid()):
+            patch_serializer.save() 
+        else:
+            return Response(data={"message": patch_serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
 
-        # Need privilege heirachy. Admin -> (Reception | Program -> Lab -> Expert)
-        #
-        # Owner -> Expert+ via assignment
-        # expert -> Lab+ via assignment
-        # status -> Expert+ but in the own lane
-        # depth -> Program or Admin
-        # description -> Program or Admin
-        # proj dates -> Expert+
-        # actual comp date -> Program or Admin
-        
 
-        return Response(data={"message": "Not implemented yet"}, status=status.HTTP_400_BAD_REQUEST)
+        return self.get(request, None, id)
+
 
 class RequestListView(BaseUserAwareRequest):
     serializer = RequestSerializer
