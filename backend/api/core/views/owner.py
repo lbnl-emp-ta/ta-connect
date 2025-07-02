@@ -20,7 +20,7 @@ class OwnerListView(views.APIView):
     ]
 
     def get_queryset(self):
-        queryset = OwnerSerializer.objects.all()
+        queryset = Owner.objects.all()
 
         maybe_context = self.request.headers.get("Context")
         if maybe_context is None:
@@ -32,24 +32,25 @@ class OwnerListView(views.APIView):
             return queryset
 
         if IsCoordinator().has_permission(self.request, self):
+            # See one layer down to programs
             return queryset.filter(domain_type="program")
 
         if IsProgramLead().has_permission(self.request, self):
             program = Program.objects.get(pk=context.get("instance"))
 
             lab_owners = queryset.none() 
-            for lab in program.labs:
+            for lab in program.labs.all():
+                print(lab)
                 lab_owners = lab_owners | Owner.objects.filter(pk=lab.owner.pk)
 
+            # See one layer back up to reception, and one layer down to associated labs 
             return queryset.filter(domain_type="reception") | lab_owners 
 
-        assignment = LabRoleAssignment.get(user=User.objects.get(pk=context.get("user")), role=Role.objects.get(pk=context.get("role")), instance=Lab.objects.get(pk=context.get("instance")))
+        assignment = LabRoleAssignment.objects.get(user=User.objects.get(pk=context.get("user")), role=Role.objects.get(pk=context.get("role")), instance=Lab.objects.get(pk=context.get("instance")))
 
         if IsLabLead().has_permission(self.request, self):
+            # Only one layer up, Experts are a role within Labs - not another layer
             return Owner.objects.filter(domain_type="program", program=assignment.program)
-        
-        # if IsExpert().has_permission(self.request, self):
-        #     return Owner.objects.filter(domain_type="lab", lab=assignment.instance)
     
     def get(self, request, format=None):
         queryset = self.get_queryset()
