@@ -97,6 +97,127 @@ class RequestDetailView(BaseUserAwareRequest):
 
         return Response(data=response_data, status=status.HTTP_200_OK)
 
+    def patch(self, request, id=None):
+        queryset = self.get_queryset()
+
+        maybe_context = self.request.headers.get("Context")
+        if maybe_context is None:
+            return Response(data={"message": "Please provide context object header with request"}, status=status.HTTP_400_BAD_REQUEST)
+            
+        context = json.loads(maybe_context)
+
+        if id is None:
+            return Response(data={"message": "Please provide a Request ID"}, status=status.HTTP_400_BAD_REQUEST)
+        
+        maybe_request = None
+        try:
+            maybe_request = queryset.get(pk=id)        
+        except Request.DoesNotExist:
+            return Response(data={"message": "Request with given ID does not exist"}, status=status.HTTP_404_NOT_FOUND)
+
+        body = json.loads(request.body)
+
+        patch_data = dict()
+
+        if not body:
+            return Response(data={"message": "Missing request body"}, status=status.HTTP_204_NO_CONTENT)
+        
+        if body.get("description"):
+            if not (IsAdmin().has_permission(request, None) or IsProgramLead().has_permission(request, None) or IsCoordinator().has_permission(request, None)):
+                return Response(data={"message": "Insufficient privillege to update 'description' field"}, status=status.HTTP_401_UNAUTHORIZED)
+
+            patch_data["description"] = body.get("description")
+
+        if body.get("depth"):
+            if not (IsAdmin().has_permission(request, None) or IsProgramLead().has_permission(request, None)):
+                return Response(data={"message": "Insufficient privillege to update 'depth' field"}, status=status.HTTP_401_UNAUTHORIZED)
+            
+            maybe_depth = None
+            try:
+                maybe_depth = Depth.objects.get(pk=body.get("depth"))
+            except Depth.DoesNotExist:
+                return Response(data={"message": "Provided depth does not exist."}, status=status.HTTP_400_BAD_REQUEST)
+
+            patch_data["depth"] = maybe_depth.name
+
+        if body.get("actual_completion_date"):
+            if not (IsAdmin().has_permission(request, None) or IsProgramLead().has_permission(request, None)):
+                return Response(data={"message": "Insufficient privillege to update 'depth' field"}, status=status.HTTP_401_UNAUTHORIZED)
+
+            patch_data["actual_completion_date"] = body.get("actual_completion_date")
+
+        if body.get("expert"):
+            if not(IsAdmin().has_permission(request, None) or IsLabLead().has_permission(request, None)):
+                return Response(data={"message": "Insufficient privillege to update 'expert' field"}, status=status.HTTP_401_UNAUTHORIZED)
+
+            maybe_expert = None
+            try:
+                maybe_expert = User.objects.get(pk=body.get("expert"))
+            except User.DoesNotExist:
+                return Response(data={"message": "Provided user in expert field does not exist."}, status=status.HTTP_400_BAD_REQUEST)
+            
+            # Need to check provided user has expert role
+            try:
+                # if they are lab lead, check to see if expert is in their lab
+                if IsLabLead().has_permission(request, None):
+                    LabRoleAssignment.objects.get(user=maybe_expert, role=Role.objects.get(name="Expert"), instance=Lab.objects.get(pk=context.get("instance")))
+
+                # if they are admin best we can do is check if they are an expert
+                else:
+                    LabRoleAssignment.objects.get(user=maybe_expert, role=Role.objects.get(name="Expert"))
+
+            except LabRoleAssignment.DoesNotExist:
+                return Response(data={"message": "Provided user in expert field does not not have expert role."}, status=status.HTTP_400_BAD_REQUEST)
+
+            except Lab.DoesNotExist:
+                return Response(data={"message": "Provided expert does not reside in your lab role exist."}, status=status.HTTP_400_BAD_REQUEST)
+            
+
+            patch_data["expert"] = maybe_expert.email 
+        
+        if body.get("proj_start_date"):
+            if not(IsAdmin().has_object_permission(request, None) or IsProgramLead().has_permission(request, None) or IsLabLead().has_permission(request, None) or IsExpert().has_permission(request, None)):
+                return Response(data={"message": "Insufficient privillege to update 'expert' field"}, status=status.HTTP_401_UNAUTHORIZED)
+
+            patch_data["proj_start_date"] = body.get("proj_start_date")
+
+        if body.get("proj_completion_date"):
+            if not(IsAdmin().has_object_permission(request, None) or IsProgramLead().has_permission(request, None) or IsLabLead().has_permission(request, None) or IsExpert().has_permission(request, None)):
+                return Response(data={"message": "Insufficient privillege to update 'expert' field"}, status=status.HTTP_401_UNAUTHORIZED)
+
+            patch_data["proj_completion_date"] = body.get("proj_completion_date")
+
+        if body.get("owner"):
+            
+            maybe_owner = None
+            try:
+                maybe_owner = Owner.objects.get(pk=body.get("owner"))
+            except Owner.DoesNotExist:
+                return Response(data={"message": "Provided owner does not exist."}, status=status.HTTP_400_BAD_REQUEST)
+
+            patch_data["owner"] = maybe_owner.pk 
+        
+            
+        if body.get("status"):
+            maybe_status = None
+            try:
+                maybe_status = RequestStatus.objects.get(pk=body.get("status"))
+            except RequestStatus.DoesNotExist:
+                return Response(data={"message": "Provided status does not exist."}, status=status.HTTP_400_BAD_REQUEST)
+
+            patch_data["status"] = maybe_status.name 
+    
+        
+       # do partial save with accumulated patch 
+        patch_serializer = RequestSerializer(instance=maybe_request, data=patch_data, partial=True)
+        if(patch_serializer.is_valid()):
+            patch_serializer.save() 
+        else:
+            return Response(data={"message": patch_serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
+
+
+        return self.get(request, None, id)
+
 
 class RequestListView(BaseUserAwareRequest):
     serializer = RequestSerializer
