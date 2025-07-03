@@ -222,48 +222,8 @@ class RequestDetailView(BaseUserAwareRequest):
 class RequestListView(BaseUserAwareRequest):
     serializer = RequestSerializer
     
-    # we want id, date_created, status, depth, poc customer name, poc customer email, expert
-    # also we filter on search params
     def get(self, request, format=None):
         queryset = self.get_queryset()
-
-        # filter requests based on search params
-        # user = self.kwargs.get("user")
-        # role = self.kwargs.get("role")
-        # location = self.kwargs.get("location")
-        # instance = self.kwargs.get("instance")
-
-        # Unused for now
-        # if user is not None:
-        #     queryset = queryset.filter(user=User.objects.get(user))
-        
-        # if role is not None:
-        #     queryset = queryset.filter(role=Role.objects.get(name=role.lower().capitalize()))
-        
-        # if location is not None:
-        #     location_filter = None
-        #     match location.lower():
-        #         case "reception":
-        #             location_filter = "Reception"
-        #             pass
-        #         case "program":
-        #             location_filter = "Program"
-        #             pass
-        #         case "lab":
-        #             location_filter = "Lab"
-        #             pass
-            
-        #     if location_filter is not None:
-        #         queryset = queryset.filter(owner__domain_type=location_filter)
-
-        #     if instance is not None:
-        #         reception_queryset = queryset.filter(owner__reception=Reception.objects.get(instance))
-        #         program_queryset = queryset.filter(owner__program=Program.objects.get(instance))
-        #         lab_queryset = queryset.filter(owner__lab=Lab.objects.get(instance))
-
-        #         queryset = reception_queryset | program_queryset | lab_queryset
-            
-                
         
         serializer = RequestListSerializer(queryset, many=True)
         response_data = list() 
@@ -275,43 +235,3 @@ class RequestListView(BaseUserAwareRequest):
             response_data.append(data)
         
         return Response(data=response_data, status=status.HTTP_200_OK)
-
-
-# class RequestCreateView(generics.CreateAPIView):
-#     queryset = Request.objects.all().select_related("status", "depth", "owner")
-#     serializer_class = RequestSerializer
-
-#     authentication_classes = [
-#         authentication.SessionAuthentication,
-#         XSessionTokenAuthentication,
-#     ]
-
-#     permission_classes = [
-#         permissions.IsAuthenticated,
-#     ]
-
-    
-#     def post(self, request):
-#         imcoming_fields_to_keep = ["description", "depth"]
-#         incoming_data = request.data.copy()
-        
-#         # Filter incoming fields
-#         for field in request.data:
-#             if field not in imcoming_fields_to_keep:
-#                 incoming_data.pop(field)
-        
-#         # ** From source code of CreateModelMixin **
-#         serializer = self.get_serializer(data=incoming_data)
-#         serializer.is_valid(raise_exception=True)
-#         self.perform_create(serializer)
-#         headers = self.get_success_headers(serializer.data)
-        
-#         outgoing_fields_to_keep = ["description", "depth", "date_created"]
-#         outgoing_data = serializer.data.copy()
-        
-#         # Filter outgoing fields
-#         for field in serializer.data:
-#             if field not in outgoing_fields_to_keep:
-#                 outgoing_data.pop(field)
-                
-#         return Response(outgoing_data, status=status.HTTP_201_CREATED, headers=headers)
