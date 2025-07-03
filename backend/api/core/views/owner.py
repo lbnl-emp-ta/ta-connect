@@ -36,6 +36,7 @@ class OwnerListView(views.APIView):
             return queryset.filter(domain_type="program")
 
         if IsProgramLead().has_permission(self.request, self):
+            # if we get here, it means "instance" field must be valid so no need to check
             program = Program.objects.get(pk=context.get("instance"))
 
             lab_owners = queryset.none() 
