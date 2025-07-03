@@ -44,19 +44,6 @@ export const identitiesQueryOptions = () =>
     queryFn: () => fetchData<TAIdentity[]>(`${import.meta.env.VITE_API_URL}/identities/`),
   });
 
-export const ownersQueryOptions = (identity?: Identity) =>
-  queryOptions({
-    staleTime: 120_000, // stale after 2 minutes
-    queryKey: ['owners', identity],
-    queryFn: () => {
-      if (identity) {
-        return fetchData<TARequest[]>(`${import.meta.env.VITE_API_URL}/owners/`, identity);
-      } else {
-        return [];
-      }
-    },
-  });
-
 export const requestsQueryOptions = (identity?: Identity) =>
   queryOptions({
     staleTime: 120_000, // stale after 2 minutes

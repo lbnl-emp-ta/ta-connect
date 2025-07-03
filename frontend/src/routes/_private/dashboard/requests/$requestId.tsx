@@ -18,10 +18,10 @@ import DateRangeIcon from '@mui/icons-material/DateRange';
 import EastIcon from '@mui/icons-material/East';
 import EditIcon from '@mui/icons-material/Edit';
 import WestIcon from '@mui/icons-material/West';
-import { useQuery, useSuspenseQuery } from '@tanstack/react-query';
+import { useSuspenseQuery } from '@tanstack/react-query';
 import { createFileRoute } from '@tanstack/react-router';
 import { RequestInfoPanel } from '../../../../features/requests/RequestInfoPanel';
-import { requestDetailQueryOptions, ownersQueryOptions } from '../../../../utils/queryOptions';
+import { requestDetailQueryOptions } from '../../../../utils/queryOptions';
 import { AppLink } from '../../../../components/AppLink';
 import { useState } from 'react';
 import { useRequestsContext } from '../../../../features/requests/RequestsContext';
@@ -29,8 +29,6 @@ import { useIdentityContext } from '../../../../features/identity/IdentityContex
 import { RequestCustomerPanel } from '../../../../features/requests/RequestCustomerPanel';
 import { InfoPanel } from '../../../../components/InfoPanel';
 import { TabPanel } from '../../../../components/TabPanel';
-import { fetchData } from '../../../../utils/utils';
-import { TARequest } from '../../../../api/dashboard/types';
 
 export const Route = createFileRoute('/_private/dashboard/requests/$requestId')({
   loader: async ({ context, params }) => {
@@ -62,7 +60,6 @@ function SelectedRequest() {
   const [tabValue, setTabValue] = useState<string | number>('attachments');
 
   const handleClickActionsMenu = (event: React.MouseEvent<HTMLButtonElement>) => {
-    fetchData<TARequest[]>(`${import.meta.env.VITE_API_URL}/owners/`, identity);
     setActionsAnchorEl(event.currentTarget);
   };
 
