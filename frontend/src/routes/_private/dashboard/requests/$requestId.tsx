@@ -36,7 +36,6 @@ export const Route = createFileRoute('/_private/dashboard/requests/$requestId')(
       requestDetailQueryOptions(params.requestId, context.identity)
     );
 
-
   },
   component: SelectedRequest,
 });

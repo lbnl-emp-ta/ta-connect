@@ -10,8 +10,10 @@ from .cohort import CohortCreateView, CohortAddCustomerView
 from .intake_form import ProcessIntakeForm
 from .identity import IdentityListView
 from .status import StatusListView
+from .owner import OwnerListView
 
 __all__ = [
+    "OwnerListView",
     "StatusListView",
     "IdentityListView",
     "RequestListView",

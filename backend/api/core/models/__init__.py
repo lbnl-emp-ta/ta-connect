@@ -2,8 +2,8 @@ from .request_status import RequestStatus
 from .depth import Depth
 from .user import User
 from .reception import Reception
-from .program import Program
 from .lab import Lab
+from .program import Program
 from .owner import Owner
 from .receipt import Receipt
 from .request import Request
