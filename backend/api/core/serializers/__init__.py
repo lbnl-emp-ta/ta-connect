@@ -1,4 +1,8 @@
 from .user import UserLeanSerializer
+from .state import StateSerializer
+from .transmission_planning_region import TransmissionPlanningRegionSerializer
+from .organization_type import OrganizationTypeSerializer
+from .organization import OrganizationSerializer
 from .customer import CustomerSerializer
 from .depth import DepthSerializer
 from .lab import LabSerializer
@@ -8,10 +12,6 @@ from .role import RoleSerializer
 from .request_status import RequestStatusSerializer
 from .owner import OwnerSerializer
 from .request import RequestSerializer, RequestListSerializer, RequestDetailSerializer
-from .state import StateSerializer
-from .organization_type import OrganizationTypeSerializer
-from .organization import OrganizationSerializer
-from .transmission_planning_region import TransmissionPlanningRegionSerializer
 from .customer_type import CustomerTypeSerializer
 from .customer_request_relationship import CustomerRequestRelationshipSerializer
 from .cohort import CohortSerializer
