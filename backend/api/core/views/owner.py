@@ -47,9 +47,10 @@ class OwnerListView(views.APIView):
             # See one layer back up to reception, and one layer down to associated labs 
             return queryset.filter(domain_type="reception") | lab_owners 
 
-        assignment = LabRoleAssignment.objects.get(user=User.objects.get(pk=context.get("user")), role=Role.objects.get(pk=context.get("role")), instance=Lab.objects.get(pk=context.get("instance")))
 
         if IsLabLead().has_permission(self.request, self):
+            assignment = LabRoleAssignment.objects.get(user=User.objects.get(pk=context.get("user")), role=Role.objects.get(pk=context.get("role")), instance=Lab.objects.get(pk=context.get("instance")))
+
             # Only one layer up, Experts are a role within Labs - not another layer
             return Owner.objects.filter(domain_type="program", program=assignment.program)
     
