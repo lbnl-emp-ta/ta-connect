@@ -1,7 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { useState } from 'react';
 import { Box, Button, Container, Divider, TextField, Typography, Grid } from '@mui/material';
-import { useSigupMutation } from '../../utils/queryOptions';
+import { useSignupMutation } from '../../utils/queryOptions';
 
 export const Route = createFileRoute('/_public-only/signup')({
   component: SignupForm,
@@ -14,7 +14,7 @@ function SignupForm() {
   const [passwordError, setPasswordError] = useState(false);
   const [passwordHelperText, setPasswordHelperText] = useState('');
 
-  const signupMutation = useSigupMutation();
+  const signupMutation = useSignupMutation();
 
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();

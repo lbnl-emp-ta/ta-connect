@@ -15,10 +15,11 @@ import {
   TAIdentity,
   TARequest,
   TARequestDetail,
+  TAStatus,
 } from '../api/dashboard/types';
 import { queryClient } from '../App';
 import { Identity } from '../features/identity/IdentityContext';
-import { fetchData } from './utils';
+import { fetchData, patchRequest } from '../api/dashboard';
 
 export const authSessionQueryOptions = () =>
   queryOptions({
@@ -60,8 +61,7 @@ export const requestsQueryOptions = (identity?: Identity) =>
 export const requestDetailQueryOptions = (requestId: string, identity?: Identity) =>
   queryOptions({
     staleTime: 120_000, // stale after 2 minutes
-    // Does identity need to be included in the query key for request detail?
-    queryKey: ['request', identity, `requestId:${requestId}`],
+    queryKey: ['requests', requestId, identity],
     queryFn: () => {
       if (identity) {
         return fetchData<TARequestDetail>(
@@ -70,6 +70,19 @@ export const requestDetailQueryOptions = (requestId: string, identity?: Identity
         );
       } else {
         return null;
+      }
+    },
+  });
+
+export const statusesQueryOptions = (identity?: Identity) =>
+  queryOptions({
+    staleTime: 120_000, // stale after 2 minutes
+    queryKey: ['statuses', identity],
+    queryFn: () => {
+      if (identity) {
+        return fetchData<TAStatus[]>(`${import.meta.env.VITE_API_URL}/statuses/`, identity);
+      } else {
+        return [];
       }
     },
   });
@@ -107,7 +120,7 @@ export const useSubmitIntakeMutation = () => {
   });
 };
 
-export const useSigupMutation = () => {
+export const useSignupMutation = () => {
   return useMutation({
     mutationFn: signupMutation,
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['authSession'] }),
@@ -125,5 +138,13 @@ export const useLogoutMutation = () => {
   return useMutation({
     mutationFn: logoutMutation,
     onSettled: () => queryClient.invalidateQueries({ queryKey: ['authSession'] }),
+  });
+};
+
+export const useRequestMutation = (requestId: string, identity?: Identity) => {
+  return useMutation({
+    mutationKey: ['requests', 'update', requestId, identity],
+    mutationFn: (data: Partial<TARequest>) => patchRequest(requestId, data, identity),
+    onSuccess: () => queryClient.invalidateQueries(),
   });
 };

@@ -21,7 +21,7 @@ import WestIcon from '@mui/icons-material/West';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { createFileRoute } from '@tanstack/react-router';
 import { RequestInfoPanel } from '../../../../features/requests/RequestInfoPanel';
-import { requestDetailQueryOptions } from '../../../../utils/queryOptions';
+import { requestDetailQueryOptions, statusesQueryOptions } from '../../../../utils/queryOptions';
 import { AppLink } from '../../../../components/AppLink';
 import { useState } from 'react';
 import { useRequestsContext } from '../../../../features/requests/RequestsContext';
@@ -35,6 +35,7 @@ export const Route = createFileRoute('/_private/dashboard/requests/$requestId')(
     await context.queryClient.ensureQueryData(
       requestDetailQueryOptions(params.requestId, context.identity)
     );
+    await context.queryClient.ensureQueryData(statusesQueryOptions(context.identity));
   },
   component: SelectedRequest,
 });

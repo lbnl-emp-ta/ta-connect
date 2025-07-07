@@ -30,6 +30,12 @@ export interface TARequest {
   actual_completion_date: string | null;
 }
 
+export interface TAStatus {
+  id: number;
+  name: string;
+  description: string;
+}
+
 export interface TARequestDetail {
   id: number;
   status: string;

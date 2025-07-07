@@ -1,29 +1,61 @@
 import {
-  TableContainer,
+  Chip,
+  IconButton,
+  Stack,
   Table,
-  TableRow,
   TableBody,
   TableCell,
+  TableContainer,
+  TableRow,
+  TextField,
   Typography,
-  Stack,
-  Box,
 } from '@mui/material';
+import EditIcon from '@mui/icons-material/Edit';
+import CheckIcon from '@mui/icons-material/Check';
+import ClearIcon from '@mui/icons-material/Clear';
 import { TARequestDetail } from '../../api/dashboard/types';
-import { capitalize, formatDate } from '../../utils/utils';
 import { InfoPanel } from '../../components/InfoPanel';
+import { capitalize, formatDate } from '../../utils/utils';
+import { useEffect, useState } from 'react';
+import { useIdentityContext } from '../identity/IdentityContext';
+import { useRequestMutation } from '../../utils/queryOptions';
 
 interface RequestInfoPanelProps {
   request?: TARequestDetail;
 }
 
 export const RequestInfoPanel: React.FC<RequestInfoPanelProps> = ({ request }) => {
+  const { identity } = useIdentityContext();
+  const updateRequestMutation = useRequestMutation(request?.id.toString() || '', identity);
+  const [description, setDescription] = useState('');
+  const [editingDescription, setEditingDescription] = useState(false);
+  const [hoveringDescription, setHoveringDescription] = useState(false);
+
+  const handleDescriptionMouseOver = () => {
+    setHoveringDescription(true);
+  };
+
+  const handleDescriptionMouseOut = () => {
+    setHoveringDescription(false);
+  };
+
+  const handleDescriptionChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setDescription(event.target.value);
+  };
+
+  const handleDescriptionSubmit = () => {
+    updateRequestMutation.mutate({ description });
+  };
+
+  useEffect(() => {
+    if (request) {
+      setDescription(request.description || '');
+    }
+  }, [request]);
+
   return (
     <InfoPanel header="Request Information">
-      {!request && (
-        <Box>
-          <Typography>No request data to show.</Typography>
-        </Box>
-      )}
+      {!request && <Typography>No request data to show.</Typography>}
       {request && (
         <>
           <TableContainer>
@@ -49,7 +81,13 @@ export const RequestInfoPanel: React.FC<RequestInfoPanelProps> = ({ request }) =
                 </TableRow>
                 <TableRow>
                   <TableCell>Status</TableCell>
-                  <TableCell>{request.status || 'Unknown'}</TableCell>
+                  <TableCell>
+                    <Chip
+                      label={request.status ? request.status : 'Unknown'}
+                      color="primary"
+                      variant="outlined"
+                    />
+                  </TableCell>
                 </TableRow>
                 <TableRow>
                   <TableCell>Depth</TableCell>
@@ -89,11 +127,50 @@ export const RequestInfoPanel: React.FC<RequestInfoPanelProps> = ({ request }) =
               </TableBody>
             </Table>
           </TableContainer>
-          <Stack sx={{ padding: 2 }}>
-            <Typography fontSize="0.875rem">Description</Typography>
-            <Typography fontSize="0.875rem">
-              {request.description || 'No description for this request.'}
-            </Typography>
+          <Stack
+            onMouseOver={handleDescriptionMouseOver}
+            onMouseOut={handleDescriptionMouseOut}
+            sx={{ padding: 2 }}
+          >
+            <Stack direction="row" alignItems="center" justifyContent="space-between">
+              <Typography fontSize="0.875rem">Description</Typography>
+              {!editingDescription && (
+                <IconButton
+                  size="small"
+                  onClick={() => setEditingDescription(!editingDescription)}
+                  sx={{ opacity: hoveringDescription ? 1 : 0 }}
+                >
+                  <EditIcon fontSize="small" />
+                </IconButton>
+              )}
+              {editingDescription && (
+                <Stack direction="row">
+                  <IconButton size="small" onClick={handleDescriptionSubmit}>
+                    <CheckIcon fontSize="small" />
+                  </IconButton>
+                  <IconButton
+                    size="small"
+                    onClick={() => setEditingDescription(!editingDescription)}
+                  >
+                    <ClearIcon fontSize="small" />
+                  </IconButton>
+                </Stack>
+              )}
+            </Stack>
+            {!editingDescription && (
+              <Typography fontSize="0.875rem">
+                {request.description || 'No description for this request.'}
+              </Typography>
+            )}
+            {editingDescription && (
+              <TextField
+                fullWidth
+                multiline
+                variant="outlined"
+                value={description}
+                onChange={handleDescriptionChange}
+              />
+            )}
           </Stack>
         </>
       )}
