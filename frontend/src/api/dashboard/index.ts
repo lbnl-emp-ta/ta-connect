@@ -42,7 +42,7 @@ export async function patchRequest(
   const url = `${import.meta.env.VITE_API_URL}/requests/${requestId}`;
   try {
     const response = await fetch(url, {
-      method: 'POST',
+      method: 'PATCH',
       credentials: 'include',
       headers: {
         'Content-Type': 'application/json',

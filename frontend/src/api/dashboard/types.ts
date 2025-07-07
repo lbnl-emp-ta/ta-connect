@@ -47,6 +47,7 @@ export interface TARequestDetail {
   proj_start_date: string | null;
   proj_end_date: string | null;
   actual_completion_date: string | null;
+  topics: string[];
 }
 
 export interface TAIdentity {
