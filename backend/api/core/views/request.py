@@ -43,33 +43,33 @@ class BaseUserAwareRequest(views.APIView):
         program_assignments = ProgramRoleAssignment.objects.filter(user=user)
         lab_assignments = LabRoleAssignment.objects.filter(user=user)
 
-        visible_requests = queryset.none() 
+        actionable_requests = queryset.none() 
 
         if  IsCoordinator().has_permission(self.request, self):
             COORDINATOR_ROLE = Role.objects.get(name="Coordinator")
             coordinator_assignments = reception_assignments.filter(role=COORDINATOR_ROLE)
             for assignment in coordinator_assignments:
-                    visible_requests = visible_requests.union(assignment.instance.owner.request_set.all())
+                    actionable_requests = actionable_requests.union(assignment.instance.owner.request_set.all())
 
         elif IsProgramLead().has_permission(self.request, self):
             PROGRAM_LEAD_ROLE = Role.objects.get(name="Program Lead")
             program_lead_assignments = program_assignments.filter(role=PROGRAM_LEAD_ROLE)
             for assignment in program_lead_assignments:
-                    visible_requests = visible_requests.union(assignment.instance.owner.request_set.all())
+                    actionable_requests = actionable_requests.union(assignment.instance.owner.request_set.all())
 
         elif IsLabLead().has_permission(self.request, self):
             LAB_LEAD_ROLE = Role.objects.get(name="Lab Lead")
             lab_lead_assignments = lab_assignments.filter(role=LAB_LEAD_ROLE)
             for assignment in lab_lead_assignments:
-                    visible_requests = visible_requests.union(assignment.instance.owner.request_set.all())
+                    actionable_requests = actionable_requests.union(assignment.instance.owner.request_set.all())
 
         elif IsExpert().has_permission(self.request, self):
             EXPERT_ROLE = Role.objects.get(name="Expert")
             expert_assignments = lab_assignments.filter(role=EXPERT_ROLE)
             for assignment in expert_assignments:
-                    visible_requests = visible_requests.union(assignment.instance.owner.request_set.all())
+                    actionable_requests = actionable_requests.union(assignment.instance.owner.request_set.all())
 
-        return visible_requests 
+        return actionable_requests 
 
 class RequestDetailView(BaseUserAwareRequest):
     serializer = RequestDetailSerializer() 
@@ -222,8 +222,25 @@ class RequestDetailView(BaseUserAwareRequest):
 class RequestListView(BaseUserAwareRequest):
     serializer = RequestSerializer
     
+    # split up into actionable and downstream
     def get(self, request, format=None):
         queryset = self.get_queryset()
+
+        maybe_context = self.request.headers.get("Context")
+
+        # Admin: None or Everything
+        # Reception: None
+        # Program: in one of labs
+        # Lab: assigned to an experts at same lab for same program
+
+        # Steps for downstream:
+        # 1.                get identity info from context 
+        # 2.                get location in which user's identity is based
+        # 3.                * decision tree based on Role *
+        # 3a Coordinator.   everything they touch downstream
+        # 3b Admin.         return all requests (i.e. return entire queryset)
+        # 3c Program Lead.  get the labs that are associated with program and return requests associated with program that are assigned to the labs
+        # 3d Lab Lead.      get all requests in lab that are part of same program that are assigned to an expert
         
         serializer = RequestListSerializer(queryset, many=True)
         response_data = list() 
