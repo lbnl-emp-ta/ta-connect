@@ -2,6 +2,9 @@ import {
   Chip,
   CircularProgress,
   IconButton,
+  MenuItem,
+  Select,
+  SelectChangeEvent,
   Stack,
   Table,
   TableBody,
@@ -20,6 +23,9 @@ import { capitalize, formatDate } from '../../utils/utils';
 import { useEffect, useState } from 'react';
 import { useIdentityContext } from '../identity/IdentityContext';
 import { useRequestMutation } from '../../utils/queryOptions';
+import { DatePicker } from '@mui/x-date-pickers';
+import dayjs, { Dayjs } from 'dayjs';
+import { PickerValue } from '@mui/x-date-pickers/internals';
 
 interface RequestInfoPanelProps {
   request?: TARequestDetail;
@@ -29,6 +35,10 @@ export const RequestInfoPanel: React.FC<RequestInfoPanelProps> = ({ request }) =
   const { identity } = useIdentityContext();
   const updateRequestMutation = useRequestMutation(request?.id.toString() || '', identity);
   const [editing, setEditing] = useState(false);
+  const [depth, setDepth] = useState<TARequestDetail['depth']>();
+  const [projectedStartDate, setProjectedStartDate] = useState<Dayjs>();
+  const [projectedCompletionDate, setProjectedCompletionDate] = useState<Dayjs>();
+  const [actualCompletionDate, setActualCompletionDate] = useState<Dayjs>();
   const [description, setDescription] = useState('');
   const [topics, setTopics] = useState<TARequestDetail['topics']>([]);
 
@@ -36,22 +46,45 @@ export const RequestInfoPanel: React.FC<RequestInfoPanelProps> = ({ request }) =
     setEditing(true);
   };
 
-  const handleDescriptionChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setDescription(event.target.value);
+  const handleEditSubmit = () => {
+    updateRequestMutation.mutate({
+      depth,
+      // proj_start_date: projectedStartDate?.toISOString(),
+      description,
+    });
   };
 
-  const handleDescriptionSubmit = () => {
-    updateRequestMutation.mutate({ description });
-  };
-
-  const handleDescriptionCancel = () => {
+  const handleEditCancel = () => {
     updateRequestMutation.reset();
+    setDepth(request?.depth);
     setDescription(request?.description || '');
     setEditing(false);
   };
 
+  const handleDepthChange = (event: SelectChangeEvent) => {
+    setDepth(event.target.value);
+  };
+
+  const handleDescriptionChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setDescription(event.target.value);
+  };
+
+  const handleProjectedStartDateChange = (value: PickerValue) => {
+    setProjectedStartDate(value as Dayjs);
+  };
+
+  const handleProjectedCompletionDateChange = (value: PickerValue) => {
+    setProjectedCompletionDate(value as Dayjs);
+  };
+
+  const handleActualCompletionDateChange = (value: PickerValue) => {
+    setActualCompletionDate(value as Dayjs);
+  };
+
   useEffect(() => {
     if (request) {
+      setDepth(request.depth);
+      setProjectedStartDate(dayjs(request.proj_start_date));
       setTopics(request.topics || []);
       setDescription(request.description || '');
     }
@@ -78,12 +111,12 @@ export const RequestInfoPanel: React.FC<RequestInfoPanelProps> = ({ request }) =
           {editing && (
             <Stack direction="row">
               {!updateRequestMutation.isPending && (
-                <IconButton color="info" onClick={handleDescriptionSubmit}>
+                <IconButton color="info" onClick={handleEditSubmit}>
                   <CheckIcon />
                 </IconButton>
               )}
               {updateRequestMutation.isPending && <CircularProgress />}
-              <IconButton color="info" onClick={handleDescriptionCancel}>
+              <IconButton color="info" onClick={handleEditCancel}>
                 <ClearIcon />
               </IconButton>
             </Stack>
@@ -127,7 +160,16 @@ export const RequestInfoPanel: React.FC<RequestInfoPanelProps> = ({ request }) =
                 </TableRow>
                 <TableRow>
                   <TableCell>Depth</TableCell>
-                  <TableCell>{request.depth || 'Unknown'}</TableCell>
+                  <TableCell>
+                    {!editing && <Typography>{request.depth || 'Unknown'}</Typography>}
+                    {editing && (
+                      <Select value={depth} onChange={handleDepthChange}>
+                        <MenuItem value="Help Desk">Help Desk</MenuItem>
+                        <MenuItem value="Expert Match">Expert Match</MenuItem>
+                        <MenuItem value="Unsure">Unsure</MenuItem>
+                      </Select>
+                    )}
+                  </TableCell>
                 </TableRow>
                 <TableRow>
                   <TableCell>Date Submitted</TableCell>
@@ -136,23 +178,55 @@ export const RequestInfoPanel: React.FC<RequestInfoPanelProps> = ({ request }) =
                   </TableCell>
                 </TableRow>
                 <TableRow>
-                  <TableCell>Project Start Date</TableCell>
+                  <TableCell>Projected Start Date</TableCell>
                   <TableCell>
-                    {request.proj_start_date ? formatDate(request.proj_start_date) : 'Unknown'}
+                    {!editing && (
+                      <Typography>
+                        {request.proj_start_date ? formatDate(request.proj_start_date) : 'Unknown'}
+                      </Typography>
+                    )}
+                    {editing && (
+                      <DatePicker
+                        value={projectedStartDate}
+                        onChange={handleProjectedStartDateChange}
+                      />
+                    )}
                   </TableCell>
                 </TableRow>
                 <TableRow>
-                  <TableCell>Project Completion Date</TableCell>
+                  <TableCell>Projected Completion Date</TableCell>
                   <TableCell>
-                    {request.proj_end_date ? formatDate(request.proj_end_date) : 'Unknown'}
+                    {!editing && (
+                      <Typography>
+                        {request.proj_completion_date
+                          ? formatDate(request.proj_completion_date)
+                          : 'Unknown'}
+                      </Typography>
+                    )}
+                    {editing && (
+                      <DatePicker
+                        value={projectedCompletionDate}
+                        onChange={handleProjectedCompletionDateChange}
+                      />
+                    )}
                   </TableCell>
                 </TableRow>
                 <TableRow>
                   <TableCell>Actual Completion Date</TableCell>
                   <TableCell>
-                    {request.actual_completion_date
-                      ? formatDate(request.actual_completion_date)
-                      : 'Unknown'}
+                    {!editing && (
+                      <Typography>
+                        {request.actual_completion_date
+                          ? formatDate(request.actual_completion_date)
+                          : 'Unknown'}
+                      </Typography>
+                    )}
+                    {editing && (
+                      <DatePicker
+                        value={actualCompletionDate}
+                        onChange={handleActualCompletionDateChange}
+                      />
+                    )}
                   </TableCell>
                 </TableRow>
                 <TableRow>

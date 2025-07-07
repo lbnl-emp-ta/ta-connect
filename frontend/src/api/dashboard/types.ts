@@ -26,7 +26,7 @@ export interface TARequest {
   customer_email: string;
   customer_name: string;
   proj_start_date: string | null;
-  proj_end_date: string | null;
+  proj_completion_date: string | null;
   actual_completion_date: string | null;
 }
 
@@ -45,7 +45,7 @@ export interface TARequestDetail {
   customers: TACustomer[];
   owner: TAOwner;
   proj_start_date: string | null;
-  proj_end_date: string | null;
+  proj_completion_date: string | null;
   actual_completion_date: string | null;
   topics: string[];
 }
