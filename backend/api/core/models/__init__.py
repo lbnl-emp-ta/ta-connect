@@ -5,6 +5,7 @@ from .reception import Reception
 from .program import Program
 from .lab import Lab
 from .owner import Owner
+from .receipt import Receipt
 from .request import Request
 from .state import State
 from .organization_type import OrganizationType
@@ -28,6 +29,7 @@ from .expertise import Expertise
 
 __all__ = [
     "RequestStatus",
+    "Receipt",
     "Request",
     "Depth",
     "State",

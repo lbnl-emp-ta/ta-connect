@@ -29,6 +29,10 @@ class RequestDetailSerializer(serializers.Serializer):
     actual_completion_date = serializers.DateTimeField()
     customers = CustomerSerializer(many=True)
 
+    def create(self, validated_data):
+        print("YASSS")
+        # return super().create(validated_data)
+
 class RequestListSerializer(serializers.Serializer):
     id = serializers.IntegerField()
     date_created = serializers.DateTimeField()
@@ -48,7 +52,12 @@ class RequestListSerializer(serializers.Serializer):
     expert = UserLeanSerializer(required=False) 
 
 class RequestSerializer(serializers.ModelSerializer):
-    owner = OwnerSerializer(required=False)
+    id = serializers.IntegerField()
+    owner = serializers.SlugRelatedField(
+        slug_field="pk",
+        required=False,
+        queryset=Owner.objects.all()
+    ) 
     expert = serializers.SlugRelatedField(
         slug_field="email",
         required=False,
@@ -59,12 +68,16 @@ class RequestSerializer(serializers.ModelSerializer):
         required=False, 
         queryset=RequestStatus.objects.all()
     )
-    
     depth = serializers.SlugRelatedField(
         slug_field="name",
         required=False,
         queryset=Depth.objects.all()
     )
+    description = serializers.CharField(max_length=None)
+    date_created = serializers.DateTimeField()
+    proj_start_date = serializers.DateTimeField()
+    proj_completion_date = serializers.DateTimeField()
+    actual_completion_date = serializers.DateTimeField()
 
     
     @classmethod
