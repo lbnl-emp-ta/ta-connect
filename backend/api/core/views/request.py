@@ -292,7 +292,6 @@ class RequestDetailView(BaseUserAwareRequest):
 class RequestListView(BaseUserAwareRequest):
     serializer = RequestSerializer
     
-    # TODO: Split up into actionable and downstream
     def get(self, request, format=None):
         actionable = self.get_actionable()
         downstream = self.get_downstream()
