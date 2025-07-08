@@ -11,8 +11,10 @@ from .intake_form import ProcessIntakeForm
 from .identity import IdentityListView
 from .status import StatusListView
 from .owner import OwnerListView
+from .assignment import AssignmentView
 
 __all__ = [
+    "AssignmentView",
     "OwnerListView",
     "StatusListView",
     "IdentityListView",

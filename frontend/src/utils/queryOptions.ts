@@ -19,6 +19,7 @@ import {
 import { queryClient } from '../App';
 import { Identity } from '../features/identity/IdentityContext';
 import { fetchData } from './utils';
+import { getCSRFToken } from './cookies';
 
 export const authSessionQueryOptions = () =>
   queryOptions({
@@ -35,6 +36,21 @@ export const customerRequestRelationshipOptions = () =>
       fetchData<CustomerRequestRelationship[]>(
         `${import.meta.env.VITE_API_URL}/customer-request-relationships/`
       ),
+  });
+
+export const assignmentQueryOptions = (identity?: Identity) =>
+  queryOptions({
+    staleTime: 120_000, // stale after 2 minutes
+    queryKey: ['assignment', identity],
+    queryFn: () => fetch(`${import.meta.env.VITE_API_URL}/requests/assign/`, {
+      method: "POST",
+      credentials: 'include',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRFToken': getCSRFToken() || '',
+        Context: identity ? JSON.stringify(identity) : '',
+      },
+    })
   });
 
 export const identitiesQueryOptions = () =>

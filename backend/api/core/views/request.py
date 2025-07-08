@@ -187,15 +187,15 @@ class RequestDetailView(BaseUserAwareRequest):
 
             patch_data["proj_completion_date"] = body.get("proj_completion_date")
 
-        if body.get("owner"):
+        # if body.get("owner"):
             
-            maybe_owner = None
-            try:
-                maybe_owner = Owner.objects.get(pk=body.get("owner"))
-            except Owner.DoesNotExist:
-                return Response(data={"message": "Provided owner does not exist."}, status=status.HTTP_400_BAD_REQUEST)
+        #     maybe_owner = None
+        #     try:
+        #         maybe_owner = Owner.objects.get(pk=body.get("owner"))
+        #     except Owner.DoesNotExist:
+        #         return Response(data={"message": "Provided owner does not exist."}, status=status.HTTP_400_BAD_REQUEST)
 
-            patch_data["owner"] = maybe_owner.pk 
+        #     patch_data["owner"] = maybe_owner.pk 
         
             
         if body.get("status"):
