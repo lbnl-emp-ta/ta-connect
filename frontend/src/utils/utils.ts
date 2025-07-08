@@ -27,6 +27,20 @@ export const capitalize = (str: string): string => {
 };
 
 /**
+ * Format a datetime string to a more readable format.
+ */
+export const formatDatetime = (dateString: string): string => {
+  const date = new Date(dateString);
+  return date.toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+  });
+};
+
+/**
  * Format a date string to a more readable format.
  */
 export const formatDate = (dateString: string): string => {
@@ -35,7 +49,5 @@ export const formatDate = (dateString: string): string => {
     year: 'numeric',
     month: '2-digit',
     day: '2-digit',
-    hour: '2-digit',
-    minute: '2-digit',
   });
 };

@@ -19,7 +19,7 @@ import CheckIcon from '@mui/icons-material/Check';
 import ClearIcon from '@mui/icons-material/Clear';
 import { TARequestDetail } from '../../api/dashboard/types';
 import { InfoPanel } from '../../components/InfoPanel';
-import { capitalize, formatDate } from '../../utils/utils';
+import { capitalize, formatDatetime } from '../../utils/utils';
 import { useEffect, useState } from 'react';
 import { useIdentityContext } from '../identity/IdentityContext';
 import { useRequestMutation } from '../../utils/queryOptions';
@@ -49,15 +49,23 @@ export const RequestInfoPanel: React.FC<RequestInfoPanelProps> = ({ request }) =
   const handleEditSubmit = () => {
     updateRequestMutation.mutate({
       depth,
-      // proj_start_date: projectedStartDate?.toISOString(),
+      proj_start_date: projectedStartDate?.format('YYYY-MM-DD'),
+      proj_completion_date: projectedCompletionDate?.format('YYYY-MM-DD'),
+      actual_completion_date: actualCompletionDate?.format('YYYY-MM-DD'),
       description,
     });
   };
 
   const handleEditCancel = () => {
     updateRequestMutation.reset();
-    setDepth(request?.depth);
-    setDescription(request?.description || '');
+    if (request) {
+      setDepth(request.depth);
+      setProjectedStartDate(dayjs(request.proj_start_date));
+      setProjectedCompletionDate(dayjs(request.proj_completion_date));
+      setActualCompletionDate(dayjs(request.actual_completion_date));
+      setTopics(request.topics || []);
+      setDescription(request.description || '');
+    }
     setEditing(false);
   };
 
@@ -85,6 +93,8 @@ export const RequestInfoPanel: React.FC<RequestInfoPanelProps> = ({ request }) =
     if (request) {
       setDepth(request.depth);
       setProjectedStartDate(dayjs(request.proj_start_date));
+      setProjectedCompletionDate(dayjs(request.proj_completion_date));
+      setActualCompletionDate(dayjs(request.actual_completion_date));
       setTopics(request.topics || []);
       setDescription(request.description || '');
     }
@@ -150,18 +160,12 @@ export const RequestInfoPanel: React.FC<RequestInfoPanelProps> = ({ request }) =
                 </TableRow>
                 <TableRow>
                   <TableCell>Status</TableCell>
-                  <TableCell>
-                    <Chip
-                      label={request.status ? request.status : 'Unknown'}
-                      color="primary"
-                      variant="outlined"
-                    />
-                  </TableCell>
+                  <TableCell>{request.status ? request.status : 'Unknown'}</TableCell>
                 </TableRow>
                 <TableRow>
                   <TableCell>Depth</TableCell>
                   <TableCell>
-                    {!editing && <Typography>{request.depth || 'Unknown'}</Typography>}
+                    {!editing && <>{request.depth || 'Unknown'}</>}
                     {editing && (
                       <Select value={depth} onChange={handleDepthChange}>
                         <MenuItem value="Help Desk">Help Desk</MenuItem>
@@ -174,16 +178,18 @@ export const RequestInfoPanel: React.FC<RequestInfoPanelProps> = ({ request }) =
                 <TableRow>
                   <TableCell>Date Submitted</TableCell>
                   <TableCell>
-                    {request.date_created ? formatDate(request.date_created) : 'Unknown'}
+                    {request.date_created ? formatDatetime(request.date_created) : 'Unknown'}
                   </TableCell>
                 </TableRow>
                 <TableRow>
                   <TableCell>Projected Start Date</TableCell>
                   <TableCell>
                     {!editing && (
-                      <Typography>
-                        {request.proj_start_date ? formatDate(request.proj_start_date) : 'Unknown'}
-                      </Typography>
+                      <>
+                        {request.proj_start_date
+                          ? dayjs(request.proj_start_date).format('MM/DD/YYYY')
+                          : 'Unknown'}
+                      </>
                     )}
                     {editing && (
                       <DatePicker
@@ -197,11 +203,11 @@ export const RequestInfoPanel: React.FC<RequestInfoPanelProps> = ({ request }) =
                   <TableCell>Projected Completion Date</TableCell>
                   <TableCell>
                     {!editing && (
-                      <Typography>
+                      <>
                         {request.proj_completion_date
-                          ? formatDate(request.proj_completion_date)
+                          ? dayjs(request.proj_completion_date).format('MM/DD/YYYY')
                           : 'Unknown'}
-                      </Typography>
+                      </>
                     )}
                     {editing && (
                       <DatePicker
@@ -215,11 +221,11 @@ export const RequestInfoPanel: React.FC<RequestInfoPanelProps> = ({ request }) =
                   <TableCell>Actual Completion Date</TableCell>
                   <TableCell>
                     {!editing && (
-                      <Typography>
+                      <>
                         {request.actual_completion_date
-                          ? formatDate(request.actual_completion_date)
+                          ? dayjs(request.actual_completion_date).format('MM/DD/YYYY')
                           : 'Unknown'}
-                      </Typography>
+                      </>
                     )}
                     {editing && (
                       <DatePicker
