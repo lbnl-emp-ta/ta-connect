@@ -134,7 +134,7 @@ class RequestDetailView(BaseUserAwareRequest):
             
             maybe_depth = None
             try:
-                maybe_depth = Depth.objects.get(pk=body.get("depth"))
+                maybe_depth = Depth.objects.get(name=body.get("depth"))
             except Depth.DoesNotExist:
                 return Response(data={"message": "Provided depth does not exist."}, status=status.HTTP_400_BAD_REQUEST)
 
