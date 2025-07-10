@@ -1,13 +1,16 @@
 import json
 from rest_framework import views, status, authentication, permissions
 from rest_framework.response import Response
+from django.db import transaction
 
 from allauth.headless.contrib.rest_framework.authentication import (
     XSessionTokenAuthentication,
 )
 
-from core.views import OwnerListView, request 
+from core.permissions import IsAdmin, IsLabLead
+from core.views import OwnerListView, request as req
 from core.models import *
+from core.constants import DOMAINTYPE, ROLE
 
 class AssignmentView(views.APIView):
     authentication_classes = [
@@ -19,50 +22,108 @@ class AssignmentView(views.APIView):
         permissions.IsAuthenticated,
     ]
 
-    def post(self, request_id=None, owner_id=None):
-        maybe_context = self.request.headers.get("Context")
-        if not maybe_context:
-            return Response(data={"message": "Please provide context object header with request."}, status=status.HTTP_400_BAD_REQUEST)
+    def post(self, request):
+        body = request.data
+
+        if not body:
+            return Response(data={"message": "Please provide a body for assignment which includes a request ID and an owner ID."}, status=status.HTTP_400_BAD_REQUEST)
         
-        context = json.loads(maybe_context)
+        request_id = body.get("request")
+        owner_id = body.get("owner")
+        expert_id = body.get("expert")
 
         if not request_id:
             return Response(data={"message": "Please provide a request ID for assignment."}, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Can have only owner, or expert given. Not both. 
+        if not (bool(owner_id) ^ bool(expert_id)):
+            return Response(data={"message": "Please provide only owner ID or an expert ID for assignment, not both."}, status=status.HTTP_400_BAD_REQUEST)
 
-        if not owner_id:
-            return Response(data={"message": "Please provide an owner ID for assignment."}, status=status.HTTP_400_BAD_REQUEST)
+        if not owner_id and not expert_id:
+            return Response(data={"message": "Please provide at least an owner ID or an expert ID for assignment."}, status=status.HTTP_400_BAD_REQUEST)
+        
+        actionable_requests = req.BaseUserAwareRequest(request=self.request).get_queryset()
 
-        possible_owners = OwnerListView(request=self.request).get_queryset()
-        actionable_requests = request.BaseUserAwareRequest(request=self.request).get_queryset()
-
-        request = None
+        ta_request = None
         try:
-            request = Request.objects.get(pk=request_id)
+            ta_request = Request.objects.get(pk=request_id)
         except Request.DoesNotExist:
             return Response(data={"message": "A request with given ID does not exist."}, status=status.HTTP_400_BAD_REQUEST)
 
-        if (not actionable_requests) or (actionable_requests.filter(id=request_id)):  
+        if (not actionable_requests) or (not actionable_requests.filter(id=request_id)):  
             return Response(data={"message": "Request is not actionable for the current user identity."}, status=status.HTTP_400_BAD_REQUEST)
 
-        new_owner = None
-        try:
-            new_owner = Owner.objects.get(pk=owner_id)
-        except Owner.DoesNotExist:
-            return Response(data={"message": "Owner with given ID does not exist."}, status=status.HTTP_400_BAD_REQUEST)
+        if (owner_id):
+            possible_owners = OwnerListView(request=self.request).get_queryset()
 
-        if (not possible_owners) or (possible_owners.filter(id=owner_id)):  
-            return Response(data={"message": "Current user identity cannot assign to that owner."}, status=status.HTTP_400_BAD_REQUEST)
+            new_owner = None
+            try:
+                new_owner = Owner.objects.get(pk=owner_id)
+            except Owner.DoesNotExist:
+                return Response(data={"message": "Owner with given ID does not exist."}, status=status.HTTP_400_BAD_REQUEST)
+
+            if (not possible_owners) or (not possible_owners.filter(id=owner_id)):  
+                return Response(data={"message": "Current user identity cannot assign to that owner."}, status=status.HTTP_400_BAD_REQUEST)
         
-        # handle side effects + changing of owner atomically
-        # What needs to happen when we assign?
-        # 1. owner needs to change
-        # 2. receipt needs to update
-        # 3. expert field might need to be cleared
-        # 4. (future) notification system engaged
-        # try:
-        #     request.owner = new_owner
-        #     new_owner.domain_type
-        # except Exception as e:
-        #     return Response(data={"message": f"{e}"}, status=status.HTTP_501_NOT_IMPLEMENTED)
+            try:
+                match new_owner.domain_type:
+                    case DOMAINTYPE.RECEPTION:
+                        ta_request.owner = new_owner
+                        ta_request.expert = None
+                        
+                        # Resetting receipt if request kicked back
+                        ta_request.receipt.program = None
+                        ta_request.receipt.lab = None
+                        ta_request.receipt.expert = None
+
+                    case DOMAINTYPE.PROGRAM:
+                        ta_request.owner = new_owner
+                        ta_request.expert = None
+
+                        ta_request.receipt.program = new_owner.program
+
+                    case DOMAINTYPE.LAB:
+                        ta_request.owner = new_owner
+                        ta_request.expert = None
+
+                        ta_request.receipt.lab = new_owner.lab
+                    
+                    # Should never happen!!
+                    case _:
+                        return Response(data={"message": "Given request's domaintype is invalid"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+                
+                with transaction.atomic():
+                    ta_request.save()
+                    ta_request.receipt.save()
+
+            except Exception as e:
+                return Response(data={"message": f"{e}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+        if (expert_id):
+            if not(IsAdmin().has_permission(request) or IsLabLead().has_permission(request)):
+                return Response(data={"message": "Insufficient privillege to assign expert for given request"}, status=status.HTTP_401_UNAUTHORIZED)
+
+            expert = None
+            try:
+                expert = User.objects.get(pk=expert_id)
+            except User.DoesNotExist:
+                return Response(data={"message": "Expert with given ID does not exist."}, status=status.HTTP_400_BAD_REQUEST)
+
+            if not ta_request.owner.domain_type == DOMAINTYPE.LAB:
+                return Response(data={"message": "Can only assign expert when given request is owned by a lab."}, status=status.HTTP_400_BAD_REQUEST)
+            
+            # Make sure that expert is part of current lab for the program associated with given request
+            try: 
+                LabRoleAssignment.objects.get(user=expert, role=Role.objects.get(name=ROLE.EXPERT), instance=ta_request.owner.lab, program=ta_request.receipt.program)
+            except LabRoleAssignment.DoesNotExist:
+                return Response(data={"message": "Given expert is not valid in the context of the given request's assigned lab."}, status=status.HTTP_400_BAD_REQUEST)
+            
+            ta_request.expert = expert
+            try:
+                ta_request.save()
+            except:
+                return Response(data={"message": f"{e}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         
-        return Response(data={"message": "This endpoint is not fully implemented yet!"}, status=status.HTTP_501_NOT_IMPLEMENTED)
+        # TODO Consider sending notification when that system in implemented
+        
+        return Response(status=status.HTTP_200_OK)

@@ -59,23 +59,23 @@ def has_role(request, role_name):
         return True 
 
 class IsAdmin(permissions.BasePermission):
-    def has_permission(self, request, view):
+    def has_permission(self, request, view=None):
         return has_role(request, "Admin")
 
 class IsCoordinator(permissions.BasePermission):
-    def has_permission(self, request, view):
+    def has_permission(self, request, view=None):
         return has_role(request, "Coordinator")
 
 class IsProgramLead(permissions.BasePermission):
-    def has_permission(self, request, view):
+    def has_permission(self, request, view=None):
         return has_role(request, "Program Lead")
 
 class IsLabLead(permissions.BasePermission):
-    def has_permission(self, request, view):
+    def has_permission(self, request, view=None):
         return has_role(request, "Lab Lead")
     
 class IsExpert(permissions.BasePermission):
-    def has_permission(self, request, view):
+    def has_permission(self, request, view=None):
         return has_role(request, "Expert")
     
         

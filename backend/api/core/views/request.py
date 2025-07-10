@@ -3,6 +3,7 @@ from rest_framework.response import Response
 from core.serializers import * 
 from core.models import * 
 from core.permissions import *
+from core.constants import ROLE
 
 from allauth.headless.contrib.rest_framework.authentication import (
     XSessionTokenAuthentication,
@@ -46,25 +47,25 @@ class BaseUserAwareRequest(views.APIView):
         visible_requests = queryset.none() 
 
         if  IsCoordinator().has_permission(self.request, self):
-            COORDINATOR_ROLE = Role.objects.get(name="Coordinator")
+            COORDINATOR_ROLE = Role.objects.get(name=ROLE.COORDINATOR)
             coordinator_assignments = reception_assignments.filter(role=COORDINATOR_ROLE)
             for assignment in coordinator_assignments:
                     visible_requests = visible_requests.union(assignment.instance.owner.request_set.all())
 
         elif IsProgramLead().has_permission(self.request, self):
-            PROGRAM_LEAD_ROLE = Role.objects.get(name="Program Lead")
+            PROGRAM_LEAD_ROLE = Role.objects.get(name=ROLE.PROGRAM_LEAD)
             program_lead_assignments = program_assignments.filter(role=PROGRAM_LEAD_ROLE)
             for assignment in program_lead_assignments:
                     visible_requests = visible_requests.union(assignment.instance.owner.request_set.all())
 
         elif IsLabLead().has_permission(self.request, self):
-            LAB_LEAD_ROLE = Role.objects.get(name="Lab Lead")
+            LAB_LEAD_ROLE = Role.objects.get(name=ROLE.LAB_LEAD)
             lab_lead_assignments = lab_assignments.filter(role=LAB_LEAD_ROLE)
             for assignment in lab_lead_assignments:
                     visible_requests = visible_requests.union(assignment.instance.owner.request_set.all())
 
         elif IsExpert().has_permission(self.request, self):
-            EXPERT_ROLE = Role.objects.get(name="Expert")
+            EXPERT_ROLE = Role.objects.get(name=ROLE.EXPERT)
             expert_assignments = lab_assignments.filter(role=EXPERT_ROLE)
             for assignment in expert_assignments:
                     visible_requests = visible_requests.union(assignment.instance.owner.request_set.all())

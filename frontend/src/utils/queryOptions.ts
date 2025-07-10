@@ -50,6 +50,11 @@ export const assignmentQueryOptions = (identity?: Identity) =>
         'X-CSRFToken': getCSRFToken() || '',
         Context: identity ? JSON.stringify(identity) : '',
       },
+      body: JSON.stringify({
+        'request': 3,
+        'owner': 1
+        // 'expert': 1
+      })
     })
   });
 
