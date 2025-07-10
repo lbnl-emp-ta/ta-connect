@@ -73,11 +73,11 @@ class RequestSerializer(serializers.ModelSerializer):
         required=False,
         queryset=Depth.objects.all()
     )
-    description = serializers.CharField(max_length=None)
+    description = serializers.CharField(max_length=None, required=False)
     date_created = serializers.DateTimeField()
-    proj_start_date = serializers.DateField()
-    proj_completion_date = serializers.DateField()
-    actual_completion_date = serializers.DateField()
+    proj_start_date = serializers.DateField(required=False)
+    proj_completion_date = serializers.DateField(required=False)
+    actual_completion_date = serializers.DateField(required=False)
 
     
     @classmethod
