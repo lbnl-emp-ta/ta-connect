@@ -21,7 +21,7 @@ import WestIcon from '@mui/icons-material/West';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { createFileRoute } from '@tanstack/react-router';
 import { RequestInfoPanel } from '../../../../features/requests/RequestInfoPanel';
-import { assignmentQueryOptions, requestDetailQueryOptions } from '../../../../utils/queryOptions';
+import { requestDetailQueryOptions } from '../../../../utils/queryOptions';
 import { AppLink } from '../../../../components/AppLink';
 import { useState } from 'react';
 import { useRequestsContext } from '../../../../features/requests/RequestsContext';
@@ -60,7 +60,6 @@ function SelectedRequest() {
   const [tabValue, setTabValue] = useState<string | number>('attachments');
 
   const handleClickActionsMenu = (event: React.MouseEvent<HTMLButtonElement>) => {
-    assignmentQueryOptions(identity).queryFn();
     setActionsAnchorEl(event.currentTarget);
   };
 
