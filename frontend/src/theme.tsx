@@ -29,10 +29,7 @@ export const theme = createTheme({
       contrastText: '#fff',
     },
     info: {
-      main: '#0288d1',
-      light: '#03a9f4',
-      dark: '#01579b',
-      contrastText: '#fff',
+      main: '#fff',
     },
     success: {
       main: '#2e7d32',
