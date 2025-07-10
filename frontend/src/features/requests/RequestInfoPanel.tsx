@@ -20,7 +20,7 @@ import ClearIcon from '@mui/icons-material/Clear';
 import { TARequestDetail } from '../../api/dashboard/types';
 import { InfoPanel } from '../../components/InfoPanel';
 import { capitalize, formatDatetime } from '../../utils/utils';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useIdentityContext } from '../identity/IdentityContext';
 import { useRequestMutation } from '../../utils/queryOptions';
 import { DatePicker } from '@mui/x-date-pickers';
@@ -42,6 +42,24 @@ export const RequestInfoPanel: React.FC<RequestInfoPanelProps> = ({ request }) =
   const [description, setDescription] = useState('');
   const [topics, setTopics] = useState<TARequestDetail['topics']>([]);
 
+  /**
+   * Reset form values based on request data.
+   */
+  const resetFormValues = useCallback(() => {
+    if (request) {
+      setDepth(request.depth);
+      setProjectedStartDate(request.proj_start_date ? dayjs(request.proj_start_date) : undefined);
+      setProjectedCompletionDate(
+        request.proj_completion_date ? dayjs(request.proj_completion_date) : undefined
+      );
+      setActualCompletionDate(
+        request.actual_completion_date ? dayjs(request.actual_completion_date) : undefined
+      );
+      setTopics(request.topics || []);
+      setDescription(request.description || '');
+    }
+  }, [request]);
+
   const handleEditClick = () => {
     setEditing(true);
   };
@@ -49,23 +67,16 @@ export const RequestInfoPanel: React.FC<RequestInfoPanelProps> = ({ request }) =
   const handleEditSubmit = () => {
     updateRequestMutation.mutate({
       depth,
-      proj_start_date: projectedStartDate?.format('YYYY-MM-DD'),
-      proj_completion_date: projectedCompletionDate?.format('YYYY-MM-DD'),
-      actual_completion_date: actualCompletionDate?.format('YYYY-MM-DD'),
+      proj_start_date: projectedStartDate?.format('YYYY-MM-DD') || null,
+      proj_completion_date: projectedCompletionDate?.format('YYYY-MM-DD') || null,
+      actual_completion_date: actualCompletionDate?.format('YYYY-MM-DD') || null,
       description,
     });
   };
 
   const handleEditCancel = () => {
     updateRequestMutation.reset();
-    if (request) {
-      setDepth(request.depth);
-      setProjectedStartDate(dayjs(request.proj_start_date));
-      setProjectedCompletionDate(dayjs(request.proj_completion_date));
-      setActualCompletionDate(dayjs(request.actual_completion_date));
-      setTopics(request.topics || []);
-      setDescription(request.description || '');
-    }
+    resetFormValues();
     setEditing(false);
   };
 
@@ -90,15 +101,8 @@ export const RequestInfoPanel: React.FC<RequestInfoPanelProps> = ({ request }) =
   };
 
   useEffect(() => {
-    if (request) {
-      setDepth(request.depth);
-      setProjectedStartDate(dayjs(request.proj_start_date));
-      setProjectedCompletionDate(dayjs(request.proj_completion_date));
-      setActualCompletionDate(dayjs(request.actual_completion_date));
-      setTopics(request.topics || []);
-      setDescription(request.description || '');
-    }
-  }, [request]);
+    resetFormValues();
+  }, [request, resetFormValues]);
 
   useEffect(() => {
     if (updateRequestMutation.isSuccess) {
@@ -193,8 +197,13 @@ export const RequestInfoPanel: React.FC<RequestInfoPanelProps> = ({ request }) =
                     )}
                     {editing && (
                       <DatePicker
-                        value={projectedStartDate}
+                        value={projectedStartDate || null}
                         onChange={handleProjectedStartDateChange}
+                        slotProps={{
+                          field: {
+                            clearable: true,
+                          },
+                        }}
                       />
                     )}
                   </TableCell>
@@ -211,8 +220,13 @@ export const RequestInfoPanel: React.FC<RequestInfoPanelProps> = ({ request }) =
                     )}
                     {editing && (
                       <DatePicker
-                        value={projectedCompletionDate}
+                        value={projectedCompletionDate || null}
                         onChange={handleProjectedCompletionDateChange}
+                        slotProps={{
+                          field: {
+                            clearable: true,
+                          },
+                        }}
                       />
                     )}
                   </TableCell>
@@ -229,8 +243,13 @@ export const RequestInfoPanel: React.FC<RequestInfoPanelProps> = ({ request }) =
                     )}
                     {editing && (
                       <DatePicker
-                        value={actualCompletionDate}
+                        value={actualCompletionDate || null}
                         onChange={handleActualCompletionDateChange}
+                        slotProps={{
+                          field: {
+                            clearable: true,
+                          },
+                        }}
                       />
                     )}
                   </TableCell>
