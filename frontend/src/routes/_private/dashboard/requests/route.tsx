@@ -1,5 +1,5 @@
 import { createFileRoute, Outlet } from '@tanstack/react-router';
-import { Box, Container, Stack, Tab, Tabs, Typography } from '@mui/material';
+import { Badge, Box, Container, Stack, Tab, Tabs, Typography } from '@mui/material';
 import { RequestsProvider } from '../../../../features/requests/RequestsContext';
 import { RequestsTable } from '../../../../features/requests/RequestsTable';
 import { requestsQueryOptions } from '../../../../utils/queryOptions';
@@ -19,7 +19,6 @@ export const Route = createFileRoute('/_private/dashboard/requests')({
 function RequestsPage() {
   const { identity } = useIdentityContext();
   const { data: requests } = useSuspenseQuery(requestsQueryOptions(identity));
-  console.log('Requests:', requests);
   const [tabValue, setTabValue] = useState<string | number>('actionable-requests');
 
   const handleChangeTab = (_event: React.SyntheticEvent, newValue: string | number) => {
@@ -38,12 +37,22 @@ function RequestsPage() {
             <Box>
               <Tabs value={tabValue} onChange={handleChangeTab} aria-label="requests tabs">
                 <Tab
-                  label="My Actionable Requests"
+                  label={
+                    <Stack direction="row" alignItems="center" spacing={2}>
+                      <Typography>Actionable Requests</Typography>
+                      <Badge badgeContent={requests.actionable.length.toString()} color="primary" />
+                    </Stack>
+                  }
                   value="actionable-requests"
                   {...a11yProps('actionable-requests')}
                 />
                 <Tab
-                  label="Downstream Requests"
+                  label={
+                    <Stack direction="row" alignItems="center" spacing={2}>
+                      <Typography>Downstream Requests</Typography>
+                      <Badge badgeContent={requests.downstream.length.toString()} color="primary" />
+                    </Stack>
+                  }
                   value="downstream-requests"
                   {...a11yProps('downstream-requests')}
                 />
