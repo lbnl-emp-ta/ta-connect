@@ -1,8 +1,13 @@
 import { createFileRoute, Outlet } from '@tanstack/react-router';
-import { Container, Stack, Typography } from '@mui/material';
+import { Box, Container, Stack, Tab, Tabs, Typography } from '@mui/material';
 import { RequestsProvider } from '../../../../features/requests/RequestsContext';
 import { RequestsTable } from '../../../../features/requests/RequestsTable';
 import { requestsQueryOptions } from '../../../../utils/queryOptions';
+import { useSuspenseQuery } from '@tanstack/react-query';
+import { useIdentityContext } from '../../../../features/identity/IdentityContext';
+import { TabPanel } from '../../../../components/TabPanel';
+import { a11yProps } from '../../../../utils/utils';
+import { useState } from 'react';
 
 export const Route = createFileRoute('/_private/dashboard/requests')({
   loader: async ({ context }) => {
@@ -12,6 +17,15 @@ export const Route = createFileRoute('/_private/dashboard/requests')({
 });
 
 function RequestsPage() {
+  const { identity } = useIdentityContext();
+  const { data: requests } = useSuspenseQuery(requestsQueryOptions(identity));
+  console.log('Requests:', requests);
+  const [tabValue, setTabValue] = useState<string | number>('actionable-requests');
+
+  const handleChangeTab = (_event: React.SyntheticEvent, newValue: string | number) => {
+    setTabValue(newValue);
+  };
+
   return (
     <RequestsProvider>
       <Container maxWidth="xl">
@@ -20,7 +34,33 @@ function RequestsPage() {
             Dashboard / Requests
           </Typography>
           <Outlet />
-          <RequestsTable />
+          {requests && (
+            <Box>
+              <Tabs value={tabValue} onChange={handleChangeTab} aria-label="requests tabs">
+                <Tab
+                  label="My Actionable Requests"
+                  value="actionable-requests"
+                  {...a11yProps('actionable-requests')}
+                />
+                <Tab
+                  label="Downstream Requests"
+                  value="downstream-requests"
+                  {...a11yProps('downstream-requests')}
+                />
+              </Tabs>
+              <TabPanel value={tabValue} index="actionable-requests">
+                <RequestsTable data={requests?.actionable} />
+              </TabPanel>
+              <TabPanel value={tabValue} index="downstream-requests">
+                <RequestsTable data={requests?.downstream} />
+              </TabPanel>
+            </Box>
+          )}
+          {!requests && (
+            <Box>
+              <Typography variant="body1">Failed to load requests.</Typography>
+            </Box>
+          )}
         </Stack>
       </Container>
     </RequestsProvider>
