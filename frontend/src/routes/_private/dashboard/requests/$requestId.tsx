@@ -87,9 +87,11 @@ function SelectedRequest() {
           </AppLink>
         )}
         {previousIndex === null && (
-          <Button variant="outlined" color="primary" startIcon={<WestIcon />} disabled>
-            Previous Request
-          </Button>
+          <span>
+            <Button variant="outlined" color="primary" startIcon={<WestIcon />} disabled>
+              Previous Request
+            </Button>
+          </span>
         )}
         {nextIndex !== null && (
           <AppLink
@@ -102,18 +104,21 @@ function SelectedRequest() {
           </AppLink>
         )}
         {nextIndex === null && (
-          <Button variant="outlined" color="primary" startIcon={<EastIcon />} disabled>
-            Next Request
-          </Button>
+          <span>
+            <Button variant="outlined" color="primary" startIcon={<EastIcon />} disabled>
+              Next Request
+            </Button>
+          </span>
         )}
         <Typography
           variant="h4"
           color="primary"
           sx={{
             flex: 1,
+            textAlign: 'center',
           }}
         >
-          View: Request #?
+          Request: {selectedRequest?.id}
         </Typography>
         <Button
           id="actions-menu-button"
