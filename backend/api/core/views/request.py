@@ -204,7 +204,7 @@ class RequestDetailView(BaseUserAwareRequest):
             
             maybe_depth = None
             try:
-                maybe_depth = Depth.objects.get(pk=body.get("depth"))
+                maybe_depth = Depth.objects.get(name=body.get("depth"))
             except Depth.DoesNotExist:
                 return Response(data={"message": "Provided depth does not exist."}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -246,13 +246,13 @@ class RequestDetailView(BaseUserAwareRequest):
             patch_data["expert"] = maybe_expert.email 
         
         if body.get("proj_start_date"):
-            if not(IsAdmin().has_object_permission(request) or IsProgramLead().has_permission(request) or IsLabLead().has_permission(request) or IsExpert().has_permission(request)):
+            if not(IsAdmin().has_object_permission(request, self, maybe_request) or IsProgramLead().has_permission(request) or IsLabLead().has_permission(request) or IsExpert().has_permission(request)):
                 return Response(data={"message": "Insufficient privillege to update 'expert' field"}, status=status.HTTP_401_UNAUTHORIZED)
 
             patch_data["proj_start_date"] = body.get("proj_start_date")
 
         if body.get("proj_completion_date"):
-            if not(IsAdmin().has_object_permission(request) or IsProgramLead().has_permission(request) or IsLabLead().has_permission(request) or IsExpert().has_permission(request)):
+            if not(IsAdmin().has_object_permission(request, self, maybe_request) or IsProgramLead().has_permission(request) or IsLabLead().has_permission(request) or IsExpert().has_permission(request)):
                 return Response(data={"message": "Insufficient privillege to update 'expert' field"}, status=status.HTTP_401_UNAUTHORIZED)
 
             patch_data["proj_completion_date"] = body.get("proj_completion_date")
