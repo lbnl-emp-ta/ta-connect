@@ -15,6 +15,7 @@ import {
   TAIdentity,
   TARequest,
   TARequestDetail,
+  TARequestsResponse,
   TAStatus,
 } from '../api/dashboard/types';
 import { queryClient } from '../App';
@@ -51,9 +52,9 @@ export const requestsQueryOptions = (identity?: Identity) =>
     queryKey: ['requests', identity],
     queryFn: () => {
       if (identity) {
-        return fetchData<TARequest[]>(`${import.meta.env.VITE_API_URL}/requests/`, identity);
+        return fetchData<TARequestsResponse>(`${import.meta.env.VITE_API_URL}/requests/`, identity);
       } else {
-        return [];
+        return null;
       }
     },
   });

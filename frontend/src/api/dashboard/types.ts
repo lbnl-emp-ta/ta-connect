@@ -4,8 +4,25 @@ export interface TACustomer {
   name: string;
   phone: string;
   title: string;
-  org: number;
-  state: number;
+  org: {
+    id: number;
+    address: string;
+    name: string;
+    type: {
+      id: number;
+      name: string;
+      description: string;
+    };
+  };
+  state: {
+    id: number;
+    name: string;
+    abbreviation: string;
+  };
+  tpr: {
+    id: number;
+    name: string;
+  };
   requests: number[];
 }
 
@@ -66,6 +83,11 @@ export interface TAIdentity {
     name: string;
     description: string;
   };
+}
+
+export interface TARequestsResponse {
+  actionable: TARequest[];
+  downstream: TARequest[];
 }
 
 export interface Customer {

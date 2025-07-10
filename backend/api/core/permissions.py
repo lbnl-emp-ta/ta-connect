@@ -34,7 +34,11 @@ def has_role(request, role_name):
         role = Role.objects.filter(name=role_name).first()
         if (not role):
             return False
-            
+        
+        # Check role against identity
+        if (not role.pk == context.get("role")):
+            return False
+
         if not context.get("location"):
             return False
 
@@ -44,14 +48,13 @@ def has_role(request, role_name):
         
         assignments = None
         if context.get("instance"):  
-            assignments = location_role_assignment_class.objects.filter(user=user, role=role, id=context.get("instance"))
+            assignments = location_role_assignment_class.objects.filter(user=user, role=role, instance=context.get("instance"))
+
         elif (role_name == "Coordinator") or (role_name == "Admin"):
             assignments = location_role_assignment_class.objects.filter(user=user, role=role)
+
         else:
             return False
-            
-        # if (location_role_assignment_class == LabRoleAssignment):
-        #     assignments = assignments.filter(program=context.get("program"))
 
         if(not assignments):
             return False
@@ -59,23 +62,23 @@ def has_role(request, role_name):
         return True 
 
 class IsAdmin(permissions.BasePermission):
-    def has_permission(self, request, view):
+    def has_permission(self, request, view=None):
         return has_role(request, "Admin")
 
 class IsCoordinator(permissions.BasePermission):
-    def has_permission(self, request, view):
+    def has_permission(self, request, view=None):
         return has_role(request, "Coordinator")
 
 class IsProgramLead(permissions.BasePermission):
-    def has_permission(self, request, view):
+    def has_permission(self, request, view=None):
         return has_role(request, "Program Lead")
 
 class IsLabLead(permissions.BasePermission):
-    def has_permission(self, request, view):
+    def has_permission(self, request, view=None):
         return has_role(request, "Lab Lead")
     
 class IsExpert(permissions.BasePermission):
-    def has_permission(self, request, view):
+    def has_permission(self, request, view=None):
         return has_role(request, "Expert")
     
         
