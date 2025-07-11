@@ -1,3 +1,4 @@
+import { Container, Stack, Typography } from '@mui/material';
 import { createFileRoute } from '@tanstack/react-router';
 
 export const Route = createFileRoute('/_private/dashboard/experts')({
@@ -5,5 +6,14 @@ export const Route = createFileRoute('/_private/dashboard/experts')({
 });
 
 function RouteComponent() {
-  return <div>Hello "/_private/dashboard/experts"!</div>;
+  return (
+    <Container maxWidth="xl">
+      <Stack>
+        <Typography variant="h5" component="h1">
+          Experts
+        </Typography>
+        <Typography>Coming soon!</Typography>
+      </Stack>
+    </Container>
+  );
 }

@@ -30,7 +30,7 @@ function RequestsPage() {
       <Container maxWidth="xl">
         <Stack>
           <Typography variant="h5" component="h1">
-            Dashboard / Requests
+            Requests
           </Typography>
           <Outlet />
           {requests && (
