@@ -10,7 +10,7 @@ class Request(models.Model):
     expert = models.ForeignKey(User, on_delete=models.PROTECT, blank=True, null=True)
     status = models.ForeignKey(RequestStatus, on_delete=models.PROTECT, default=RequestStatus.get_default_pk)
     depth = models.ForeignKey(Depth, on_delete=models.PROTECT, default=Depth.get_default_pk)
-    description = models.TextField()
+    description = models.TextField(blank=True, null=True)
     date_created = models.DateTimeField(auto_now_add=True)
     proj_start_date = models.DateField(blank=True, null=True, verbose_name="projected start date")
     proj_completion_date = models.DateField(blank=True, null=True, verbose_name="projected completion date")
