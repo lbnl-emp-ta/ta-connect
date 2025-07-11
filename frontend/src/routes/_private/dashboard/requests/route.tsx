@@ -18,7 +18,6 @@ export const Route = createFileRoute('/_private/dashboard/requests')({
 
 function RequestsPage() {
   const { identity } = useIdentityContext();
-
   const { data: requests } = useSuspenseQuery(requestsQueryOptions(identity));
   const [tabValue, setTabValue] = useState<string | number>('actionable-requests');
 

@@ -64,6 +64,7 @@ export const requestsQueryOptions = (identity?: Identity) =>
 export const requestDetailQueryOptions = (requestId: string, identity?: Identity) =>
   queryOptions({
     staleTime: 120_000, // stale after 2 minutes
+    retry: false,
     queryKey: ['requests', requestId, identity],
     queryFn: () => {
       if (identity) {

@@ -21,9 +21,9 @@ import { useIdentityContext } from '../../../features/identity/IdentityContext';
 
 export const Route = createFileRoute('/_private/dashboard')({
   beforeLoad({ location }) {
-    if (location.pathname === '/dashboard' || location.pathname === '/dashboard/')
-      // eslint-disable-next-line @typescript-eslint/only-throw-error
+    if (location.pathname === '/dashboard' || location.pathname === '/dashboard/') {
       throw redirect({ to: '/dashboard/requests' });
+    }
   },
   loader: async ({ context }) => {
     await context.queryClient.ensureQueryData(identitiesQueryOptions());
@@ -51,7 +51,7 @@ function DashboardComponent() {
         instance: fullIdentity.instance?.id,
       });
     }
-  }, [fullIdentity, setIdentity]);
+  }, [fullIdentity, setIdentity, navigate]);
 
   return (
     <Stack direction="row" spacing={0} sx={{ width: '100%' }}>

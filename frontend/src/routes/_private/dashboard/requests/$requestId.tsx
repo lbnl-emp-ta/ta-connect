@@ -57,8 +57,6 @@ function SelectedRequest() {
   );
   const { data: owners } = useSuspenseQuery(ownersQueryOptions(identity));
   const assignRequestMutation = useAssignmentMutation(params.requestId, identity);
-  console.log('Selected Request:', selectedRequest);
-  console.log('Owners:', owners);
   const { sortedRequests } = useRequestsContext();
   const currentIndex = sortedRequests.findIndex((request) => {
     if (params?.requestId) {
