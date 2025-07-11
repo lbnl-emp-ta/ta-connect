@@ -31,7 +31,7 @@ class BaseUserAwareRequest(views.APIView):
 
         context = json.loads(maybe_context) 
 
-        actionable_pks = [request.pk for request in self.get_actionable().values_list()]
+        actionable_pks = [request.pk for request in self.get_actionable()]
 
         # This is a convention, we assume all requests for admin are 
         # "actionable" and none are "downstream". In reality, this 
