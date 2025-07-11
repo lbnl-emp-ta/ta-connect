@@ -29,10 +29,6 @@ class RequestDetailSerializer(serializers.Serializer):
     actual_completion_date = serializers.DateTimeField()
     customers = CustomerSerializer(many=True)
 
-    def create(self, validated_data):
-        print("YASSS")
-        # return super().create(validated_data)
-
 class RequestListSerializer(serializers.Serializer):
     id = serializers.IntegerField()
     date_created = serializers.DateTimeField()
