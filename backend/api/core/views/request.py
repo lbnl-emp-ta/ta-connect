@@ -3,6 +3,7 @@ from rest_framework.response import Response
 from core.serializers import * 
 from core.models import * 
 from core.permissions import *
+from core.constants import ROLE
 
 from allauth.headless.contrib.rest_framework.authentication import (
     XSessionTokenAuthentication,
@@ -110,20 +111,25 @@ class BaseUserAwareRequest(views.APIView):
         program_assignments = ProgramRoleAssignment.objects.filter(user=user)
         lab_assignments = LabRoleAssignment.objects.filter(user=user)
 
-        if  IsCoordinator().has_permission(self.request):
-            COORDINATOR_ROLE = Role.objects.get(name="Coordinator")
+        visible_requests = queryset.none() 
+
+        if  IsCoordinator().has_permission(self.request, self):
+            COORDINATOR_ROLE = Role.objects.get(name=ROLE.COORDINATOR)
+
             coordinator_assignments = reception_assignments.filter(role=COORDINATOR_ROLE)
             for assignment in coordinator_assignments:
                     requests = requests.union(assignment.instance.owner.request_set.all())
 
-        elif IsProgramLead().has_permission(self.request):
-            PROGRAM_LEAD_ROLE = Role.objects.get(name="Program Lead")
+        elif IsProgramLead().has_permission(self.request, self):
+            PROGRAM_LEAD_ROLE = Role.objects.get(name=ROLE.PROGRAM_LEAD)
+
             program_lead_assignments = program_assignments.filter(role=PROGRAM_LEAD_ROLE)
             for assignment in program_lead_assignments:
                     requests = requests.union(assignment.instance.owner.request_set.all())
 
-        elif IsLabLead().has_permission(self.request):
-            LAB_LEAD_ROLE = Role.objects.get(name="Lab Lead")
+        elif IsLabLead().has_permission(self.request, self):
+            LAB_LEAD_ROLE = Role.objects.get(name=ROLE.LAB_LEAD)
+
             lab_lead_assignments = lab_assignments.filter(role=LAB_LEAD_ROLE)
             for assignment in lab_lead_assignments:
                     requests = requests.union(assignment.instance.owner.request_set.all())
@@ -132,8 +138,9 @@ class BaseUserAwareRequest(views.APIView):
             # considered are considered "downstream", not "actionable".
             requests = requests.filter(expert=None)
 
-        elif IsExpert().has_permission(self.request):
-            EXPERT_ROLE = Role.objects.get(name="Expert")
+        elif IsExpert().has_permission(self.request, self):
+            EXPERT_ROLE = Role.objects.get(name=ROLE.EXPERT)
+      
             expert_assignments = lab_assignments.filter(role=EXPERT_ROLE)
             print(expert_assignments)
             for assignment in expert_assignments:
@@ -257,15 +264,15 @@ class RequestDetailView(BaseUserAwareRequest):
 
             patch_data["proj_completion_date"] = body.get("proj_completion_date")
 
-        if body.get("owner"):
+        # if body.get("owner"):
             
-            maybe_owner = None
-            try:
-                maybe_owner = Owner.objects.get(pk=body.get("owner"))
-            except Owner.DoesNotExist:
-                return Response(data={"message": "Provided owner does not exist."}, status=status.HTTP_400_BAD_REQUEST)
+        #     maybe_owner = None
+        #     try:
+        #         maybe_owner = Owner.objects.get(pk=body.get("owner"))
+        #     except Owner.DoesNotExist:
+        #         return Response(data={"message": "Provided owner does not exist."}, status=status.HTTP_400_BAD_REQUEST)
 
-            patch_data["owner"] = maybe_owner.pk 
+        #     patch_data["owner"] = maybe_owner.pk 
         
             
         if body.get("status"):
