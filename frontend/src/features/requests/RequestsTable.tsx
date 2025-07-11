@@ -4,7 +4,7 @@ import {
   gridSortedRowEntriesSelector,
   useGridApiRef,
 } from '@mui/x-data-grid';
-import { useNavigate } from '@tanstack/react-router';
+import { useNavigate, useParams } from '@tanstack/react-router';
 import { useEffect, useState } from 'react';
 import { TARequest } from '../../api/dashboard/types';
 import { useRequestsContext } from './RequestsContext';
@@ -17,10 +17,8 @@ export const RequestsTable: React.FC<RequestsTableProps> = ({ data }) => {
   const navigate = useNavigate();
   const { setSortedRequests } = useRequestsContext();
   console.log('RequestTable data', data);
-  const [rowSelectionModel, setRowSelectionModel] = useState<GridRowSelectionModel>({
-    type: 'include',
-    ids: new Set<string | number>(),
-  });
+  const params = useParams({ strict: false });
+  const [rowSelectionModel, setRowSelectionModel] = useState<GridRowSelectionModel>();
   const apiRef = useGridApiRef();
 
   const handleRowSelectionModelChange = (newSelection: GridRowSelectionModel) => {
@@ -52,18 +50,25 @@ export const RequestsTable: React.FC<RequestsTableProps> = ({ data }) => {
     }
   }, [setSortedRequests, data]);
 
+  /**
+   * If a request ID is in the URL params,
+   * set that request as selected in the table.
+   */
+  useEffect(() => {
+    if (params.requestId) {
+      setRowSelectionModel({
+        type: 'include',
+        ids: new Set<string | number>([params.requestId ? parseInt(params.requestId) : '']),
+      });
+    }
+  }, [params.requestId]);
+
   return (
     <DataGrid
       apiRef={apiRef}
       rows={data || []}
       columns={[
         { field: 'id', headerName: 'ID', width: 90, align: 'center' },
-        // {
-        //   field: 'age',
-        //   headerName: 'Age (in days)',
-        //   type: 'number',
-        //   width: 150,
-        // },
         {
           field: 'status',
           headerName: 'Status',
