@@ -152,7 +152,7 @@ class RequestDetailView(BaseUserAwareRequest):
     serializer = RequestDetailSerializer() 
 
     def get(self, request, format=None, id=None):
-        queryset= self.get_queryset()
+        queryset= self.get_actionable() | self.get_downstream()
 
         if id is None:
             return Response(data={"message": "Please provide a Request ID"}, status=status.HTTP_400_BAD_REQUEST)
