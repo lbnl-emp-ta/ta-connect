@@ -117,7 +117,7 @@ function DashboardComponent() {
           </ListItem>
         </List>
       </Box>
-      <Box component="main" sx={{ flex: 1, overflow: 'hidden' }}>
+      <Box component="main" sx={{ flex: 1, overflow: 'hidden', paddingTop: 2 }}>
         <Outlet />
       </Box>
     </Stack>

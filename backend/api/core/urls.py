@@ -6,6 +6,7 @@ urlpatterns = [
     
     path('requests/', RequestListView.as_view(), name="request-list"),
     path('requests/<int:id>', RequestDetailView.as_view(), name="request-detail"),
+    path('requests/assign/', AssignmentView.as_view(), name="assignment"),
 
     path('identities/', IdentityListView.as_view(), name="identities-list"),
 
@@ -31,4 +32,5 @@ urlpatterns = [
     
     path('cohorts/', CohortCreateView.as_view(), name="cohort-create"),
     path('cohorts/add-customer/', CohortAddCustomerView.as_view(), name="cohort-customer-add"),
+
 ]
