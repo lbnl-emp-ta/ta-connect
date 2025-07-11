@@ -77,7 +77,7 @@ class RequestSerializer(serializers.ModelSerializer):
         allow_null=True,
         queryset=Depth.objects.all()
     )
-    description = serializers.CharField(max_length=None, required=False, allow_null=True)
+    description = serializers.CharField(max_length=None, required=False, allow_null=True, allow_blank=True)
     date_created = serializers.DateTimeField()
     proj_start_date = serializers.DateField(required=False, allow_null=True)
     proj_completion_date = serializers.DateField(required=False, allow_null=True)
