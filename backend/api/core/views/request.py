@@ -9,6 +9,11 @@ from allauth.headless.contrib.rest_framework.authentication import (
     XSessionTokenAuthentication,
 )
 
+"""
+Provides common functionality across all Request views. Like
+differentiating between requests that are actionable vs.
+downstream vs. not visable.
+"""
 class BaseUserAwareRequest(views.APIView):
     authentication_classes = [
         authentication.SessionAuthentication,
@@ -151,6 +156,9 @@ class BaseUserAwareRequest(views.APIView):
 class RequestDetailView(BaseUserAwareRequest):
     serializer = RequestDetailSerializer() 
 
+    """
+    Used to populate Request and Customer panels.
+    """
     def get(self, request, format=None, id=None):
         queryset= self.get_queryset()
 
@@ -174,6 +182,9 @@ class RequestDetailView(BaseUserAwareRequest):
 
         return Response(data=response_data, status=status.HTTP_200_OK)
 
+    """
+    Used for Edit action.
+    """
     def patch(self, request, id=None):
         queryset = self.get_queryset()
 
@@ -296,9 +307,10 @@ class RequestDetailView(BaseUserAwareRequest):
         return self.get(request, None, id)
 
 
+"""
+Used to populate the request table. 
+"""
 class RequestListView(BaseUserAwareRequest):
-    serializer = RequestSerializer
-    
     def get(self, request, format=None):
         actionable = self.get_actionable()
         downstream = self.get_downstream()
@@ -327,3 +339,7 @@ class RequestListView(BaseUserAwareRequest):
             response_data[tag] = requests_data
 
         return Response(data=response_data, status=status.HTTP_200_OK)
+
+class RequestMarkCompleteView(BaseUserAwareRequest):
+    def post(self, request) :
+        return Response(status=status.HTTP_501_NOT_IMPLEMENTED)
