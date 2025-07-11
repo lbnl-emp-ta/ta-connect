@@ -1,5 +1,4 @@
 import {
-  Chip,
   CircularProgress,
   IconButton,
   MenuItem,
@@ -40,7 +39,7 @@ export const RequestInfoPanel: React.FC<RequestInfoPanelProps> = ({ request }) =
   const [projectedCompletionDate, setProjectedCompletionDate] = useState<Dayjs>();
   const [actualCompletionDate, setActualCompletionDate] = useState<Dayjs>();
   const [description, setDescription] = useState('');
-  const [topics, setTopics] = useState<TARequestDetail['topics']>([]);
+  // const [topics, setTopics] = useState<TARequestDetail['topics']>([]);
 
   /**
    * Reset form values based on request data.
@@ -55,7 +54,7 @@ export const RequestInfoPanel: React.FC<RequestInfoPanelProps> = ({ request }) =
       setActualCompletionDate(
         request.actual_completion_date ? dayjs(request.actual_completion_date) : undefined
       );
-      setTopics(request.topics || []);
+      // setTopics(request.topics || []);
       setDescription(request.description || '');
     }
   }, [request]);

@@ -32,6 +32,7 @@ export default tseslint.config(
       ...reactX.configs['recommended-typescript'].rules,
       ...reactDom.configs.recommended.rules,
       '@typescript-eslint/no-unsafe-argument': 'off',
+      '@typescript-eslint/only-throw-error': 'off',
     },
   }
 );

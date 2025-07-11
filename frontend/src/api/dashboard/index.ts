@@ -61,3 +61,26 @@ export async function patchRequest(
     }
   }
 }
+
+export async function postData<T>(url: string, data: T, identity?: Identity): Promise<void> {
+  try {
+    const response = await fetch(url, {
+      method: 'POST',
+      credentials: 'include',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRFToken': getCSRFToken() || '',
+        Context: identity ? JSON.stringify(identity) : '',
+      },
+      body: JSON.stringify({ ...data }),
+    });
+
+    if (!response.ok) {
+      throw Error(`Request status: ${response.status}`);
+    }
+  } catch (error) {
+    if (error instanceof Error) {
+      console.error(error.message);
+    }
+  }
+}
