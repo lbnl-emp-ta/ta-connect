@@ -164,11 +164,11 @@ class RequestDetailView(BaseUserAwareRequest):
         customers = found_request.customers 
         customer_serializer = CustomerSerializer(customers, many=True)
         customers_response_data = customer_serializer.data
-
-        for customer in customers:
+        for customer in customers_response_data:
             try:
-                customer_type = CustomerRequestRelationship.objects.get(request=found_request, customer=customer).customer_type
+                customer_type = CustomerRequestRelationship.objects.get(request=found_request, customer=Customer.objects.get(pk=customer["id"])).customer_type
                 customer_type_data = CustomerTypeSerializer(customer_type).data
+                customer["type"] = customer_type_data
 
             except CustomerRequestRelationship.DoesNotExist:
                 return Response(data={"message": "Customer relationship data is missing!"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

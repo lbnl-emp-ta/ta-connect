@@ -16,9 +16,9 @@ class CustomerDetailSerializer(serializers.Serializer):
     org = OrganizationSerializer()
     state = StateSerializer()
     tpr = TransmissionPlanningRegionSerializer() 
-    email = serializers.EmailField(max_length=256, unique=True)
+    email = serializers.EmailField(max_length=256)
     name = serializers.CharField(max_length=256)
-    phone = serializers.CharField(max_length=64, verbose_name="phone number", default=None)
-    title = serializers.CharField(max_length=256, verbose_name="job title")
+    phone = serializers.CharField(max_length=64)
+    title = serializers.CharField(max_length=256)
 
     type = CustomerTypeSerializer()
