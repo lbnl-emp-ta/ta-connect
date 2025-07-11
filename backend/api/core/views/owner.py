@@ -8,6 +8,7 @@ from allauth.headless.contrib.rest_framework.authentication import (
 from core.serializers import *
 from core.permissions import *
 from core.models import *
+from core.constants import DOMAINTYPE
 
 class OwnerListView(views.APIView):
     authentication_classes = [
@@ -33,7 +34,7 @@ class OwnerListView(views.APIView):
 
         if IsCoordinator().has_permission(self.request, self):
             # See one layer down to programs
-            return queryset.filter(domain_type="program")
+            return queryset.filter(domain_type=DOMAINTYPE.PROGRAM)
 
         if IsProgramLead().has_permission(self.request, self):
             # if we get here, it means "instance" field must be valid so no need to check
@@ -45,14 +46,14 @@ class OwnerListView(views.APIView):
                 lab_owners = lab_owners | Owner.objects.filter(pk=lab.owner.pk)
 
             # See one layer back up to reception, and one layer down to associated labs 
-            return queryset.filter(domain_type="reception") | lab_owners 
+            return queryset.filter(domain_type=DOMAINTYPE.RECEPTION) | lab_owners 
 
 
         if IsLabLead().has_permission(self.request, self):
             assignment = LabRoleAssignment.objects.get(user=User.objects.get(pk=context.get("user")), role=Role.objects.get(pk=context.get("role")), instance=Lab.objects.get(pk=context.get("instance")))
 
             # Only one layer up, Experts are a role within Labs - not another layer
-            return Owner.objects.filter(domain_type="program", program=assignment.program)
+            return Owner.objects.filter(domain_type=DOMAINTYPE.PROGRAM, program=assignment.program)
     
     def get(self, request, format=None):
         queryset = self.get_queryset()

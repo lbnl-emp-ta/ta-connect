@@ -21,7 +21,7 @@ import WestIcon from '@mui/icons-material/West';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { createFileRoute } from '@tanstack/react-router';
 import { RequestInfoPanel } from '../../../../features/requests/RequestInfoPanel';
-import { requestDetailQueryOptions } from '../../../../utils/queryOptions';
+import { requestDetailQueryOptions, statusesQueryOptions } from '../../../../utils/queryOptions';
 import { AppLink } from '../../../../components/AppLink';
 import { useState } from 'react';
 import { useRequestsContext } from '../../../../features/requests/RequestsContext';
@@ -35,7 +35,7 @@ export const Route = createFileRoute('/_private/dashboard/requests/$requestId')(
     await context.queryClient.ensureQueryData(
       requestDetailQueryOptions(params.requestId, context.identity)
     );
-
+    await context.queryClient.ensureQueryData(statusesQueryOptions(context.identity));
   },
   component: SelectedRequest,
 });
@@ -87,9 +87,11 @@ function SelectedRequest() {
           </AppLink>
         )}
         {previousIndex === null && (
-          <Button variant="outlined" color="primary" startIcon={<WestIcon />} disabled>
-            Previous Request
-          </Button>
+          <span>
+            <Button variant="outlined" color="primary" startIcon={<WestIcon />} disabled>
+              Previous Request
+            </Button>
+          </span>
         )}
         {nextIndex !== null && (
           <AppLink
@@ -102,18 +104,21 @@ function SelectedRequest() {
           </AppLink>
         )}
         {nextIndex === null && (
-          <Button variant="outlined" color="primary" startIcon={<EastIcon />} disabled>
-            Next Request
-          </Button>
+          <span>
+            <Button variant="outlined" color="primary" startIcon={<EastIcon />} disabled>
+              Next Request
+            </Button>
+          </span>
         )}
         <Typography
           variant="h4"
           color="primary"
           sx={{
             flex: 1,
+            textAlign: 'center',
           }}
         >
-          View: Request #?
+          Request: {selectedRequest?.id}
         </Typography>
         <Button
           id="actions-menu-button"
