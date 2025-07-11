@@ -11,14 +11,3 @@ class CustomerSerializer(serializers.ModelSerializer):
     class Meta:
         model = Customer
         fields = "__all__"
-
-class CustomerDetailSerializer(serializers.Serializer):
-    org = OrganizationSerializer()
-    state = StateSerializer()
-    tpr = TransmissionPlanningRegionSerializer() 
-    email = serializers.EmailField(max_length=256)
-    name = serializers.CharField(max_length=256)
-    phone = serializers.CharField(max_length=64)
-    title = serializers.CharField(max_length=256)
-
-    type = CustomerTypeSerializer()
