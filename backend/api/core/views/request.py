@@ -19,11 +19,75 @@ class BaseUserAwareRequest(views.APIView):
         permissions.IsAuthenticated,
     ]
 
+    def get_actionable(self):
+        return self.get_queryset()
+    
+    def get_downstream(self):
+        queryset = Request.objects.all()
+
+        maybe_context = self.request.headers.get("Context")
+        if not maybe_context:
+            return queryset.none()
+
+        context = json.loads(maybe_context) 
+
+        # This is a convention, we assume all requests for admin are 
+        # "actionable" and none are "downstream". In reality, this 
+        # concept doesn't really apply to Admins.
+        if IsAdmin().has_permission(self.request):
+            return queryset.none()
+
+        # All requests that are in the system, excluding ones that have been 
+        # archived (i.e. no owner) or are owned by Reception currently 
+        # (i.e. are actionable).
+        elif IsCoordinator().has_permission(self.request):
+            return queryset.exclude(owner=None).difference(self.get_actionable())
+
+        elif IsProgramLead().has_permission(self.request):
+            program = None
+            try:
+                program = Program.objects.get(pk=context.get("instance"))
+            except Program.DoesNotExist:
+                return queryset.none()
+            
+            program_downstream = queryset.none()
+            for lab in program.labs.all():
+                # Take all requests owned by Labs associated with this 
+                # Program, and filter all requests that are also
+                # associated with this Program.
+                program_downstream |= lab.owner.request_set.filter(receipt__program=program)
+            
+            return program_downstream.difference(self.get_actionable())
+        
+        elif IsLabLead().has_permission(self.request):
+            # For a Request to be "downstream" to a Lab means that the 
+            # Request is associated with an expert in # the same Lab.
+            #
+            # NOTE: Need to reset Expert field after "reassignment" back up to
+            # Lab. Otherwise this query is too simple and would catch an old 
+            # leftover Expert assignment.
+
+            lab = None
+            try:
+                lab = Lab.objects.get(pk=context.get("instance"))
+            except Lab.DoesNotExist:
+                return queryset.none()
+
+            return lab.owner.request_set.exclude(expert=None)
+        
+        # Here just to be explicit.
+        elif IsExpert().has_permission(self.request):
+            return queryset.none()
+
+        else:
+            return queryset.none()
+
+
     def get_queryset(self):
         queryset = Request.objects.all()
 
         # admins can see all requests
-        if IsAdmin().has_permission(self.request, self):
+        if IsAdmin().has_permission(self.request):
             return queryset
 
         maybe_context = self.request.headers.get("Context")
@@ -35,10 +99,13 @@ class BaseUserAwareRequest(views.APIView):
         if not context:
             return queryset.none()
 
-        if not (context.get("user") == self.request.user.id): # user is trying to impersonate another user
+        # user is trying to impersonate another user
+        if not (context.get("user") == self.request.user.id): 
             return queryset.none()
 
         user = User.objects.get(pk=self.request.user.id)
+
+        requests = queryset.none()
 
         reception_assignments = ReceptionRoleAssignment.objects.filter(user=user)
         program_assignments = ProgramRoleAssignment.objects.filter(user=user)
@@ -48,29 +115,38 @@ class BaseUserAwareRequest(views.APIView):
 
         if  IsCoordinator().has_permission(self.request, self):
             COORDINATOR_ROLE = Role.objects.get(name=ROLE.COORDINATOR)
+
             coordinator_assignments = reception_assignments.filter(role=COORDINATOR_ROLE)
             for assignment in coordinator_assignments:
-                    visible_requests = visible_requests.union(assignment.instance.owner.request_set.all())
+                    requests = requests.union(assignment.instance.owner.request_set.all())
 
         elif IsProgramLead().has_permission(self.request, self):
             PROGRAM_LEAD_ROLE = Role.objects.get(name=ROLE.PROGRAM_LEAD)
+
             program_lead_assignments = program_assignments.filter(role=PROGRAM_LEAD_ROLE)
             for assignment in program_lead_assignments:
-                    visible_requests = visible_requests.union(assignment.instance.owner.request_set.all())
+                    requests = requests.union(assignment.instance.owner.request_set.all())
 
         elif IsLabLead().has_permission(self.request, self):
             LAB_LEAD_ROLE = Role.objects.get(name=ROLE.LAB_LEAD)
+
             lab_lead_assignments = lab_assignments.filter(role=LAB_LEAD_ROLE)
             for assignment in lab_lead_assignments:
-                    visible_requests = visible_requests.union(assignment.instance.owner.request_set.all())
+                    requests = requests.union(assignment.instance.owner.request_set.all())
+            
+            # Requests owned by the Lab that have an "assigned" Expert are not 
+            # considered are considered "downstream", not "actionable".
+            requests = requests.filter(expert=None)
 
         elif IsExpert().has_permission(self.request, self):
             EXPERT_ROLE = Role.objects.get(name=ROLE.EXPERT)
+      
             expert_assignments = lab_assignments.filter(role=EXPERT_ROLE)
+            print(expert_assignments)
             for assignment in expert_assignments:
-                    visible_requests = visible_requests.union(assignment.instance.owner.request_set.all())
+                    requests = requests.union(assignment.instance.owner.request_set.all())
 
-        return visible_requests 
+        return requests 
 
 class RequestDetailView(BaseUserAwareRequest):
     serializer = RequestDetailSerializer() 
@@ -124,13 +200,13 @@ class RequestDetailView(BaseUserAwareRequest):
             return Response(data={"message": "Missing request body"}, status=status.HTTP_204_NO_CONTENT)
         
         if body.get("description"):
-            if not (IsAdmin().has_permission(request, None) or IsProgramLead().has_permission(request, None) or IsCoordinator().has_permission(request, None)):
+            if not (IsAdmin().has_permission(request) or IsProgramLead().has_permission(request) or IsCoordinator().has_permission(request)):
                 return Response(data={"message": "Insufficient privillege to update 'description' field"}, status=status.HTTP_401_UNAUTHORIZED)
 
             patch_data["description"] = body.get("description")
 
         if body.get("depth"):
-            if not (IsAdmin().has_permission(request, None) or IsProgramLead().has_permission(request, None)):
+            if not (IsAdmin().has_permission(request) or IsProgramLead().has_permission(request)):
                 return Response(data={"message": "Insufficient privillege to update 'depth' field"}, status=status.HTTP_401_UNAUTHORIZED)
             
             maybe_depth = None
@@ -142,13 +218,13 @@ class RequestDetailView(BaseUserAwareRequest):
             patch_data["depth"] = maybe_depth.name
 
         if body.get("actual_completion_date"):
-            if not (IsAdmin().has_permission(request, None) or IsProgramLead().has_permission(request, None)):
+            if not (IsAdmin().has_permission(request) or IsProgramLead().has_permission(request)):
                 return Response(data={"message": "Insufficient privillege to update 'depth' field"}, status=status.HTTP_401_UNAUTHORIZED)
 
             patch_data["actual_completion_date"] = body.get("actual_completion_date")
 
         if body.get("expert"):
-            if not(IsAdmin().has_permission(request, None) or IsLabLead().has_permission(request, None)):
+            if not(IsAdmin().has_permission(request) or IsLabLead().has_permission(request)):
                 return Response(data={"message": "Insufficient privillege to update 'expert' field"}, status=status.HTTP_401_UNAUTHORIZED)
 
             maybe_expert = None
@@ -160,7 +236,7 @@ class RequestDetailView(BaseUserAwareRequest):
             # Need to check provided user has expert role
             try:
                 # if they are lab lead, check to see if expert is in their lab
-                if IsLabLead().has_permission(request, None):
+                if IsLabLead().has_permission(request):
                     LabRoleAssignment.objects.get(user=maybe_expert, role=Role.objects.get(name="Expert"), instance=Lab.objects.get(pk=context.get("instance")))
 
                 # if they are admin best we can do is check if they are an expert
@@ -177,13 +253,13 @@ class RequestDetailView(BaseUserAwareRequest):
             patch_data["expert"] = maybe_expert.email 
         
         if body.get("proj_start_date"):
-            if not(IsAdmin().has_object_permission(request, None) or IsProgramLead().has_permission(request, None) or IsLabLead().has_permission(request, None) or IsExpert().has_permission(request, None)):
+            if not(IsAdmin().has_object_permission(request, self, maybe_request) or IsProgramLead().has_permission(request) or IsLabLead().has_permission(request) or IsExpert().has_permission(request)):
                 return Response(data={"message": "Insufficient privillege to update 'expert' field"}, status=status.HTTP_401_UNAUTHORIZED)
 
             patch_data["proj_start_date"] = body.get("proj_start_date")
 
         if body.get("proj_completion_date"):
-            if not(IsAdmin().has_object_permission(request, None) or IsProgramLead().has_permission(request, None) or IsLabLead().has_permission(request, None) or IsExpert().has_permission(request, None)):
+            if not(IsAdmin().has_object_permission(request, self, maybe_request) or IsProgramLead().has_permission(request) or IsLabLead().has_permission(request) or IsExpert().has_permission(request)):
                 return Response(data={"message": "Insufficient privillege to update 'expert' field"}, status=status.HTTP_401_UNAUTHORIZED)
 
             patch_data["proj_completion_date"] = body.get("proj_completion_date")
@@ -223,96 +299,31 @@ class RequestDetailView(BaseUserAwareRequest):
 class RequestListView(BaseUserAwareRequest):
     serializer = RequestSerializer
     
-    # we want id, date_created, status, depth, poc customer name, poc customer email, expert
-    # also we filter on search params
     def get(self, request, format=None):
-        queryset = self.get_queryset()
-
-        # filter requests based on search params
-        # user = self.kwargs.get("user")
-        # role = self.kwargs.get("role")
-        # location = self.kwargs.get("location")
-        # instance = self.kwargs.get("instance")
-
-        # Unused for now
-        # if user is not None:
-        #     queryset = queryset.filter(user=User.objects.get(user))
+        actionable = self.get_actionable()
+        downstream = self.get_downstream()
         
-        # if role is not None:
-        #     queryset = queryset.filter(role=Role.objects.get(name=role.lower().capitalize()))
-        
-        # if location is not None:
-        #     location_filter = None
-        #     match location.lower():
-        #         case "reception":
-        #             location_filter = "Reception"
-        #             pass
-        #         case "program":
-        #             location_filter = "Program"
-        #             pass
-        #         case "lab":
-        #             location_filter = "Lab"
-        #             pass
-            
-        #     if location_filter is not None:
-        #         queryset = queryset.filter(owner__domain_type=location_filter)
+        response_data = {"actionable": list(), "downstream": list()}
 
-        #     if instance is not None:
-        #         reception_queryset = queryset.filter(owner__reception=Reception.objects.get(instance))
-        #         program_queryset = queryset.filter(owner__program=Program.objects.get(instance))
-        #         lab_queryset = queryset.filter(owner__lab=Lab.objects.get(instance))
-
-        #         queryset = reception_queryset | program_queryset | lab_queryset
+        for tag in response_data:
+            queryset = None 
+            if tag == "actionable":
+                queryset = actionable
+            else:
+                queryset = downstream
             
+            if not queryset.exists():
+                continue 
                 
-        
-        serializer = RequestListSerializer(queryset, many=True)
-        response_data = list() 
-        for request in serializer.data:
-            data = request
-            poc_customer = Request.objects.get(pk=request["id"]).customerrequestrelationship_set.filter(customer_type=CustomerType.objects.get(name="Primary Contact")).first().customer
-            data["customer_name"] = poc_customer.name 
-            data["customer_email"] = poc_customer.email 
-            response_data.append(data)
-        
+            serializer = RequestListSerializer(queryset, many=True)
+            requests_data = list() 
+            for request in serializer.data:
+                data = request
+                poc_customer = Request.objects.get(pk=request["id"]).customerrequestrelationship_set.filter(customer_type=CustomerType.objects.get(name="Primary Contact")).first().customer
+                data["customer_name"] = poc_customer.name 
+                data["customer_email"] = poc_customer.email 
+                requests_data.append(data)
+            
+            response_data[tag] = requests_data
+
         return Response(data=response_data, status=status.HTTP_200_OK)
-
-
-# class RequestCreateView(generics.CreateAPIView):
-#     queryset = Request.objects.all().select_related("status", "depth", "owner")
-#     serializer_class = RequestSerializer
-
-#     authentication_classes = [
-#         authentication.SessionAuthentication,
-#         XSessionTokenAuthentication,
-#     ]
-
-#     permission_classes = [
-#         permissions.IsAuthenticated,
-#     ]
-
-    
-#     def post(self, request):
-#         imcoming_fields_to_keep = ["description", "depth"]
-#         incoming_data = request.data.copy()
-        
-#         # Filter incoming fields
-#         for field in request.data:
-#             if field not in imcoming_fields_to_keep:
-#                 incoming_data.pop(field)
-        
-#         # ** From source code of CreateModelMixin **
-#         serializer = self.get_serializer(data=incoming_data)
-#         serializer.is_valid(raise_exception=True)
-#         self.perform_create(serializer)
-#         headers = self.get_success_headers(serializer.data)
-        
-#         outgoing_fields_to_keep = ["description", "depth", "date_created"]
-#         outgoing_data = serializer.data.copy()
-        
-#         # Filter outgoing fields
-#         for field in serializer.data:
-#             if field not in outgoing_fields_to_keep:
-#                 outgoing_data.pop(field)
-                
-#         return Response(outgoing_data, status=status.HTTP_201_CREATED, headers=headers)

@@ -50,12 +50,12 @@ export const RequestCustomerPanel: React.FC<RequestInfoTableProps> = ({ customer
               <TableRow>
                 <TableCell>Organization</TableCell>
                 {/* TODO: Implement nested organization data in the API */}
-                <TableCell>{customer.org}</TableCell>
+                <TableCell>{customer.org.name}</TableCell>
               </TableRow>
               <TableRow>
                 <TableCell>State</TableCell>
                 {/* TODO: Return state name instead of ID in the API */}
-                <TableCell>{customer.state}</TableCell>
+                <TableCell>{customer.state.name}</TableCell>
               </TableRow>
             </TableBody>
           </Table>
