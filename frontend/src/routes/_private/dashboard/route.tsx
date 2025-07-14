@@ -12,12 +12,12 @@ import {
   SelectChangeEvent,
   Stack,
 } from '@mui/material';
-import { createFileRoute, Outlet, redirect, useNavigate } from '@tanstack/react-router';
-import { identitiesQueryOptions } from '../../../utils/queryOptions';
 import { useSuspenseQuery } from '@tanstack/react-query';
+import { createFileRoute, Outlet, redirect, useNavigate } from '@tanstack/react-router';
 import { useEffect, useState } from 'react';
 import { TAIdentity } from '../../../api/dashboard/types';
 import { useIdentityContext } from '../../../features/identity/IdentityContext';
+import { identitiesQueryOptions } from '../../../utils/queryOptions';
 
 export const Route = createFileRoute('/_private/dashboard')({
   beforeLoad({ location }) {
@@ -51,7 +51,7 @@ function DashboardComponent() {
         instance: fullIdentity.instance?.id,
       });
     }
-  }, [fullIdentity, setIdentity, navigate]);
+  }, [fullIdentity, setIdentity]);
 
   return (
     <Stack direction="row" spacing={0} sx={{ width: '100%' }}>
