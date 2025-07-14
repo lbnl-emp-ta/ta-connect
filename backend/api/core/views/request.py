@@ -31,6 +31,8 @@ class BaseUserAwareRequest(views.APIView):
 
         context = json.loads(maybe_context) 
 
+        actionable_pks = [request.pk for request in self.get_actionable()]
+
         # This is a convention, we assume all requests for admin are 
         # "actionable" and none are "downstream". In reality, this 
         # concept doesn't really apply to Admins.
@@ -41,7 +43,7 @@ class BaseUserAwareRequest(views.APIView):
         # archived (i.e. no owner) or are owned by Reception currently 
         # (i.e. are actionable).
         elif IsCoordinator().has_permission(self.request):
-            return queryset.exclude(owner=None).difference(self.get_actionable())
+            return queryset.exclude(owner=None).exclude(pk__in=actionable_pks)
 
         elif IsProgramLead().has_permission(self.request):
             program = None
@@ -57,7 +59,8 @@ class BaseUserAwareRequest(views.APIView):
                 # associated with this Program.
                 program_downstream |= lab.owner.request_set.filter(receipt__program=program)
             
-            return program_downstream.difference(self.get_actionable())
+            return program_downstream.exclude(pk__in=actionable_pks)
+
         
         elif IsLabLead().has_permission(self.request):
             # For a Request to be "downstream" to a Lab means that the 
@@ -150,7 +153,7 @@ class BaseUserAwareRequest(views.APIView):
 
 class RequestDetailView(BaseUserAwareRequest):
     def get(self, request, format=None, id=None):
-        queryset= self.get_queryset()
+        queryset= self.get_actionable() | self.get_downstream()
 
         if id is None:
             return Response(data={"message": "Please provide a Request ID"}, status=status.HTTP_400_BAD_REQUEST)
