@@ -116,3 +116,7 @@ export interface TAAssignment {
   owner?: number;
   expert?: number;
 }
+
+export interface TAError {
+  message: string | { non_field_errors?: string[] };
+}
