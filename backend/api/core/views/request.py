@@ -206,15 +206,22 @@ class RequestDetailView(BaseUserAwareRequest):
         if not body:
             return Response(data={"message": "Missing request body"}, status=status.HTTP_204_NO_CONTENT)
         
-        if body.get("description"):
-            if not (IsAdmin().has_permission(request) or IsProgramLead().has_permission(request) or IsCoordinator().has_permission(request)):
+        if "description" in body:
+            if not (IsAdmin().has_permission(request, None) or IsProgramLead().has_permission(request, None) or IsCoordinator().has_permission(request, None)):
                 return Response(data={"message": "Insufficient privillege to update 'description' field"}, status=status.HTTP_401_UNAUTHORIZED)
+            
+            new_description_data = body.get("description")
+            if new_description_data is None:
+                new_description_data = ""
 
-            patch_data["description"] = body.get("description")
+            patch_data["description"] = new_description_data 
 
-        if body.get("depth"):
-            if not (IsAdmin().has_permission(request) or IsProgramLead().has_permission(request)):
+        if "depth" in body:
+            if not (IsAdmin().has_permission(request, None) or IsProgramLead().has_permission(request, None)):
                 return Response(data={"message": "Insufficient privillege to update 'depth' field"}, status=status.HTTP_401_UNAUTHORIZED)
+            
+            if body.get("depth") is None:
+                return Response(data={"message": "Cannot clear depth field on a request. Need to provide a valid replacement value."}, status=status.HTTP_401_UNAUTHORIZED)
             
             maybe_depth = None
             try:
@@ -224,49 +231,51 @@ class RequestDetailView(BaseUserAwareRequest):
 
             patch_data["depth"] = maybe_depth.name
 
-        if body.get("actual_completion_date"):
-            if not (IsAdmin().has_permission(request) or IsProgramLead().has_permission(request)):
+        if "actual_completion_date" in body:
+            if not (IsAdmin().has_permission(request, None) or IsProgramLead().has_permission(request, None)):
                 return Response(data={"message": "Insufficient privillege to update 'depth' field"}, status=status.HTTP_401_UNAUTHORIZED)
 
-            patch_data["actual_completion_date"] = body.get("actual_completion_date")
+            patch_data["actual_completion_date"] = body.get("actual_completion_date") 
 
-        if body.get("expert"):
-            if not(IsAdmin().has_permission(request) or IsLabLead().has_permission(request)):
+        if "expert" in body:
+            if not(IsAdmin().has_permission(request, None) or IsLabLead().has_permission(request, None)):
                 return Response(data={"message": "Insufficient privillege to update 'expert' field"}, status=status.HTTP_401_UNAUTHORIZED)
-
-            maybe_expert = None
-            try:
-                maybe_expert = User.objects.get(pk=body.get("expert"))
-            except User.DoesNotExist:
-                return Response(data={"message": "Provided user in expert field does not exist."}, status=status.HTTP_400_BAD_REQUEST)
             
-            # Need to check provided user has expert role
-            try:
-                # if they are lab lead, check to see if expert is in their lab
-                if IsLabLead().has_permission(request):
-                    LabRoleAssignment.objects.get(user=maybe_expert, role=Role.objects.get(name="Expert"), instance=Lab.objects.get(pk=context.get("instance")))
+            new_expert_data = body.get("expert")
+            if new_expert_data is not None:
+                maybe_expert = None
+                try:
+                    maybe_expert = User.objects.get(pk=new_expert_data)
+                except User.DoesNotExist:
+                    return Response(data={"message": "Provided user in expert field does not exist."}, status=status.HTTP_400_BAD_REQUEST)
+                
+                # Need to check provided user has expert role
+                try:
+                    # if they are lab lead, check to see if expert is in their lab
+                    if IsLabLead().has_permission(request, None):
+                        LabRoleAssignment.objects.get(user=maybe_expert, role=Role.objects.get(name="Expert"), instance=Lab.objects.get(pk=context.get("instance")))
 
-                # if they are admin best we can do is check if they are an expert
-                else:
-                    LabRoleAssignment.objects.get(user=maybe_expert, role=Role.objects.get(name="Expert"))
+                    # if they are admin best we can do is check if they are an expert
+                    else:
+                        LabRoleAssignment.objects.get(user=maybe_expert, role=Role.objects.get(name="Expert"))
 
-            except LabRoleAssignment.DoesNotExist:
-                return Response(data={"message": "Provided user in expert field does not not have expert role."}, status=status.HTTP_400_BAD_REQUEST)
+                except LabRoleAssignment.DoesNotExist:
+                    return Response(data={"message": "Provided user in expert field does not not have expert role."}, status=status.HTTP_400_BAD_REQUEST)
 
-            except Lab.DoesNotExist:
-                return Response(data={"message": "Provided expert does not reside in your lab role exist."}, status=status.HTTP_400_BAD_REQUEST)
-            
+                except Lab.DoesNotExist:
+                    return Response(data={"message": "Provided expert does not reside in your lab role exist."}, status=status.HTTP_400_BAD_REQUEST)
+                
 
             patch_data["expert"] = maybe_expert.email 
         
-        if body.get("proj_start_date"):
-            if not(IsAdmin().has_object_permission(request, self, maybe_request) or IsProgramLead().has_permission(request) or IsLabLead().has_permission(request) or IsExpert().has_permission(request)):
+        if "proj_start_date" in body:
+            if not(IsAdmin().has_permission(request, None) or IsProgramLead().has_permission(request, None) or IsLabLead().has_permission(request, None) or IsExpert().has_permission(request, None)):
                 return Response(data={"message": "Insufficient privillege to update 'expert' field"}, status=status.HTTP_401_UNAUTHORIZED)
 
             patch_data["proj_start_date"] = body.get("proj_start_date")
 
-        if body.get("proj_completion_date"):
-            if not(IsAdmin().has_object_permission(request, self, maybe_request) or IsProgramLead().has_permission(request) or IsLabLead().has_permission(request) or IsExpert().has_permission(request)):
+        if "proj_completion_date" in body:
+            if not(IsAdmin().has_permission(request, None) or IsProgramLead().has_permission(request, None) or IsLabLead().has_permission(request, None) or IsExpert().has_permission(request, None)):
                 return Response(data={"message": "Insufficient privillege to update 'expert' field"}, status=status.HTTP_401_UNAUTHORIZED)
 
             patch_data["proj_completion_date"] = body.get("proj_completion_date")
@@ -282,7 +291,10 @@ class RequestDetailView(BaseUserAwareRequest):
         #     patch_data["owner"] = maybe_owner.pk 
         
             
-        if body.get("status"):
+        if "status" in body:
+            if body.get("status") is None:
+                return Response(data={"message": "Cannot clear status field on request. Need to provide value replacement value."}, status=status.HTTP_400_BAD_REQUEST)
+
             maybe_status = None
             try:
                 maybe_status = RequestStatus.objects.get(pk=body.get("status"))
