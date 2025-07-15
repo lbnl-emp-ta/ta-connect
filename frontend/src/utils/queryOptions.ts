@@ -12,7 +12,9 @@ import { loginMutation } from '../api/accounts/login';
 import { logoutMutation } from '../api/accounts/logout';
 import {
   CustomerRequestRelationship,
+  TAAssignment,
   TAIdentity,
+  TAOwner,
   TARequest,
   TARequestDetail,
   TARequestsResponse,
@@ -20,7 +22,9 @@ import {
 } from '../api/dashboard/types';
 import { queryClient } from '../App';
 import { Identity } from '../features/identity/IdentityContext';
-import { fetchData, patchRequest } from '../api/dashboard';
+import { fetchData, patchRequest, postData } from '../api/dashboard';
+
+const apiUrl = import.meta.env.VITE_API_URL as string;
 
 export const authSessionQueryOptions = () =>
   queryOptions({
@@ -34,16 +38,14 @@ export const customerRequestRelationshipOptions = () =>
     staleTime: 120_000, // stale after 2 minutes
     queryKey: ['customerRequestRelationships'],
     queryFn: () =>
-      fetchData<CustomerRequestRelationship[]>(
-        `${import.meta.env.VITE_API_URL}/customer-request-relationships/`
-      ),
+      fetchData<CustomerRequestRelationship[]>(`${apiUrl}/customer-request-relationships/`),
   });
 
 export const identitiesQueryOptions = () =>
   queryOptions({
     staleTime: 120_000, // stale after 2 minutes
     queryKey: ['identities'],
-    queryFn: () => fetchData<TAIdentity[]>(`${import.meta.env.VITE_API_URL}/identities/`),
+    queryFn: () => fetchData<TAIdentity[]>(`${apiUrl}/identities/`),
   });
 
 export const requestsQueryOptions = (identity?: Identity) =>
@@ -52,7 +54,7 @@ export const requestsQueryOptions = (identity?: Identity) =>
     queryKey: ['requests', identity],
     queryFn: () => {
       if (identity) {
-        return fetchData<TARequestsResponse>(`${import.meta.env.VITE_API_URL}/requests/`, identity);
+        return fetchData<TARequestsResponse>(`${apiUrl}/requests/`, identity);
       } else {
         return null;
       }
@@ -62,13 +64,11 @@ export const requestsQueryOptions = (identity?: Identity) =>
 export const requestDetailQueryOptions = (requestId: string, identity?: Identity) =>
   queryOptions({
     staleTime: 120_000, // stale after 2 minutes
+    retry: false,
     queryKey: ['requests', requestId, identity],
     queryFn: () => {
       if (identity) {
-        return fetchData<TARequestDetail>(
-          `${import.meta.env.VITE_API_URL}/requests/${requestId}`,
-          identity
-        );
+        return fetchData<TARequestDetail>(`${apiUrl}/requests/${requestId}`, identity);
       } else {
         return null;
       }
@@ -81,7 +81,20 @@ export const statusesQueryOptions = (identity?: Identity) =>
     queryKey: ['statuses', identity],
     queryFn: () => {
       if (identity) {
-        return fetchData<TAStatus[]>(`${import.meta.env.VITE_API_URL}/statuses/`, identity);
+        return fetchData<TAStatus[]>(`${apiUrl}/statuses/`, identity);
+      } else {
+        return [];
+      }
+    },
+  });
+
+export const ownersQueryOptions = (identity?: Identity) =>
+  queryOptions({
+    staleTime: 120_000, // stale after 2 minutes
+    queryKey: ['owners', identity],
+    queryFn: () => {
+      if (identity) {
+        return fetchData<TAOwner[]>(`${apiUrl}/owners/`, identity);
       } else {
         return [];
       }
@@ -92,15 +105,14 @@ export const statesQueryOptions = () =>
   queryOptions({
     staleTime: 120_000, // stale after 2 minutes
     queryKey: ['states'],
-    queryFn: () => fetchData<State[]>(`${import.meta.env.VITE_API_URL}/states/`),
+    queryFn: () => fetchData<State[]>(`${apiUrl}/states/`),
   });
 
 export const organizationTypesQueryOptions = () =>
   queryOptions({
     staleTime: 120_000, // stale after 2 minutes
     queryKey: ['organizationTypes'],
-    queryFn: () =>
-      fetchData<OrganiztionType[]>(`${import.meta.env.VITE_API_URL}/organization-types/`),
+    queryFn: () => fetchData<OrganiztionType[]>(`${apiUrl}/organization-types/`),
   });
 
 export const transmissionPlanningRegionsQueryOptions = () =>
@@ -108,9 +120,7 @@ export const transmissionPlanningRegionsQueryOptions = () =>
     staleTime: 120_000, // stale after 2 minutes
     queryKey: ['transmissionPlanningRegions'],
     queryFn: () =>
-      fetchData<TransmissionPlanningRegion[]>(
-        `${import.meta.env.VITE_API_URL}/transmission-planning-regions/`
-      ),
+      fetchData<TransmissionPlanningRegion[]>(`${apiUrl}/transmission-planning-regions/`),
   });
 
 export const useSubmitIntakeMutation = () => {
@@ -146,6 +156,15 @@ export const useRequestMutation = (requestId: string, identity?: Identity) => {
   return useMutation({
     mutationKey: ['requests', 'update', requestId, identity],
     mutationFn: (data: Partial<TARequest>) => patchRequest(requestId, data, identity),
+    onSuccess: () => queryClient.invalidateQueries(),
+  });
+};
+
+export const useAssignmentMutation = (requestId: string, identity?: Identity) => {
+  return useMutation({
+    mutationKey: ['requests', 'assign', requestId, identity],
+    mutationFn: (data: TAAssignment) =>
+      postData<TAAssignment>(`${apiUrl}/requests/assign/`, data, identity),
     onSuccess: () => queryClient.invalidateQueries(),
   });
 };

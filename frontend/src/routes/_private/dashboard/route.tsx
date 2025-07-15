@@ -12,18 +12,18 @@ import {
   SelectChangeEvent,
   Stack,
 } from '@mui/material';
-import { createFileRoute, Outlet, redirect, useNavigate } from '@tanstack/react-router';
-import { identitiesQueryOptions } from '../../../utils/queryOptions';
 import { useSuspenseQuery } from '@tanstack/react-query';
+import { createFileRoute, Outlet, redirect, useNavigate } from '@tanstack/react-router';
 import { useEffect, useState } from 'react';
 import { TAIdentity } from '../../../api/dashboard/types';
 import { useIdentityContext } from '../../../features/identity/IdentityContext';
+import { identitiesQueryOptions } from '../../../utils/queryOptions';
 
 export const Route = createFileRoute('/_private/dashboard')({
   beforeLoad({ location }) {
-    if (location.pathname === '/dashboard' || location.pathname === '/dashboard/')
-      // eslint-disable-next-line @typescript-eslint/only-throw-error
+    if (location.pathname === '/dashboard' || location.pathname === '/dashboard/') {
       throw redirect({ to: '/dashboard/requests' });
+    }
   },
   loader: async ({ context }) => {
     await context.queryClient.ensureQueryData(identitiesQueryOptions());

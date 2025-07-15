@@ -110,3 +110,9 @@ export interface CustomerRequestRelationship {
   customer: Customer;
   customer_type: CustomerType;
 }
+
+export interface TAAssignment {
+  request: number;
+  owner?: number;
+  expert?: number;
+}
