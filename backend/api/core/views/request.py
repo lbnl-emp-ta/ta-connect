@@ -373,7 +373,7 @@ class RequestMarkCompleteView(BaseUserAwareRequest):
         if id is None:
             return Response(data={"message": "Please provide a Request ID"}, status=status.HTTP_400_BAD_REQUEST)
 
-        if not IsProgramLead.has_permission(request):
+        if not (IsProgramLead().has_permission(request) or IsAdmin().has_permission(request)):
             return Response(data={"message": "Insufficient privillege to mark request as complete"}, status=status.HTTP_401_UNAUTHORIZED)
 
         queryset = self.get_actionable()
