@@ -1,14 +1,23 @@
+from django.db import transaction
+
 from rest_framework import views, status, permissions, authentication
 from rest_framework.response import Response
+
 from core.serializers import * 
 from core.models import * 
 from core.permissions import *
-from core.constants import ROLE
+from core.constants import ROLE, REQUEST_STATUS
+
 
 from allauth.headless.contrib.rest_framework.authentication import (
     XSessionTokenAuthentication,
 )
 
+"""
+Provides common functionality across all Request views. Like
+differentiating between requests that are actionable vs.
+downstream vs. not visable.
+"""
 class BaseUserAwareRequest(views.APIView):
     authentication_classes = [
         authentication.SessionAuthentication,
@@ -152,6 +161,11 @@ class BaseUserAwareRequest(views.APIView):
         return requests 
 
 class RequestDetailView(BaseUserAwareRequest):
+    serializer = RequestDetailSerializer() 
+
+    """
+    Used to populate Request and Customer panels.
+    """
     def get(self, request, format=None, id=None):
         queryset= self.get_actionable() | self.get_downstream()
 
@@ -184,6 +198,9 @@ class RequestDetailView(BaseUserAwareRequest):
 
         return Response(data=response_data, status=status.HTTP_200_OK)
 
+    """
+    Used for Edit action.
+    """
     def patch(self, request, id=None):
         queryset = self.get_queryset()
 
@@ -318,9 +335,10 @@ class RequestDetailView(BaseUserAwareRequest):
         return self.get(request, None, id)
 
 
+"""
+Used to populate the request table. 
+"""
 class RequestListView(BaseUserAwareRequest):
-    serializer = RequestSerializer
-    
     def get(self, request, format=None):
         actionable = self.get_actionable()
         downstream = self.get_downstream()
@@ -349,6 +367,33 @@ class RequestListView(BaseUserAwareRequest):
             response_data[tag] = requests_data
 
         return Response(data=response_data, status=status.HTTP_200_OK)
+
+class RequestMarkCompleteView(BaseUserAwareRequest):
+    def post(self, request, id=None) :
+        if id is None:
+            return Response(data={"message": "Please provide a Request ID"}, status=status.HTTP_400_BAD_REQUEST)
+
+        if not (IsProgramLead().has_permission(request) or IsAdmin().has_permission(request)):
+            return Response(data={"message": "Insufficient privillege to mark request as complete"}, status=status.HTTP_401_UNAUTHORIZED)
+
+        queryset = self.get_actionable()
+
+        found_request = None
+        try:
+            found_request = queryset.get(pk=id)        
+        except:
+            return Response(data={"message": "Request with given ID does not exist"}, status=status.HTTP_404_NOT_FOUND)
+
+        # Maybe consider checking receipt to see if its even been serviced?
+        try:
+            found_request.status = RequestStatus.objects.get(name=REQUEST_STATUS.COMPLETED)
+            found_request.owner = None
+            found_request.expert = None
+            found_request.save()
+        except Exception as e:
+            return Response(data={"message": f"{e}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+        return Response(status=status.HTTP_200_OK)
 
 class RequestCancelView(BaseUserAwareRequest):
     def get(self, request, id=None):
