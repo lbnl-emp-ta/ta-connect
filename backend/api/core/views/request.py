@@ -1,9 +1,13 @@
+from django.db import transaction
+
 from rest_framework import views, status, permissions, authentication
 from rest_framework.response import Response
+
 from core.serializers import * 
 from core.models import * 
 from core.permissions import *
-from core.constants import ROLE
+from core.constants import ROLE, REQUEST_STATUS
+
 
 from allauth.headless.contrib.rest_framework.authentication import (
     XSessionTokenAuthentication,
@@ -365,5 +369,27 @@ class RequestListView(BaseUserAwareRequest):
         return Response(data=response_data, status=status.HTTP_200_OK)
 
 class RequestMarkCompleteView(BaseUserAwareRequest):
-    def post(self, request) :
-        return Response(status=status.HTTP_501_NOT_IMPLEMENTED)
+    def post(self, request, id=None) :
+        if id is None:
+            return Response(data={"message": "Please provide a Request ID"}, status=status.HTTP_400_BAD_REQUEST)
+
+        if not IsProgramLead.has_permission(request):
+            return Response(data={"message": "Insufficient privillege to mark request as complete"}, status=status.HTTP_401_UNAUTHORIZED)
+
+        queryset = self.get_actionable()
+
+        found_request = None
+        try:
+            found_request = queryset.get(pk=id)        
+        except:
+            return Response(data={"message": "Request with given ID does not exist"}, status=status.HTTP_404_NOT_FOUND)
+
+        # Maybe consider checking receipt to see if its even been serviced?
+        try:
+            found_request.status = RequestStatus.objects.get(name=REQUEST_STATUS.COMPLETED)
+            found_request.owner = None
+            found_request.save()
+        except Exception as e:
+            return Response(data={"message": f"{e}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+        return Response(status=status.HTTP_200_OK)
