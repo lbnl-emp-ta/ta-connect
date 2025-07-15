@@ -16,7 +16,6 @@ interface RequestsTableProps {
 export const RequestsTable: React.FC<RequestsTableProps> = ({ data }) => {
   const navigate = useNavigate();
   const { setSortedRequests } = useRequestsContext();
-  console.log('RequestTable data', data);
   const params = useParams({ strict: false });
   const [rowSelectionModel, setRowSelectionModel] = useState<GridRowSelectionModel>();
   const apiRef = useGridApiRef();
