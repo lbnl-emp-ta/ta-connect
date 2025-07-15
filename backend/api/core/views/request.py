@@ -415,6 +415,7 @@ class RequestCancelView(BaseUserAwareRequest):
             with transaction.atomic():
                 found_request.status = RequestStatus.objects.get(name=REQUEST_STATUS.UNABLE_TO_ADDRESS)
                 found_request.owner = None
+                found_request.expert = None
 
                 found_request.receipt.program = None
                 found_request.receipt.lab = None
