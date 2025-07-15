@@ -349,3 +349,7 @@ class RequestListView(BaseUserAwareRequest):
             response_data[tag] = requests_data
 
         return Response(data=response_data, status=status.HTTP_200_OK)
+
+class RequestCancelView(BaseUserAwareRequest):
+    def get(self, request, id=None):
+        return Response(status=status.HTTP_501_NOT_IMPLEMENTED)
