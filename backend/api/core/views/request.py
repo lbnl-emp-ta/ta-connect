@@ -388,6 +388,7 @@ class RequestMarkCompleteView(BaseUserAwareRequest):
         try:
             found_request.status = RequestStatus.objects.get(name=REQUEST_STATUS.COMPLETED)
             found_request.owner = None
+            found_request.expert = None
             found_request.save()
         except Exception as e:
             return Response(data={"message": f"{e}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
