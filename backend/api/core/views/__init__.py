@@ -12,10 +12,12 @@ from .identity import IdentityListView
 from .status import StatusListView
 from .owner import OwnerListView
 from .assignment import AssignmentView
+from .expert import ExpertsListView
 
 __all__ = [
     "AssignmentView",
     "OwnerListView",
+    "ExpertsListView",
     "StatusListView",
     "IdentityListView",
     "RequestListView",

@@ -36,7 +36,7 @@ class ExpertsListView(views.APIView):
             return Response(data={"message": "Insufficient credentials to access experts"}, status=status.HTTP_400_BAD_REQUEST)
 
         # Program agnostic for now, might consider changing in future! 
-        expert_assignments = LabRoleAssignment.objects.filter(role=Role.objects.get(ROLE.EXPERT), instance=maybe_lab)
+        expert_assignments = LabRoleAssignment.objects.filter(role=Role.objects.get(name=ROLE.EXPERT), instance=maybe_lab)
         experts_data = list()
         for assignment in expert_assignments:
             data = dict()
@@ -47,8 +47,19 @@ class ExpertsListView(views.APIView):
             expertise_list = Expertise.objects.filter(user=assignment.user.pk)
             expertise = dict()
             for expertise_entry in expertise_list:
-                expertise["topic"] = TopicSerializer(data=Topic.objects.get(pk=expertise_entry.topic)).validated_data
-                expertise["depth"] = DepthSerializer(data=Depth.objects.get(pk=expertise_entry.depth)).validated_data
+                maybe_topic = None
+                maybe_depth = None
+                try:
+                    maybe_topic = Topic.objects.get(pk=expertise_entry.topic.pk)
+                    maybe_depth = Depth.objects.get(pk=expertise_entry.depth.pk)
+                except:
+                    return Response(data={"message": "Topic/Depth internal error"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+                topic_serializer = TopicSerializer(maybe_topic)
+                depth_serializer = DepthSerializer(maybe_depth)
+
+                expertise["topic"] = topic_serializer.data
+                expertise["depth"] = depth_serializer.data 
 
             data["expertise"] = expertise
             experts_data.append(data)

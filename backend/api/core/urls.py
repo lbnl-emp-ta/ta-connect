@@ -13,6 +13,8 @@ urlpatterns = [
     path('statuses/', StatusListView.as_view(), name="statuses-list"),
 
     path('owners/', OwnerListView.as_view(), name="owners-list"),
+    path('experts/<str:lab_name>', ExpertsListView.as_view(), name="experts-list"),
+
     
     path('depths/', DepthListView.as_view(), name="depth-list"),
     path('depths/<int:pk>', DepthRetrieveView.as_view(), name="depth-retrieve"),
