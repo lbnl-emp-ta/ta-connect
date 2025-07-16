@@ -42,7 +42,6 @@ class OwnerListView(views.APIView):
 
             lab_owners = queryset.none() 
             for lab in program.labs.all():
-                print(lab)
                 lab_owners = lab_owners | Owner.objects.filter(pk=lab.owner.pk)
 
             # See one layer back up to reception, and one layer down to associated labs 
