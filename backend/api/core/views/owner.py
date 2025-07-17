@@ -57,6 +57,9 @@ class OwnerListView(views.APIView):
     
     def get(self, request, format=None):
         queryset = self.get_queryset()
-        
-        owner_serializer = OwnerSerializer(queryset, many=True)
-        return Response(data=owner_serializer.data, status=status.HTTP_200_OK)
+
+        owners_data = list()
+        for owner in queryset.all():
+            owners_data.append(OwnerSerializer().format_owner(owner))
+
+        return Response(data=owners_data, status=status.HTTP_200_OK)

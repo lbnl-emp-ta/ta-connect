@@ -195,6 +195,7 @@ class RequestDetailView(BaseUserAwareRequest):
         response_data = dict()
         response_data = response_data | request_serializer.data 
         response_data["customers"] = customer_serializer.data
+        response_data["owner"] = OwnerSerializer().format_owner(found_request.owner)
 
         return Response(data=response_data, status=status.HTTP_200_OK)
 
