@@ -7,5 +7,8 @@ class Program(models.Model):
     description = models.TextField()
     labs = models.ManyToManyField(Lab, blank=True, related_name="programs")
 
-class Meta:
-    db_table = "program"
+    def __str__(self):
+        return f"{self.name}"
+
+    class Meta:
+        db_table = "program"
