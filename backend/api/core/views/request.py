@@ -8,6 +8,7 @@ from core.models import *
 from core.permissions import *
 from core.constants import ROLE, REQUEST_STATUS
 
+from core.views import assignment
 
 from allauth.headless.contrib.rest_framework.authentication import (
     XSessionTokenAuthentication,
@@ -395,7 +396,7 @@ class RequestMarkCompleteView(BaseUserAwareRequest):
             return Response(data={"message": f"{e}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
         return Response(status=status.HTTP_200_OK)
-
+      
 class RequestCancelView(BaseUserAwareRequest):
     def get(self, request, id=None):
         if id is None:
@@ -424,6 +425,36 @@ class RequestCancelView(BaseUserAwareRequest):
 
                 found_request.receipt.save()
                 found_request.save()
+
+        except Exception as e:
+            return Response(data={"message": f"{e}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+        return Response(status=status.HTTP_200_OK)
+
+class RequestCloseoutCompleteView(BaseUserAwareRequest):
+    def post(self, request, id=None):
+        if id is None:
+            return Response(data={"message": "Please provide a Request ID"}, status=status.HTTP_400_BAD_REQUEST)
+
+        if not (IsExpert().has_permission(request) or IsAdmin().has_permission(request)):
+            return Response(data={"message": "Insufficient privillege to mark request as complete"}, status=status.HTTP_401_UNAUTHORIZED)
+
+        queryset = self.get_actionable()
+
+        found_request = None
+        try:
+            found_request = queryset.get(pk=id)        
+        except:
+            return Response(data={"message": "Request with given ID does not exist"}, status=status.HTTP_404_NOT_FOUND)
+
+        if found_request.expert is None:
+            return Response(data={"message": "Request must have an assigned expert in order to complete closeout"}, status=status.HTTP_404_NOT_FOUND)
+
+        try:
+            found_request.status = RequestStatus.objects.get(name=REQUEST_STATUS.CLOSE_OUT_COMPLETED)
+            # Effectively this "assigns" back up to Lab
+            found_request.expert = None 
+            found_request.save()
 
         except Exception as e:
             return Response(data={"message": f"{e}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
