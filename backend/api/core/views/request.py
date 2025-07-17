@@ -394,3 +394,37 @@ class RequestMarkCompleteView(BaseUserAwareRequest):
             return Response(data={"message": f"{e}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
         return Response(status=status.HTTP_200_OK)
+
+class RequestCancelView(BaseUserAwareRequest):
+    def get(self, request, id=None):
+        if id is None:
+            return Response(data={"message": "Please provide a Request ID"}, status=status.HTTP_400_BAD_REQUEST)
+
+        if not (IsCoordinator().has_permission(request) or IsAdmin().has_permission(request)):
+            return Response(data={"message": "Insufficient privillege to mark request as complete"}, status=status.HTTP_401_UNAUTHORIZED)
+
+        queryset = self.get_actionable()
+
+        found_request = None
+        try:
+            found_request = queryset.get(pk=id)        
+        except:
+            return Response(data={"message": "Request with given ID does not exist"}, status=status.HTTP_404_NOT_FOUND)
+
+        try:
+            with transaction.atomic():
+                found_request.status = RequestStatus.objects.get(name=REQUEST_STATUS.UNABLE_TO_ADDRESS)
+                found_request.owner = None
+                found_request.expert = None
+
+                found_request.receipt.program = None
+                found_request.receipt.lab = None
+                found_request.receipt.expert = None
+
+                found_request.receipt.save()
+                found_request.save()
+
+        except Exception as e:
+            return Response(data={"message": f"{e}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+        return Response(status=status.HTTP_200_OK)
