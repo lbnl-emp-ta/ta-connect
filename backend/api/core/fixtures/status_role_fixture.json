@@ -88,5 +88,14 @@
             "description": "Request was not able to be serviced by any available program."
         }
 
+    },
+    {
+        "model": "core.RequestStatus",
+        "pk": 10,
+        "fields": {
+            "name": "Closeout Completed",
+            "description": "Closeout forms have been completed by an expert and are ready for review"
+        }
+
     }
 ]
