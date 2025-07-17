@@ -8,7 +8,7 @@ from allauth.headless.contrib.rest_framework.authentication import (
 )
 
 from core.permissions import IsAdmin, IsLabLead
-from core.views import OwnerListView, request as req
+from core.views.owner import OwnerListView
 from core.models import *
 from core.constants import DOMAINTYPE, ROLE
 
@@ -23,6 +23,9 @@ class AssignmentView(views.APIView):
     ]
 
     def post(self, request):
+        # Import BaseUserAwareRequest here to avoid circular import
+        from core.views.request import BaseUserAwareRequest
+
         body = request.data
 
         if not body:
@@ -42,7 +45,7 @@ class AssignmentView(views.APIView):
         if not owner_id and not expert_id:
             return Response(data={"message": "Please provide at least an owner ID or an expert ID for assignment."}, status=status.HTTP_400_BAD_REQUEST)
         
-        actionable_requests = req.BaseUserAwareRequest(request=self.request).get_queryset()
+        actionable_requests = BaseUserAwareRequest(request=self.request).get_queryset()
 
         ta_request = None
         try:
