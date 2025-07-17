@@ -47,14 +47,9 @@ class RequestListSerializer(serializers.Serializer):
     
     expert = UserLeanSerializer(required=False) 
 
-class RequestSerializer(serializers.ModelSerializer):
+class RequestSerializer(serializers.Serializer):
     id = serializers.IntegerField()
-    owner = serializers.SlugRelatedField(
-        slug_field="pk",
-        required=False,
-        allow_null=True,
-        queryset=Owner.objects.all()
-    ) 
+    # owner field added later
     expert = serializers.SlugRelatedField(
         slug_field="email",
         required=False,
@@ -78,6 +73,7 @@ class RequestSerializer(serializers.ModelSerializer):
     proj_start_date = serializers.DateField(required=False, allow_null=True)
     proj_completion_date = serializers.DateField(required=False, allow_null=True)
     actual_completion_date = serializers.DateField(required=False, allow_null=True)
+    # customers field added later
 
     
     @classmethod

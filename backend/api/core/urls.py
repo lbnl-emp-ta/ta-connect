@@ -8,6 +8,7 @@ urlpatterns = [
     path('requests/<int:id>', RequestDetailView.as_view(), name="request-detail"),
     path('requests/<int:id>/mark-complete/', RequestMarkCompleteView.as_view(), name="mark-complete"),
     path('requests/<int:id>/closeout-complete/', RequestCloseoutCompleteView.as_view(), name="closeout-complete"),
+    path('requests/<int:id>/cancel/', RequestCancelView.as_view(), name="mark-complete"),
     path('requests/assign/', AssignmentView.as_view(), name="assignment"),
 
     path('identities/', IdentityListView.as_view(), name="identities-list"),

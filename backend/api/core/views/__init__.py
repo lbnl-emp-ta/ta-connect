@@ -1,4 +1,4 @@
-from .request import RequestListView, RequestDetailView, RequestMarkCompleteView, RequestCloseoutCompleteView
+from .request import RequestListView, RequestDetailView, RequestMarkCompleteView, RequestCancelView, RequestCloseoutCompleteView
 from .depth import DepthListView, DepthRetrieveView
 from .state import StateListView, StateRetrieveView
 from .organization_type import OrganizationTypeListView, OrganizationTypeRetrieveView
@@ -24,6 +24,7 @@ __all__ = [
     "RequestDetailView",
     "RequestMarkCompleteView",
     "RequestCloseoutCompleteView",
+    "RequestCancelView",
     "DepthListView",
     "DepthRetrieveView",
     "StateListView",
