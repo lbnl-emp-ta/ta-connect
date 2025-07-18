@@ -1,23 +1,6 @@
-import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
-import ArticleIcon from '@mui/icons-material/Article';
-import AssignmentTurnedInIcon from '@mui/icons-material/AssignmentTurnedIn';
-import CancelIcon from '@mui/icons-material/Cancel';
-import DateRangeIcon from '@mui/icons-material/DateRange';
 import EastIcon from '@mui/icons-material/East';
-import EditIcon from '@mui/icons-material/Edit';
 import WestIcon from '@mui/icons-material/West';
-import {
-  Button,
-  Grid,
-  ListItemIcon,
-  ListItemText,
-  Menu,
-  MenuItem,
-  Stack,
-  Tab,
-  Tabs,
-  Typography,
-} from '@mui/material';
+import { Button, Grid, Stack, Tab, Tabs, Typography } from '@mui/material';
 import { useQuery, useSuspenseQuery } from '@tanstack/react-query';
 import { createFileRoute } from '@tanstack/react-router';
 import { useState } from 'react';
@@ -25,6 +8,7 @@ import { AppLink } from '../../../../components/AppLink';
 import { InfoPanel } from '../../../../components/InfoPanel';
 import { TabPanel } from '../../../../components/TabPanel';
 import { useIdentityContext } from '../../../../features/identity/IdentityContext';
+import { RequestActionsButton } from '../../../../features/requests/RequestActionsButton';
 import { RequestAssignButton } from '../../../../features/requests/RequestAssignButton';
 import { RequestCustomerPanel } from '../../../../features/requests/RequestCustomerPanel';
 import { RequestInfoPanel } from '../../../../features/requests/RequestInfoPanel';
@@ -33,9 +17,6 @@ import {
   expertsQueryOptions,
   ownersQueryOptions,
   requestDetailQueryOptions,
-  useCancelMutation,
-  useFinishCloseoutMutation,
-  useMarkCompleteMutation,
 } from '../../../../utils/queryOptions';
 
 export const Route = createFileRoute('/_private/dashboard/requests/$requestId')({
@@ -67,9 +48,7 @@ function SelectedRequest() {
     ...expertsQueryOptions(identity),
     enabled: canAssignExperts,
   });
-  const completeRequestMutation = useMarkCompleteMutation(params.requestId, identity);
-  const cancelRequestMutation = useCancelMutation(params.requestId, identity);
-  const finishCloseoutMutation = useFinishCloseoutMutation(params.requestId, identity);
+
   const { sortedRequests } = useRequestsContext();
   const currentIndex = sortedRequests.findIndex((request) => {
     if (params?.requestId) {
@@ -78,32 +57,7 @@ function SelectedRequest() {
   });
   const nextIndex = currentIndex < sortedRequests.length - 1 ? currentIndex + 1 : null;
   const previousIndex = currentIndex > 0 ? currentIndex - 1 : null;
-  const [actionsAnchorEl, setActionsAnchorEl] = useState<null | HTMLElement>(null);
-  const actionsMenuOpen = Boolean(actionsAnchorEl);
   const [tabValue, setTabValue] = useState<string | number>('attachments');
-
-  const handleActionsMenuClick = (event: React.MouseEvent<HTMLButtonElement>) => {
-    setActionsAnchorEl(event.currentTarget);
-  };
-
-  const handleActionsMenuClose = () => {
-    setActionsAnchorEl(null);
-  };
-
-  const handleMarkComplete = () => {
-    completeRequestMutation.mutate();
-    setActionsAnchorEl(null);
-  };
-
-  const handleCancelRequest = () => {
-    cancelRequestMutation.mutate();
-    setActionsAnchorEl(null);
-  };
-
-  const handleFinishCloseout = () => {
-    finishCloseoutMutation.mutate();
-    setActionsAnchorEl(null);
-  };
 
   const handleTabChange = (_event: React.SyntheticEvent, newValue: string | number) => {
     setTabValue(newValue);
@@ -158,70 +112,11 @@ function SelectedRequest() {
         >
           Request: {selectedRequest?.id}
         </Typography>
-        <Button
-          id="actions-menu-button"
-          aria-controls={actionsMenuOpen ? 'actions-menu' : undefined}
-          aria-haspopup="true"
-          aria-expanded={actionsMenuOpen ? 'true' : undefined}
-          variant="outlined"
-          color="primary"
-          endIcon={<ArrowDropDownIcon />}
-          onClick={handleActionsMenuClick}
-        >
-          More Actions
-        </Button>
-        <Menu
-          id="actions-menu"
-          anchorEl={actionsAnchorEl}
-          anchorOrigin={{
-            vertical: 'bottom',
-            horizontal: 'right',
-          }}
-          transformOrigin={{
-            vertical: 'top',
-            horizontal: 'right',
-          }}
-          open={actionsMenuOpen}
-          onClose={handleActionsMenuClose}
-          aria-labelledby="actions-menu-button"
-        >
-          <MenuItem onClick={handleActionsMenuClose}>
-            <ListItemIcon>
-              <EditIcon />
-            </ListItemIcon>
-            <ListItemText>Edit</ListItemText>
-          </MenuItem>
-          <MenuItem onClick={handleActionsMenuClose}>
-            <ListItemIcon>
-              <DateRangeIcon />
-            </ListItemIcon>
-            <ListItemText>Set Dates</ListItemText>
-          </MenuItem>
-          <MenuItem onClick={handleFinishCloseout}>
-            <ListItemIcon>
-              <ArticleIcon />
-            </ListItemIcon>
-            <ListItemText>Finish Closout</ListItemText>
-          </MenuItem>
-          <MenuItem onClick={handleMarkComplete}>
-            <ListItemIcon>
-              <AssignmentTurnedInIcon />
-            </ListItemIcon>
-            <ListItemText>Mark Complete</ListItemText>
-          </MenuItem>
-          <MenuItem onClick={handleCancelRequest}>
-            <ListItemIcon>
-              <CancelIcon />
-            </ListItemIcon>
-            <ListItemText>Cancel Request</ListItemText>
-          </MenuItem>
-        </Menu>
         {selectedRequest && (
-          <RequestAssignButton
-            selectedRequest={selectedRequest}
-            owners={owners}
-            experts={experts}
-          />
+          <>
+            <RequestActionsButton requestId={selectedRequest.id} />
+            <RequestAssignButton requestId={selectedRequest.id} owners={owners} experts={experts} />
+          </>
         )}
       </Stack>
       <Grid container spacing={2}>

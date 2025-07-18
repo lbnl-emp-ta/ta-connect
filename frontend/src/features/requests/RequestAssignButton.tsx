@@ -16,18 +16,18 @@ import { useAssignmentMutation } from '../../utils/queryOptions';
 import { useIdentityContext } from '../identity/IdentityContext';
 
 interface RequestAssignButtonProps {
-  selectedRequest: TARequestDetail;
+  requestId: TARequestDetail['id'];
   owners?: TAOwner[] | null;
   experts?: TAExpert[] | null;
 }
 
 export const RequestAssignButton: React.FC<RequestAssignButtonProps> = ({
-  selectedRequest,
+  requestId,
   owners,
   experts,
 }) => {
   const { identity } = useIdentityContext();
-  const assignRequestMutation = useAssignmentMutation(selectedRequest.id.toString(), identity);
+  const assignRequestMutation = useAssignmentMutation(requestId.toString(), identity);
   const [assignAnchorEl, setAssignAnchorEl] = useState<null | HTMLElement>(null);
   const assignMenuOpen = Boolean(assignAnchorEl);
   const handleAssignMenuClick = (event: React.MouseEvent<HTMLButtonElement>) => {
@@ -39,15 +39,13 @@ export const RequestAssignButton: React.FC<RequestAssignButtonProps> = ({
   };
 
   const handleAssignment = (entity: TAOwner | TAExpert) => {
-    if (selectedRequest) {
-      const mutationData: TAAssignment = { request: selectedRequest.id };
-      if (entity.hasOwnProperty('domain_id')) {
-        mutationData.owner = entity.id;
-      } else if (entity.hasOwnProperty('expertise')) {
-        mutationData.expert = entity.id;
-      }
-      assignRequestMutation.mutate(mutationData);
+    const mutationData: TAAssignment = { request: requestId };
+    if (entity.hasOwnProperty('domain_id')) {
+      mutationData.owner = entity.id;
+    } else if (entity.hasOwnProperty('expertise')) {
+      mutationData.expert = entity.id;
     }
+    assignRequestMutation.mutate(mutationData);
   };
   return (
     <>
