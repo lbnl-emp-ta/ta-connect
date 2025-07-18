@@ -33,6 +33,7 @@ export default tseslint.config(
       ...reactDom.configs.recommended.rules,
       '@typescript-eslint/no-unsafe-argument': 'off',
       '@typescript-eslint/only-throw-error': 'off',
+      'no-prototype-builtins': 'off',
     },
   }
 );

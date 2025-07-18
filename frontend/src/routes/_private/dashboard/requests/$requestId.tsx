@@ -21,7 +21,7 @@ import DateRangeIcon from '@mui/icons-material/DateRange';
 import EastIcon from '@mui/icons-material/East';
 import EditIcon from '@mui/icons-material/Edit';
 import WestIcon from '@mui/icons-material/West';
-import { useSuspenseQuery } from '@tanstack/react-query';
+import { useQuery, useSuspenseQuery } from '@tanstack/react-query';
 import { createFileRoute } from '@tanstack/react-router';
 import { RequestInfoPanel } from '../../../../features/requests/RequestInfoPanel';
 import {
@@ -41,7 +41,7 @@ import { RequestCustomerPanel } from '../../../../features/requests/RequestCusto
 import { InfoPanel } from '../../../../components/InfoPanel';
 import { TabPanel } from '../../../../components/TabPanel';
 import { capitalize } from '../../../../utils/utils';
-import { TAOwner } from '../../../../api/dashboard/types';
+import { TAAssignment, TAExpert, TAOwner } from '../../../../api/dashboard/types';
 
 export const Route = createFileRoute('/_private/dashboard/requests/$requestId')({
   loader: async ({ context, params }) => {
@@ -61,12 +61,18 @@ export const Route = createFileRoute('/_private/dashboard/requests/$requestId')(
 
 function SelectedRequest() {
   const params = Route.useParams();
-  const { identity } = useIdentityContext();
+  const { identity, detailedIdentity } = useIdentityContext();
   const { data: selectedRequest } = useSuspenseQuery(
     requestDetailQueryOptions(params.requestId, identity)
   );
+  console.log('Selected Request:', selectedRequest);
   const { data: owners } = useSuspenseQuery(ownersQueryOptions(identity));
-  const { data: experts } = useSuspenseQuery(expertsQueryOptions(identity));
+  const canAssignExperts =
+    detailedIdentity?.role.name === 'Lab Lead' || detailedIdentity?.role.name === 'Admin';
+  const { data: experts = [] } = useQuery({
+    ...expertsQueryOptions(identity),
+    enabled: canAssignExperts,
+  });
   console.log('Experts:', experts);
   const assignRequestMutation = useAssignmentMutation(params.requestId, identity);
   const completeRequestMutation = useMarkCompleteMutation(params.requestId, identity);
@@ -102,12 +108,15 @@ function SelectedRequest() {
     setAssignAnchorEl(null);
   };
 
-  const handleAssignment = (owner: TAOwner) => {
+  const handleAssignment = (entity: TAOwner | TAExpert) => {
     if (selectedRequest) {
-      assignRequestMutation.mutate({
-        request: selectedRequest.id,
-        owner: owner.id,
-      });
+      const mutationData: TAAssignment = { request: selectedRequest.id };
+      if (entity.hasOwnProperty('domain_id')) {
+        mutationData.owner = entity.id;
+      } else if (entity.hasOwnProperty('expertise')) {
+        mutationData.expert = entity.id;
+      }
+      assignRequestMutation.mutate(mutationData);
     }
   };
 
@@ -270,8 +279,16 @@ function SelectedRequest() {
           {owners?.map((owner) => (
             <MenuItem key={owner.id} onClick={() => handleAssignment(owner)}>
               <Stack direction="row" spacing={1}>
+                <ListItemText>{owner.domain_name}</ListItemText>
                 <Chip label={capitalize(owner.domain_type)} size="small" />
-                <ListItemText>Test</ListItemText>
+              </Stack>
+            </MenuItem>
+          ))}
+          {experts?.map((expert) => (
+            <MenuItem key={expert.id} onClick={() => handleAssignment(expert)}>
+              <Stack direction="row" spacing={1}>
+                <ListItemText>{expert.name}</ListItemText>
+                <Chip label="Expert" size="small" />
               </Stack>
             </MenuItem>
           ))}
