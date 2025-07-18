@@ -40,9 +40,9 @@ export const RequestAssignButton: React.FC<RequestAssignButtonProps> = ({
 
   const handleAssignment = (entity: TAOwner | TAExpert) => {
     const mutationData: TAAssignment = { request: requestId };
-    if (entity.hasOwnProperty('domain_id')) {
+    if (Object.prototype.hasOwnProperty.call(entity, 'domain_id')) {
       mutationData.owner = entity.id;
-    } else if (entity.hasOwnProperty('expertise')) {
+    } else if (Object.prototype.hasOwnProperty.call(entity, 'expertise')) {
       mutationData.expert = entity.id;
     }
     assignRequestMutation.mutate(mutationData);
