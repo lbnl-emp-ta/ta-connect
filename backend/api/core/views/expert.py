@@ -22,27 +22,33 @@ class ExpertsListView(views.APIView):
         permissions.IsAuthenticated,
     ]
 
-    def get(self, request, lab_name=None, format=None):
-        if lab_name is None:
-            return Response(data={"message": "Please provide a lab name parameter with request"}, status=status.HTTP_400_BAD_REQUEST)
-        
-        maybe_lab = None
-        try:
-            maybe_lab = Lab.objects.get(name=lab_name)
-        except Lab.DoesNotExist:
-            return Response(data={"message": "Lab with provided name does not exist"}, status=status.HTTP_400_BAD_REQUEST)
+    def get(self, request, format=None):
+        # A(1/2): empty list so that...
+        expert_assignments = list()
+        if IsAdmin().has_permission(request):
+            expert_assignments = LabRoleAssignment.objects.filter(role=Role.objects.get(name=ROLE.EXPERT))
+        elif IsLabLead().has_permission(request):
+            maybe_context = self.request.headers.get("Context")
+            if not maybe_context:
+                return Response(data={"message": "Please include identity context with request"}, status=status.HTTP_400_BAD_REQUEST)
 
-        if not (IsLabLead().has_permission(request) or IsAdmin().has_permission(request)):
+            context = json.loads(maybe_context) 
+            try:
+                expert_assignments = LabRoleAssignment.objects.filter(role=Role.objects.get(name=ROLE.EXPERT), instance=Lab.objects.get(pk=context.get("instance")))
+            except Exception as e:
+                return Response(data={"message": f"{e}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        else:
             return Response(data={"message": "Insufficient credentials to access experts"}, status=status.HTTP_400_BAD_REQUEST)
 
-        # Program agnostic for now, might consider changing in future! 
-        expert_assignments = LabRoleAssignment.objects.filter(role=Role.objects.get(name=ROLE.EXPERT), instance=maybe_lab)
         experts_data = list()
+
+        # A(2/2): ...this loop can fail gracefully
         for assignment in expert_assignments:
             data = dict()
             data["id"] = assignment.user.pk
             data["name"] = assignment.user.name
             data["email"] = assignment.user.email
+            data["lab"] = assignment.instance
 
             expertise_list = Expertise.objects.filter(user=assignment.user.pk)
             expertise = dict()
