@@ -11,6 +11,8 @@ class OwnerSerializer(serializers.ModelSerializer):
     
     # Expects a valid Owner objects
     def format_owner(self, owner):
+        if not owner:
+            return None
         data = dict()
         data["id"] = owner.pk
         data["domain_type"] = owner.domain_type
