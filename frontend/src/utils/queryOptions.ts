@@ -102,13 +102,13 @@ export const ownersQueryOptions = (identity?: Identity) =>
     },
   });
 
-export const expertsQueryOptions = (labName: string | null, identity?: Identity) =>
+export const expertsQueryOptions = (identity?: Identity) =>
   queryOptions({
     staleTime: 120_000, // stale after 2 minutes
-    queryKey: ['experts', labName, identity],
+    queryKey: ['experts', identity],
     queryFn: () => {
-      if (identity && labName) {
-        return fetchData<TAExpert[]>(`${apiUrl}/experts/${labName}`, identity);
+      if (identity) {
+        return fetchData<TAExpert[]>(`${apiUrl}/experts/`, identity);
       } else {
         return [];
       }

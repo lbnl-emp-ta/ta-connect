@@ -31,6 +31,7 @@ import {
   useMarkCompleteMutation,
   useCancelMutation,
   useFinishCloseoutMutation,
+  expertsQueryOptions,
 } from '../../../../utils/queryOptions';
 import { AppLink } from '../../../../components/AppLink';
 import { useState } from 'react';
@@ -48,6 +49,12 @@ export const Route = createFileRoute('/_private/dashboard/requests/$requestId')(
       requestDetailQueryOptions(params.requestId, context.identity)
     );
     await context.queryClient.ensureQueryData(ownersQueryOptions(context.identity));
+    if (
+      context.detailedIdentity?.role.name === 'Lab Lead' ||
+      context.detailedIdentity?.role.name === 'Admin'
+    ) {
+      await context.queryClient.ensureQueryData(expertsQueryOptions(context.identity));
+    }
   },
   component: SelectedRequest,
 });
@@ -59,6 +66,8 @@ function SelectedRequest() {
     requestDetailQueryOptions(params.requestId, identity)
   );
   const { data: owners } = useSuspenseQuery(ownersQueryOptions(identity));
+  const { data: experts } = useSuspenseQuery(expertsQueryOptions(identity));
+  console.log('Experts:', experts);
   const assignRequestMutation = useAssignmentMutation(params.requestId, identity);
   const completeRequestMutation = useMarkCompleteMutation(params.requestId, identity);
   const cancelRequestMutation = useCancelMutation(params.requestId, identity);

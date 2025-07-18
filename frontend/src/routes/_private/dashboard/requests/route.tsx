@@ -19,6 +19,7 @@ export const Route = createFileRoute('/_private/dashboard/requests')({
 function RequestsPage() {
   const { identity } = useIdentityContext();
   const { data: requests } = useSuspenseQuery(requestsQueryOptions(identity));
+  console.log('Requests:', requests);
   const [tabValue, setTabValue] = useState<string | number>('actionable-requests');
 
   const handleChangeTab = (_event: React.SyntheticEvent, newValue: string | number) => {
