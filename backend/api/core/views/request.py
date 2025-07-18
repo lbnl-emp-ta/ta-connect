@@ -398,7 +398,7 @@ class RequestMarkCompleteView(BaseUserAwareRequest):
         return Response(status=status.HTTP_200_OK)
       
 class RequestCancelView(BaseUserAwareRequest):
-    def get(self, request, id=None):
+    def post(self, request, id=None):
         if id is None:
             return Response(data={"message": "Please provide a Request ID"}, status=status.HTTP_400_BAD_REQUEST)
 

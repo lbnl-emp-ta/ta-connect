@@ -24,6 +24,7 @@ const router = createRouter({
   context: {
     queryClient,
     identity: {},
+    detailedIdentity: null,
   },
 });
 
@@ -35,14 +36,14 @@ declare module '@tanstack/react-router' {
 }
 
 const App: React.FC = () => {
-  const { identity } = useIdentityContext();
+  const { identity, detailedIdentity } = useIdentityContext();
 
   return (
     <QueryClientProvider client={queryClient}>
       <LocalizationProvider dateAdapter={AdapterDayjs}>
         <ThemeProvider theme={theme}>
           <CssBaseline />
-          <RouterProvider router={router} context={{ queryClient, identity }} />
+          <RouterProvider router={router} context={{ queryClient, identity, detailedIdentity }} />
         </ThemeProvider>
       </LocalizationProvider>
     </QueryClientProvider>

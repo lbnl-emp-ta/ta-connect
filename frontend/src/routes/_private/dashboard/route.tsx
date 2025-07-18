@@ -14,7 +14,7 @@ import {
 } from '@mui/material';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { createFileRoute, Outlet, redirect, useNavigate } from '@tanstack/react-router';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { TAIdentity } from '../../../api/dashboard/types';
 import { useIdentityContext } from '../../../features/identity/IdentityContext';
 import { identitiesQueryOptions } from '../../../utils/queryOptions';
@@ -33,25 +33,26 @@ export const Route = createFileRoute('/_private/dashboard')({
 
 function DashboardComponent() {
   const navigate = useNavigate();
-  const { setIdentity } = useIdentityContext();
+  const { detailedIdentity, setIdentity, setDetailedIdentity } = useIdentityContext();
   const { data: identities } = useSuspenseQuery(identitiesQueryOptions());
-  const [fullIdentity, setFullIdentity] = useState(identities ? identities[0] : null);
 
   const handleIdentityChange = (event: SelectChangeEvent<TAIdentity | null>) => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    setFullIdentity(event.target.value as any);
+    setDetailedIdentity(event.target.value as any);
   };
 
   useEffect(() => {
-    if (fullIdentity) {
+    if (detailedIdentity) {
       setIdentity({
-        user: fullIdentity.user.id,
-        role: fullIdentity.role.id,
-        location: fullIdentity.location,
-        instance: fullIdentity.instance?.id,
+        user: detailedIdentity.user.id,
+        role: detailedIdentity.role.id,
+        location: detailedIdentity.location,
+        instance: detailedIdentity.instance?.id,
       });
+    } else {
+      setDetailedIdentity(identities ? identities[0] : null);
     }
-  }, [fullIdentity, setIdentity]);
+  }, [detailedIdentity, identities, setDetailedIdentity, setIdentity]);
 
   return (
     <Stack direction="row" spacing={0} sx={{ width: '100%' }}>
@@ -71,7 +72,7 @@ function DashboardComponent() {
                 width: 'stretch',
                 bgcolor: 'white',
               }}
-              value={fullIdentity}
+              value={detailedIdentity || ''}
               onChange={handleIdentityChange}
             >
               {identities?.map((identity) => (

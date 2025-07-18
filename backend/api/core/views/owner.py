@@ -53,6 +53,8 @@ class OwnerListView(views.APIView):
 
             # Only one layer up, Experts are a role within Labs - not another layer
             return Owner.objects.filter(domain_type=DOMAINTYPE.PROGRAM, program=assignment.program)
+        
+        return queryset.none()
     
     def get(self, request, format=None):
         queryset = self.get_queryset()

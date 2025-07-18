@@ -26,12 +26,36 @@ export interface TACustomer {
   requests: number[];
 }
 
+export interface TATopic {
+  id: number;
+  name: string;
+  description: string;
+}
+
+export interface TADepth {
+  id: number;
+  name: string;
+  description: string;
+}
+
 export interface TAOwner {
   id: number;
-  lab?: number;
-  program?: number;
-  reception: number;
+  domain_description?: string;
+  domain_id?: number;
+  domain_name?: string;
   domain_type: string;
+}
+
+export interface TAExpertise {
+  topic: TATopic;
+  depth: TADepth;
+}
+
+export interface TAExpert {
+  id: number;
+  email: string;
+  name: string;
+  expertise: TAExpertise[];
 }
 
 export interface TARequest {
@@ -42,6 +66,7 @@ export interface TARequest {
   date_created: string;
   customer_email: string;
   customer_name: string;
+  expert: Partial<TAExpert> | null;
   proj_start_date: string | null;
   proj_completion_date: string | null;
   actual_completion_date: string | null;
@@ -60,7 +85,8 @@ export interface TARequestDetail {
   description: string;
   date_created: string;
   customers: TACustomer[];
-  owner: TAOwner;
+  expert: string | null;
+  owner?: TAOwner;
   proj_start_date: string | null;
   proj_completion_date: string | null;
   actual_completion_date: string | null;

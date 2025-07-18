@@ -5,10 +5,12 @@ import { useSuspenseQuery, type QueryClient } from '@tanstack/react-query';
 import { createRootRouteWithContext } from '@tanstack/react-router';
 import { authSessionQueryOptions, useLogoutMutation } from '../utils/queryOptions';
 import { Identity } from '../features/identity/IdentityContext';
+import { TAIdentity } from '../api/dashboard/types';
 
 export interface MyRouterContext {
   queryClient: QueryClient;
   identity: Identity;
+  detailedIdentity?: TAIdentity | null;
 }
 
 export const Route = createRootRouteWithContext<MyRouterContext>()({

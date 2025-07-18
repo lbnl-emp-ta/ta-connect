@@ -1,43 +1,23 @@
-import {
-  Box,
-  Button,
-  Chip,
-  Grid,
-  ListItemIcon,
-  ListItemText,
-  Menu,
-  MenuItem,
-  Stack,
-  Tab,
-  Tabs,
-  TextField,
-  Typography,
-} from '@mui/material';
-import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
-import ArticleIcon from '@mui/icons-material/Article';
-import AssignmentTurnedInIcon from '@mui/icons-material/AssignmentTurnedIn';
-import CancelIcon from '@mui/icons-material/Cancel';
-import DateRangeIcon from '@mui/icons-material/DateRange';
 import EastIcon from '@mui/icons-material/East';
-import EditIcon from '@mui/icons-material/Edit';
 import WestIcon from '@mui/icons-material/West';
-import { useSuspenseQuery } from '@tanstack/react-query';
+import { Button, Grid, Stack, Tab, Tabs, Typography } from '@mui/material';
+import { useQuery, useSuspenseQuery } from '@tanstack/react-query';
 import { createFileRoute } from '@tanstack/react-router';
-import { RequestInfoPanel } from '../../../../features/requests/RequestInfoPanel';
-import {
-  requestDetailQueryOptions,
-  ownersQueryOptions,
-  useAssignmentMutation,
-} from '../../../../utils/queryOptions';
-import { AppLink } from '../../../../components/AppLink';
 import { useState } from 'react';
-import { useRequestsContext } from '../../../../features/requests/RequestsContext';
-import { useIdentityContext } from '../../../../features/identity/IdentityContext';
-import { RequestCustomerPanel } from '../../../../features/requests/RequestCustomerPanel';
+import { AppLink } from '../../../../components/AppLink';
 import { InfoPanel } from '../../../../components/InfoPanel';
 import { TabPanel } from '../../../../components/TabPanel';
-import { capitalize } from '../../../../utils/utils';
-import { TAOwner } from '../../../../api/dashboard/types';
+import { useIdentityContext } from '../../../../features/identity/IdentityContext';
+import { RequestActionsButton } from '../../../../features/requests/RequestActionsButton';
+import { RequestAssignButton } from '../../../../features/requests/RequestAssignButton';
+import { RequestCustomerPanel } from '../../../../features/requests/RequestCustomerPanel';
+import { RequestInfoPanel } from '../../../../features/requests/RequestInfoPanel';
+import { useRequestsContext } from '../../../../features/requests/RequestsContext';
+import {
+  expertsQueryOptions,
+  ownersQueryOptions,
+  requestDetailQueryOptions,
+} from '../../../../utils/queryOptions';
 
 export const Route = createFileRoute('/_private/dashboard/requests/$requestId')({
   loader: async ({ context, params }) => {
@@ -45,18 +25,30 @@ export const Route = createFileRoute('/_private/dashboard/requests/$requestId')(
       requestDetailQueryOptions(params.requestId, context.identity)
     );
     await context.queryClient.ensureQueryData(ownersQueryOptions(context.identity));
+    if (
+      context.detailedIdentity?.role.name === 'Lab Lead' ||
+      context.detailedIdentity?.role.name === 'Admin'
+    ) {
+      await context.queryClient.ensureQueryData(expertsQueryOptions(context.identity));
+    }
   },
   component: SelectedRequest,
 });
 
 function SelectedRequest() {
   const params = Route.useParams();
-  const { identity } = useIdentityContext();
+  const { identity, detailedIdentity } = useIdentityContext();
   const { data: selectedRequest } = useSuspenseQuery(
     requestDetailQueryOptions(params.requestId, identity)
   );
   const { data: owners } = useSuspenseQuery(ownersQueryOptions(identity));
-  const assignRequestMutation = useAssignmentMutation(params.requestId, identity);
+  const canAssignExperts =
+    detailedIdentity?.role.name === 'Lab Lead' || detailedIdentity?.role.name === 'Admin';
+  const { data: experts = [] } = useQuery({
+    ...expertsQueryOptions(identity),
+    enabled: canAssignExperts,
+  });
+
   const { sortedRequests } = useRequestsContext();
   const currentIndex = sortedRequests.findIndex((request) => {
     if (params?.requestId) {
@@ -65,36 +57,7 @@ function SelectedRequest() {
   });
   const nextIndex = currentIndex < sortedRequests.length - 1 ? currentIndex + 1 : null;
   const previousIndex = currentIndex > 0 ? currentIndex - 1 : null;
-  const [actionsAnchorEl, setActionsAnchorEl] = useState<null | HTMLElement>(null);
-  const actionsMenuOpen = Boolean(actionsAnchorEl);
-  const [assignAnchorEl, setAssignAnchorEl] = useState<null | HTMLElement>(null);
-  const assignMenuOpen = Boolean(assignAnchorEl);
   const [tabValue, setTabValue] = useState<string | number>('attachments');
-
-  const handleActionsMenuClick = (event: React.MouseEvent<HTMLButtonElement>) => {
-    setActionsAnchorEl(event.currentTarget);
-  };
-
-  const handleActionsMenuClose = () => {
-    setActionsAnchorEl(null);
-  };
-
-  const handleAssignMenuClick = (event: React.MouseEvent<HTMLButtonElement>) => {
-    setAssignAnchorEl(event.currentTarget);
-  };
-
-  const handleAssignMenuClose = () => {
-    setAssignAnchorEl(null);
-  };
-
-  const handleAssignment = (owner: TAOwner) => {
-    if (selectedRequest) {
-      assignRequestMutation.mutate({
-        request: selectedRequest.id,
-        owner: owner.id,
-      });
-    }
-  };
 
   const handleTabChange = (_event: React.SyntheticEvent, newValue: string | number) => {
     setTabValue(newValue);
@@ -149,103 +112,12 @@ function SelectedRequest() {
         >
           Request: {selectedRequest?.id}
         </Typography>
-        <Button
-          id="actions-menu-button"
-          aria-controls={actionsMenuOpen ? 'actions-menu' : undefined}
-          aria-haspopup="true"
-          aria-expanded={actionsMenuOpen ? 'true' : undefined}
-          variant="outlined"
-          color="primary"
-          endIcon={<ArrowDropDownIcon />}
-          onClick={handleActionsMenuClick}
-        >
-          More Actions
-        </Button>
-        <Menu
-          id="actions-menu"
-          anchorEl={actionsAnchorEl}
-          anchorOrigin={{
-            vertical: 'bottom',
-            horizontal: 'right',
-          }}
-          transformOrigin={{
-            vertical: 'top',
-            horizontal: 'right',
-          }}
-          open={actionsMenuOpen}
-          onClose={handleActionsMenuClose}
-          aria-labelledby="actions-menu-button"
-        >
-          <MenuItem onClick={handleActionsMenuClose}>
-            <ListItemIcon>
-              <EditIcon />
-            </ListItemIcon>
-            <ListItemText>Edit</ListItemText>
-          </MenuItem>
-          <MenuItem onClick={handleActionsMenuClose}>
-            <ListItemIcon>
-              <DateRangeIcon />
-            </ListItemIcon>
-            <ListItemText>Set Dates</ListItemText>
-          </MenuItem>
-          <MenuItem onClick={handleActionsMenuClose}>
-            <ListItemIcon>
-              <ArticleIcon />
-            </ListItemIcon>
-            <ListItemText>Finish Closout</ListItemText>
-          </MenuItem>
-          <MenuItem onClick={handleActionsMenuClose}>
-            <ListItemIcon>
-              <AssignmentTurnedInIcon />
-            </ListItemIcon>
-            <ListItemText>Mark Complete</ListItemText>
-          </MenuItem>
-          <MenuItem onClick={handleActionsMenuClose}>
-            <ListItemIcon>
-              <CancelIcon />
-            </ListItemIcon>
-            <ListItemText>Cancel Request</ListItemText>
-          </MenuItem>
-        </Menu>
-        <Button
-          id="assign-menu-button"
-          aria-controls={assignMenuOpen ? 'assign-menu' : undefined}
-          aria-haspopup="true"
-          aria-expanded={assignMenuOpen ? 'true' : undefined}
-          variant="contained"
-          color="primary"
-          endIcon={<EastIcon />}
-          onClick={handleAssignMenuClick}
-        >
-          Assign
-        </Button>
-        <Menu
-          id="assign-menu"
-          anchorEl={assignAnchorEl}
-          anchorOrigin={{
-            vertical: 'bottom',
-            horizontal: 'right',
-          }}
-          transformOrigin={{
-            vertical: 'top',
-            horizontal: 'right',
-          }}
-          open={assignMenuOpen}
-          onClose={handleAssignMenuClose}
-          aria-labelledby="assign-menu-button"
-        >
-          <Box sx={{ padding: 1 }}>
-            <TextField variant="outlined" size="small" placeholder="Search Owners" fullWidth />
-          </Box>
-          {owners?.map((owner) => (
-            <MenuItem key={owner.id} onClick={() => handleAssignment(owner)}>
-              <Stack direction="row" spacing={1}>
-                <Chip label={capitalize(owner.domain_type)} size="small" />
-                <ListItemText>Test</ListItemText>
-              </Stack>
-            </MenuItem>
-          ))}
-        </Menu>
+        {selectedRequest && (
+          <>
+            <RequestActionsButton requestId={selectedRequest.id} />
+            <RequestAssignButton requestId={selectedRequest.id} owners={owners} experts={experts} />
+          </>
+        )}
       </Stack>
       <Grid container spacing={2}>
         <Grid size={6} sx={{ minHeight: 550 }}>

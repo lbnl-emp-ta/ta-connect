@@ -13,6 +13,7 @@ import { logoutMutation } from '../api/accounts/logout';
 import {
   CustomerRequestRelationship,
   TAAssignment,
+  TAExpert,
   TAIdentity,
   TAOwner,
   TARequest,
@@ -101,6 +102,19 @@ export const ownersQueryOptions = (identity?: Identity) =>
     },
   });
 
+export const expertsQueryOptions = (identity?: Identity) =>
+  queryOptions({
+    staleTime: 120_000, // stale after 2 minutes
+    queryKey: ['experts', identity],
+    queryFn: () => {
+      if (identity) {
+        return fetchData<TAExpert[]>(`${apiUrl}/experts/`, identity);
+      } else {
+        return [];
+      }
+    },
+  });
+
 export const statesQueryOptions = () =>
   queryOptions({
     staleTime: 120_000, // stale after 2 minutes
@@ -165,6 +179,31 @@ export const useAssignmentMutation = (requestId: string, identity?: Identity) =>
     mutationKey: ['requests', 'assign', requestId, identity],
     mutationFn: (data: TAAssignment) =>
       postData<TAAssignment>(`${apiUrl}/requests/assign/`, data, identity),
+    onSuccess: () => queryClient.invalidateQueries(),
+  });
+};
+
+export const useMarkCompleteMutation = (requestId: string, identity?: Identity) => {
+  return useMutation({
+    mutationKey: ['requests', 'mark-complete', requestId, identity],
+    mutationFn: () => postData(`${apiUrl}/requests/${requestId}/mark-complete/`, null, identity),
+    onSuccess: () => queryClient.invalidateQueries(),
+  });
+};
+
+export const useCancelMutation = (requestId: string, identity?: Identity) => {
+  return useMutation({
+    mutationKey: ['requests', 'cancel', requestId, identity],
+    mutationFn: () => postData(`${apiUrl}/requests/${requestId}/cancel/`, null, identity),
+    onSuccess: () => queryClient.invalidateQueries(),
+  });
+};
+
+export const useFinishCloseoutMutation = (requestId: string, identity?: Identity) => {
+  return useMutation({
+    mutationKey: ['requests', 'finish-closeout', requestId, identity],
+    mutationFn: () =>
+      postData(`${apiUrl}/requests/${requestId}/closeout-complete/`, null, identity),
     onSuccess: () => queryClient.invalidateQueries(),
   });
 };
