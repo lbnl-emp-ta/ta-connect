@@ -60,7 +60,6 @@ function SelectedRequest() {
   const { data: selectedRequest } = useSuspenseQuery(
     requestDetailQueryOptions(params.requestId, identity)
   );
-  console.log('Selected Request:', selectedRequest);
   const { data: owners } = useSuspenseQuery(ownersQueryOptions(identity));
   const canAssignExperts =
     detailedIdentity?.role.name === 'Lab Lead' || detailedIdentity?.role.name === 'Admin';
@@ -68,7 +67,6 @@ function SelectedRequest() {
     ...expertsQueryOptions(identity),
     enabled: canAssignExperts,
   });
-  console.log('Experts:', experts);
   const completeRequestMutation = useMarkCompleteMutation(params.requestId, identity);
   const cancelRequestMutation = useCancelMutation(params.requestId, identity);
   const finishCloseoutMutation = useFinishCloseoutMutation(params.requestId, identity);
