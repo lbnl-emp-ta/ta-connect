@@ -26,12 +26,36 @@ export interface TACustomer {
   requests: number[];
 }
 
+export interface TATopic {
+  id: number;
+  name: string;
+  description: string;
+}
+
+export interface TADepth {
+  id: number;
+  name: string;
+  description: string;
+}
+
 export interface TAOwner {
   id: number;
   domain_description?: string;
   domain_id?: number;
   domain_name?: string;
   domain_type: string;
+}
+
+export interface TAExpertise {
+  topic: TATopic;
+  depth: TADepth;
+}
+
+export interface TAExpert {
+  id: number;
+  email: string;
+  name: string;
+  expertise: TAExpertise[];
 }
 
 export interface TARequest {

@@ -13,6 +13,7 @@ import { logoutMutation } from '../api/accounts/logout';
 import {
   CustomerRequestRelationship,
   TAAssignment,
+  TAExpert,
   TAIdentity,
   TAOwner,
   TARequest,
@@ -95,6 +96,19 @@ export const ownersQueryOptions = (identity?: Identity) =>
     queryFn: () => {
       if (identity) {
         return fetchData<TAOwner[]>(`${apiUrl}/owners/`, identity);
+      } else {
+        return [];
+      }
+    },
+  });
+
+export const expertsQueryOptions = (labName: string | null, identity?: Identity) =>
+  queryOptions({
+    staleTime: 120_000, // stale after 2 minutes
+    queryKey: ['experts', labName, identity],
+    queryFn: () => {
+      if (identity && labName) {
+        return fetchData<TAExpert[]>(`${apiUrl}/experts/${labName}`, identity);
       } else {
         return [];
       }
