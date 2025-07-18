@@ -168,3 +168,11 @@ export const useAssignmentMutation = (requestId: string, identity?: Identity) =>
     onSuccess: () => queryClient.invalidateQueries(),
   });
 };
+
+export const useMarkCompleteMutation = (requestId: string, identity?: Identity) => {
+  return useMutation({
+    mutationKey: ['requests', 'mark-complete', requestId, identity],
+    mutationFn: () => postData(`${apiUrl}/requests/${requestId}/mark-complete/`, null, identity),
+    onSuccess: () => queryClient.invalidateQueries(),
+  });
+};

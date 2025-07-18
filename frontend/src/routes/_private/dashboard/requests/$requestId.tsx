@@ -28,6 +28,7 @@ import {
   requestDetailQueryOptions,
   ownersQueryOptions,
   useAssignmentMutation,
+  useMarkCompleteMutation,
 } from '../../../../utils/queryOptions';
 import { AppLink } from '../../../../components/AppLink';
 import { useState } from 'react';
@@ -57,6 +58,7 @@ function SelectedRequest() {
   );
   const { data: owners } = useSuspenseQuery(ownersQueryOptions(identity));
   const assignRequestMutation = useAssignmentMutation(params.requestId, identity);
+  const completeRequestMutation = useMarkCompleteMutation(params.requestId, identity);
   const { sortedRequests } = useRequestsContext();
   const currentIndex = sortedRequests.findIndex((request) => {
     if (params?.requestId) {
@@ -94,6 +96,11 @@ function SelectedRequest() {
         owner: owner.id,
       });
     }
+  };
+
+  const handleMarkComplete = () => {
+    completeRequestMutation.mutate();
+    setActionsAnchorEl(null);
   };
 
   const handleTabChange = (_event: React.SyntheticEvent, newValue: string | number) => {
@@ -194,7 +201,7 @@ function SelectedRequest() {
             </ListItemIcon>
             <ListItemText>Finish Closout</ListItemText>
           </MenuItem>
-          <MenuItem onClick={handleActionsMenuClose}>
+          <MenuItem onClick={handleMarkComplete}>
             <ListItemIcon>
               <AssignmentTurnedInIcon />
             </ListItemIcon>
