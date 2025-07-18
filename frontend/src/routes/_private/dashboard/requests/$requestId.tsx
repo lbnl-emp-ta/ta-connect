@@ -1,18 +1,3 @@
-import {
-  Box,
-  Button,
-  Chip,
-  Grid,
-  ListItemIcon,
-  ListItemText,
-  Menu,
-  MenuItem,
-  Stack,
-  Tab,
-  Tabs,
-  TextField,
-  Typography,
-} from '@mui/material';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import ArticleIcon from '@mui/icons-material/Article';
 import AssignmentTurnedInIcon from '@mui/icons-material/AssignmentTurnedIn';
@@ -21,27 +6,37 @@ import DateRangeIcon from '@mui/icons-material/DateRange';
 import EastIcon from '@mui/icons-material/East';
 import EditIcon from '@mui/icons-material/Edit';
 import WestIcon from '@mui/icons-material/West';
+import {
+  Button,
+  Grid,
+  ListItemIcon,
+  ListItemText,
+  Menu,
+  MenuItem,
+  Stack,
+  Tab,
+  Tabs,
+  Typography,
+} from '@mui/material';
 import { useQuery, useSuspenseQuery } from '@tanstack/react-query';
 import { createFileRoute } from '@tanstack/react-router';
-import { RequestInfoPanel } from '../../../../features/requests/RequestInfoPanel';
-import {
-  requestDetailQueryOptions,
-  ownersQueryOptions,
-  useAssignmentMutation,
-  useMarkCompleteMutation,
-  useCancelMutation,
-  useFinishCloseoutMutation,
-  expertsQueryOptions,
-} from '../../../../utils/queryOptions';
-import { AppLink } from '../../../../components/AppLink';
 import { useState } from 'react';
-import { useRequestsContext } from '../../../../features/requests/RequestsContext';
-import { useIdentityContext } from '../../../../features/identity/IdentityContext';
-import { RequestCustomerPanel } from '../../../../features/requests/RequestCustomerPanel';
+import { AppLink } from '../../../../components/AppLink';
 import { InfoPanel } from '../../../../components/InfoPanel';
 import { TabPanel } from '../../../../components/TabPanel';
-import { capitalize } from '../../../../utils/utils';
-import { TAAssignment, TAExpert, TAOwner } from '../../../../api/dashboard/types';
+import { useIdentityContext } from '../../../../features/identity/IdentityContext';
+import { RequestAssignButton } from '../../../../features/requests/RequestAssignButton';
+import { RequestCustomerPanel } from '../../../../features/requests/RequestCustomerPanel';
+import { RequestInfoPanel } from '../../../../features/requests/RequestInfoPanel';
+import { useRequestsContext } from '../../../../features/requests/RequestsContext';
+import {
+  expertsQueryOptions,
+  ownersQueryOptions,
+  requestDetailQueryOptions,
+  useCancelMutation,
+  useFinishCloseoutMutation,
+  useMarkCompleteMutation,
+} from '../../../../utils/queryOptions';
 
 export const Route = createFileRoute('/_private/dashboard/requests/$requestId')({
   loader: async ({ context, params }) => {
@@ -74,7 +69,6 @@ function SelectedRequest() {
     enabled: canAssignExperts,
   });
   console.log('Experts:', experts);
-  const assignRequestMutation = useAssignmentMutation(params.requestId, identity);
   const completeRequestMutation = useMarkCompleteMutation(params.requestId, identity);
   const cancelRequestMutation = useCancelMutation(params.requestId, identity);
   const finishCloseoutMutation = useFinishCloseoutMutation(params.requestId, identity);
@@ -88,8 +82,6 @@ function SelectedRequest() {
   const previousIndex = currentIndex > 0 ? currentIndex - 1 : null;
   const [actionsAnchorEl, setActionsAnchorEl] = useState<null | HTMLElement>(null);
   const actionsMenuOpen = Boolean(actionsAnchorEl);
-  const [assignAnchorEl, setAssignAnchorEl] = useState<null | HTMLElement>(null);
-  const assignMenuOpen = Boolean(assignAnchorEl);
   const [tabValue, setTabValue] = useState<string | number>('attachments');
 
   const handleActionsMenuClick = (event: React.MouseEvent<HTMLButtonElement>) => {
@@ -98,26 +90,6 @@ function SelectedRequest() {
 
   const handleActionsMenuClose = () => {
     setActionsAnchorEl(null);
-  };
-
-  const handleAssignMenuClick = (event: React.MouseEvent<HTMLButtonElement>) => {
-    setAssignAnchorEl(event.currentTarget);
-  };
-
-  const handleAssignMenuClose = () => {
-    setAssignAnchorEl(null);
-  };
-
-  const handleAssignment = (entity: TAOwner | TAExpert) => {
-    if (selectedRequest) {
-      const mutationData: TAAssignment = { request: selectedRequest.id };
-      if (entity.hasOwnProperty('domain_id')) {
-        mutationData.owner = entity.id;
-      } else if (entity.hasOwnProperty('expertise')) {
-        mutationData.expert = entity.id;
-      }
-      assignRequestMutation.mutate(mutationData);
-    }
   };
 
   const handleMarkComplete = () => {
@@ -246,53 +218,13 @@ function SelectedRequest() {
             <ListItemText>Cancel Request</ListItemText>
           </MenuItem>
         </Menu>
-        <Button
-          id="assign-menu-button"
-          aria-controls={assignMenuOpen ? 'assign-menu' : undefined}
-          aria-haspopup="true"
-          aria-expanded={assignMenuOpen ? 'true' : undefined}
-          variant="contained"
-          color="primary"
-          endIcon={<EastIcon />}
-          onClick={handleAssignMenuClick}
-        >
-          Assign
-        </Button>
-        <Menu
-          id="assign-menu"
-          anchorEl={assignAnchorEl}
-          anchorOrigin={{
-            vertical: 'bottom',
-            horizontal: 'right',
-          }}
-          transformOrigin={{
-            vertical: 'top',
-            horizontal: 'right',
-          }}
-          open={assignMenuOpen}
-          onClose={handleAssignMenuClose}
-          aria-labelledby="assign-menu-button"
-        >
-          <Box sx={{ padding: 1 }}>
-            <TextField variant="outlined" size="small" placeholder="Search Owners" fullWidth />
-          </Box>
-          {owners?.map((owner) => (
-            <MenuItem key={owner.id} onClick={() => handleAssignment(owner)}>
-              <Stack direction="row" spacing={1}>
-                <ListItemText>{owner.domain_name}</ListItemText>
-                <Chip label={capitalize(owner.domain_type)} size="small" />
-              </Stack>
-            </MenuItem>
-          ))}
-          {experts?.map((expert) => (
-            <MenuItem key={expert.id} onClick={() => handleAssignment(expert)}>
-              <Stack direction="row" spacing={1}>
-                <ListItemText>{expert.name}</ListItemText>
-                <Chip label="Expert" size="small" />
-              </Stack>
-            </MenuItem>
-          ))}
-        </Menu>
+        {selectedRequest && (
+          <RequestAssignButton
+            selectedRequest={selectedRequest}
+            owners={owners}
+            experts={experts}
+          />
+        )}
       </Stack>
       <Grid container spacing={2}>
         <Grid size={6} sx={{ minHeight: 550 }}>
