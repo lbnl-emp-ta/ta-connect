@@ -31,7 +31,6 @@ interface RequestInfoPanelProps {
 }
 
 export const RequestInfoPanel: React.FC<RequestInfoPanelProps> = ({ request }) => {
-  console.log('Selected request:', request);
   const { identity } = useIdentityContext();
   const updateRequestMutation = useRequestMutation(request?.id.toString() || '', identity);
   const [editing, setEditing] = useState(false);

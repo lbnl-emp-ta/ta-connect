@@ -176,3 +176,20 @@ export const useMarkCompleteMutation = (requestId: string, identity?: Identity) 
     onSuccess: () => queryClient.invalidateQueries(),
   });
 };
+
+export const useCancelMutation = (requestId: string, identity?: Identity) => {
+  return useMutation({
+    mutationKey: ['requests', 'cancel', requestId, identity],
+    mutationFn: () => postData(`${apiUrl}/requests/${requestId}/cancel/`, null, identity),
+    onSuccess: () => queryClient.invalidateQueries(),
+  });
+};
+
+export const useFinishCloseoutMutation = (requestId: string, identity?: Identity) => {
+  return useMutation({
+    mutationKey: ['requests', 'finish-closeout', requestId, identity],
+    mutationFn: () =>
+      postData(`${apiUrl}/requests/${requestId}/closeout-complete/`, null, identity),
+    onSuccess: () => queryClient.invalidateQueries(),
+  });
+};

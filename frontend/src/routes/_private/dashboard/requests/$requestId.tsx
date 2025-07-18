@@ -29,6 +29,8 @@ import {
   ownersQueryOptions,
   useAssignmentMutation,
   useMarkCompleteMutation,
+  useCancelMutation,
+  useFinishCloseoutMutation,
 } from '../../../../utils/queryOptions';
 import { AppLink } from '../../../../components/AppLink';
 import { useState } from 'react';
@@ -59,6 +61,8 @@ function SelectedRequest() {
   const { data: owners } = useSuspenseQuery(ownersQueryOptions(identity));
   const assignRequestMutation = useAssignmentMutation(params.requestId, identity);
   const completeRequestMutation = useMarkCompleteMutation(params.requestId, identity);
+  const cancelRequestMutation = useCancelMutation(params.requestId, identity);
+  const finishCloseoutMutation = useFinishCloseoutMutation(params.requestId, identity);
   const { sortedRequests } = useRequestsContext();
   const currentIndex = sortedRequests.findIndex((request) => {
     if (params?.requestId) {
@@ -100,6 +104,16 @@ function SelectedRequest() {
 
   const handleMarkComplete = () => {
     completeRequestMutation.mutate();
+    setActionsAnchorEl(null);
+  };
+
+  const handleCancelRequest = () => {
+    cancelRequestMutation.mutate();
+    setActionsAnchorEl(null);
+  };
+
+  const handleFinishCloseout = () => {
+    finishCloseoutMutation.mutate();
     setActionsAnchorEl(null);
   };
 
@@ -195,7 +209,7 @@ function SelectedRequest() {
             </ListItemIcon>
             <ListItemText>Set Dates</ListItemText>
           </MenuItem>
-          <MenuItem onClick={handleActionsMenuClose}>
+          <MenuItem onClick={handleFinishCloseout}>
             <ListItemIcon>
               <ArticleIcon />
             </ListItemIcon>
@@ -207,7 +221,7 @@ function SelectedRequest() {
             </ListItemIcon>
             <ListItemText>Mark Complete</ListItemText>
           </MenuItem>
-          <MenuItem onClick={handleActionsMenuClose}>
+          <MenuItem onClick={handleCancelRequest}>
             <ListItemIcon>
               <CancelIcon />
             </ListItemIcon>
