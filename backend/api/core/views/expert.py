@@ -48,7 +48,7 @@ class ExpertsListView(views.APIView):
             data["id"] = assignment.user.pk
             data["name"] = assignment.user.name
             data["email"] = assignment.user.email
-            data["lab"] = assignment.instance
+            data["lab"] = LabSerializer(assignment.instance).data
 
             expertise_list = Expertise.objects.filter(user=assignment.user.pk)
             expertise = dict()
