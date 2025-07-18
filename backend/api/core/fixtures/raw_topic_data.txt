@@ -1,0 +1,23 @@
+Regional coordination
+Grid architecture
+Grid visibility and control
+Transmission and bulk power system planning
+Transmission and distribution system interface issues
+Integrated grid planning
+Resource planning
+Economic value of reliability and or resilience
+Load forecasting
+Planning for DER integration
+Microgrids
+Building electrification
+Transportation electrification
+Storage Energy efficiency
+Demand response
+Participation and compensation models for DERs
+Interconnection
+Ratemaking and rate design
+Performance-based regulation
+Alternative utility business models 
+Equity and energy justice
+Customer data access
+Third-party data access

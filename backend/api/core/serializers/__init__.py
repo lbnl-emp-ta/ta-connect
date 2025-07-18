@@ -3,6 +3,7 @@ from .state import StateSerializer
 from .transmission_planning_region import TransmissionPlanningRegionSerializer
 from .organization_type import OrganizationTypeSerializer
 from .organization import OrganizationSerializer
+from .customer_type import CustomerTypeSerializer
 from .customer import CustomerSerializer
 from .depth import DepthSerializer
 from .lab import LabSerializer
@@ -12,9 +13,9 @@ from .role import RoleSerializer
 from .request_status import RequestStatusSerializer
 from .owner import OwnerSerializer
 from .request import RequestSerializer, RequestListSerializer, RequestDetailSerializer
-from .customer_type import CustomerTypeSerializer
 from .customer_request_relationship import CustomerRequestRelationshipSerializer
 from .cohort import CohortSerializer
+from .topic import TopicSerializer
 
 __all__ = [
     "UserLeanSerializer",
@@ -36,4 +37,5 @@ __all__ = [
     "CustomerTypeSerializer",
     "CustomerRequestRelationshipSerializer",
     "CohortSerializer",
+    "TopicSerializer"
 ]

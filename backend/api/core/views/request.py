@@ -1,14 +1,24 @@
+from django.db import transaction
+
 from rest_framework import views, status, permissions, authentication
 from rest_framework.response import Response
+
 from core.serializers import * 
 from core.models import * 
 from core.permissions import *
-from core.constants import ROLE
+from core.constants import ROLE, REQUEST_STATUS
+
+from core.views import assignment
 
 from allauth.headless.contrib.rest_framework.authentication import (
     XSessionTokenAuthentication,
 )
 
+"""
+Provides common functionality across all Request views. Like
+differentiating between requests that are actionable vs.
+downstream vs. not visable.
+"""
 class BaseUserAwareRequest(views.APIView):
     authentication_classes = [
         authentication.SessionAuthentication,
@@ -31,6 +41,8 @@ class BaseUserAwareRequest(views.APIView):
 
         context = json.loads(maybe_context) 
 
+        actionable_pks = [request.pk for request in self.get_actionable()]
+
         # This is a convention, we assume all requests for admin are 
         # "actionable" and none are "downstream". In reality, this 
         # concept doesn't really apply to Admins.
@@ -41,7 +53,7 @@ class BaseUserAwareRequest(views.APIView):
         # archived (i.e. no owner) or are owned by Reception currently 
         # (i.e. are actionable).
         elif IsCoordinator().has_permission(self.request):
-            return queryset.exclude(owner=None).difference(self.get_actionable())
+            return queryset.exclude(owner=None).exclude(pk__in=actionable_pks)
 
         elif IsProgramLead().has_permission(self.request):
             program = None
@@ -57,7 +69,8 @@ class BaseUserAwareRequest(views.APIView):
                 # associated with this Program.
                 program_downstream |= lab.owner.request_set.filter(receipt__program=program)
             
-            return program_downstream.difference(self.get_actionable())
+            return program_downstream.exclude(pk__in=actionable_pks)
+
         
         elif IsLabLead().has_permission(self.request):
             # For a Request to be "downstream" to a Lab means that the 
@@ -151,8 +164,11 @@ class BaseUserAwareRequest(views.APIView):
 class RequestDetailView(BaseUserAwareRequest):
     serializer = RequestDetailSerializer() 
 
+    """
+    Used to populate Request and Customer panels.
+    """
     def get(self, request, format=None, id=None):
-        queryset= self.get_queryset()
+        queryset= self.get_actionable() | self.get_downstream()
 
         if id is None:
             return Response(data={"message": "Please provide a Request ID"}, status=status.HTTP_400_BAD_REQUEST)
@@ -165,15 +181,28 @@ class RequestDetailView(BaseUserAwareRequest):
 
         customers = found_request.customers 
         customer_serializer = CustomerSerializer(customers, many=True)
+        customers_response_data = customer_serializer.data
+        for customer in customers_response_data:
+            try:
+                customer_type = CustomerRequestRelationship.objects.get(request=found_request, customer=Customer.objects.get(pk=customer["id"])).customer_type
+                customer_type_data = CustomerTypeSerializer(customer_type).data
+                customer["type"] = customer_type_data
+
+            except CustomerRequestRelationship.DoesNotExist:
+                return Response(data={"message": "Customer relationship data is missing!"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
         request_serializer = RequestSerializer(found_request)
 
         response_data = dict()
         response_data = response_data | request_serializer.data 
         response_data["customers"] = customer_serializer.data
+        response_data["owner"] = OwnerSerializer().format_owner(found_request.owner)
 
         return Response(data=response_data, status=status.HTTP_200_OK)
 
+    """
+    Used for Edit action.
+    """
     def patch(self, request, id=None):
         queryset = self.get_queryset()
 
@@ -199,15 +228,22 @@ class RequestDetailView(BaseUserAwareRequest):
         if not body:
             return Response(data={"message": "Missing request body"}, status=status.HTTP_204_NO_CONTENT)
         
-        if body.get("description"):
-            if not (IsAdmin().has_permission(request) or IsProgramLead().has_permission(request) or IsCoordinator().has_permission(request)):
+        if "description" in body:
+            if not (IsAdmin().has_permission(request, None) or IsProgramLead().has_permission(request, None) or IsCoordinator().has_permission(request, None)):
                 return Response(data={"message": "Insufficient privillege to update 'description' field"}, status=status.HTTP_401_UNAUTHORIZED)
+            
+            new_description_data = body.get("description")
+            if new_description_data is None:
+                new_description_data = ""
 
-            patch_data["description"] = body.get("description")
+            patch_data["description"] = new_description_data 
 
-        if body.get("depth"):
-            if not (IsAdmin().has_permission(request) or IsProgramLead().has_permission(request)):
+        if "depth" in body:
+            if not (IsAdmin().has_permission(request, None) or IsProgramLead().has_permission(request, None)):
                 return Response(data={"message": "Insufficient privillege to update 'depth' field"}, status=status.HTTP_401_UNAUTHORIZED)
+            
+            if body.get("depth") is None:
+                return Response(data={"message": "Cannot clear depth field on a request. Need to provide a valid replacement value."}, status=status.HTTP_401_UNAUTHORIZED)
             
             maybe_depth = None
             try:
@@ -217,49 +253,51 @@ class RequestDetailView(BaseUserAwareRequest):
 
             patch_data["depth"] = maybe_depth.name
 
-        if body.get("actual_completion_date"):
-            if not (IsAdmin().has_permission(request) or IsProgramLead().has_permission(request)):
+        if "actual_completion_date" in body:
+            if not (IsAdmin().has_permission(request, None) or IsProgramLead().has_permission(request, None)):
                 return Response(data={"message": "Insufficient privillege to update 'depth' field"}, status=status.HTTP_401_UNAUTHORIZED)
 
-            patch_data["actual_completion_date"] = body.get("actual_completion_date")
+            patch_data["actual_completion_date"] = body.get("actual_completion_date") 
 
-        if body.get("expert"):
-            if not(IsAdmin().has_permission(request) or IsLabLead().has_permission(request)):
+        if "expert" in body:
+            if not(IsAdmin().has_permission(request, None) or IsLabLead().has_permission(request, None)):
                 return Response(data={"message": "Insufficient privillege to update 'expert' field"}, status=status.HTTP_401_UNAUTHORIZED)
-
-            maybe_expert = None
-            try:
-                maybe_expert = User.objects.get(pk=body.get("expert"))
-            except User.DoesNotExist:
-                return Response(data={"message": "Provided user in expert field does not exist."}, status=status.HTTP_400_BAD_REQUEST)
             
-            # Need to check provided user has expert role
-            try:
-                # if they are lab lead, check to see if expert is in their lab
-                if IsLabLead().has_permission(request):
-                    LabRoleAssignment.objects.get(user=maybe_expert, role=Role.objects.get(name="Expert"), instance=Lab.objects.get(pk=context.get("instance")))
+            new_expert_data = body.get("expert")
+            if new_expert_data is not None:
+                maybe_expert = None
+                try:
+                    maybe_expert = User.objects.get(pk=new_expert_data)
+                except User.DoesNotExist:
+                    return Response(data={"message": "Provided user in expert field does not exist."}, status=status.HTTP_400_BAD_REQUEST)
+                
+                # Need to check provided user has expert role
+                try:
+                    # if they are lab lead, check to see if expert is in their lab
+                    if IsLabLead().has_permission(request, None):
+                        LabRoleAssignment.objects.get(user=maybe_expert, role=Role.objects.get(name="Expert"), instance=Lab.objects.get(pk=context.get("instance")))
 
-                # if they are admin best we can do is check if they are an expert
-                else:
-                    LabRoleAssignment.objects.get(user=maybe_expert, role=Role.objects.get(name="Expert"))
+                    # if they are admin best we can do is check if they are an expert
+                    else:
+                        LabRoleAssignment.objects.get(user=maybe_expert, role=Role.objects.get(name="Expert"))
 
-            except LabRoleAssignment.DoesNotExist:
-                return Response(data={"message": "Provided user in expert field does not not have expert role."}, status=status.HTTP_400_BAD_REQUEST)
+                except LabRoleAssignment.DoesNotExist:
+                    return Response(data={"message": "Provided user in expert field does not not have expert role."}, status=status.HTTP_400_BAD_REQUEST)
 
-            except Lab.DoesNotExist:
-                return Response(data={"message": "Provided expert does not reside in your lab role exist."}, status=status.HTTP_400_BAD_REQUEST)
-            
+                except Lab.DoesNotExist:
+                    return Response(data={"message": "Provided expert does not reside in your lab role exist."}, status=status.HTTP_400_BAD_REQUEST)
+                
 
             patch_data["expert"] = maybe_expert.email 
         
-        if body.get("proj_start_date"):
-            if not(IsAdmin().has_object_permission(request, self, maybe_request) or IsProgramLead().has_permission(request) or IsLabLead().has_permission(request) or IsExpert().has_permission(request)):
+        if "proj_start_date" in body:
+            if not(IsAdmin().has_permission(request, None) or IsProgramLead().has_permission(request, None) or IsLabLead().has_permission(request, None) or IsExpert().has_permission(request, None)):
                 return Response(data={"message": "Insufficient privillege to update 'expert' field"}, status=status.HTTP_401_UNAUTHORIZED)
 
             patch_data["proj_start_date"] = body.get("proj_start_date")
 
-        if body.get("proj_completion_date"):
-            if not(IsAdmin().has_object_permission(request, self, maybe_request) or IsProgramLead().has_permission(request) or IsLabLead().has_permission(request) or IsExpert().has_permission(request)):
+        if "proj_completion_date" in body:
+            if not(IsAdmin().has_permission(request, None) or IsProgramLead().has_permission(request, None) or IsLabLead().has_permission(request, None) or IsExpert().has_permission(request, None)):
                 return Response(data={"message": "Insufficient privillege to update 'expert' field"}, status=status.HTTP_401_UNAUTHORIZED)
 
             patch_data["proj_completion_date"] = body.get("proj_completion_date")
@@ -275,7 +313,10 @@ class RequestDetailView(BaseUserAwareRequest):
         #     patch_data["owner"] = maybe_owner.pk 
         
             
-        if body.get("status"):
+        if "status" in body:
+            if body.get("status") is None:
+                return Response(data={"message": "Cannot clear status field on request. Need to provide value replacement value."}, status=status.HTTP_400_BAD_REQUEST)
+
             maybe_status = None
             try:
                 maybe_status = RequestStatus.objects.get(pk=body.get("status"))
@@ -296,9 +337,10 @@ class RequestDetailView(BaseUserAwareRequest):
         return self.get(request, None, id)
 
 
+"""
+Used to populate the request table. 
+"""
 class RequestListView(BaseUserAwareRequest):
-    serializer = RequestSerializer
-    
     def get(self, request, format=None):
         actionable = self.get_actionable()
         downstream = self.get_downstream()
@@ -327,3 +369,94 @@ class RequestListView(BaseUserAwareRequest):
             response_data[tag] = requests_data
 
         return Response(data=response_data, status=status.HTTP_200_OK)
+
+class RequestMarkCompleteView(BaseUserAwareRequest):
+    def post(self, request, id=None) :
+        if id is None:
+            return Response(data={"message": "Please provide a Request ID"}, status=status.HTTP_400_BAD_REQUEST)
+
+        if not (IsProgramLead().has_permission(request) or IsAdmin().has_permission(request)):
+            return Response(data={"message": "Insufficient privillege to mark request as complete"}, status=status.HTTP_401_UNAUTHORIZED)
+
+        queryset = self.get_actionable()
+
+        found_request = None
+        try:
+            found_request = queryset.get(pk=id)        
+        except:
+            return Response(data={"message": "Request with given ID does not exist"}, status=status.HTTP_404_NOT_FOUND)
+
+        # Maybe consider checking receipt to see if its even been serviced?
+        try:
+            found_request.status = RequestStatus.objects.get(name=REQUEST_STATUS.COMPLETED)
+            found_request.owner = None
+            found_request.expert = None
+            found_request.save()
+        except Exception as e:
+            return Response(data={"message": f"{e}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+        return Response(status=status.HTTP_200_OK)
+      
+class RequestCancelView(BaseUserAwareRequest):
+    def post(self, request, id=None):
+        if id is None:
+            return Response(data={"message": "Please provide a Request ID"}, status=status.HTTP_400_BAD_REQUEST)
+
+        if not (IsCoordinator().has_permission(request) or IsAdmin().has_permission(request)):
+            return Response(data={"message": "Insufficient privillege to mark request as complete"}, status=status.HTTP_401_UNAUTHORIZED)
+
+        queryset = self.get_actionable()
+
+        found_request = None
+        try:
+            found_request = queryset.get(pk=id)        
+        except:
+            return Response(data={"message": "Request with given ID does not exist"}, status=status.HTTP_404_NOT_FOUND)
+
+        try:
+            with transaction.atomic():
+                found_request.status = RequestStatus.objects.get(name=REQUEST_STATUS.UNABLE_TO_ADDRESS)
+                found_request.owner = None
+                found_request.expert = None
+
+                found_request.receipt.program = None
+                found_request.receipt.lab = None
+                found_request.receipt.expert = None
+
+                found_request.receipt.save()
+                found_request.save()
+
+        except Exception as e:
+            return Response(data={"message": f"{e}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+        return Response(status=status.HTTP_200_OK)
+
+class RequestCloseoutCompleteView(BaseUserAwareRequest):
+    def post(self, request, id=None):
+        if id is None:
+            return Response(data={"message": "Please provide a Request ID"}, status=status.HTTP_400_BAD_REQUEST)
+
+        if not (IsExpert().has_permission(request) or IsAdmin().has_permission(request)):
+            return Response(data={"message": "Insufficient privillege to mark request as complete"}, status=status.HTTP_401_UNAUTHORIZED)
+
+        queryset = self.get_actionable()
+
+        found_request = None
+        try:
+            found_request = queryset.get(pk=id)        
+        except:
+            return Response(data={"message": "Request with given ID does not exist"}, status=status.HTTP_404_NOT_FOUND)
+
+        if found_request.expert is None:
+            return Response(data={"message": "Request must have an assigned expert in order to complete closeout"}, status=status.HTTP_404_NOT_FOUND)
+
+        try:
+            found_request.status = RequestStatus.objects.get(name=REQUEST_STATUS.CLOSE_OUT_COMPLETED)
+            # Effectively this "assigns" back up to Lab
+            found_request.expert = None 
+            found_request.save()
+
+        except Exception as e:
+            return Response(data={"message": f"{e}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+        return Response(status=status.HTTP_200_OK)

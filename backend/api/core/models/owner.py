@@ -1,7 +1,11 @@
-from django.db import IntegrityError, models
+from django.db import IntegrityError, models, transaction
 from django.db.models import CheckConstraint, Q
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+
 
 from core.models import * 
+from core.constants import DOMAINTYPE
 
 class Owner(models.Model):
     class DomainType(models.TextChoices):
@@ -54,3 +58,13 @@ class Owner(models.Model):
             )
         ]
         db_table = "owner"
+
+@receiver(post_save, sender=Lab)
+def create_owner_on_lab_save(sender, instance, created, **kwargs):
+    if created:
+        Owner.objects.create(domain_type=DOMAINTYPE.LAB, lab=instance)
+
+@receiver(post_save, sender=Program)
+def create_owner_on_lab_save(sender, instance, created, **kwargs):
+    if created:
+        Owner.objects.create(domain_type=DOMAINTYPE.PROGRAM, program=instance)

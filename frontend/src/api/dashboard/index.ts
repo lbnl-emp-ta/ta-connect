@@ -75,7 +75,7 @@ export async function patchRequest<T>(
   }
 }
 
-export async function postData<T>(url: string, data: T, identity?: Identity): Promise<void> {
+export async function postData<T>(url: string, data?: T, identity?: Identity): Promise<void> {
   try {
     const response = await fetch(url, {
       method: 'POST',

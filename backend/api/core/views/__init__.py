@@ -1,4 +1,4 @@
-from .request import RequestListView, RequestDetailView
+from .request import RequestListView, RequestDetailView, RequestMarkCompleteView, RequestCancelView, RequestCloseoutCompleteView
 from .depth import DepthListView, DepthRetrieveView
 from .state import StateListView, StateRetrieveView
 from .organization_type import OrganizationTypeListView, OrganizationTypeRetrieveView
@@ -12,14 +12,19 @@ from .identity import IdentityListView
 from .status import StatusListView
 from .owner import OwnerListView
 from .assignment import AssignmentView
+from .expert import ExpertsListView
 
 __all__ = [
     "AssignmentView",
     "OwnerListView",
+    "ExpertsListView",
     "StatusListView",
     "IdentityListView",
     "RequestListView",
     "RequestDetailView",
+    "RequestMarkCompleteView",
+    "RequestCloseoutCompleteView",
+    "RequestCancelView",
     "DepthListView",
     "DepthRetrieveView",
     "StateListView",

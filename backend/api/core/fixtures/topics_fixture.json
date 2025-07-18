@@ -1,0 +1,186 @@
+[
+    {
+        "model": "core.Topic",
+        "pk": 1,
+        "fields": {
+            "name": "Regional coordination",
+            "description": "no description for now"
+        }
+    },
+    {
+        "model": "core.Topic",
+        "pk": 2,
+        "fields": {
+            "name": "Grid architecture",
+            "description": "no description for now"
+        }
+    },
+    {
+        "model": "core.Topic",
+        "pk": 3,
+        "fields": {
+            "name": "Grid visibility and control",
+            "description": "no description for now"
+        }
+    },
+    {
+        "model": "core.Topic",
+        "pk": 4,
+        "fields": {
+            "name": "Transmission and bulk power system planning",
+            "description": "no description for now"
+        }
+    },
+    {
+        "model": "core.Topic",
+        "pk": 5,
+        "fields": {
+            "name": "Transmission and distribution system interface issues",
+            "description": "no description for now"
+        }
+    },
+    {
+        "model": "core.Topic",
+        "pk": 6,
+        "fields": {
+            "name": "Integrated grid planning",
+            "description": "no description for now"
+        }
+    },
+    {
+        "model": "core.Topic",
+        "pk": 7,
+        "fields": {
+            "name": "Resource planning",
+            "description": "no description for now"
+        }
+    },
+    {
+        "model": "core.Topic",
+        "pk": 8,
+        "fields": {
+            "name": "Economic value of reliability and or resilience",
+            "description": "no description for now"
+        }
+    },
+    {
+        "model": "core.Topic",
+        "pk": 9,
+        "fields": {
+            "name": "Load forecasting",
+            "description": "no description for now"
+        }
+    },
+    {
+        "model": "core.Topic",
+        "pk": 10,
+        "fields": {
+            "name": "Planning for DER integration",
+            "description": "no description for now"
+        }
+    },
+    {
+        "model": "core.Topic",
+        "pk": 11,
+        "fields": {
+            "name": "Microgrids",
+            "description": "no description for now"
+        }
+    },
+    {
+        "model": "core.Topic",
+        "pk": 12,
+        "fields": {
+            "name": "Building electrification",
+            "description": "no description for now"
+        }
+    },
+    {
+        "model": "core.Topic",
+        "pk": 13,
+        "fields": {
+            "name": "Transportation electrification",
+            "description": "no description for now"
+        }
+    },
+    {
+        "model": "core.Topic",
+        "pk": 14,
+        "fields": {
+            "name": "Storage Energy efficiency",
+            "description": "no description for now"
+        }
+    },
+    {
+        "model": "core.Topic",
+        "pk": 15,
+        "fields": {
+            "name": "Demand response",
+            "description": "no description for now"
+        }
+    },
+    {
+        "model": "core.Topic",
+        "pk": 16,
+        "fields": {
+            "name": "Participation and compensation models for DERs",
+            "description": "no description for now"
+        }
+    },
+    {
+        "model": "core.Topic",
+        "pk": 17,
+        "fields": {
+            "name": "Interconnection",
+            "description": "no description for now"
+        }
+    },
+    {
+        "model": "core.Topic",
+        "pk": 18,
+        "fields": {
+            "name": "Ratemaking and rate design",
+            "description": "no description for now"
+        }
+    },
+    {
+        "model": "core.Topic",
+        "pk": 19,
+        "fields": {
+            "name": "Performance-based regulation",
+            "description": "no description for now"
+        }
+    },
+    {
+        "model": "core.Topic",
+        "pk": 20,
+        "fields": {
+            "name": "Alternative utility business models",
+            "description": "no description for now"
+        }
+    },
+    {
+        "model": "core.Topic",
+        "pk": 21,
+        "fields": {
+            "name": "Equity and energy justice",
+            "description": "no description for now"
+        }
+    },
+    {
+        "model": "core.Topic",
+        "pk": 22,
+        "fields": {
+            "name": "Customer data access",
+            "description": "no description for now"
+        }
+    },
+    {
+        "model": "core.Topic",
+        "pk": 23,
+        "fields": {
+            "name": "Third-party data access",
+            "description": "no description for now"
+        }
+    }
+]

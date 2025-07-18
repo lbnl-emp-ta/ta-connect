@@ -42,7 +42,6 @@ class OwnerListView(views.APIView):
 
             lab_owners = queryset.none() 
             for lab in program.labs.all():
-                print(lab)
                 lab_owners = lab_owners | Owner.objects.filter(pk=lab.owner.pk)
 
             # See one layer back up to reception, and one layer down to associated labs 
@@ -54,9 +53,14 @@ class OwnerListView(views.APIView):
 
             # Only one layer up, Experts are a role within Labs - not another layer
             return Owner.objects.filter(domain_type=DOMAINTYPE.PROGRAM, program=assignment.program)
+        
+        return queryset.none()
     
     def get(self, request, format=None):
         queryset = self.get_queryset()
-        
-        owner_serializer = OwnerSerializer(queryset, many=True)
-        return Response(data=owner_serializer.data, status=status.HTTP_200_OK)
+
+        owners_data = list()
+        for owner in queryset.all():
+            owners_data.append(OwnerSerializer().format_owner(owner))
+
+        return Response(data=owners_data, status=status.HTTP_200_OK)
