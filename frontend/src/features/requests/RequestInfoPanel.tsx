@@ -31,6 +31,7 @@ interface RequestInfoPanelProps {
 }
 
 export const RequestInfoPanel: React.FC<RequestInfoPanelProps> = ({ request }) => {
+  console.log('Selected request:', request);
   const { identity } = useIdentityContext();
   const updateRequestMutation = useRequestMutation(request?.id.toString() || '', identity);
   const [editing, setEditing] = useState(false);
@@ -151,13 +152,14 @@ export const RequestInfoPanel: React.FC<RequestInfoPanelProps> = ({ request }) =
                   <TableCell>Assignment Location</TableCell>
                   <TableCell>
                     <Stack direction="row" spacing={1}>
-                      <span>
-                        {request.owner.domain_type
-                          ? capitalize(request.owner.domain_type)
-                          : 'Unknown'}
-                      </span>
-                      <span>|</span>
-                      <span>{request.owner.program ? request.owner.program : 'Unknown'}</span>
+                      {request.owner && <span>{capitalize(request.owner.domain_type)}</span>}
+                      {request.owner && request.owner.domain_type !== 'reception' && (
+                        <>
+                          <span>|</span>
+                          <span>{request.owner.domain_name}</span>
+                        </>
+                      )}
+                      {!request.owner && <span>None</span>}
                     </Stack>
                   </TableCell>
                 </TableRow>

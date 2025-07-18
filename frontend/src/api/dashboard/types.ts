@@ -28,9 +28,9 @@ export interface TACustomer {
 
 export interface TAOwner {
   id: number;
-  lab?: number;
-  program?: number;
-  reception: number;
+  domain_description?: string;
+  domain_id?: number;
+  domain_name?: string;
   domain_type: string;
 }
 
@@ -60,7 +60,7 @@ export interface TARequestDetail {
   description: string;
   date_created: string;
   customers: TACustomer[];
-  owner: TAOwner;
+  owner?: TAOwner;
   proj_start_date: string | null;
   proj_completion_date: string | null;
   actual_completion_date: string | null;
