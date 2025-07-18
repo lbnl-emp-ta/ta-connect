@@ -66,6 +66,7 @@ export interface TARequest {
   date_created: string;
   customer_email: string;
   customer_name: string;
+  expert: Partial<TAExpert> | null;
   proj_start_date: string | null;
   proj_completion_date: string | null;
   actual_completion_date: string | null;
@@ -84,6 +85,7 @@ export interface TARequestDetail {
   description: string;
   date_created: string;
   customers: TACustomer[];
+  expert: string | null;
   owner?: TAOwner;
   proj_start_date: string | null;
   proj_completion_date: string | null;

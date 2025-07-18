@@ -163,6 +163,10 @@ export const RequestInfoPanel: React.FC<RequestInfoPanelProps> = ({ request }) =
                   </TableCell>
                 </TableRow>
                 <TableRow>
+                  <TableCell>Assigned Expert</TableCell>
+                  <TableCell>{request.expert ? request.expert : 'None'}</TableCell>
+                </TableRow>
+                <TableRow>
                   <TableCell>Status</TableCell>
                   <TableCell>{request.status ? request.status : 'Unknown'}</TableCell>
                 </TableRow>
