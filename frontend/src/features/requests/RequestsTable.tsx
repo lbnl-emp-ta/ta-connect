@@ -89,8 +89,9 @@ export const RequestsTable: React.FC<RequestsTableProps> = ({ data }) => {
           width: 200,
         },
         {
-          field: 'assignedExpert',
+          field: 'expert',
           headerName: 'Assigned Expert',
+          valueGetter: (_value, row) => row.expert?.name || 'None',
           width: 200,
         },
       ]}
