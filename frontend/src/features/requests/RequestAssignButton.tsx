@@ -12,12 +12,10 @@ import {
   Stack,
   TextField,
 } from '@mui/material';
-import { useMutation } from '@tanstack/react-query';
 import { useState } from 'react';
-import { queryClient } from '../../App';
-import { postData } from '../../api/dashboard';
 import { TAAssignment, TAExpert, TAOwner, TARequestDetail } from '../../api/dashboard/types';
-import { apiUrl } from '../../utils/queryOptions';
+import { queryClient } from '../../App';
+import { useAssignmentMutation } from '../../utils/queryOptions';
 import { useIdentityContext } from '../identity/IdentityContext';
 import { useToastContext } from '../toasts/ToastContext';
 import { ToastMessage } from '../toasts/ToastMessage';
@@ -35,10 +33,7 @@ export const RequestAssignButton: React.FC<RequestAssignButtonProps> = ({
 }) => {
   const { identity } = useIdentityContext();
   const { setShowToast, setToastMessage } = useToastContext();
-  const assignRequestMutation = useMutation({
-    mutationKey: ['requests', 'assign', requestId, identity],
-    mutationFn: (data: TAAssignment) =>
-      postData<TAAssignment>(`${apiUrl}/requests/assign/`, data, identity),
+  const assignRequestMutation = useAssignmentMutation(requestId.toString(), identity, {
     onSuccess: () => {
       queryClient.invalidateQueries();
       setShowToast(true);
