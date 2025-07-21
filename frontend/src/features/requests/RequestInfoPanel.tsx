@@ -1,11 +1,14 @@
+import CheckIcon from '@mui/icons-material/Check';
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import ClearIcon from '@mui/icons-material/Clear';
+import EditIcon from '@mui/icons-material/Edit';
+import ErrorIcon from '@mui/icons-material/Error';
 import {
   CircularProgress,
   IconButton,
   MenuItem,
   Select,
   SelectChangeEvent,
-  Snackbar,
-  SnackbarCloseReason,
   Stack,
   Table,
   TableBody,
@@ -15,21 +18,17 @@ import {
   TextField,
   Typography,
 } from '@mui/material';
-import EditIcon from '@mui/icons-material/Edit';
-import CheckIcon from '@mui/icons-material/Check';
-import ClearIcon from '@mui/icons-material/Clear';
-import CheckCircleIcon from '@mui/icons-material/CheckCircle';
-import ErrorIcon from '@mui/icons-material/Error';
+import { DatePicker } from '@mui/x-date-pickers';
+import { PickerValue } from '@mui/x-date-pickers/internals';
+import dayjs, { Dayjs } from 'dayjs';
+import { useCallback, useEffect, useState } from 'react';
 import { TARequestDetail } from '../../api/dashboard/types';
 import { InfoPanel } from '../../components/InfoPanel';
-import { capitalize, formatDatetime } from '../../utils/utils';
-import { useCallback, useEffect, useState } from 'react';
-import { useIdentityContext } from '../identity/IdentityContext';
 import { useRequestMutation } from '../../utils/queryOptions';
-import { DatePicker } from '@mui/x-date-pickers';
-import dayjs, { Dayjs } from 'dayjs';
-import { PickerValue } from '@mui/x-date-pickers/internals';
-import { ToastMessage } from '../../components/ToastMessage';
+import { capitalize, formatDatetime } from '../../utils/utils';
+import { useIdentityContext } from '../identity/IdentityContext';
+import { useToastContext } from '../toasts/ToastContext';
+import { ToastMessage } from '../toasts/ToastMessage';
 
 interface RequestInfoPanelProps {
   request?: TARequestDetail;
@@ -39,8 +38,7 @@ export const RequestInfoPanel: React.FC<RequestInfoPanelProps> = ({ request }) =
   const { identity } = useIdentityContext();
   const updateRequestMutation = useRequestMutation(request?.id.toString() || '', identity);
   const [editing, setEditing] = useState(false);
-  const [showToast, setShowToast] = useState(false);
-  const [toastMessage, setToastMessage] = useState<React.ReactNode>();
+  const { setShowToast, setToastMessage } = useToastContext();
   const [depth, setDepth] = useState<TARequestDetail['depth']>();
   const [projectedStartDate, setProjectedStartDate] = useState<Dayjs>();
   const [projectedCompletionDate, setProjectedCompletionDate] = useState<Dayjs>();
@@ -65,14 +63,6 @@ export const RequestInfoPanel: React.FC<RequestInfoPanelProps> = ({ request }) =
       setDescription(request.description || '');
     }
   }, [request]);
-
-  const handleToastClose = (_event: React.SyntheticEvent | Event, reason?: SnackbarCloseReason) => {
-    if (reason === 'clickaway') {
-      return;
-    }
-
-    setShowToast(false);
-  };
 
   const handleEditClick = () => {
     setEditing(true);
@@ -315,18 +305,6 @@ export const RequestInfoPanel: React.FC<RequestInfoPanelProps> = ({ request }) =
           </Stack>
         </>
       )}
-      <Snackbar
-        open={showToast}
-        autoHideDuration={6000}
-        message={toastMessage}
-        onClose={handleToastClose}
-        action={
-          <IconButton size="small" aria-label="close" color="inherit" onClick={handleToastClose}>
-            <ClearIcon fontSize="small" />
-          </IconButton>
-        }
-        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
-      />
     </InfoPanel>
   );
 };

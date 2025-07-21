@@ -144,5 +144,5 @@ export interface TAAssignment {
 }
 
 export interface TAError {
-  message: string | { non_field_errors?: string[] };
+  message: string | Record<string, string[]>;
 }

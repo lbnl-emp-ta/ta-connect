@@ -54,15 +54,23 @@ export async function patchRequest<T>(
 
     if (!response.ok) {
       const errorData = (await response.json()) as TAError;
+      console.error('Error updating request:', errorData);
       // Some serializer errors don't get returned directly in the message field.
       // Instead they are nested in a non_field_errors array.
       // This is a hacky way to make sure we get the actual message even if it's nested.
       // In the future this should be handled by the backend and the frontend should just
       // handle message as a simple string.
       let errorMessage =
-        typeof errorData.message === 'string' ? errorData.message : 'Request update failed';
-      if (typeof errorData.message === 'object' && errorData.message.non_field_errors) {
-        errorMessage = errorData.message.non_field_errors[0];
+        typeof errorData.message === 'string'
+          ? errorData.message
+          : 'An unknown error has occurred.';
+      if (typeof errorData.message === 'object') {
+        errorMessage = '';
+        for (const [_, value] of Object.entries(errorData.message)) {
+          if (Array.isArray(value)) {
+            errorMessage += `${value.join('. ')}. `;
+          }
+        }
       }
       throw new Error(errorMessage);
     }

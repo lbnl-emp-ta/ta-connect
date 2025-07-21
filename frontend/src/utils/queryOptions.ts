@@ -25,7 +25,7 @@ import { queryClient } from '../App';
 import { Identity } from '../features/identity/IdentityContext';
 import { fetchData, patchRequest, postData } from '../api/dashboard';
 
-const apiUrl = import.meta.env.VITE_API_URL as string;
+export const apiUrl = import.meta.env.VITE_API_URL as string;
 
 export const authSessionQueryOptions = () =>
   queryOptions({
@@ -170,15 +170,6 @@ export const useRequestMutation = (requestId: string, identity?: Identity) => {
   return useMutation({
     mutationKey: ['requests', 'update', requestId, identity],
     mutationFn: (data: Partial<TARequest>) => patchRequest(requestId, data, identity),
-    onSuccess: () => queryClient.invalidateQueries(),
-  });
-};
-
-export const useAssignmentMutation = (requestId: string, identity?: Identity) => {
-  return useMutation({
-    mutationKey: ['requests', 'assign', requestId, identity],
-    mutationFn: (data: TAAssignment) =>
-      postData<TAAssignment>(`${apiUrl}/requests/assign/`, data, identity),
     onSuccess: () => queryClient.invalidateQueries(),
   });
 };

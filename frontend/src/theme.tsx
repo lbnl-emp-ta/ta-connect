@@ -131,5 +131,14 @@ export const theme = createTheme({
         },
       },
     },
+    MuiSnackbar: {
+      styleOverrides: {
+        root: {
+          '& .MuiSnackbarContent-root': {
+            flexWrap: 'nowrap',
+          },
+        },
+      },
+    },
   },
 });

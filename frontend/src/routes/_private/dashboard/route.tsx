@@ -1,7 +1,9 @@
 import AssignmentIcon from '@mui/icons-material/Assignment';
+import ClearIcon from '@mui/icons-material/Clear';
 import PeopleIcon from '@mui/icons-material/People';
 import {
   Box,
+  IconButton,
   List,
   ListItem,
   ListItemButton,
@@ -10,6 +12,8 @@ import {
   MenuItem,
   Select,
   SelectChangeEvent,
+  Snackbar,
+  SnackbarCloseReason,
   Stack,
 } from '@mui/material';
 import { useSuspenseQuery } from '@tanstack/react-query';
@@ -17,6 +21,7 @@ import { createFileRoute, Outlet, redirect, useNavigate } from '@tanstack/react-
 import { useEffect } from 'react';
 import { TAIdentity } from '../../../api/dashboard/types';
 import { useIdentityContext } from '../../../features/identity/IdentityContext';
+import { useToastContext } from '../../../features/toasts/ToastContext';
 import { identitiesQueryOptions } from '../../../utils/queryOptions';
 
 export const Route = createFileRoute('/_private/dashboard')({
@@ -34,11 +39,19 @@ export const Route = createFileRoute('/_private/dashboard')({
 function DashboardComponent() {
   const navigate = useNavigate();
   const { detailedIdentity, setIdentity, setDetailedIdentity } = useIdentityContext();
+  const { showToast, toastMessage, setShowToast } = useToastContext();
   const { data: identities } = useSuspenseQuery(identitiesQueryOptions());
 
   const handleIdentityChange = (event: SelectChangeEvent<TAIdentity | null>) => {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    setDetailedIdentity(event.target.value as any);
+    setDetailedIdentity(event.target.value as TAIdentity);
+  };
+
+  const handleToastClose = (_event: React.SyntheticEvent | Event, reason?: SnackbarCloseReason) => {
+    // if (reason === 'clickaway') {
+    //   return;
+    // }
+
+    setShowToast(false);
   };
 
   useEffect(() => {
@@ -121,6 +134,18 @@ function DashboardComponent() {
       <Box component="main" sx={{ flex: 1, overflow: 'hidden', paddingTop: 2 }}>
         <Outlet />
       </Box>
+      <Snackbar
+        open={showToast}
+        autoHideDuration={6000}
+        message={toastMessage}
+        onClose={handleToastClose}
+        action={
+          <IconButton size="small" aria-label="close" color="inherit" onClick={handleToastClose}>
+            <ClearIcon fontSize="small" />
+          </IconButton>
+        }
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+      />
     </Stack>
   );
 }
