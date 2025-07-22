@@ -1,4 +1,4 @@
-import { queryOptions, useMutation } from '@tanstack/react-query';
+import { queryOptions, useMutation, UseMutationOptions } from '@tanstack/react-query';
 import { sessionsApi } from '../api/sessions';
 import { submitIntakeMutation } from '../api/forms';
 import {
@@ -25,7 +25,7 @@ import { queryClient } from '../App';
 import { Identity } from '../features/identity/IdentityContext';
 import { fetchData, patchRequest, postData } from '../api/dashboard';
 
-const apiUrl = import.meta.env.VITE_API_URL as string;
+export const apiUrl = import.meta.env.VITE_API_URL as string;
 
 export const authSessionQueryOptions = () =>
   queryOptions({
@@ -174,36 +174,52 @@ export const useRequestMutation = (requestId: string, identity?: Identity) => {
   });
 };
 
-export const useAssignmentMutation = (requestId: string, identity?: Identity) => {
+export const useAssignmentMutation = (
+  requestId: string,
+  identity?: Identity,
+  options?: UseMutationOptions<unknown, Error, TAAssignment, unknown>
+) => {
   return useMutation({
     mutationKey: ['requests', 'assign', requestId, identity],
     mutationFn: (data: TAAssignment) =>
       postData<TAAssignment>(`${apiUrl}/requests/assign/`, data, identity),
-    onSuccess: () => queryClient.invalidateQueries(),
+    ...options,
   });
 };
 
-export const useMarkCompleteMutation = (requestId: string, identity?: Identity) => {
+export const useMarkCompleteMutation = (
+  requestId: string,
+  identity?: Identity,
+  options?: UseMutationOptions<unknown, Error, void, unknown>
+) => {
   return useMutation({
     mutationKey: ['requests', 'mark-complete', requestId, identity],
     mutationFn: () => postData(`${apiUrl}/requests/${requestId}/mark-complete/`, null, identity),
-    onSuccess: () => queryClient.invalidateQueries(),
+    ...options,
   });
 };
 
-export const useCancelMutation = (requestId: string, identity?: Identity) => {
+export const useCancelMutation = (
+  requestId: string,
+  identity?: Identity,
+  options?: UseMutationOptions<unknown, Error, void, unknown>
+) => {
   return useMutation({
     mutationKey: ['requests', 'cancel', requestId, identity],
     mutationFn: () => postData(`${apiUrl}/requests/${requestId}/cancel/`, null, identity),
-    onSuccess: () => queryClient.invalidateQueries(),
+    ...options,
   });
 };
 
-export const useFinishCloseoutMutation = (requestId: string, identity?: Identity) => {
+export const useFinishCloseoutMutation = (
+  requestId: string,
+  identity?: Identity,
+  options?: UseMutationOptions<unknown, Error, void, unknown>
+) => {
   return useMutation({
     mutationKey: ['requests', 'finish-closeout', requestId, identity],
     mutationFn: () =>
       postData(`${apiUrl}/requests/${requestId}/closeout-complete/`, null, identity),
-    onSuccess: () => queryClient.invalidateQueries(),
+    ...options,
   });
 };

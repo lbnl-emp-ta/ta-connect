@@ -1,4 +1,6 @@
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import EastIcon from '@mui/icons-material/East';
+import ErrorIcon from '@mui/icons-material/Error';
 import {
   Box,
   Button,
@@ -12,8 +14,11 @@ import {
 } from '@mui/material';
 import { useState } from 'react';
 import { TAAssignment, TAExpert, TAOwner, TARequestDetail } from '../../api/dashboard/types';
+import { queryClient } from '../../App';
 import { useAssignmentMutation } from '../../utils/queryOptions';
 import { useIdentityContext } from '../identity/IdentityContext';
+import { useToastContext } from '../toasts/ToastContext';
+import { ToastMessage } from '../toasts/ToastMessage';
 
 interface RequestAssignButtonProps {
   requestId: TARequestDetail['id'];
@@ -27,7 +32,20 @@ export const RequestAssignButton: React.FC<RequestAssignButtonProps> = ({
   experts,
 }) => {
   const { identity } = useIdentityContext();
-  const assignRequestMutation = useAssignmentMutation(requestId.toString(), identity);
+  const { setShowToast, setToastMessage } = useToastContext();
+  const assignRequestMutation = useAssignmentMutation(requestId.toString(), identity, {
+    onSuccess: () => {
+      queryClient.invalidateQueries();
+      setShowToast(true);
+      setToastMessage(
+        <ToastMessage icon={<CheckCircleIcon />}>Request assignment saved</ToastMessage>
+      );
+    },
+    onError: (error: Error) => {
+      setShowToast(true);
+      setToastMessage(<ToastMessage icon={<ErrorIcon />}>{error.message}</ToastMessage>);
+    },
+  });
   const [assignAnchorEl, setAssignAnchorEl] = useState<null | HTMLElement>(null);
   const assignMenuOpen = Boolean(assignAnchorEl);
   const handleAssignMenuClick = (event: React.MouseEvent<HTMLButtonElement>) => {
@@ -47,6 +65,7 @@ export const RequestAssignButton: React.FC<RequestAssignButtonProps> = ({
     }
     assignRequestMutation.mutate(mutationData);
   };
+
   return (
     <>
       <Button

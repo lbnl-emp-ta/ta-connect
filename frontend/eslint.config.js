@@ -12,6 +12,7 @@ export default tseslint.config(
   {
     extends: [js.configs.recommended, ...tseslint.configs.recommendedTypeChecked],
     files: ['**/*.{ts,tsx}'],
+    args: 'after-used',
     languageOptions: {
       ecmaVersion: 2020,
       globals: globals.browser,

@@ -110,6 +110,31 @@ class RequestSerializer(serializers.Serializer):
         
         return data
     
+    
+    def update(self, instance, validated_data):
+        # Handle foreign key relationships that need special handling
+        if 'depth' in validated_data:
+            depth_name = validated_data.pop('depth')
+            instance.depth = Depth.objects.get(name=depth_name)
+        
+        if 'expert' in validated_data:
+            expert_email = validated_data.pop('expert')
+            if expert_email:
+                instance.expert = User.objects.get(email=expert_email)
+            else:
+                instance.expert = None
+        
+        if 'status' in validated_data:
+            status_name = validated_data.pop('status')
+            instance.status = RequestStatus.objects.get(name=status_name)
+        
+        # Update remaining fields
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+        
+        instance.save()
+        return instance
+    
     class Meta:
         model = Request
         fields = "__all__"

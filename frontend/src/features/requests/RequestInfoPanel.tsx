@@ -1,3 +1,8 @@
+import CheckIcon from '@mui/icons-material/Check';
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import ClearIcon from '@mui/icons-material/Clear';
+import EditIcon from '@mui/icons-material/Edit';
+import ErrorIcon from '@mui/icons-material/Error';
 import {
   CircularProgress,
   IconButton,
@@ -13,18 +18,17 @@ import {
   TextField,
   Typography,
 } from '@mui/material';
-import EditIcon from '@mui/icons-material/Edit';
-import CheckIcon from '@mui/icons-material/Check';
-import ClearIcon from '@mui/icons-material/Clear';
+import { DatePicker } from '@mui/x-date-pickers';
+import { PickerValue } from '@mui/x-date-pickers/internals';
+import dayjs, { Dayjs } from 'dayjs';
+import { useCallback, useEffect, useState } from 'react';
 import { TARequestDetail } from '../../api/dashboard/types';
 import { InfoPanel } from '../../components/InfoPanel';
-import { capitalize, formatDatetime } from '../../utils/utils';
-import { useCallback, useEffect, useState } from 'react';
-import { useIdentityContext } from '../identity/IdentityContext';
 import { useRequestMutation } from '../../utils/queryOptions';
-import { DatePicker } from '@mui/x-date-pickers';
-import dayjs, { Dayjs } from 'dayjs';
-import { PickerValue } from '@mui/x-date-pickers/internals';
+import { capitalize, formatDatetime } from '../../utils/utils';
+import { useIdentityContext } from '../identity/IdentityContext';
+import { useToastContext } from '../toasts/ToastContext';
+import { ToastMessage } from '../toasts/ToastMessage';
 
 interface RequestInfoPanelProps {
   request?: TARequestDetail;
@@ -34,6 +38,7 @@ export const RequestInfoPanel: React.FC<RequestInfoPanelProps> = ({ request }) =
   const { identity } = useIdentityContext();
   const updateRequestMutation = useRequestMutation(request?.id.toString() || '', identity);
   const [editing, setEditing] = useState(false);
+  const { setShowToast, setToastMessage } = useToastContext();
   const [depth, setDepth] = useState<TARequestDetail['depth']>();
   const [projectedStartDate, setProjectedStartDate] = useState<Dayjs>();
   const [projectedCompletionDate, setProjectedCompletionDate] = useState<Dayjs>();
@@ -106,8 +111,21 @@ export const RequestInfoPanel: React.FC<RequestInfoPanelProps> = ({ request }) =
   useEffect(() => {
     if (updateRequestMutation.isSuccess) {
       setEditing(false);
+      setShowToast(true);
+      setToastMessage(
+        <ToastMessage icon={<CheckCircleIcon />}>Request information saved</ToastMessage>
+      );
+    } else if (updateRequestMutation.isError) {
+      setShowToast(true);
+      setToastMessage(
+        <ToastMessage icon={<ErrorIcon />}>{updateRequestMutation.error.message}</ToastMessage>
+      );
     }
-  }, [updateRequestMutation.isSuccess]);
+  }, [
+    updateRequestMutation.isSuccess,
+    updateRequestMutation.isError,
+    updateRequestMutation.error?.message,
+  ]);
 
   return (
     <InfoPanel

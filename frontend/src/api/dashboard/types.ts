@@ -142,3 +142,7 @@ export interface TAAssignment {
   owner?: number;
   expert?: number;
 }
+
+export interface TAError {
+  message: string | Record<string, string[]>;
+}

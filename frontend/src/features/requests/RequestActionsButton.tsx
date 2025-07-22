@@ -2,17 +2,22 @@ import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import ArticleIcon from '@mui/icons-material/Article';
 import AssignmentTurnedInIcon from '@mui/icons-material/AssignmentTurnedIn';
 import CancelIcon from '@mui/icons-material/Cancel';
-import EditIcon from '@mui/icons-material/Edit';
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import DateRangeIcon from '@mui/icons-material/DateRange';
+import EditIcon from '@mui/icons-material/Edit';
+import ErrorIcon from '@mui/icons-material/Error';
 import { Button, ListItemIcon, ListItemText, Menu, MenuItem } from '@mui/material';
 import { useState } from 'react';
 import { TARequestDetail } from '../../api/dashboard/types';
+import { queryClient } from '../../App';
 import {
   useCancelMutation,
   useFinishCloseoutMutation,
   useMarkCompleteMutation,
 } from '../../utils/queryOptions';
 import { useIdentityContext } from '../identity/IdentityContext';
+import { useToastContext } from '../toasts/ToastContext';
+import { ToastMessage } from '../toasts/ToastMessage';
 
 interface RequestActionsButtonProps {
   requestId: TARequestDetail['id'];
@@ -20,9 +25,30 @@ interface RequestActionsButtonProps {
 
 export const RequestActionsButton: React.FC<RequestActionsButtonProps> = ({ requestId }) => {
   const { identity } = useIdentityContext();
-  const completeRequestMutation = useMarkCompleteMutation(requestId.toString(), identity);
-  const cancelRequestMutation = useCancelMutation(requestId.toString(), identity);
-  const finishCloseoutMutation = useFinishCloseoutMutation(requestId.toString(), identity);
+  const { setShowToast, setToastMessage } = useToastContext();
+  const onSuccess = (message: string) => {
+    return () => {
+      queryClient.invalidateQueries();
+      setShowToast(true);
+      setToastMessage(<ToastMessage icon={<CheckCircleIcon />}>{message}</ToastMessage>);
+    };
+  };
+  const onError = (error: Error) => {
+    setShowToast(true);
+    setToastMessage(<ToastMessage icon={<ErrorIcon />}>{error.message}</ToastMessage>);
+  };
+  const completeRequestMutation = useMarkCompleteMutation(requestId.toString(), identity, {
+    onSuccess: onSuccess('Request marked complete'),
+    onError: onError,
+  });
+  const cancelRequestMutation = useCancelMutation(requestId.toString(), identity, {
+    onSuccess: onSuccess('Request canceled'),
+    onError: onError,
+  });
+  const finishCloseoutMutation = useFinishCloseoutMutation(requestId.toString(), identity, {
+    onSuccess: onSuccess('Request closeout finished'),
+    onError: onError,
+  });
   const [actionsAnchorEl, setActionsAnchorEl] = useState<null | HTMLElement>(null);
   const actionsMenuOpen = Boolean(actionsAnchorEl);
 
