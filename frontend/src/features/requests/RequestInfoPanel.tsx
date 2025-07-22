@@ -75,14 +75,13 @@ export const RequestInfoPanel: React.FC<RequestInfoPanelProps> = ({ request }) =
    */
   const handleEditSubmit = () => {
     const mutationData = {} as Partial<TARequest>;
-    console.log('projectedStartDate:', projectedStartDate);
     if (depth !== request?.depth) {
       mutationData.depth = depth;
     }
     if (description !== request?.description) {
       mutationData.description = description;
     }
-    if (projectedStartDate === null) {
+    if (projectedStartDate === null && request?.proj_start_date !== null) {
       mutationData.proj_start_date = null;
     }
     if (
@@ -91,7 +90,7 @@ export const RequestInfoPanel: React.FC<RequestInfoPanelProps> = ({ request }) =
     ) {
       mutationData.proj_start_date = projectedStartDate.format('YYYY-MM-DD');
     }
-    if (projectedCompletionDate === null) {
+    if (projectedCompletionDate === null && request?.proj_completion_date !== null) {
       mutationData.proj_completion_date = null;
     }
     if (
@@ -100,7 +99,7 @@ export const RequestInfoPanel: React.FC<RequestInfoPanelProps> = ({ request }) =
     ) {
       mutationData.proj_completion_date = projectedCompletionDate.format('YYYY-MM-DD');
     }
-    if (actualCompletionDate === null) {
+    if (actualCompletionDate === null && request?.actual_completion_date !== null) {
       mutationData.actual_completion_date = null;
     }
     if (
@@ -109,7 +108,10 @@ export const RequestInfoPanel: React.FC<RequestInfoPanelProps> = ({ request }) =
     ) {
       mutationData.actual_completion_date = actualCompletionDate.format('YYYY-MM-DD');
     }
-    console.log('Submitting request update with data:', mutationData);
+    if (Object.keys(mutationData).length === 0) {
+      setEditing(false);
+      return;
+    }
     updateRequestMutation.mutate(mutationData);
   };
 
