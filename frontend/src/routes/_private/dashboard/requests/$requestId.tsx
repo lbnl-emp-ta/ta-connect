@@ -41,6 +41,7 @@ function SelectedRequest() {
   const { data: selectedRequest } = useSuspenseQuery(
     requestDetailQueryOptions(params.requestId, identity)
   );
+  console.log('Selected Request:', selectedRequest);
   const { data: owners } = useSuspenseQuery(ownersQueryOptions(identity));
   const canAssignExperts =
     detailedIdentity?.role.name === 'Lab Lead' || detailedIdentity?.role.name === 'Admin';

@@ -73,40 +73,51 @@ export const RequestInfoPanel: React.FC<RequestInfoPanelProps> = ({ request }) =
     setEditing(true);
   };
 
-    /**
+  /**
    * Handle submission of edited request information.
    * Only send fields that have changed to the API.
    * If a field is set explicitly to null, it will be cleared in the API.
    */
   const handleEditSubmit = () => {
-        const mutationData = {} as Partial<TARequest>;
-
-        if (depth !== request?.depth) {
-            mutationData.depth = depth;
-        }
-        if (description !== request?.description) {
-            mutationData.description = description;
-        }
-        if (projectedStartDate === null) {
-            mutationData.proj_start_date = null;
-        }
-        if (projectedStartDate?.format('YYYY-MM-DD') !== request?.proj_start_date) {
-            mutationData.proj_start_date = projectedStartDate?.format('YYYY-MM-DD');
-        }
-        if (projectedCompletionDate === null) {
-            mutationData.proj_completion_date = null;
-        }
-        if (projectedCompletionDate?.format('YYYY-MM-DD') !== request?.proj_completion_date) {
-            mutationData.proj_completion_date = projectedCompletionDate?.format('YYYY-MM-DD');
-        }
-        if (actualCompletionDate === null) {
-            mutationData.actual_completion_date = null;
-        }  
-        if (actualCompletionDate?.format('YYYY-MM-DD') !== request?.actual_completion_date) {
-            mutationData.actual_completion_date = actualCompletionDate?.format('YYYY-MM-DD');
-        }
-
-        updateRequestMutation.mutate(mutationData);
+    const mutationData = {} as Partial<TARequest>;
+    if (depth !== request?.depth) {
+      mutationData.depth = depth;
+    }
+    if (description !== request?.description) {
+      mutationData.description = description;
+    }
+    if (projectedStartDate === null && request?.proj_start_date !== null) {
+      mutationData.proj_start_date = null;
+    }
+    if (
+      projectedStartDate &&
+      projectedStartDate.format('YYYY-MM-DD') !== request?.proj_start_date
+    ) {
+      mutationData.proj_start_date = projectedStartDate.format('YYYY-MM-DD');
+    }
+    if (projectedCompletionDate === null && request?.proj_completion_date !== null) {
+      mutationData.proj_completion_date = null;
+    }
+    if (
+      projectedCompletionDate &&
+      projectedCompletionDate.format('YYYY-MM-DD') !== request?.proj_completion_date
+    ) {
+      mutationData.proj_completion_date = projectedCompletionDate.format('YYYY-MM-DD');
+    }
+    if (actualCompletionDate === null && request?.actual_completion_date !== null) {
+      mutationData.actual_completion_date = null;
+    }
+    if (
+      actualCompletionDate &&
+      actualCompletionDate.format('YYYY-MM-DD') !== request?.actual_completion_date
+    ) {
+      mutationData.actual_completion_date = actualCompletionDate.format('YYYY-MM-DD');
+    }
+    if (Object.keys(mutationData).length === 0) {
+      setEditing(false);
+      return;
+    }
+    updateRequestMutation.mutate(mutationData);
   };
 
   const handleEditCancel = () => {
