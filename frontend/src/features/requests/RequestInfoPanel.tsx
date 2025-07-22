@@ -75,6 +75,7 @@ export const RequestInfoPanel: React.FC<RequestInfoPanelProps> = ({ request }) =
    */
   const handleEditSubmit = () => {
     const mutationData = {} as Partial<TARequest>;
+    console.log('projectedStartDate:', projectedStartDate);
     if (depth !== request?.depth) {
       mutationData.depth = depth;
     }
@@ -84,21 +85,31 @@ export const RequestInfoPanel: React.FC<RequestInfoPanelProps> = ({ request }) =
     if (projectedStartDate === null) {
       mutationData.proj_start_date = null;
     }
-    if (projectedStartDate?.format('YYYY-MM-DD') !== request?.proj_start_date) {
-      mutationData.proj_start_date = projectedStartDate?.format('YYYY-MM-DD');
+    if (
+      projectedStartDate &&
+      projectedStartDate.format('YYYY-MM-DD') !== request?.proj_start_date
+    ) {
+      mutationData.proj_start_date = projectedStartDate.format('YYYY-MM-DD');
     }
     if (projectedCompletionDate === null) {
       mutationData.proj_completion_date = null;
     }
-    if (projectedCompletionDate?.format('YYYY-MM-DD') !== request?.proj_completion_date) {
-      mutationData.proj_completion_date = projectedCompletionDate?.format('YYYY-MM-DD');
+    if (
+      projectedCompletionDate &&
+      projectedCompletionDate.format('YYYY-MM-DD') !== request?.proj_completion_date
+    ) {
+      mutationData.proj_completion_date = projectedCompletionDate.format('YYYY-MM-DD');
     }
     if (actualCompletionDate === null) {
       mutationData.actual_completion_date = null;
     }
-    if (actualCompletionDate?.format('YYYY-MM-DD') !== request?.actual_completion_date) {
-      mutationData.actual_completion_date = actualCompletionDate?.format('YYYY-MM-DD');
+    if (
+      actualCompletionDate &&
+      actualCompletionDate.format('YYYY-MM-DD') !== request?.actual_completion_date
+    ) {
+      mutationData.actual_completion_date = actualCompletionDate.format('YYYY-MM-DD');
     }
+    console.log('Submitting request update with data:', mutationData);
     updateRequestMutation.mutate(mutationData);
   };
 
