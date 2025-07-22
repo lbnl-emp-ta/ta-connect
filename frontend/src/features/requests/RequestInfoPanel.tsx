@@ -22,7 +22,7 @@ import { DatePicker } from '@mui/x-date-pickers';
 import { PickerValue } from '@mui/x-date-pickers/internals';
 import dayjs, { Dayjs } from 'dayjs';
 import { useCallback, useEffect, useState } from 'react';
-import { TARequestDetail } from '../../api/dashboard/types';
+import { TARequest, TARequestDetail } from '../../api/dashboard/types';
 import { InfoPanel } from '../../components/InfoPanel';
 import { useRequestMutation } from '../../utils/queryOptions';
 import { capitalize, formatDatetime } from '../../utils/utils';
@@ -52,15 +52,20 @@ export const RequestInfoPanel: React.FC<RequestInfoPanelProps> = ({ request }) =
   const resetFormValues = useCallback(() => {
     if (request) {
       setDepth(request.depth);
+
       setProjectedStartDate(request.proj_start_date ? dayjs(request.proj_start_date) : undefined);
+
       setProjectedCompletionDate(
         request.proj_completion_date ? dayjs(request.proj_completion_date) : undefined
       );
+
       setActualCompletionDate(
         request.actual_completion_date ? dayjs(request.actual_completion_date) : undefined
       );
+
       // setTopics(request.topics || []);
       setDescription(request.description || '');
+
     }
   }, [request]);
 
@@ -68,14 +73,40 @@ export const RequestInfoPanel: React.FC<RequestInfoPanelProps> = ({ request }) =
     setEditing(true);
   };
 
+    /**
+   * Handle submission of edited request information.
+   * Only send fields that have changed to the API.
+   * If a field is set explicitly to null, it will be cleared in the API.
+   */
   const handleEditSubmit = () => {
-    updateRequestMutation.mutate({
-      depth,
-      proj_start_date: projectedStartDate?.format('YYYY-MM-DD') || null,
-      proj_completion_date: projectedCompletionDate?.format('YYYY-MM-DD') || null,
-      actual_completion_date: actualCompletionDate?.format('YYYY-MM-DD') || null,
-      description,
-    });
+        const mutationData = {} as Partial<TARequest>;
+
+        if (depth !== request?.depth) {
+            mutationData.depth = depth;
+        }
+        if (description !== request?.description) {
+            mutationData.description = description;
+        }
+        if (projectedStartDate === null) {
+            mutationData.proj_start_date = null;
+        }
+        if (projectedStartDate?.format('YYYY-MM-DD') !== request?.proj_start_date) {
+            mutationData.proj_start_date = projectedStartDate?.format('YYYY-MM-DD');
+        }
+        if (projectedCompletionDate === null) {
+            mutationData.proj_completion_date = null;
+        }
+        if (projectedCompletionDate?.format('YYYY-MM-DD') !== request?.proj_completion_date) {
+            mutationData.proj_completion_date = projectedCompletionDate?.format('YYYY-MM-DD');
+        }
+        if (actualCompletionDate === null) {
+            mutationData.actual_completion_date = null;
+        }  
+        if (actualCompletionDate?.format('YYYY-MM-DD') !== request?.actual_completion_date) {
+            mutationData.actual_completion_date = actualCompletionDate?.format('YYYY-MM-DD');
+        }
+
+        updateRequestMutation.mutate(mutationData);
   };
 
   const handleEditCancel = () => {
@@ -120,8 +151,7 @@ export const RequestInfoPanel: React.FC<RequestInfoPanelProps> = ({ request }) =
       setToastMessage(
         <ToastMessage icon={<ErrorIcon />}>{updateRequestMutation.error.message}</ToastMessage>
       );
-    }
-  }, [
+    }}, [
     updateRequestMutation.isSuccess,
     updateRequestMutation.isError,
     updateRequestMutation.error?.message,

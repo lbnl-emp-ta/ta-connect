@@ -90,8 +90,13 @@ class BaseUserAwareRequest(views.APIView):
         
         # Here just to be explicit.
         elif IsExpert().has_permission(self.request):
-            return queryset.none()
+            lab = None
+            try:
+                lab = Lab.objects.get(pk=context.get("instance"))
+            except Lab.DoesNotExist:
+                return queryset.none()
 
+            return lab.owner.request_set.filter(receipt__expert=User.objects.get(pk=context.get("user"))).filter(expert=None)
         else:
             return queryset.none()
 
@@ -124,8 +129,6 @@ class BaseUserAwareRequest(views.APIView):
         program_assignments = ProgramRoleAssignment.objects.filter(user=user)
         lab_assignments = LabRoleAssignment.objects.filter(user=user)
 
-        visible_requests = queryset.none() 
-
         if  IsCoordinator().has_permission(self.request, self):
             COORDINATOR_ROLE = Role.objects.get(name=ROLE.COORDINATOR)
 
@@ -136,29 +139,46 @@ class BaseUserAwareRequest(views.APIView):
         elif IsProgramLead().has_permission(self.request, self):
             PROGRAM_LEAD_ROLE = Role.objects.get(name=ROLE.PROGRAM_LEAD)
 
-            program_lead_assignments = program_assignments.filter(role=PROGRAM_LEAD_ROLE)
+            program = None
+            try:
+                program = Program.objects.get(pk=context.get("instance"))
+            except Program.DoesNotExist:
+                return queryset.none()
+
+            program_lead_assignments = program_assignments.filter(role=PROGRAM_LEAD_ROLE, instance=program)
             for assignment in program_lead_assignments:
                     requests = requests.union(assignment.instance.owner.request_set.all())
 
         elif IsLabLead().has_permission(self.request, self):
             LAB_LEAD_ROLE = Role.objects.get(name=ROLE.LAB_LEAD)
 
-            lab_lead_assignments = lab_assignments.filter(role=LAB_LEAD_ROLE)
+            lab = None
+            try:
+                lab = Lab.objects.get(pk=context.get("instance"))
+            except Lab.DoesNotExist:
+                return queryset.none()
+
+            lab_lead_assignments = lab_assignments.filter(role=LAB_LEAD_ROLE, instance=lab)
             for assignment in lab_lead_assignments:
-                    requests = requests.union(assignment.instance.owner.request_set.all())
-            
-            # Requests owned by the Lab that have an "assigned" Expert are not 
-            # considered are considered "downstream", not "actionable".
-            requests = requests.filter(expert=None)
+                    # Requests owned by the Lab that have an "assigned" Expert are not 
+                    # considered are considered "downstream", not "actionable".
+                    requests = requests.union(assignment.instance.owner.request_set.all().filter(expert=None))
 
         elif IsExpert().has_permission(self.request, self):
             EXPERT_ROLE = Role.objects.get(name=ROLE.EXPERT)
-      
-            expert_assignments = lab_assignments.filter(role=EXPERT_ROLE)
-            print(expert_assignments)
-            for assignment in expert_assignments:
-                    requests = requests.union(assignment.instance.owner.request_set.all())
+            user = User.objects.get(pk=context.get("user"))
 
+            lab = None
+            try:
+                lab = Lab.objects.get(pk=context.get("instance"))
+            except Lab.DoesNotExist:
+                return queryset.none()
+      
+            expert_assignments = lab_assignments.filter(role=EXPERT_ROLE, instance=lab)
+            for assignment in expert_assignments:
+                    requests = requests.union(assignment.instance.owner.request_set.all().filter(expert=user))
+
+        requests = Request.objects.filter(id__in=[req.id for req in list(requests)])
         return requests 
 
 class RequestDetailView(BaseUserAwareRequest):
@@ -168,7 +188,7 @@ class RequestDetailView(BaseUserAwareRequest):
     Used to populate Request and Customer panels.
     """
     def get(self, request, format=None, id=None):
-        queryset= self.get_actionable() | self.get_downstream()
+        queryset = self.get_actionable() | self.get_downstream()
 
         if id is None:
             return Response(data={"message": "Please provide a Request ID"}, status=status.HTTP_400_BAD_REQUEST)
@@ -239,7 +259,7 @@ class RequestDetailView(BaseUserAwareRequest):
             patch_data["description"] = new_description_data 
 
         if "depth" in body:
-            if not (IsAdmin().has_permission(request, None) or IsProgramLead().has_permission(request, None)):
+            if not (IsAdmin().has_permission(request, None) or IsProgramLead().has_permission(request, None) or IsCoordinator().has_permission(request, None)):
                 return Response(data={"message": "Insufficient privillege to update 'depth' field"}, status=status.HTTP_401_UNAUTHORIZED)
             
             if body.get("depth") is None:
@@ -255,7 +275,7 @@ class RequestDetailView(BaseUserAwareRequest):
 
         if "actual_completion_date" in body:
             if not (IsAdmin().has_permission(request, None) or IsProgramLead().has_permission(request, None)):
-                return Response(data={"message": "Insufficient privillege to update 'depth' field"}, status=status.HTTP_401_UNAUTHORIZED)
+                return Response(data={"message": "Insufficient privillege to update 'actual completion date' field"}, status=status.HTTP_401_UNAUTHORIZED)
 
             patch_data["actual_completion_date"] = body.get("actual_completion_date") 
 
@@ -292,13 +312,13 @@ class RequestDetailView(BaseUserAwareRequest):
         
         if "proj_start_date" in body:
             if not(IsAdmin().has_permission(request, None) or IsProgramLead().has_permission(request, None) or IsLabLead().has_permission(request, None) or IsExpert().has_permission(request, None)):
-                return Response(data={"message": "Insufficient privillege to update 'expert' field"}, status=status.HTTP_401_UNAUTHORIZED)
+                return Response(data={"message": "Insufficient privillege to update 'projected start date' field"}, status=status.HTTP_401_UNAUTHORIZED)
 
             patch_data["proj_start_date"] = body.get("proj_start_date")
 
         if "proj_completion_date" in body:
             if not(IsAdmin().has_permission(request, None) or IsProgramLead().has_permission(request, None) or IsLabLead().has_permission(request, None) or IsExpert().has_permission(request, None)):
-                return Response(data={"message": "Insufficient privillege to update 'expert' field"}, status=status.HTTP_401_UNAUTHORIZED)
+                return Response(data={"message": "Insufficient privillege to update 'projected completion date' field"}, status=status.HTTP_401_UNAUTHORIZED)
 
             patch_data["proj_completion_date"] = body.get("proj_completion_date")
 

@@ -122,8 +122,11 @@ class AssignmentView(views.APIView):
                 return Response(data={"message": "Given expert is not valid in the context of the given request's assigned lab."}, status=status.HTTP_400_BAD_REQUEST)
             
             ta_request.expert = expert
+            ta_request.receipt.expert = expert
             try:
-                ta_request.save()
+                with transaction.atomic():
+                    ta_request.receipt.save()
+                    ta_request.save()
             except:
                 return Response(data={"message": f"{e}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         
