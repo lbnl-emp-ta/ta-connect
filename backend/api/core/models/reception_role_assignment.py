@@ -9,3 +9,6 @@ class ReceptionRoleAssignment(models.Model):
 
     class Meta:
         db_table = "reception_role_assignment"
+        
+    def __str__(self):
+        return f"{self.user.email} | {self.role.name} - {self.instance.name}"
