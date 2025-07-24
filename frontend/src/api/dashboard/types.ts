@@ -85,7 +85,11 @@ export interface TARequestDetail {
   description: string;
   date_created: string;
   customers: TACustomer[];
-  expert: string | null;
+  expert: {
+    id: number;
+    email: string;
+    phone: string;
+  } | null;
   owner?: TAOwner;
   proj_start_date: string | null;
   proj_completion_date: string | null;

@@ -217,6 +217,9 @@ class RequestDetailView(BaseUserAwareRequest):
         response_data = response_data | request_serializer.data 
         response_data["customers"] = customer_serializer.data
         response_data["owner"] = OwnerSerializer().format_owner(found_request.owner)
+        
+        if found_request.expert is not None:
+            response_data["expert"] = UserLeanSerializer(found_request.expert).data
 
         return Response(data=response_data, status=status.HTTP_200_OK)
 
