@@ -98,6 +98,9 @@ export const RequestsTable: React.FC<RequestsTableProps> = ({ data }) => {
       onRowSelectionModelChange={handleRowSelectionModelChange}
       rowSelectionModel={rowSelectionModel}
       onSortModelChange={handleSortChange}
+      sx={{
+        backgroundColor: 'white',
+      }}
     />
   );
 };

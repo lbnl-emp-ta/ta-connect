@@ -65,7 +65,6 @@ export const RequestInfoPanel: React.FC<RequestInfoPanelProps> = ({ request }) =
 
       // setTopics(request.topics || []);
       setDescription(request.description || '');
-
     }
   }, [request]);
 
@@ -162,7 +161,8 @@ export const RequestInfoPanel: React.FC<RequestInfoPanelProps> = ({ request }) =
       setToastMessage(
         <ToastMessage icon={<ErrorIcon />}>{updateRequestMutation.error.message}</ToastMessage>
       );
-    }}, [
+    }
+  }, [
     updateRequestMutation.isSuccess,
     updateRequestMutation.isError,
     updateRequestMutation.error?.message,
@@ -172,11 +172,9 @@ export const RequestInfoPanel: React.FC<RequestInfoPanelProps> = ({ request }) =
     <InfoPanel
       header={
         <Stack direction="row" alignItems="center" justifyContent="space-between">
-          <Typography variant="h6" component="h3">
-            Request Details
-          </Typography>
+          <span>Request Details</span>
           {!editing && (
-            <IconButton color="info" onClick={handleEditClick}>
+            <IconButton onClick={handleEditClick}>
               <EditIcon />
             </IconButton>
           )}
