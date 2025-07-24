@@ -4,6 +4,7 @@ import ClearIcon from '@mui/icons-material/Clear';
 import EditIcon from '@mui/icons-material/Edit';
 import ErrorIcon from '@mui/icons-material/Error';
 import {
+  Chip,
   CircularProgress,
   IconButton,
   MenuItem,
@@ -225,7 +226,9 @@ export const RequestInfoPanel: React.FC<RequestInfoPanelProps> = ({ request }) =
                 </TableRow>
                 <TableRow>
                   <TableCell>Status</TableCell>
-                  <TableCell>{request.status ? request.status : 'Unknown'}</TableCell>
+                  <TableCell>
+                    <Chip label={request.status ? request.status : 'Unknown'} color="success" />
+                  </TableCell>
                 </TableRow>
                 <TableRow>
                   <TableCell>Depth</TableCell>
