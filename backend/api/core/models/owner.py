@@ -38,10 +38,18 @@ class Owner(models.Model):
         return owner.pk
 
     def __str__(self):
-        if (self.pk == Reception.get_default_pk()):
-            return "Reception Owner"
-
-        return f"Owner #{self.pk}"
+        match self.domain_type:
+            case DOMAINTYPE.RECEPTION:
+                return "Reception Owner"
+            
+            case DOMAINTYPE.LAB:
+                return f"Lab Owner | {self.lab.name}"
+            
+            case DOMAINTYPE.PROGRAM:
+                return f"Program Owner | {self.program.name}"
+            
+            case _:
+                return f"Owner #{self.pk}"
 
     class Meta:
         constraints = [

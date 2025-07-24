@@ -1,5 +1,6 @@
 from django.db import models
 from core.models import *
+from core.constants import ROLE
 
 class LabRoleAssignment(models.Model):
     user = models.ForeignKey(User, on_delete=models.PROTECT)
@@ -19,6 +20,11 @@ class LabRoleAssignment(models.Model):
 
     class Meta:
         db_table = "lab_role_assignment"
-
-
-# model.date_assigned
+    
+    def __str__(self):
+        match self.role.name:
+            case ROLE.EXPERT:
+                return f"{self.user.email} | {self.role.name} - {self.instance.name}"
+            
+            case _:
+                return f"{self.user.email} | {self.role.name} - {self.instance.name} under {self.program.name}"
