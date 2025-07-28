@@ -8,3 +8,6 @@ class SystemRoleAssignment(models.Model):
 
     class Meta:
         db_table = "system_role_assignment"
+    
+    def __str__(self):
+        return f"{self.user.email} | {self.role.name}"
