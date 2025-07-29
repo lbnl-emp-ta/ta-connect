@@ -1,9 +1,11 @@
+import json
 from django.conf import settings
 from django.http import FileResponse
     
 from rest_framework import views, authentication, permissions, status
 from rest_framework.response import Response
 
+from core.views.request import BaseUserAwareRequest
 from core.serializers import AttachmentUploadSerializer
 from core.models import Attachment, Request
 
@@ -24,6 +26,14 @@ class UploadAttachmentView(views.APIView):
     ]
 
     def post(self, request, request_id):
+        try:
+            request_obj = Request.objects.get(pk=request_id)
+        except Request.DoesNotExist:
+            return Response(data={"message": "Request with given id does not exist"}, status=status.HTTP_400_BAD_REQUEST)
+
+        if not BaseUserAwareRequest(request=request).get_actionable().contains(request_obj):
+            return Response(data={"message": "Insufficient authorization to upload file for given request"}, status=status.HTTP_400_BAD_REQUEST)
+
         if not request.data.get("file"):
             return Response(data={"message": "File to upload missing"}, status=status.HTTP_400_BAD_REQUEST)
         
@@ -52,6 +62,14 @@ class DownloadAttachmentView(views.APIView):
     ]
 
     def get(self, request, request_id, filename):
+        try:
+            request_obj = Request.objects.get(pk=request_id)
+        except Request.DoesNotExist:
+            return Response(data={"message": "Request with given id does not exist"}, status=status.HTTP_400_BAD_REQUEST)
+
+        user_aware_request_view = BaseUserAwareRequest(request=request)
+        if not (user_aware_request_view.get_actionable() | user_aware_request_view.get_downstream()).contains(request_obj):
+            return Response(data={"message": "Insufficient authorization to upload file for given request"}, status=status.HTTP_400_BAD_REQUEST)
         try:
             attachment = Attachment.objects.get(file_name=filename, request=Request.objects.get(pk=request_id))
         except Request.DoesNotExist:
