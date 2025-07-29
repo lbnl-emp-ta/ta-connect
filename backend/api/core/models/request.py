@@ -25,7 +25,7 @@ class Request(models.Model):
         if not (self.receipt):
             self.receipt = Receipt.objects.create()
 
-        super(Request, self).save(*args, **kwargs)
+        super().save(*args, **kwargs)
     
     class Meta:
         db_table = "request"
