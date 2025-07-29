@@ -5,4 +5,4 @@ from core.models import Attachment
 class AttachmentUploadSerializer(serializers.ModelSerializer):
     class Meta:
         model = Attachment
-        fields = ['file', 'request']
+        fields = ['file', 'request', 'description']
