@@ -71,12 +71,10 @@ class DownloadAttachmentView(views.APIView):
 
         user_aware_request_view = BaseUserAwareRequest(request=request)
         if not (user_aware_request_view.get_actionable() | user_aware_request_view.get_downstream()).contains(request_obj):
-            return Response(data={"message": "Insufficient authorization to upload file for given request"}, status=status.HTTP_400_BAD_REQUEST)
+            return Response(data={"message": "Insufficient authorization to download file for given request"}, status=status.HTTP_400_BAD_REQUEST)
 
         try:
             attachment = Attachment.objects.get(file_name=filename, request=request_obj)
-        except Request.DoesNotExist:
-            return Response(data={"message": "Request with given id does not exist"}, status=status.HTTP_400_BAD_REQUEST) 
         except Attachment.DoesNotExist:
             return Response(data={"message": "Attachment with given filename does not exist"}, status=status.HTTP_400_BAD_REQUEST) 
         
