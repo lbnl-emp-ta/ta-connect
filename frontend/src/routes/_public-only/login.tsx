@@ -3,6 +3,7 @@ import { createFileRoute } from '@tanstack/react-router';
 import { useState } from 'react';
 import { useLoginMutation } from '../../utils/queryOptions';
 import { getCSRFToken } from '../../utils/cookies';
+import { redirectToProvider } from '../../api/accounts/login';
 
 export const Route = createFileRoute('/_public-only/login')({
   component: RouteComponent,
@@ -87,7 +88,7 @@ function RouteComponent() {
           >
             Submit
           </Button>
-          <LoginWithSocialButton name="Google" id="googleauth2" />
+          <LoginWithSocialButton name="Google" id="google" />
         </Box>
       </Box>
     </Container>
@@ -100,27 +101,10 @@ interface LoginWithSocialButtonProps {
 }
 
 export default function LoginWithSocialButton({ name, id }: LoginWithSocialButtonProps) {
-  function handleClick() {
-    const form = document.createElement('form');
-    form.style.display = 'none';
-    form.method = 'POST';
-    form.action = `${import.meta.env.VITE_API_URL}/_allauth/browser/v1/auth/provider/redirect`;
-    const data = {
-      provider: id,
-      callback_url: 'http://taconnect-local.lbl.gov:1337/api/account/provider/callback',
-      csrfmiddlewaretoken: getCSRFToken() || '',
-      process: 'login',
-    };
+  const handleClick = () => {
+    redirectToProvider(id, '/account/provider/callback', 'login');
+  };
 
-    Object.entries(data).forEach(([k, v]) => {
-      const input = document.createElement('input');
-      input.name = k;
-      input.value = v;
-      form.appendChild(input);
-    });
-    document.body.appendChild(form);
-    form.submit();
-  }
   return (
     <Button onClick={handleClick} fullWidth variant="contained">
       Login with {name}
