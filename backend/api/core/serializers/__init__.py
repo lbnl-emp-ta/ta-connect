@@ -16,6 +16,7 @@ from .request import RequestSerializer, RequestListSerializer, RequestDetailSeri
 from .customer_request_relationship import CustomerRequestRelationshipSerializer
 from .cohort import CohortSerializer
 from .topic import TopicSerializer
+from .attachment import AttachmentUploadSerializer
 
 __all__ = [
     "UserLeanSerializer",
@@ -37,5 +38,6 @@ __all__ = [
     "CustomerTypeSerializer",
     "CustomerRequestRelationshipSerializer",
     "CohortSerializer",
-    "TopicSerializer"
+    "TopicSerializer",
+    "AttachmentUploadSerializer",
 ]

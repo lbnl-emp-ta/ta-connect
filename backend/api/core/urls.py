@@ -10,6 +10,7 @@ urlpatterns = [
     path('requests/<int:id>/closeout-complete/', RequestCloseoutCompleteView.as_view(), name="closeout-complete"),
     path('requests/<int:id>/cancel/', RequestCancelView.as_view(), name="mark-complete"),
     path('requests/assign/', AssignmentView.as_view(), name="assignment"),
+    path('requests/<int:request_id>/upload-attachment/', UploadAttachmentView.as_view(), name="upload-attachment"),
 
     path('identities/', IdentityListView.as_view(), name="identities-list"),
 
