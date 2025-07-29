@@ -7,7 +7,14 @@ def generate_upload_filepath(instance, filename):
 
 class Attachment(models.Model):
     file = models.FileField(upload_to=generate_upload_filepath)
+    file_name = models.CharField(max_length=255, blank=True)
     uploaded_at = models.DateTimeField(auto_now_add=True)
     description = models.TextField(blank=True, null=True)
     
     request = models.ForeignKey(Request, on_delete=models.PROTECT)
+    
+    def save(self, *args, **kwargs):
+        if self.file:
+            self.file_name = self.file.name.split("/")[-1]
+
+        super().save(*args, *kwargs)

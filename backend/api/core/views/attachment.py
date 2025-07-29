@@ -1,7 +1,11 @@
+from django.conf import settings
+from django.http import FileResponse
+    
 from rest_framework import views, authentication, permissions, status
 from rest_framework.response import Response
 
 from core.serializers import AttachmentUploadSerializer
+from core.models import Attachment, Request
 
 from allauth.headless.contrib.rest_framework.authentication import (
     XSessionTokenAuthentication,
@@ -36,3 +40,23 @@ class UploadAttachmentView(views.APIView):
         
         serializer.save()
         return Response(data={"message": "Attachment successfully uploaded"}, status=status.HTTP_201_CREATED)
+
+class DownloadAttachmentView(views.APIView):
+    authentication_classes = [
+        authentication.SessionAuthentication,
+        XSessionTokenAuthentication,
+    ]
+
+    permission_classes = [
+        permissions.IsAuthenticated,
+    ]
+
+    def get(self, request, request_id, filename):
+        try:
+            attachment = Attachment.objects.get(file_name=filename, request=Request.objects.get(pk=request_id))
+        except Request.DoesNotExist:
+            return Response(data={"message": "Request with given id does not exist"}, status=status.HTTP_400_BAD_REQUEST) 
+        except Attachment.DoesNotExist:
+            return Response(data={"message": "Attachment with given filename does not exist"}, status=status.HTTP_400_BAD_REQUEST) 
+        
+        return FileResponse(open(attachment.file.path, "rb"), as_attachment=True)
