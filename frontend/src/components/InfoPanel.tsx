@@ -24,6 +24,7 @@ export const InfoPanel: React.FC<InfoPanelProps> = ({ header, tabs, children }) 
         borderStyle: 'solid',
         borderColor: 'grey.50',
         borderRadius: 1,
+        borderWidth: 1,
       }}
     >
       {tabs && (

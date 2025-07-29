@@ -227,7 +227,7 @@ export const RequestInfoPanel: React.FC<RequestInfoPanelProps> = ({ request }) =
                 <TableRow>
                   <TableCell>Status</TableCell>
                   <TableCell>
-                    <Chip label={request.status ? request.status : 'Unknown'} color="success" />
+                    <Chip label={request.status ? request.status : 'Unknown'} color="primary" />
                   </TableCell>
                 </TableRow>
                 <TableRow>
