@@ -16,6 +16,7 @@ import { Route as PrivateRouteImport } from './routes/_private/route'
 import { Route as IndexImport } from './routes/index'
 import { Route as PublicOnlySignupImport } from './routes/_public-only/signup'
 import { Route as PublicOnlyLoginImport } from './routes/_public-only/login'
+import { Route as PrivateProfileImport } from './routes/_private/profile'
 import { Route as publicIntakeImport } from './routes/(public)/intake'
 import { Route as PrivateDashboardRouteImport } from './routes/_private/dashboard/route'
 import { Route as PrivateDashboardExpertsImport } from './routes/_private/dashboard/experts'
@@ -52,6 +53,12 @@ const PublicOnlyLoginRoute = PublicOnlyLoginImport.update({
   id: '/login',
   path: '/login',
   getParentRoute: () => PublicOnlyRouteRoute,
+} as any)
+
+const PrivateProfileRoute = PrivateProfileImport.update({
+  id: '/profile',
+  path: '/profile',
+  getParentRoute: () => PrivateRouteRoute,
 } as any)
 
 const publicIntakeRoute = publicIntakeImport.update({
@@ -138,6 +145,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/intake'
       preLoaderRoute: typeof publicIntakeImport
       parentRoute: typeof rootRoute
+    }
+    '/_private/profile': {
+      id: '/_private/profile'
+      path: '/profile'
+      fullPath: '/profile'
+      preLoaderRoute: typeof PrivateProfileImport
+      parentRoute: typeof PrivateRouteImport
     }
     '/_public-only/login': {
       id: '/_public-only/login'
@@ -228,10 +242,12 @@ const PrivateDashboardRouteRouteWithChildren =
 
 interface PrivateRouteRouteChildren {
   PrivateDashboardRouteRoute: typeof PrivateDashboardRouteRouteWithChildren
+  PrivateProfileRoute: typeof PrivateProfileRoute
 }
 
 const PrivateRouteRouteChildren: PrivateRouteRouteChildren = {
   PrivateDashboardRouteRoute: PrivateDashboardRouteRouteWithChildren,
+  PrivateProfileRoute: PrivateProfileRoute,
 }
 
 const PrivateRouteRouteWithChildren = PrivateRouteRoute._addFileChildren(
@@ -257,6 +273,7 @@ export interface FileRoutesByFullPath {
   '': typeof PublicOnlyRouteRouteWithChildren
   '/dashboard': typeof PrivateDashboardRouteRouteWithChildren
   '/intake': typeof publicIntakeRoute
+  '/profile': typeof PrivateProfileRoute
   '/login': typeof PublicOnlyLoginRoute
   '/signup': typeof PublicOnlySignupRoute
   '/dashboard/requests': typeof PrivateDashboardRequestsRouteRouteWithChildren
@@ -271,6 +288,7 @@ export interface FileRoutesByTo {
   '': typeof PublicOnlyRouteRouteWithChildren
   '/dashboard': typeof PrivateDashboardRouteRouteWithChildren
   '/intake': typeof publicIntakeRoute
+  '/profile': typeof PrivateProfileRoute
   '/login': typeof PublicOnlyLoginRoute
   '/signup': typeof PublicOnlySignupRoute
   '/dashboard/experts': typeof PrivateDashboardExpertsRoute
@@ -286,6 +304,7 @@ export interface FileRoutesById {
   '/_public-only': typeof PublicOnlyRouteRouteWithChildren
   '/_private/dashboard': typeof PrivateDashboardRouteRouteWithChildren
   '/(public)/intake': typeof publicIntakeRoute
+  '/_private/profile': typeof PrivateProfileRoute
   '/_public-only/login': typeof PublicOnlyLoginRoute
   '/_public-only/signup': typeof PublicOnlySignupRoute
   '/_private/dashboard/requests': typeof PrivateDashboardRequestsRouteRouteWithChildren
@@ -302,6 +321,7 @@ export interface FileRouteTypes {
     | ''
     | '/dashboard'
     | '/intake'
+    | '/profile'
     | '/login'
     | '/signup'
     | '/dashboard/requests'
@@ -315,6 +335,7 @@ export interface FileRouteTypes {
     | ''
     | '/dashboard'
     | '/intake'
+    | '/profile'
     | '/login'
     | '/signup'
     | '/dashboard/experts'
@@ -328,6 +349,7 @@ export interface FileRouteTypes {
     | '/_public-only'
     | '/_private/dashboard'
     | '/(public)/intake'
+    | '/_private/profile'
     | '/_public-only/login'
     | '/_public-only/signup'
     | '/_private/dashboard/requests'
@@ -377,7 +399,8 @@ export const routeTree = rootRoute
     "/_private": {
       "filePath": "_private/route.tsx",
       "children": [
-        "/_private/dashboard"
+        "/_private/dashboard",
+        "/_private/profile"
       ]
     },
     "/_public-only": {
@@ -397,6 +420,10 @@ export const routeTree = rootRoute
     },
     "/(public)/intake": {
       "filePath": "(public)/intake.tsx"
+    },
+    "/_private/profile": {
+      "filePath": "_private/profile.tsx",
+      "parent": "/_private"
     },
     "/_public-only/login": {
       "filePath": "_public-only/login.tsx",

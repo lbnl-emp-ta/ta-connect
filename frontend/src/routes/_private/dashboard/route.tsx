@@ -18,7 +18,7 @@ import {
   Typography,
 } from '@mui/material';
 import { useSuspenseQuery } from '@tanstack/react-query';
-import { createFileRoute, Outlet, redirect, useNavigate } from '@tanstack/react-router';
+import { createFileRoute, Navigate, Outlet, redirect, useNavigate } from '@tanstack/react-router';
 import { useEffect } from 'react';
 import { TAIdentity } from '../../../api/dashboard/types';
 import { useIdentityContext } from '../../../features/identity/IdentityContext';
@@ -67,6 +67,11 @@ function DashboardComponent() {
       setDetailedIdentity(identities ? identities[0] : null);
     }
   }, [detailedIdentity, identities, setDetailedIdentity, setIdentity]);
+
+  console.log('Identities:', identities);
+  if (!identities || identities.length === 0) {
+    return <Navigate to="/profile" />;
+  }
 
   return (
     <Stack direction="row" spacing={0} sx={{ width: '100%' }}>
