@@ -22,6 +22,7 @@ import { Route as PrivateDashboardExpertsImport } from './routes/_private/dashbo
 import { Route as PrivateDashboardRequestsRouteImport } from './routes/_private/dashboard/requests/route'
 import { Route as PrivateDashboardRequestsIndexImport } from './routes/_private/dashboard/requests/index'
 import { Route as PrivateDashboardRequestsRequestIdImport } from './routes/_private/dashboard/requests/$requestId'
+import { Route as publicAccountProviderCallbackImport } from './routes/(public)/account.provider.callback'
 
 // Create/Update Routes
 
@@ -92,6 +93,13 @@ const PrivateDashboardRequestsRequestIdRoute =
     getParentRoute: () => PrivateDashboardRequestsRouteRoute,
   } as any)
 
+const publicAccountProviderCallbackRoute =
+  publicAccountProviderCallbackImport.update({
+    id: '/(public)/account/provider/callback',
+    path: '/account/provider/callback',
+    getParentRoute: () => rootRoute,
+  } as any)
+
 // Populate the FileRoutesByPath interface
 
 declare module '@tanstack/react-router' {
@@ -158,6 +166,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/dashboard/experts'
       preLoaderRoute: typeof PrivateDashboardExpertsImport
       parentRoute: typeof PrivateDashboardRouteImport
+    }
+    '/(public)/account/provider/callback': {
+      id: '/(public)/account/provider/callback'
+      path: '/account/provider/callback'
+      fullPath: '/account/provider/callback'
+      preLoaderRoute: typeof publicAccountProviderCallbackImport
+      parentRoute: typeof rootRoute
     }
     '/_private/dashboard/requests/$requestId': {
       id: '/_private/dashboard/requests/$requestId'
@@ -246,6 +261,7 @@ export interface FileRoutesByFullPath {
   '/signup': typeof PublicOnlySignupRoute
   '/dashboard/requests': typeof PrivateDashboardRequestsRouteRouteWithChildren
   '/dashboard/experts': typeof PrivateDashboardExpertsRoute
+  '/account/provider/callback': typeof publicAccountProviderCallbackRoute
   '/dashboard/requests/$requestId': typeof PrivateDashboardRequestsRequestIdRoute
   '/dashboard/requests/': typeof PrivateDashboardRequestsIndexRoute
 }
@@ -258,6 +274,7 @@ export interface FileRoutesByTo {
   '/login': typeof PublicOnlyLoginRoute
   '/signup': typeof PublicOnlySignupRoute
   '/dashboard/experts': typeof PrivateDashboardExpertsRoute
+  '/account/provider/callback': typeof publicAccountProviderCallbackRoute
   '/dashboard/requests/$requestId': typeof PrivateDashboardRequestsRequestIdRoute
   '/dashboard/requests': typeof PrivateDashboardRequestsIndexRoute
 }
@@ -273,6 +290,7 @@ export interface FileRoutesById {
   '/_public-only/signup': typeof PublicOnlySignupRoute
   '/_private/dashboard/requests': typeof PrivateDashboardRequestsRouteRouteWithChildren
   '/_private/dashboard/experts': typeof PrivateDashboardExpertsRoute
+  '/(public)/account/provider/callback': typeof publicAccountProviderCallbackRoute
   '/_private/dashboard/requests/$requestId': typeof PrivateDashboardRequestsRequestIdRoute
   '/_private/dashboard/requests/': typeof PrivateDashboardRequestsIndexRoute
 }
@@ -288,6 +306,7 @@ export interface FileRouteTypes {
     | '/signup'
     | '/dashboard/requests'
     | '/dashboard/experts'
+    | '/account/provider/callback'
     | '/dashboard/requests/$requestId'
     | '/dashboard/requests/'
   fileRoutesByTo: FileRoutesByTo
@@ -299,6 +318,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/signup'
     | '/dashboard/experts'
+    | '/account/provider/callback'
     | '/dashboard/requests/$requestId'
     | '/dashboard/requests'
   id:
@@ -312,6 +332,7 @@ export interface FileRouteTypes {
     | '/_public-only/signup'
     | '/_private/dashboard/requests'
     | '/_private/dashboard/experts'
+    | '/(public)/account/provider/callback'
     | '/_private/dashboard/requests/$requestId'
     | '/_private/dashboard/requests/'
   fileRoutesById: FileRoutesById
@@ -322,6 +343,7 @@ export interface RootRouteChildren {
   PrivateRouteRoute: typeof PrivateRouteRouteWithChildren
   PublicOnlyRouteRoute: typeof PublicOnlyRouteRouteWithChildren
   publicIntakeRoute: typeof publicIntakeRoute
+  publicAccountProviderCallbackRoute: typeof publicAccountProviderCallbackRoute
 }
 
 const rootRouteChildren: RootRouteChildren = {
@@ -329,6 +351,7 @@ const rootRouteChildren: RootRouteChildren = {
   PrivateRouteRoute: PrivateRouteRouteWithChildren,
   PublicOnlyRouteRoute: PublicOnlyRouteRouteWithChildren,
   publicIntakeRoute: publicIntakeRoute,
+  publicAccountProviderCallbackRoute: publicAccountProviderCallbackRoute,
 }
 
 export const routeTree = rootRoute
@@ -344,7 +367,8 @@ export const routeTree = rootRoute
         "/",
         "/_private",
         "/_public-only",
-        "/(public)/intake"
+        "/(public)/intake",
+        "/(public)/account/provider/callback"
       ]
     },
     "/": {
@@ -393,6 +417,9 @@ export const routeTree = rootRoute
     "/_private/dashboard/experts": {
       "filePath": "_private/dashboard/experts.tsx",
       "parent": "/_private/dashboard"
+    },
+    "/(public)/account/provider/callback": {
+      "filePath": "(public)/account.provider.callback.tsx"
     },
     "/_private/dashboard/requests/$requestId": {
       "filePath": "_private/dashboard/requests/$requestId.tsx",

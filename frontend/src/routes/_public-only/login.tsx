@@ -2,7 +2,6 @@ import { Grid, Box, Button, Container, Divider, TextField, Typography } from '@m
 import { createFileRoute } from '@tanstack/react-router';
 import { useState } from 'react';
 import { useLoginMutation } from '../../utils/queryOptions';
-import { getCSRFToken } from '../../utils/cookies';
 import { redirectToProvider } from '../../api/accounts/login';
 
 export const Route = createFileRoute('/_public-only/login')({

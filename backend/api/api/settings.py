@@ -149,18 +149,16 @@ SOCIALACCOUNT_PROVIDERS = {
                     ],
                     "auth_params": {
                         "access_type": "online",
+                        # Force Google to show the page for account selection
+                        "prompt": "select_account",
                     },
                 },
             },
         ],
-        # The following provider-specific settings will be used for all apps:
         "SCOPE": [
             "profile",
             "email",
         ],
-        "AUTH_PARAMS": {
-            "access_type": "online",
-        },
         "VERIFIED_EMAIL": True
     }
 }
