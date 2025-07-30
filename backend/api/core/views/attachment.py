@@ -106,21 +106,20 @@ class DeleteAttachmentView(views.APIView):
             return Response(data={"message": "Attachment with given filename does not exist"}, status=status.HTTP_400_BAD_REQUEST) 
         
         can_delete = False 
-      
-        if (attachment.user_who_uploaded is None) and IsAdmin.has_permission(request):
-            can_delete = True
 
-        elif request.user.id == attachment.user_who_uploaded.pk:
-            can_delete = True
-
-        elif IsAdmin.has_permission(request) or \
-            IsCoordinator.has_permission(request) or \
-            IsProgramLead.has_permission(request) or \
-            IsLabLead.has_permission(request):
+        if IsAdmin.has_permission(request) or \
+           IsCoordinator.has_permission(request) or \
+           IsProgramLead.has_permission(request) or \
+           IsLabLead.has_permission(request):
             
             user_aware_request_view = BaseUserAwareRequest(request=request)
             if (user_aware_request_view.get_actionable() | user_aware_request_view.get_downstream()).contains(request_obj):
                 can_delete = True 
+
+        elif (attachment.user_who_uploaded is not None) and \
+             (request.user.id == attachment.user_who_uploaded.pk):
+
+            can_delete = True
              
         if can_delete:
             attachment.delete()
