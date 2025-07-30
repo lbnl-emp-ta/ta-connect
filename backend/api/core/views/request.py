@@ -217,6 +217,13 @@ class RequestDetailView(BaseUserAwareRequest):
         response_data = response_data | request_serializer.data 
         response_data["customers"] = customer_serializer.data
         response_data["owner"] = OwnerSerializer().format_owner(found_request.owner)
+        response_data["attachments"] = list() 
+        for attachment in found_request.attachment_set.all():
+            attachment_data = dict()
+            attachment_data["id"] = attachment.pk
+            attachment_data["file"] = attachment.file_name
+            attachment_data["description"] = attachment.description
+            response_data["attachments"].append(attachment_data)
 
         return Response(data=response_data, status=status.HTTP_200_OK)
 
