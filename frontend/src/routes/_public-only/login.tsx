@@ -5,6 +5,11 @@ import { useLoginMutation } from '../../utils/queryOptions';
 import { redirectToProvider } from '../../api/accounts/login';
 
 export const Route = createFileRoute('/_public-only/login')({
+  beforeLoad: ({ context }) => {
+    context.queryClient.invalidateQueries({
+      queryKey: ['identities'],
+    });
+  },
   component: RouteComponent,
 });
 
