@@ -222,6 +222,7 @@ class RequestDetailView(BaseUserAwareRequest):
             attachment_data = dict()
             attachment_data["id"] = attachment.pk
             attachment_data["file"] = attachment.file_name
+            attachment_data["uploaded_at"] = attachment.uploaded_at
             attachment_data["description"] = attachment.description
             response_data["attachments"].append(attachment_data)
 
