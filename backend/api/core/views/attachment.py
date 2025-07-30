@@ -4,6 +4,7 @@ from django.http import FileResponse
     
 from rest_framework import views, authentication, permissions, status
 from rest_framework.response import Response
+from rest_framework.parsers import MultiPartParser, FormParser
 
 from core.views.request import BaseUserAwareRequest
 from core.serializers import AttachmentUploadSerializer
@@ -15,6 +16,8 @@ from allauth.headless.contrib.rest_framework.authentication import (
 
 class UploadAttachmentView(views.APIView):
     serializer_class = AttachmentUploadSerializer 
+    
+    parser_classes = [MultiPartParser, FormParser]
 
     authentication_classes = [
         authentication.SessionAuthentication,
