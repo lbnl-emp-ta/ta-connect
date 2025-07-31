@@ -27,14 +27,22 @@ function RequestsPage() {
 
   return (
     <RequestsProvider>
-      <Container maxWidth="xl">
-        <Stack>
-          <Typography variant="h5" component="h1">
-            Requests
-          </Typography>
-          <Outlet />
+      <Stack sx={{ height: '100%' }}>
+        <Box>
+          <Container maxWidth="xl">
+            <Outlet />
+          </Container>
+        </Box>
+        <Box
+          sx={{
+            backgroundColor: 'white',
+            borderTop: '1px solid',
+            borderTopColor: 'grey.50',
+            flex: 1,
+          }}
+        >
           {requests && (
-            <Box>
+            <>
               <Tabs value={tabValue} onChange={handleChangeTab} aria-label="requests tabs">
                 <Tab
                   label={
@@ -63,15 +71,11 @@ function RequestsPage() {
               <TabPanel value={tabValue} index="downstream-requests">
                 <RequestsTable data={requests?.downstream} />
               </TabPanel>
-            </Box>
+            </>
           )}
-          {!requests && (
-            <Box>
-              <Typography variant="body1">Failed to load requests.</Typography>
-            </Box>
-          )}
-        </Stack>
-      </Container>
+          {!requests && <Typography variant="body1">Failed to load requests.</Typography>}
+        </Box>
+      </Stack>
     </RequestsProvider>
   );
 }

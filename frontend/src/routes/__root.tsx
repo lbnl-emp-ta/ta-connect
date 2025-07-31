@@ -46,19 +46,15 @@ function Initializer() {
             gap: 5,
             color: 'primary.main',
             bgcolor: 'white',
-            minHeight: 100,
-            height: 100,
+            // minHeight: 100,
+            height: 40,
           }}
         >
           <Link to="/dashboard">
-            <Typography variant="h6" display="inline" sx={{ color: 'primary.main' }}>
-              Dashboard
-            </Typography>
+            <Typography sx={{ color: 'primary.main' }}>Dashboard</Typography>
           </Link>
           <Link to="/intake">
-            <Typography variant="h6" display="inline" sx={{ color: 'primary.main' }}>
-              Intake
-            </Typography>
+            <Typography sx={{ color: 'primary.main' }}>Intake</Typography>
           </Link>
           <Box sx={{ margin: 'auto' }} />
           {isAuthenticated ? (

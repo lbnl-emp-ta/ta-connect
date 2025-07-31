@@ -15,6 +15,7 @@ import {
   Snackbar,
   SnackbarCloseReason,
   Stack,
+  Typography,
 } from '@mui/material';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { createFileRoute, Outlet, redirect, useNavigate } from '@tanstack/react-router';
@@ -75,36 +76,42 @@ function DashboardComponent() {
           width: 240,
         }}
       >
+        <Stack
+          spacing={1}
+          sx={{
+            borderBottom: '1px solid',
+            borderBottomColor: 'grey.500',
+            padding: 2,
+            width: '100%',
+          }}
+        >
+          <Typography color="primary.contrastText">Viewing as:</Typography>
+          <Select
+            sx={{
+              width: 'stretch',
+              bgcolor: 'white',
+            }}
+            value={detailedIdentity || ''}
+            onChange={handleIdentityChange}
+          >
+            {identities?.map((identity) => (
+              // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-explicit-any
+              <MenuItem key={identity.role.id} value={identity as any}>
+                <Stack direction="row" spacing={1}>
+                  {identity.location === 'Reception' && <span>{identity.location}</span>}
+                  <span>{identity.role.name}</span>
+                  {identity.instance && (
+                    <>
+                      <span>|</span>
+                      <span>{identity.instance.name}</span>
+                    </>
+                  )}
+                </Stack>
+              </MenuItem>
+            ))}
+          </Select>
+        </Stack>
         <List sx={{ bgcolor: 'primary.main', color: 'white' }}>
-          <ListItem>
-            <ListItemText>Viewing as:</ListItemText>
-          </ListItem>
-          <ListItem>
-            <Select
-              sx={{
-                width: 'stretch',
-                bgcolor: 'white',
-              }}
-              value={detailedIdentity || ''}
-              onChange={handleIdentityChange}
-            >
-              {identities?.map((identity) => (
-                // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-explicit-any
-                <MenuItem key={identity.role.id} value={identity as any}>
-                  <Stack direction="row" spacing={1}>
-                    {identity.location === 'Reception' && <span>{identity.location}</span>}
-                    <span>{identity.role.name}</span>
-                    {identity.instance && (
-                      <>
-                        <span>|</span>
-                        <span>{identity.instance.name}</span>
-                      </>
-                    )}
-                  </Stack>
-                </MenuItem>
-              ))}
-            </Select>
-          </ListItem>
           <ListItem key={'Requests'} disablePadding>
             <ListItemButton
               onClick={() => {
