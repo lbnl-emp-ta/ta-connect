@@ -16,7 +16,7 @@ class Request(models.Model):
     proj_completion_date = models.DateField(blank=True, null=True, verbose_name="projected completion date")
     actual_completion_date = models.DateField(blank=True, null=True)
 
-    receipt = models.OneToOneField(Receipt, on_delete=models.PROTECT, related_name="request", default=Receipt.objects.create)
+    receipt = models.OneToOneField(Receipt, on_delete=models.PROTECT, blank=True, null=True, related_name="request", default=Receipt.objects.create)
 
     def __str__(self):
         return f"Request #{self.pk}"
@@ -25,7 +25,7 @@ class Request(models.Model):
         if not (self.receipt):
             self.receipt = Receipt.objects.create()
 
-        super(Request, self).save(*args, **kwargs)
+        super().save(*args, **kwargs)
     
     class Meta:
         db_table = "request"
