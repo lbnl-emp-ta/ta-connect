@@ -107,10 +107,10 @@ class DeleteAttachmentView(views.APIView):
         
         can_delete = False 
 
-        if IsAdmin.has_permission(request) or \
-           IsCoordinator.has_permission(request) or \
-           IsProgramLead.has_permission(request) or \
-           IsLabLead.has_permission(request):
+        if IsAdmin().has_permission(request) or \
+           IsCoordinator().has_permission(request) or \
+           IsProgramLead().has_permission(request) or \
+           IsLabLead().has_permission(request):
             
             user_aware_request_view = BaseUserAwareRequest(request=request)
             if (user_aware_request_view.get_actionable() | user_aware_request_view.get_downstream()).contains(request_obj):
