@@ -12,7 +12,7 @@ from .reception import ReceptionSerializer
 from .role import RoleSerializer
 from .request_status import RequestStatusSerializer
 from .owner import OwnerSerializer
-from .request import RequestSerializer, RequestListSerializer, RequestDetailSerializer
+from .request import RequestSerializer, RequestListSerializer, RequestDetailSerializer, RequestExpertListSerializer
 from .customer_request_relationship import CustomerRequestRelationshipSerializer
 from .cohort import CohortSerializer
 from .topic import TopicSerializer
@@ -29,6 +29,7 @@ __all__ = [
     "CustomerSerializer",
     "RequestListSerializer",
     "RequestDetailSerializer",
+    "RequestExpertListSerializer",
     "DepthSerializer",
     "StateSerializer",
     "OrganizationTypeSerializer",
@@ -37,5 +38,5 @@ __all__ = [
     "CustomerTypeSerializer",
     "CustomerRequestRelationshipSerializer",
     "CohortSerializer",
-    "TopicSerializer"
+    "TopicSerializer",
 ]
