@@ -13,6 +13,7 @@ urlpatterns = [
     path('requests/<int:request_id>/upload-attachment/', UploadAttachmentView.as_view(), name="upload-attachment"),
     path('requests/<int:request_id>/download-attachment/<str:filename>/', DownloadAttachmentView.as_view(), name="download-attachment"),
     path('requests/<int:request_id>/delete-attachment/<str:filename>/', DeleteAttachmentView.as_view(), name="delete-attachment"),
+    path('requests/<int:request_id>/edit-attachment/<str:filename>/', EditAttachmentView.as_view(), name="edit-attachment"),
 
     path('identities/', IdentityListView.as_view(), name="identities-list"),
     path('statuses/', StatusListView.as_view(), name="statuses-list"),

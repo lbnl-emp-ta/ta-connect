@@ -7,7 +7,7 @@ from rest_framework.response import Response
 from rest_framework.parsers import MultiPartParser, FormParser
 
 from core.views.request import BaseUserAwareRequest
-from core.serializers import AttachmentUploadSerializer
+from core.serializers import AttachmentUploadSerializer, AttachmentEditSerializer, AttachmentSerializer
 from core.models import Attachment, Request, User
 from core.permissions import *
 
@@ -107,10 +107,10 @@ class DeleteAttachmentView(views.APIView):
         
         can_delete = False 
 
-        if IsAdmin.has_permission(request) or \
-           IsCoordinator.has_permission(request) or \
-           IsProgramLead.has_permission(request) or \
-           IsLabLead.has_permission(request):
+        if IsAdmin().has_permission(request) or \
+           IsCoordinator().has_permission(request) or \
+           IsProgramLead().has_permission(request) or \
+           IsLabLead().has_permission(request):
             
             user_aware_request_view = BaseUserAwareRequest(request=request)
             if (user_aware_request_view.get_actionable() | user_aware_request_view.get_downstream()).contains(request_obj):
@@ -125,3 +125,67 @@ class DeleteAttachmentView(views.APIView):
             attachment.delete()
 
         return Response(data={"message": "Attachment deleted successfully"}, status=status.HTTP_204_NO_CONTENT)
+
+class EditAttachmentView(views.APIView):
+    authentication_classes = [
+        authentication.SessionAuthentication,
+        XSessionTokenAuthentication,
+    ]
+
+    permission_classes = [
+        permissions.IsAuthenticated,
+    ]
+   
+    # filename, description
+    def patch(self, request, request_id, filename):
+        try:
+            request_obj = Request.objects.get(pk=request_id)
+        except Request.DoesNotExist:
+            return Response(data={"message": "Given request does not exist"}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            attachment_obj = Attachment.objects.get(file_name=filename, request=request_obj)  
+        except Attachment.DoesNotExist:
+            return Response(data={"message": "Attachment with given filename does not exist for given request"}, status=status.HTTP_400_BAD_REQUEST)
+         
+        body = json.loads(request.body)
+
+        patch_data = dict()
+
+        if not body:
+            return Response(data={"message": "Missing request body"}, status=status.HTTP_204_NO_CONTENT)
+
+        can_edit = False
+        if IsAdmin().has_permission(request) or \
+           IsCoordinator().has_permission(request) or \
+           IsProgramLead().has_permission(request) or \
+           IsLabLead().has_permission(request):
+            
+            user_aware_request_view = BaseUserAwareRequest(request=request)
+            if (user_aware_request_view.get_actionable() | user_aware_request_view.get_downstream()).contains(request_obj):
+                can_edit = True  
+
+        elif (attachment_obj.user_who_uploaded is not None) and \
+             (request.user.id == attachment_obj.user_who_uploaded.pk):
+
+            can_edit = True
+        
+        if "file_name" in body:
+            if not body.get("file_name"): 
+                return Response(data={"message": "Cannot clear file_name field"}, status=status.HTTP_400_BAD_REQUEST)
+                
+            patch_data["file_name"] = body.get("file_name")
+
+        if "description" in body:
+            new_description_data = body.get("description")
+            if new_description_data is None:
+                new_description_data = ""
+                
+            patch_data["description"] = new_description_data 
+    
+        
+        serializer = AttachmentEditSerializer(instance=attachment_obj, data=patch_data, partial=True)
+        if can_edit and serializer.is_valid():
+            serializer.save()
+        
+        return Response(data=AttachmentSerializer(Attachment.objects.get(pk=attachment_obj.pk)).data, status=status.HTTP_200_OK)

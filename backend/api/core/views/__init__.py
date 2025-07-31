@@ -13,7 +13,7 @@ from .status import StatusListView
 from .owner import OwnerListView
 from .assignment import AssignmentView
 from .expert import ExpertsListView
-from .attachment import UploadAttachmentView, DownloadAttachmentView, DeleteAttachmentView
+from .attachment import UploadAttachmentView, DownloadAttachmentView, DeleteAttachmentView, EditAttachmentView
 
 __all__ = [
     "AssignmentView",
@@ -42,4 +42,5 @@ __all__ = [
     "UploadAttachmentView",
     "DownloadAttachmentView",
     "DeleteAttachmentView",
+    "EditAttachmentView",
 ]
