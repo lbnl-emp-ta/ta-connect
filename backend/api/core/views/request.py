@@ -334,7 +334,7 @@ class RequestDetailView(BaseUserAwareRequest):
 
             patch_data["status"] = maybe_status.name 
         
-        # Topics are done a special way (not using patch serizlier) because they are 
+        # Topics are done a special way (not using patch serializer) because they are 
         # stored as a Many-to-Many relationship in the database.
         if "topics" in body:
             current_topics = maybe_request.topics.all()
