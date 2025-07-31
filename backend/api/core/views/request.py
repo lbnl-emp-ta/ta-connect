@@ -337,19 +337,15 @@ class RequestDetailView(BaseUserAwareRequest):
         # Topics are done a special way (not using patch serizlier) because they are 
         # stored as a Many-to-Many relationship in the database.
         if "topics" in body:
-            if body.get("topics") is None:
-                maybe_request.topics.clear()
-            
             current_topics = maybe_request.topics.all()
             maybe_request.topics.clear()
             
-            topics = body.get("topics")
+            topics = body.get("topics", list())
             for topic_name in topics:
                 try:
                     topic = Topic.objects.get(name=topic_name)
                 except Topic.DoesNotExist:
-                    maybe_request.topics.clear()
-                    maybe_request.topics.add(current_topics)
+                    maybe_request.topics.set(current_topics)
                     return Response(data={"message": "One of the provided topics does not exist."}, status=status.HTTP_400_BAD_REQUEST)
 
                 maybe_request.topics.add(topic)
