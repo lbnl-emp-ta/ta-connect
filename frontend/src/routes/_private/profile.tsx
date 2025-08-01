@@ -17,8 +17,9 @@ function ProfilePage() {
         Welcome to TA Connect!
       </Typography>
       {(!identities || identities.length === 0) && (
-        <Paper sx={{ padding: 2, textAlign: 'center' }}>
+        <Paper sx={{ padding: 2 }}>
           <Typography sx={{ marginBottom: 1 }}>You don't have any roles assigned yet.</Typography>
+          {/* TODO: link to role request form */}
           <Button variant="contained">Request a new role</Button>
         </Paper>
       )}
@@ -34,6 +35,7 @@ function ProfilePage() {
               Roles
             </Typography>
             <Box>
+              {/* TODO: link to role request form */}
               <Button variant="contained">Request a new role</Button>
             </Box>
           </Stack>
