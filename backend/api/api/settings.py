@@ -134,6 +134,9 @@ ACCOUNT_USER_MODEL_USERNAME_FIELD = None
 ACCOUNT_SIGNUP_FIELDS = ['email*', 'password1*', 'password2*']
 ACCOUNT_LOGIN_METHODS= {'email'}
 ACCOUNT_EMAIL_VERIFICATION = "none"
+ACCOUNT_ADAPTER = 'core.adapters.CustomAccountAdapter'
+SOCIALACCOUNT_ADAPTER = 'core.adapters.CustomSocialAccountAdapter'
+SOCIALACCOUNT_AUTO_SIGNUP = True
 
 SOCIALACCOUNT_PROVIDERS = {
     "google": {
@@ -162,7 +165,6 @@ SOCIALACCOUNT_PROVIDERS = {
         "VERIFIED_EMAIL": True
     }
 }
-
 
 HEADLESS_ONLY = True
 HEADLESS_SERVE_SPECIFICATION = True
