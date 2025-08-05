@@ -1,6 +1,7 @@
 from rest_framework import views, authentication, permissions, status
 from rest_framework.response import Response
 
+from permissions import IsAdmin
 from core.models import Note, Request
 from core.serializers import NoteSerializer, NoteCreateSerializer
 from core.views.request import BaseUserAwareRequest
@@ -92,5 +93,20 @@ class NoteDeleteView(views.APIView):
         permissions.IsAuthenticated,
     ]
     
-    def delete(self, request, request_id):
-        return Response(status=status.HTTP_501_NOT_IMPLEMENTED)
+    def delete(self, request, request_id, note_id):
+        try:
+            Request.objects.get(pk=request_id)
+        except Request.DoesNotExist:
+            return Response(data={"message":"Request does not exist for given ID"}, status=status.HTTP_400_BAD_REQUEST)
+        
+        try:
+            note_obj = Note.objects.get(pk=note_id)
+        except Note.DoesNotExist:
+            return Response(data={"message":"Note with given ID does not exist"}, status=status.HTTP_400_BAD_REQUEST)
+        
+        if not IsAdmin().has_permission(request):
+            return Response(data={"message": "Insufficient authorization to delete note for given request"}, status=status.HTTP_400_BAD_REQUEST)
+
+        note_obj.delete()
+
+        return Response(data={"message": "Note deleted successfully"}, status=status.HTTP_204_NO_CONTENT)

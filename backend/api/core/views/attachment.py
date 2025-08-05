@@ -123,6 +123,8 @@ class DeleteAttachmentView(views.APIView):
              
         if can_delete:
             attachment.delete()
+        else:
+            return Response(data={"message": "Insufficient authorization to delete attachment for given request"}, status=status.HTTP_400_BAD_REQUEST)
 
         return Response(data={"message": "Attachment deleted successfully"}, status=status.HTTP_204_NO_CONTENT)
 

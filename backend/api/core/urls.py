@@ -17,6 +17,7 @@ urlpatterns = [
 
     path('requests/<int:request_id>/list-notes/', NoteListView.as_view(), name="list-notes"),
     path('requests/<int:request_id>/add-note/', NoteCreateView.as_view(), name="add-note"),
+    path('requests/<int:request_id>/delete-note/<int:note_id>/', NoteDeleteView.as_view(), name="delete-note"),
 
     path('identities/', IdentityListView.as_view(), name="identities-list"),
     path('statuses/', StatusListView.as_view(), name="statuses-list"),
