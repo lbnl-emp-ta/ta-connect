@@ -15,6 +15,8 @@ urlpatterns = [
     path('requests/<int:request_id>/delete-attachment/<str:filename>/', DeleteAttachmentView.as_view(), name="delete-attachment"),
     path('requests/<int:request_id>/edit-attachment/<str:filename>/', EditAttachmentView.as_view(), name="edit-attachment"),
 
+    path('requests/<int:request_id>/notes/', NoteListView.as_view(), name="notes"),
+
     path('identities/', IdentityListView.as_view(), name="identities-list"),
     path('statuses/', StatusListView.as_view(), name="statuses-list"),
     path('owners/', OwnerListView.as_view(), name="owners-list"),
