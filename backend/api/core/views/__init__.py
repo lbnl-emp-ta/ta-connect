@@ -14,7 +14,7 @@ from .owner import OwnerListView
 from .assignment import AssignmentView
 from .expert import ExpertsListView
 from .attachment import UploadAttachmentView, DownloadAttachmentView, DeleteAttachmentView, EditAttachmentView
-from .note import NoteListView
+from .note import NoteListView, NoteCreateView 
 
 __all__ = [
     "AssignmentView",
@@ -45,4 +45,5 @@ __all__ = [
     "DeleteAttachmentView",
     "EditAttachmentView",
     "NoteListView",
+    "NoteCreateView",
 ]
