@@ -24,14 +24,15 @@ class NoteListView(views.APIView):
         try:
             request_obj = Request.objects.get(pk=request_id)
         except Request.DoesNotExist:
-            return Response(data={"message": "Request with given ID does not exist"}, status=status.HTTP_501_NOT_IMPLEMENTED)
+            return Response(data={"message": "Request with given ID does not exist"}, status=status.HTTP_400_BAD_REQUEST)
             
         base_user_request_obj = BaseUserAwareRequest(request=request)
         visible_request = base_user_request_obj.get_actionable() | base_user_request_obj.get_downstream()
         
-
+        if not visible_request.contains(request_obj):
+            return Response(data={"message": "Insufficient authorization to view notes for given request"}, status=status.HTTP_400_BAD_REQUEST)
+            
         queryset = Note.objects.all().filter(request=request_obj)
-        queryset = queryset.filter(request__in=visible_request)
         
         if not queryset.exists():
             return Response(data=list(), status=status.HTTP_204_NO_CONTENT)
