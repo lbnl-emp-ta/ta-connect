@@ -1,7 +1,7 @@
 from rest_framework import views, authentication, permissions, status
 from rest_framework.response import Response
 
-from permissions import IsAdmin
+from core.permissions import IsAdmin
 from core.models import Note, Request
 from core.serializers import NoteSerializer, NoteCreateSerializer
 from core.views.request import BaseUserAwareRequest
