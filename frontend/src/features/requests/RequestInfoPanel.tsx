@@ -4,6 +4,7 @@ import ClearIcon from '@mui/icons-material/Clear';
 import EditIcon from '@mui/icons-material/Edit';
 import ErrorIcon from '@mui/icons-material/Error';
 import {
+  Chip,
   CircularProgress,
   IconButton,
   MenuItem,
@@ -65,7 +66,6 @@ export const RequestInfoPanel: React.FC<RequestInfoPanelProps> = ({ request }) =
 
       // setTopics(request.topics || []);
       setDescription(request.description || '');
-
     }
   }, [request]);
 
@@ -162,7 +162,8 @@ export const RequestInfoPanel: React.FC<RequestInfoPanelProps> = ({ request }) =
       setToastMessage(
         <ToastMessage icon={<ErrorIcon />}>{updateRequestMutation.error.message}</ToastMessage>
       );
-    }}, [
+    }
+  }, [
     updateRequestMutation.isSuccess,
     updateRequestMutation.isError,
     updateRequestMutation.error?.message,
@@ -172,11 +173,9 @@ export const RequestInfoPanel: React.FC<RequestInfoPanelProps> = ({ request }) =
     <InfoPanel
       header={
         <Stack direction="row" alignItems="center" justifyContent="space-between">
-          <Typography variant="h6" component="h3">
-            Request Details
-          </Typography>
+          <span>Request Details</span>
           {!editing && (
-            <IconButton color="info" onClick={handleEditClick}>
+            <IconButton onClick={handleEditClick}>
               <EditIcon />
             </IconButton>
           )}
@@ -227,7 +226,9 @@ export const RequestInfoPanel: React.FC<RequestInfoPanelProps> = ({ request }) =
                 </TableRow>
                 <TableRow>
                   <TableCell>Status</TableCell>
-                  <TableCell>{request.status ? request.status : 'Unknown'}</TableCell>
+                  <TableCell>
+                    <Chip label={request.status ? request.status : 'Unknown'} color="primary" />
+                  </TableCell>
                 </TableRow>
                 <TableRow>
                   <TableCell>Depth</TableCell>

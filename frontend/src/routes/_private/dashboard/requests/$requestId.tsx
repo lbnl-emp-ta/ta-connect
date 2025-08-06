@@ -1,6 +1,6 @@
 import EastIcon from '@mui/icons-material/East';
 import WestIcon from '@mui/icons-material/West';
-import { Button, Grid, Stack, Tab, Tabs, Typography } from '@mui/material';
+import { Button, Grid, Paper, Stack, Tab, Tabs, Typography } from '@mui/material';
 import { useQuery, useSuspenseQuery } from '@tanstack/react-query';
 import { createFileRoute } from '@tanstack/react-router';
 import { useState } from 'react';
@@ -65,8 +65,8 @@ function SelectedRequest() {
   };
 
   return (
-    <Stack>
-      <Stack direction="row">
+    <Paper sx={{ padding: 2 }}>
+      <Stack direction="row" sx={{ marginBottom: 2 }}>
         {previousIndex !== null && (
           <AppLink
             to={'/dashboard/requests/$requestId'}
@@ -104,14 +104,16 @@ function SelectedRequest() {
           </span>
         )}
         <Typography
-          variant="h4"
+          variant="h6"
+          component="h1"
           color="primary"
           sx={{
             flex: 1,
+            fontWeight: 'bold',
             textAlign: 'center',
           }}
         >
-          Request: {selectedRequest?.id}
+          Request #{selectedRequest?.id}
         </Typography>
         {selectedRequest && (
           <>
@@ -120,15 +122,15 @@ function SelectedRequest() {
           </>
         )}
       </Stack>
-      <Grid container spacing={2}>
-        <Grid size={6} sx={{ minHeight: 550 }}>
+      <Grid container spacing={1}>
+        <Grid size={6}>
           <RequestInfoPanel request={selectedRequest!} />
         </Grid>
         <Grid size={6}>
           <Stack>
             <RequestCustomerPanel customer={selectedRequest?.customers[0]} />
             <InfoPanel
-              header={
+              tabs={
                 <Tabs
                   onChange={handleTabChange}
                   value={tabValue}
@@ -158,6 +160,6 @@ function SelectedRequest() {
           </Stack>
         </Grid>
       </Grid>
-    </Stack>
+    </Paper>
   );
 }
