@@ -95,6 +95,9 @@ class NoteDeleteView(views.APIView):
     ]
     
     def delete(self, request, request_id, note_id):
+        if not IsAdmin().has_permission(request):
+            return Response(data={"message": "Insufficient authorization to delete note for given request"}, status=status.HTTP_400_BAD_REQUEST)
+
         try:
             Request.objects.get(pk=request_id)
         except Request.DoesNotExist:
@@ -104,9 +107,6 @@ class NoteDeleteView(views.APIView):
             note_obj = Note.objects.get(pk=note_id)
         except Note.DoesNotExist:
             return Response(data={"message":"Note with given ID does not exist"}, status=status.HTTP_400_BAD_REQUEST)
-        
-        if not IsAdmin().has_permission(request):
-            return Response(data={"message": "Insufficient authorization to delete note for given request"}, status=status.HTTP_400_BAD_REQUEST)
 
         note_obj.delete()
 
