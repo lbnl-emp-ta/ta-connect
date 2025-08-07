@@ -1,9 +1,6 @@
-import json
 from rest_framework import views, status, authentication, permissions
 from rest_framework.response import Response
 from django.db import transaction
-
-from django.core.mail import send_mail
 
 from allauth.headless.contrib.rest_framework.authentication import (
     XSessionTokenAuthentication,
