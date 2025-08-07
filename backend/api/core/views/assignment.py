@@ -3,6 +3,8 @@ from rest_framework import views, status, authentication, permissions
 from rest_framework.response import Response
 from django.db import transaction
 
+from django.core.mail import send_mail
+
 from allauth.headless.contrib.rest_framework.authentication import (
     XSessionTokenAuthentication,
 )
@@ -123,6 +125,7 @@ class AssignmentView(views.APIView):
             
             ta_request.expert = expert
             ta_request.receipt.expert = expert
+            
             try:
                 with transaction.atomic():
                     ta_request.receipt.save()
@@ -131,5 +134,15 @@ class AssignmentView(views.APIView):
                 return Response(data={"message": f"{e}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         
         # TODO Consider sending notification when that system in implemented
+        try:
+            send_mail(
+                "Test Subject",
+                "Test message",
+                "dmerchelski99@gmail.com",
+                ["dmerchelski@lbl.gov"],
+                fail_silently=False
+            ) 
+        except Exception as e:
+            print(e)
         
         return Response(status=status.HTTP_200_OK)
