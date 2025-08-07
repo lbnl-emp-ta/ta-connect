@@ -133,16 +133,4 @@ class AssignmentView(views.APIView):
             except:
                 return Response(data={"message": f"{e}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         
-        # TODO Consider sending notification when that system in implemented
-        try:
-            send_mail(
-                "Test Subject",
-                "Test message",
-                "dmerchelski99@gmail.com",
-                ["dmerchelski@lbl.gov"],
-                fail_silently=False
-            ) 
-        except Exception as e:
-            print(e)
-        
         return Response(status=status.HTTP_200_OK)
