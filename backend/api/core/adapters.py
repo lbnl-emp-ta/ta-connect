@@ -1,5 +1,6 @@
 from allauth.socialaccount.adapter import DefaultSocialAccountAdapter
 from allauth.account.adapter import DefaultAccountAdapter
+from allauth.headless.adapter import DefaultHeadlessAdapter
 from core.models import User
 
 class CustomSocialAccountAdapter(DefaultSocialAccountAdapter):
@@ -33,11 +34,13 @@ class CustomSocialAccountAdapter(DefaultSocialAccountAdapter):
             except User.DoesNotExist:
                 pass
 
+
 class CustomAccountAdapter(DefaultAccountAdapter):
     def save_user(self, request, user, form, commit=True):
         """
         Saves a new `User` instance using information provided in the
         signup form.
+        This may not actually be needed.
         """
         user = super().save_user(request, user, form, commit=False)
         
@@ -45,3 +48,17 @@ class CustomAccountAdapter(DefaultAccountAdapter):
         if commit:
             user.save()
         return user
+    
+    
+class CustomHeadlessAdapter(DefaultHeadlessAdapter):
+    """
+    Custom adapter for headless mode.
+    This is a placeholder function to ensure the adapter is recognized.
+    """
+    def serialize_user(self, user):
+        """
+        Serializes the user object for headless mode.
+        """
+        ret = super().serialize_user(user)
+        ret['name'] = user.name
+        return ret

@@ -175,6 +175,7 @@ HEADLESS_FRONTEND_URLS = {
     "account_signup": "/account/signup",
     "socialaccount_login_error": "/account/provider/callback",
 }
+HEADLESS_ADAPTER = 'core.adapters.CustomHeadlessAdapter'
 
 TEMPLATES = [
     {
