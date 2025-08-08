@@ -14,7 +14,7 @@ class Receipt(models.Model):
     expert = models.ForeignKey(User, blank=True, null=True, on_delete=models.PROTECT)
 
     def __str__(self):
-        if (self.request):
+        if hasattr(self, "request"):
             return f"Receipt for Request #{self.request.pk}"
         
         return f"Receipt #{self.pk}"
