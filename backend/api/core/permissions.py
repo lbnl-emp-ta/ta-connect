@@ -63,6 +63,7 @@ def has_role(request, role_name):
 
 class IsAdmin(permissions.BasePermission):
     def has_permission(self, request, view=None):
+        print("klsdjflsjk")
         return has_role(request, "Admin")
 
 class IsCoordinator(permissions.BasePermission):
