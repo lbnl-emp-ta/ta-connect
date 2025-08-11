@@ -13,7 +13,7 @@ def main():
     ]
 
     for fixture in fixture_list:
-        command = f"python3 manage.py loaddata core/fixtures/{fixture}"
+        command = f"python manage.py loaddata core/fixtures/{fixture}"
         subprocess.run(command, shell=True, text=True)
 
 

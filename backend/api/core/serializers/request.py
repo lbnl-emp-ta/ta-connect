@@ -73,7 +73,7 @@ class RequestSerializer(serializers.Serializer):
     proj_start_date = serializers.DateField(required=False, allow_null=True)
     proj_completion_date = serializers.DateField(required=False, allow_null=True)
     actual_completion_date = serializers.DateField(required=False, allow_null=True)
-    # customers field added later
+    topics = TopicSerializer(many=True)
 
     
     @classmethod
