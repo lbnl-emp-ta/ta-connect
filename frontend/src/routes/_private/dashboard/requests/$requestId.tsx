@@ -19,6 +19,7 @@ import {
   requestDetailQueryOptions,
   topicsQueryOptions,
 } from '../../../../utils/queryOptions';
+import { RequestAttachments } from '../../../../features/requests/RequestAttachments';
 
 export const Route = createFileRoute('/_private/dashboard/requests/$requestId')({
   loader: async ({ context, params }) => {
@@ -153,7 +154,7 @@ function SelectedRequest() {
               }
             >
               <TabPanel value={tabValue} index="attachments">
-                Attachments
+                <RequestAttachments attachments={selectedRequest?.attachments} />
               </TabPanel>
               <TabPanel value={tabValue} index="audit-history">
                 Audit history
