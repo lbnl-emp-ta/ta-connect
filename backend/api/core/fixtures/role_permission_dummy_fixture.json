@@ -126,8 +126,7 @@
         "pk": 2,
         "fields": {
             "name": "Coordinator",
-            "description": "Direct request traffic in reception to applicable programs",
-            "statuses": [1, 2, 9]
+            "description": "Direct request traffic in reception to applicable programs"
         }
     },
     {
@@ -135,8 +134,7 @@
         "pk": 3,
         "fields": {
             "name": "Program Lead",
-            "description": "Point of contact for a program",
-            "statuses": [10, 8]
+            "description": "Point of contact for a program"
         }
     },
     {
@@ -144,8 +142,7 @@
         "pk": 4,
         "fields": {
             "name": "Lab Lead",
-            "description": "A labs point of contact for a specific program",
-            "statuses": [11]
+            "description": "A labs point of contact for a specific program"
         }
     },
     {
@@ -153,8 +150,7 @@
         "pk": 5,
         "fields": {
             "name": "Expert",
-            "description": "Subject matter expert who fulfills technical assistance",
-            "statuses": [6, 7]
+            "description": "Subject matter expert who fulfills technical assistance"
         }
     },
     {

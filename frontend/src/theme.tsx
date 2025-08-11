@@ -54,7 +54,8 @@ export const theme = createTheme({
       white: '#fff',
     },
     grey: {
-      50: '#ddd',
+      50: '#eee',
+      100: '#ddd',
       500: '#999',
       900: '#444',
     },

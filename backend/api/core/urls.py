@@ -37,7 +37,9 @@ urlpatterns = [
     path('customers/', CustomerCreateView.as_view(), name="customer-create"),
     path('customer-request-relationships/', CustomerRequestRelationshipListCreateView.as_view(), name="customer-request-relationship-create"),
     
-    path('cohorts/', CohortCreateView.as_view(), name="cohort-create"),
-    path('cohorts/add-customer/', CohortAddCustomerView.as_view(), name="cohort-customer-add"),
+    # path('cohorts/', CohortCreateView.as_view(), name="cohort-create"),
+    # path('cohorts/add-customer/', CohortAddCustomerView.as_view(), name="cohort-customer-add"),
 
+    path('topics/', TopicListView.as_view(), name="topic-list"),
+    
 ]
