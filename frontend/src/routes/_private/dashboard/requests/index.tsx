@@ -30,7 +30,7 @@ function NoSelectedRequest() {
    * then show a message.
    */
   return (
-    <Stack sx={{ textAlign: 'center' }}>
+    <Stack sx={{ textAlign: 'center', height: 500, justifyContent: 'center' }} spacing={2}>
       <Stack direction="row" alignItems="center" justifyContent="center">
         <Typography>All caught up!</Typography>
         <CheckCircleIcon color="primary" fontSize="large" />

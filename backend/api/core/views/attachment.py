@@ -43,7 +43,7 @@ class UploadAttachmentView(views.APIView):
         
         attachment_data = dict()
         attachment_data["file"] = request.data.get("file")
-        attachment_data["file_name"] = request.data.get("file").__str__()
+        attachment_data["title"] = request.data.get("file").__str__()
         attachment_data["request"] = request_id
         attachment_data["user_who_uploaded"] = request.user.id
         
@@ -67,7 +67,7 @@ class DownloadAttachmentView(views.APIView):
         permissions.IsAuthenticated,
     ]
 
-    def get(self, request, request_id, filename):
+    def get(self, request, request_id, attachment_id):
         try:
             request_obj = Request.objects.get(pk=request_id)
         except Request.DoesNotExist:
@@ -78,7 +78,7 @@ class DownloadAttachmentView(views.APIView):
             return Response(data={"message": "Insufficient authorization to download attachment for given request"}, status=status.HTTP_400_BAD_REQUEST)
 
         try:
-            attachment = Attachment.objects.get(file_name=filename, request=request_obj)
+            attachment = Attachment.objects.get(pk=attachment_id)
         except Attachment.DoesNotExist:
             return Response(data={"message": "Attachment with given filename does not exist"}, status=status.HTTP_400_BAD_REQUEST) 
         
@@ -94,14 +94,14 @@ class DeleteAttachmentView(views.APIView):
         permissions.IsAuthenticated,
     ]
     
-    def delete(self, request, request_id, filename):
+    def delete(self, request, request_id, attachment_id):
         try:
             request_obj = Request.objects.get(pk=request_id)
         except Request.DoesNotExist:
             return Response(data={"message": "Request with given id does not exist"}, status=status.HTTP_400_BAD_REQUEST)
 
         try:
-            attachment = Attachment.objects.get(file_name=filename, request=request_obj)
+            attachment = Attachment.objects.get(pk=attachment_id)
         except Attachment.DoesNotExist:
             return Response(data={"message": "Attachment with given filename does not exist"}, status=status.HTTP_400_BAD_REQUEST) 
         
@@ -137,14 +137,14 @@ class EditAttachmentView(views.APIView):
     ]
    
     # filename, description
-    def patch(self, request, request_id, filename):
+    def patch(self, request, request_id, attachment_id):
         try:
             request_obj = Request.objects.get(pk=request_id)
         except Request.DoesNotExist:
             return Response(data={"message": "Given request does not exist"}, status=status.HTTP_400_BAD_REQUEST)
 
         try:
-            attachment_obj = Attachment.objects.get(file_name=filename, request=request_obj)  
+            attachment_obj = Attachment.objects.get(pk=attachment_id)  
         except Attachment.DoesNotExist:
             return Response(data={"message": "Attachment with given filename does not exist for given request"}, status=status.HTTP_400_BAD_REQUEST)
          
@@ -170,11 +170,11 @@ class EditAttachmentView(views.APIView):
 
             can_edit = True
         
-        if "file_name" in body:
-            if not body.get("file_name"): 
-                return Response(data={"message": "Cannot clear file_name field"}, status=status.HTTP_400_BAD_REQUEST)
+        if "title" in body:
+            if not body.get("title"): 
+                return Response(data={"message": "Cannot clear title field"}, status=status.HTTP_400_BAD_REQUEST)
                 
-            patch_data["file_name"] = body.get("file_name")
+            patch_data["title"] = body.get("title")
 
         if "description" in body:
             new_description_data = body.get("description")
@@ -188,4 +188,5 @@ class EditAttachmentView(views.APIView):
         if can_edit and serializer.is_valid():
             serializer.save()
         
+        # return updated attachment data
         return Response(data=AttachmentSerializer(Attachment.objects.get(pk=attachment_obj.pk)).data, status=status.HTTP_200_OK)

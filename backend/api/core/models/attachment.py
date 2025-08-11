@@ -6,7 +6,7 @@ def generate_upload_filepath(instance, filename):
 
 class Attachment(models.Model):
     file = models.FileField(upload_to=generate_upload_filepath)
-    file_name = models.CharField(max_length=255)
+    title = models.CharField(max_length=255)
     uploaded_at = models.DateTimeField(auto_now_add=True)
     description = models.TextField(blank=True, null=True)
     

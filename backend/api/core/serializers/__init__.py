@@ -12,6 +12,7 @@ from .reception import ReceptionSerializer
 from .role import RoleSerializer
 from .request_status import RequestStatusSerializer
 from .owner import OwnerSerializer
+from .topic import TopicSerializer
 from .request import RequestSerializer, RequestListSerializer, RequestDetailSerializer
 from .customer_request_relationship import CustomerRequestRelationshipSerializer
 from .cohort import CohortSerializer
