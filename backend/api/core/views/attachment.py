@@ -42,7 +42,7 @@ class UploadAttachmentView(views.APIView):
         
         attachment_data = dict()
         attachment_data["file"] = request.data.get("file")
-        attachment_data["file_name"] = request.data.get("file").__str__()
+        attachment_data["title"] = request.data.get("file").__str__()
         attachment_data["request"] = request_id
         attachment_data["user_who_uploaded"] = request.user.id
         
@@ -66,7 +66,7 @@ class DownloadAttachmentView(views.APIView):
         permissions.IsAuthenticated,
     ]
 
-    def get(self, request, request_id, filename):
+    def get(self, request, request_id, attachment_id):
         try:
             request_obj = Request.objects.get(pk=request_id)
         except Request.DoesNotExist:
@@ -77,7 +77,7 @@ class DownloadAttachmentView(views.APIView):
             return Response(data={"message": "Insufficient authorization to download file for given request"}, status=status.HTTP_400_BAD_REQUEST)
 
         try:
-            attachment = Attachment.objects.get(file_name=filename, request=request_obj)
+            attachment = Attachment.objects.get(pk=attachment_id, request=request_obj)
         except Attachment.DoesNotExist:
             return Response(data={"message": "Attachment with given filename does not exist"}, status=status.HTTP_400_BAD_REQUEST) 
         
