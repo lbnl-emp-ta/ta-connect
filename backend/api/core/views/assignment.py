@@ -6,6 +6,7 @@ from allauth.headless.contrib.rest_framework.authentication import (
     XSessionTokenAuthentication,
 )
 
+from core.util.notifications import send_email_notification
 from core.permissions import IsAdmin, IsLabLead
 from core.views.owner import OwnerListView
 from core.models import *
@@ -129,5 +130,11 @@ class AssignmentView(views.APIView):
                     ta_request.save()
             except:
                 return Response(data={"message": f"{e}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+        # try:
+        #     send_email_notification("test", "TESTING", ['dmerchelski@lbl.gov'])
+        # except Exception as e:
+        #     print(e)
+            
         
         return Response(status=status.HTTP_200_OK)
