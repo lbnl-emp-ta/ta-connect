@@ -131,10 +131,4 @@ class AssignmentView(views.APIView):
             except:
                 return Response(data={"message": f"{e}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         
-        # try:
-        #     send_email_notification("test", "TESTING", ['dmerchelski@lbl.gov'])
-        # except Exception as e:
-        #     print(e)
-            
-        
         return Response(status=status.HTTP_200_OK)
