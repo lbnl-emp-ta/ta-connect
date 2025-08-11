@@ -67,6 +67,10 @@ function SelectedRequest() {
     setTabValue(newValue);
   };
 
+  if (!selectedRequest) {
+    return <Typography variant="h6">Loading request details...</Typography>;
+  }
+
   return (
     <Paper sx={{ padding: 2 }}>
       <Stack direction="row" sx={{ marginBottom: 2 }}>
@@ -154,7 +158,10 @@ function SelectedRequest() {
               }
             >
               <TabPanel value={tabValue} index="attachments">
-                <RequestAttachments attachments={selectedRequest?.attachments} />
+                <RequestAttachments
+                  requestId={selectedRequest.id}
+                  attachments={selectedRequest.attachments}
+                />
               </TabPanel>
               <TabPanel value={tabValue} index="audit-history">
                 Audit history
