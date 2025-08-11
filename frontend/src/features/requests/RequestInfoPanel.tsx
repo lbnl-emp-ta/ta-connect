@@ -194,12 +194,12 @@ export const RequestInfoPanel: React.FC<RequestInfoPanelProps> = ({ request }) =
           {editing && (
             <Stack direction="row">
               {!updateRequestMutation.isPending && (
-                <IconButton color="info" onClick={handleEditSubmit}>
+                <IconButton onClick={handleEditSubmit}>
                   <CheckIcon />
                 </IconButton>
               )}
               {updateRequestMutation.isPending && <CircularProgress />}
-              <IconButton color="info" onClick={handleEditCancel}>
+              <IconButton onClick={handleEditCancel}>
                 <ClearIcon />
               </IconButton>
             </Stack>
