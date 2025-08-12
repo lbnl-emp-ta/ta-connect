@@ -211,7 +211,7 @@ export const RequestInfoPanel: React.FC<RequestInfoPanelProps> = ({ request }) =
       {request && (
         <>
           <TableContainer>
-            <Table size="small" sx={{ '& .MuiTableCell-root:first-child': { width: '205px' } }}>
+            <Table size="small" sx={{ '& .MuiTableCell-root:first-of-type': { width: '205px' } }}>
               <TableBody>
                 <TableRow>
                   <TableCell>ID</TableCell>

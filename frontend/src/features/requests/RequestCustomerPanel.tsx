@@ -24,7 +24,7 @@ export const RequestCustomerPanel: React.FC<RequestInfoTableProps> = ({ customer
       )}
       {customer && (
         <TableContainer>
-          <Table size="small" sx={{ '& .MuiTableCell-root:first-child': { width: '205px' } }}>
+          <Table size="small" sx={{ '& .MuiTableCell-root:first-of-type': { width: '205px' } }}>
             <TableBody>
               <TableRow>
                 <TableCell>Relationship</TableCell>
