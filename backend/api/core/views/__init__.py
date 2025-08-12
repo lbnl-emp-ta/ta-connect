@@ -46,9 +46,6 @@ __all__ = [
     "ProcessIntakeForm",
     "UploadAttachmentView",
     "DownloadAttachmentView",
-<<<<<<< HEAD
     "DeleteAttachmentView",
-=======
     "TopicListView",
->>>>>>> feature/upload-download-attachment
 ]
