@@ -1,10 +1,11 @@
 import os
 from django.core.mail import send_mail
+from django.conf import settings
 
 # Send email with given information to a list of recipients. 
 # If the email was sent successfully, True is returned. False is returned otherwise.
 def send_email_notification(subject: str, message: str, recipient_list: list[str]) -> bool:
-    return bool(
+    if settings.ENABLE_EMAIL_SENDING:
         send_mail(
             subject=subject, 
             message=message, 
@@ -12,4 +13,5 @@ def send_email_notification(subject: str, message: str, recipient_list: list[str
             recipient_list=recipient_list, 
             fail_silently=False
         ) 
-    )
+    else:
+        print(f"email to:{recipient_list} was sent")
