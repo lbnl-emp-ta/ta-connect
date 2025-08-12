@@ -20,7 +20,7 @@ class AttachmentUploadSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Attachment
-        fields = ['file', 'request', 'description', 'user_who_uploaded', 'file_name']
+        fields = ['file', 'request', 'description', 'user_who_uploaded', 'title']
 
 class AttachmentEditSerializer(serializers.ModelSerializer):
     class Meta:
