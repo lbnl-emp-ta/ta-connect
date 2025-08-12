@@ -13,12 +13,8 @@ from .status import StatusListView
 from .owner import OwnerListView
 from .assignment import AssignmentView
 from .expert import ExpertsListView
-<<<<<<< HEAD
-from .attachment import UploadAttachmentView, DownloadAttachmentView, DeleteAttachmentView
-=======
-from .attachment import UploadAttachmentView, DownloadAttachmentView
+from .attachment import UploadAttachmentView, DownloadAttachmentView, DeleteAttachmentView, EditAttachmentView
 from .topic import TopicListView
->>>>>>> feature/upload-download-attachment
 
 __all__ = [
     "AssignmentView",
@@ -47,5 +43,6 @@ __all__ = [
     "UploadAttachmentView",
     "DownloadAttachmentView",
     "DeleteAttachmentView",
+    "EditAttachmentView",
     "TopicListView",
 ]
