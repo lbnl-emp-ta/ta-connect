@@ -26,6 +26,7 @@ from .available_program_role import AvailableProgramRole
 from .available_lab_role import AvailableLabRole
 from .available_reception_role import AvailableReceptionRole
 from .expertise import Expertise
+from .attachment import Attachment
 
 __all__ = [
     "RequestStatus",
@@ -56,4 +57,5 @@ __all__ = [
     "AvailableReceptionRole",
     "Topic",
     "Expertise",
+    "Attachment",
 ]

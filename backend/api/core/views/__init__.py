@@ -13,6 +13,7 @@ from .status import StatusListView
 from .owner import OwnerListView
 from .assignment import AssignmentView
 from .expert import ExpertsListView
+from .attachment import UploadAttachmentView, DownloadAttachmentView, DeleteAttachmentView, EditAttachmentView
 from .topic import TopicListView
 
 __all__ = [
@@ -39,5 +40,9 @@ __all__ = [
     "CohortCreateView",
     "CohortAddCustomerView",
     "ProcessIntakeForm",
+    "UploadAttachmentView",
+    "DownloadAttachmentView",
+    "DeleteAttachmentView",
+    "EditAttachmentView",
     "TopicListView",
 ]

@@ -15,7 +15,6 @@ class Request(models.Model):
     proj_start_date = models.DateField(blank=True, null=True, verbose_name="projected start date")
     proj_completion_date = models.DateField(blank=True, null=True, verbose_name="projected completion date")
     actual_completion_date = models.DateField(blank=True, null=True)
-
     topics = models.ManyToManyField(Topic, blank=True, related_name="requests")
     receipt = models.OneToOneField(Receipt, on_delete=models.PROTECT, blank=True, null=True, related_name="request")
 
@@ -26,7 +25,7 @@ class Request(models.Model):
         if not (self.receipt):
             self.receipt = Receipt.objects.create()
 
-        super(Request, self).save(*args, **kwargs)
+        super().save(*args, **kwargs)
     
     class Meta:
         db_table = "request"

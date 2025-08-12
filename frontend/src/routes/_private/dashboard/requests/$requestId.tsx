@@ -17,6 +17,7 @@ import {
   expertsQueryOptions,
   ownersQueryOptions,
   requestDetailQueryOptions,
+  topicsQueryOptions,
 } from '../../../../utils/queryOptions';
 
 export const Route = createFileRoute('/_private/dashboard/requests/$requestId')({
@@ -25,6 +26,7 @@ export const Route = createFileRoute('/_private/dashboard/requests/$requestId')(
       requestDetailQueryOptions(params.requestId, context.identity)
     );
     await context.queryClient.ensureQueryData(ownersQueryOptions(context.identity));
+    await context.queryClient.ensureQueryData(topicsQueryOptions());
     if (
       context.detailedIdentity?.role.name === 'Lab Lead' ||
       context.detailedIdentity?.role.name === 'Admin'
