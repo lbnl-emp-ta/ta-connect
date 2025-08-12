@@ -20,13 +20,9 @@ class AttachmentUploadSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Attachment
-<<<<<<< HEAD
         fields = ['file', 'request', 'description', 'user_who_uploaded', 'file_name']
 
 class AttachmentEditSerializer(serializers.ModelSerializer):
     class Meta:
         model = Attachment
-        fields = ['file_name', 'description']
-=======
         fields = ['id', 'file', 'request', 'description', 'user_who_uploaded', 'title']
->>>>>>> feature/delete-attachment
