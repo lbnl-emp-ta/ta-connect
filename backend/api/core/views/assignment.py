@@ -147,6 +147,6 @@ class AssignmentView(views.APIView):
             except:
                 return Response(data={"message": f"{e}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         
-        send_email_notification("TACONNECT Assignment Notification", generic_template(User.objects.get(pk=self.request.user.id).name.split(" ")[0], f"A request has been assigned to {ta_request.owner.__str__().replace(" Owner", "")}."), receipients)
+        send_email_notification("TACONNECT Assignment Notification", generic_template(User.objects.get(pk=self.request.user.id).name.split(" ")[0], f"You have received this email because {ta_request} has been assigned to {ta_request.owner.__str__().replace(" Owner", "")}."), receipients)
         
         return Response(status=status.HTTP_200_OK)
