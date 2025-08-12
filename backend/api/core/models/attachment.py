@@ -10,5 +10,5 @@ class Attachment(models.Model):
     uploaded_at = models.DateTimeField(auto_now_add=True)
     description = models.TextField(blank=True, null=True)
     
-    user_who_uploaded = models.ForeignKey(User, on_delete=models.PROTECT)
+    user_who_uploaded = models.ForeignKey(User, on_delete=models.PROTECT, null=True)
     request = models.ForeignKey(Request, on_delete=models.PROTECT)
