@@ -12,11 +12,10 @@ urlpatterns = [
     path('requests/assign/', AssignmentView.as_view(), name="assignment"),
     path('requests/<int:request_id>/upload-attachment/', UploadAttachmentView.as_view(), name="upload-attachment"),
     path('requests/<int:request_id>/download-attachment/<int:attachment_id>/', DownloadAttachmentView.as_view(), name="download-attachment"),
+    path('requests/<int:request_id>/delete-attachment/<int:attachment_id>/', DeleteAttachmentView.as_view(), name="delete-attachment"),
 
     path('identities/', IdentityListView.as_view(), name="identities-list"),
-
     path('statuses/', StatusListView.as_view(), name="statuses-list"),
-
     path('owners/', OwnerListView.as_view(), name="owners-list"),
     path('experts/', ExpertsListView.as_view(), name="experts-list"),
 
@@ -27,11 +26,10 @@ urlpatterns = [
     path('states/', StateListView.as_view(), name="state-list"),
     path('states/<int:pk>', StateRetrieveView.as_view(), name="state-retrieve"),
     
+    path('organizations/', OrganizationListCreateView.as_view(), name="organization-list-create"),
     path('organization-types/', OrganizationTypeListView.as_view(), name="organization-type-list"),
     path('organization-types/<int:pk>', OrganizationTypeRetrieveView.as_view(), name="organization-type-retrieve"),
-    
-    path('organizations/', OrganizationListCreateView.as_view(), name="organization-list-create"),
-    
+
     path('transmission-planning-regions/', TransmissionPlanningRegionListView.as_view(), name="transmission-planning-regions-list"),
     
     path('customers/', CustomerCreateView.as_view(), name="customer-create"),
