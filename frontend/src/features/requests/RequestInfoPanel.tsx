@@ -4,8 +4,10 @@ import ClearIcon from '@mui/icons-material/Clear';
 import EditIcon from '@mui/icons-material/Edit';
 import ErrorIcon from '@mui/icons-material/Error';
 import {
+  Autocomplete,
   Chip,
   CircularProgress,
+  Grid,
   IconButton,
   MenuItem,
   Select,
@@ -23,13 +25,14 @@ import { DatePicker } from '@mui/x-date-pickers';
 import { PickerValue } from '@mui/x-date-pickers/internals';
 import dayjs, { Dayjs } from 'dayjs';
 import { useCallback, useEffect, useState } from 'react';
-import { TARequest, TARequestDetail } from '../../api/dashboard/types';
+import { TARequest, TARequestDetail, TATopic } from '../../api/dashboard/types';
 import { InfoPanel } from '../../components/InfoPanel';
-import { useRequestMutation } from '../../utils/queryOptions';
+import { topicsQueryOptions, useRequestMutation } from '../../utils/queryOptions';
 import { capitalize, formatDatetime } from '../../utils/utils';
 import { useIdentityContext } from '../identity/IdentityContext';
 import { useToastContext } from '../toasts/ToastContext';
 import { ToastMessage } from '../toasts/ToastMessage';
+import { useSuspenseQuery } from '@tanstack/react-query';
 
 interface RequestInfoPanelProps {
   request?: TARequestDetail;
@@ -38,6 +41,7 @@ interface RequestInfoPanelProps {
 export const RequestInfoPanel: React.FC<RequestInfoPanelProps> = ({ request }) => {
   const { identity } = useIdentityContext();
   const updateRequestMutation = useRequestMutation(request?.id.toString() || '', identity);
+  const { data: allTopics } = useSuspenseQuery(topicsQueryOptions());
   const [editing, setEditing] = useState(false);
   const { setShowToast, setToastMessage } = useToastContext();
   const [depth, setDepth] = useState<TARequestDetail['depth']>();
@@ -45,7 +49,7 @@ export const RequestInfoPanel: React.FC<RequestInfoPanelProps> = ({ request }) =
   const [projectedCompletionDate, setProjectedCompletionDate] = useState<Dayjs>();
   const [actualCompletionDate, setActualCompletionDate] = useState<Dayjs>();
   const [description, setDescription] = useState('');
-  // const [topics, setTopics] = useState<TARequestDetail['topics']>([]);
+  const [topics, setTopics] = useState<TARequestDetail['topics']>([]);
 
   /**
    * Reset form values based on request data.
@@ -64,7 +68,7 @@ export const RequestInfoPanel: React.FC<RequestInfoPanelProps> = ({ request }) =
         request.actual_completion_date ? dayjs(request.actual_completion_date) : undefined
       );
 
-      // setTopics(request.topics || []);
+      setTopics(request.topics || []);
       setDescription(request.description || '');
     }
   }, [request]);
@@ -113,10 +117,14 @@ export const RequestInfoPanel: React.FC<RequestInfoPanelProps> = ({ request }) =
     ) {
       mutationData.actual_completion_date = actualCompletionDate.format('YYYY-MM-DD');
     }
+    // Always send topics, even if they are unchanged
+    // We could add a special function to check if topics have changed
+    mutationData.topics = topics.map((topic) => topic.name);
     if (Object.keys(mutationData).length === 0) {
       setEditing(false);
       return;
     }
+    console.log('Submitting request update:', mutationData);
     updateRequestMutation.mutate(mutationData);
   };
 
@@ -144,6 +152,10 @@ export const RequestInfoPanel: React.FC<RequestInfoPanelProps> = ({ request }) =
 
   const handleActualCompletionDateChange = (value: PickerValue) => {
     setActualCompletionDate(value as Dayjs);
+  };
+
+  const handleTopicsChange = (_event: React.SyntheticEvent, newValue: TATopic[]) => {
+    setTopics(newValue);
   };
 
   useEffect(() => {
@@ -182,12 +194,12 @@ export const RequestInfoPanel: React.FC<RequestInfoPanelProps> = ({ request }) =
           {editing && (
             <Stack direction="row">
               {!updateRequestMutation.isPending && (
-                <IconButton color="info" onClick={handleEditSubmit}>
+                <IconButton onClick={handleEditSubmit}>
                   <CheckIcon />
                 </IconButton>
               )}
               {updateRequestMutation.isPending && <CircularProgress />}
-              <IconButton color="info" onClick={handleEditCancel}>
+              <IconButton onClick={handleEditCancel}>
                 <ClearIcon />
               </IconButton>
             </Stack>
@@ -199,7 +211,7 @@ export const RequestInfoPanel: React.FC<RequestInfoPanelProps> = ({ request }) =
       {request && (
         <>
           <TableContainer>
-            <Table size="small">
+            <Table size="small" sx={{ '& .MuiTableCell-root:first-child': { width: '205px' } }}>
               <TableBody>
                 <TableRow>
                   <TableCell>ID</TableCell>
@@ -320,8 +332,39 @@ export const RequestInfoPanel: React.FC<RequestInfoPanelProps> = ({ request }) =
                 </TableRow>
                 <TableRow>
                   <TableCell>Topics</TableCell>
-                  {/* TODO: Implement topics in the API and display */}
-                  <TableCell>Unknown</TableCell>
+                  <TableCell>
+                    {!editing && (
+                      <Grid container spacing={1}>
+                        {request.topics && request.topics.length > 0 ? (
+                          request.topics.map((topic) => (
+                            <Grid key={topic.id} size="auto">
+                              <Chip
+                                key={topic.name}
+                                label={topic.name}
+                                color="default"
+                                size="small"
+                              />
+                            </Grid>
+                          ))
+                        ) : (
+                          <span>None</span>
+                        )}
+                      </Grid>
+                    )}
+                    {editing && (
+                      <Autocomplete
+                        multiple
+                        options={allTopics || []}
+                        getOptionLabel={(option) => option.name}
+                        value={topics || []}
+                        onChange={handleTopicsChange}
+                        renderInput={(params) => (
+                          <TextField {...params} variant="outlined" label="Topics" />
+                        )}
+                        disableCloseOnSelect
+                      />
+                    )}
+                  </TableCell>
                 </TableRow>
               </TableBody>
             </Table>

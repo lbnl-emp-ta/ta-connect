@@ -20,6 +20,7 @@ import {
   TARequestDetail,
   TARequestsResponse,
   TAStatus,
+  TATopic,
 } from '../api/dashboard/types';
 import { queryClient } from '../App';
 import { Identity } from '../features/identity/IdentityContext';
@@ -112,6 +113,15 @@ export const expertsQueryOptions = (identity?: Identity) =>
       } else {
         return [];
       }
+    },
+  });
+
+export const topicsQueryOptions = () =>
+  queryOptions({
+    staleTime: 120_000, // stale after 2 minutes
+    queryKey: ['topics'],
+    queryFn: () => {
+      return fetchData<TATopic[]>(`${apiUrl}/topics/`);
     },
   });
 
