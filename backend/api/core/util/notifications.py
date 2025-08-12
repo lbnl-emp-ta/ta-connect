@@ -14,4 +14,4 @@ def send_email_notification(subject: str, message: str, recipient_list: list[str
             fail_silently=False
         ) 
     else:
-        print(f"email to:{recipient_list} was sent")
+        print(f"DEV: email to {recipient_list} was sent")
