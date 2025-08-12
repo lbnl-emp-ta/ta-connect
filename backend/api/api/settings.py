@@ -229,4 +229,4 @@ EMAIL_USE_TLS = True
 
 
 # Custom setting for development
-ENABLE_EMAIL_SENDING = False
+ENABLE_EMAIL_SENDING = False 

@@ -14,4 +14,10 @@ def send_email_notification(subject: str, message: str, recipient_list: list[str
             fail_silently=False
         ) 
     else:
-        print(f"DEV: email to {recipient_list} was sent")
+        email = dict()
+        email["to"] = recipient_list
+        email["from"] = os.getenv("EMAIL_HOST_FROM_USER")
+        email["subject"] = subject
+        email["message"] = message
+
+        print(f"DEV: {email} was sent")
