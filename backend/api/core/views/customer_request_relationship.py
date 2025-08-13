@@ -8,7 +8,7 @@ from allauth.headless.contrib.rest_framework.authentication import (
     XSessionTokenAuthentication,
 )
 
-class CustomerRequestRelationshipListCreateView(generics.ListCreateAPIView):
+class CustomerRequestRelationshipListView(generics.ListAPIView):
     queryset = CustomerRequestRelationship.objects.all()
     serializer_class = CustomerRequestRelationshipSerializer
 

@@ -2,10 +2,10 @@ from .request import RequestListView, RequestDetailView, RequestMarkCompleteView
 from .depth import DepthListView, DepthRetrieveView
 from .state import StateListView, StateRetrieveView
 from .organization_type import OrganizationTypeListView, OrganizationTypeRetrieveView
-from .organization import OrganizationListCreateView
+from .organization import OrganizationListView
 from .transmission_planning_region import TransmissionPlanningRegionListView
-from .customer import CustomerCreateView
-from .customer_request_relationship import CustomerRequestRelationshipListCreateView
+from .customer import CustomerEditView
+from .customer_request_relationship import CustomerRequestRelationshipListView
 from .cohort import CohortCreateView, CohortAddCustomerView
 from .intake_form import ProcessIntakeForm
 from .identity import IdentityListView
@@ -33,10 +33,10 @@ __all__ = [
     "StateRetrieveView",
     "OrganizationTypeListView",
     "OrganizationTypeRetrieveView",
-    "OrganizationListCreateView",
+    "OrganizationListView",
     "TransmissionPlanningRegionListView",
-    "CustomerCreateView",
-    "CustomerRequestRelationshipListCreateView",
+    "CustomerEditView",
+    "CustomerRequestRelationshipListView",
     "CohortCreateView",
     "CohortAddCustomerView",
     "ProcessIntakeForm",
