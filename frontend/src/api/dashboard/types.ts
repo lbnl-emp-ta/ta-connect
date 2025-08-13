@@ -58,6 +58,13 @@ export interface TAExpert {
   expertise: TAExpertise[];
 }
 
+export interface TAAttachment {
+  id: number;
+  title: string;
+  description?: string;
+  uploaded_at: string;
+}
+
 export interface TARequest {
   id: number;
   status: string;
@@ -70,7 +77,6 @@ export interface TARequest {
   proj_start_date: string | null;
   proj_completion_date: string | null;
   actual_completion_date: string | null;
-  topics: TATopic[] | TATopic['name'][];
 }
 
 export interface TAStatus {
@@ -96,6 +102,16 @@ export interface TARequestDetail {
   proj_completion_date: string | null;
   actual_completion_date: string | null;
   topics: TATopic[];
+  attachments: TAAttachment[];
+}
+
+export interface TARequestDetailMutation {
+  depth: string;
+  description: string;
+  proj_start_date: string | null;
+  proj_completion_date: string | null;
+  actual_completion_date: string | null;
+  topics: string[];
 }
 
 export interface TAIdentity {

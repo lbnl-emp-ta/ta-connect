@@ -25,7 +25,7 @@ import { DatePicker } from '@mui/x-date-pickers';
 import { PickerValue } from '@mui/x-date-pickers/internals';
 import dayjs, { Dayjs } from 'dayjs';
 import { useCallback, useEffect, useState } from 'react';
-import { TARequest, TARequestDetail, TATopic } from '../../api/dashboard/types';
+import { TARequestDetail, TARequestDetailMutation, TATopic } from '../../api/dashboard/types';
 import { InfoPanel } from '../../components/InfoPanel';
 import { topicsQueryOptions, useRequestMutation } from '../../utils/queryOptions';
 import { capitalize, formatDatetime } from '../../utils/utils';
@@ -83,7 +83,7 @@ export const RequestInfoPanel: React.FC<RequestInfoPanelProps> = ({ request }) =
    * If a field is set explicitly to null, it will be cleared in the API.
    */
   const handleEditSubmit = () => {
-    const mutationData = {} as Partial<TARequest>;
+    const mutationData = {} as Partial<TARequestDetailMutation>;
     if (depth !== request?.depth) {
       mutationData.depth = depth;
     }
@@ -117,8 +117,8 @@ export const RequestInfoPanel: React.FC<RequestInfoPanelProps> = ({ request }) =
     ) {
       mutationData.actual_completion_date = actualCompletionDate.format('YYYY-MM-DD');
     }
-    // Always send topics, even if they are unchanged
-    // We could add a special function to check if topics have changed
+    // Always send topics, even if they are unchanged.
+    // We could add a special function to check if topics have changed.
     mutationData.topics = topics.map((topic) => topic.name);
     if (Object.keys(mutationData).length === 0) {
       setEditing(false);
@@ -211,7 +211,7 @@ export const RequestInfoPanel: React.FC<RequestInfoPanelProps> = ({ request }) =
       {request && (
         <>
           <TableContainer>
-            <Table size="small" sx={{ '& .MuiTableCell-root:first-child': { width: '205px' } }}>
+            <Table size="small" sx={{ '& .MuiTableCell-root:first-of-type': { width: '205px' } }}>
               <TableBody>
                 <TableRow>
                   <TableCell>ID</TableCell>

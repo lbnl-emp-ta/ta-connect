@@ -19,6 +19,7 @@ import {
   requestDetailQueryOptions,
   topicsQueryOptions,
 } from '../../../../utils/queryOptions';
+import { RequestAttachments } from '../../../../features/requests/RequestAttachments';
 
 export const Route = createFileRoute('/_private/dashboard/requests/$requestId')({
   loader: async ({ context, params }) => {
@@ -65,6 +66,10 @@ function SelectedRequest() {
   const handleTabChange = (_event: React.SyntheticEvent, newValue: string | number) => {
     setTabValue(newValue);
   };
+
+  if (!selectedRequest) {
+    return <Typography variant="h6">Loading request details...</Typography>;
+  }
 
   return (
     <Paper sx={{ padding: 2 }}>
@@ -153,7 +158,10 @@ function SelectedRequest() {
               }
             >
               <TabPanel value={tabValue} index="attachments">
-                Attachments
+                <RequestAttachments
+                  requestId={selectedRequest.id}
+                  attachments={selectedRequest.attachments}
+                />
               </TabPanel>
               <TabPanel value={tabValue} index="audit-history">
                 Audit history
