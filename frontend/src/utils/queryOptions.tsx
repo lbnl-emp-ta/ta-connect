@@ -1,15 +1,10 @@
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import ErrorIcon from '@mui/icons-material/Error';
 import { queryOptions, useMutation, UseMutationOptions } from '@tanstack/react-query';
-import { sessionsApi } from '../api/sessions';
-import { submitIntakeMutation } from '../api/forms';
-import {
-  IntakeFormData,
-  OrganiztionType,
-  State,
-  TransmissionPlanningRegion,
-} from '../api/forms/types';
-import { signupMutation } from '../api/accounts/signup';
 import { loginMutation } from '../api/accounts/login';
 import { logoutMutation } from '../api/accounts/logout';
+import { signupMutation } from '../api/accounts/signup';
+import { deleteData, fetchData, patchRequest, postData, postForm } from '../api/dashboard';
 import {
   CustomerRequestRelationship,
   TAAssignment,
@@ -22,11 +17,28 @@ import {
   TAStatus,
   TATopic,
 } from '../api/dashboard/types';
+import { submitIntakeMutation } from '../api/forms';
+import {
+  IntakeFormData,
+  OrganiztionType,
+  State,
+  TransmissionPlanningRegion,
+} from '../api/forms/types';
+import { sessionsApi } from '../api/sessions';
 import { queryClient } from '../App';
 import { Identity } from '../features/identity/IdentityContext';
-import { fetchData, patchRequest, postData } from '../api/dashboard';
+import { useToastContext } from '../features/toasts/ToastContext';
+import { ToastMessage } from '../features/toasts/ToastMessage';
 
 export const apiUrl = import.meta.env.VITE_API_URL as string;
+
+// const onSuccess = (message: string) => {
+//   return () => {
+//     queryClient.invalidateQueries();
+//     setShowToast(true);
+//     setToastMessage(<ToastMessage icon={<CheckCircleIcon />}>{message}</ToastMessage>);
+//   };
+// };
 
 export const authSessionQueryOptions = () =>
   queryOptions({
@@ -230,6 +242,56 @@ export const useFinishCloseoutMutation = (
     mutationKey: ['requests', 'finish-closeout', requestId, identity],
     mutationFn: () =>
       postData(`${apiUrl}/requests/${requestId}/closeout-complete/`, null, identity),
+    ...options,
+  });
+};
+
+export const useAttachmentMutation = (
+  requestId: string,
+  identity?: Identity,
+  options?: UseMutationOptions<unknown, Error, FormData, unknown>
+) => {
+  const { setShowToast, setToastMessage } = useToastContext();
+  return useMutation({
+    mutationKey: ['requests', 'upload-attachment', requestId, identity],
+    mutationFn: (formData: FormData) =>
+      postForm(`${apiUrl}/requests/${requestId}/upload-attachment/`, formData, identity),
+    onSuccess: () => {
+      queryClient.invalidateQueries();
+      setShowToast(true);
+      setToastMessage(
+        <ToastMessage icon={<CheckCircleIcon />}>Added attachment to request</ToastMessage>
+      );
+    },
+    onError: (error: Error) => {
+      setShowToast(true);
+      setToastMessage(<ToastMessage icon={<ErrorIcon />}>{error.message}</ToastMessage>);
+    },
+    ...options,
+  });
+};
+
+export const useDeleteAttachmentMutation = (
+  requestId: string,
+  identity?: Identity,
+  options?: UseMutationOptions<unknown, Error, string, unknown>
+) => {
+  const { setShowToast, setToastMessage } = useToastContext();
+  return useMutation({
+    mutationKey: ['requests', 'delete-attachment', requestId, identity],
+    mutationFn: (attachmentId: string) =>
+      deleteData(`${apiUrl}/requests/${requestId}/delete-attachment/${attachmentId}/`, identity),
+    onSuccess: () => {
+      queryClient.invalidateQueries();
+      setShowToast(true);
+      setToastMessage(
+        <ToastMessage icon={<CheckCircleIcon />}>Deleted attachment from request</ToastMessage>
+      );
+    },
+    onError: (error: Error) => {
+      setShowToast(true);
+      setToastMessage(<ToastMessage icon={<ErrorIcon />}>{error.message}</ToastMessage>);
+    },
     ...options,
   });
 };

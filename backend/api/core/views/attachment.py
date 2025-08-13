@@ -40,13 +40,19 @@ class UploadAttachmentView(views.APIView):
 
         if not request.data.get("file"):
             return Response(data={"message": "File to upload missing"}, status=status.HTTP_400_BAD_REQUEST)
+
         
         attachment_data = dict()
         attachment_data["file"] = request.data.get("file")
-        attachment_data["title"] = request.data.get("file").__str__()
         attachment_data["request"] = request_id
         attachment_data["user_who_uploaded"] = request.user.id
-        
+
+        # Title cannot be just whitespace otherwise will throw serialization error later
+        if "title" in request.data and request.data.get("title").strip(): 
+            attachment_data["title"] = request.data.get("title").strip()
+        else:
+            attachment_data["title"] = request.data.get("file").__str__()
+
         if "description" in request.data:
             attachment_data["description"] = request.data.get("description")
 
