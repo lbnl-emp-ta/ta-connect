@@ -21,7 +21,7 @@ class CustomerEditView(views.APIView):
 
     permission_classes = [
         permissions.IsAuthenticated,
-        # IsAdmin|IsProgramLead|IsCoordinator|IsLabLead
+        IsAdmin|IsProgramLead|IsCoordinator|IsLabLead
     ]
     
     def post(self, request, customer_id):
@@ -32,8 +32,8 @@ class CustomerEditView(views.APIView):
 
         # Making sure the customer that is being edited is associated with a request that is actionable for the user
         # i.e. preventing user from editing arbitrary customers in system 
-        # if not CustomerRequestRelationship.objects.filter(customer=customer_obj).filter(request__in=BaseUserAwareRequest(request=request).get_actionable()):
-        #     return Response(data={"message": "Insufficient authorization to edit given customer's information"}, status=status.HTTP_400_BAD_REQUEST)
+        if not CustomerRequestRelationship.objects.filter(customer=customer_obj).filter(request__in=BaseUserAwareRequest(request=request).get_actionable()):
+            return Response(data={"message": "Insufficient authorization to edit given customer's information"}, status=status.HTTP_400_BAD_REQUEST)
 
         customer_patch_data = dict() 
         
