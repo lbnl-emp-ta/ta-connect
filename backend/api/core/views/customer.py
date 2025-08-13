@@ -24,7 +24,7 @@ class CustomerEditView(views.APIView):
         IsAdmin|IsProgramLead|IsCoordinator|IsLabLead
     ]
     
-    def post(self, request, customer_id):
+    def patch(self, request, customer_id):
         try:
             customer_obj = Customer.objects.get(pk=customer_id)
         except Customer.DoesNotExist:
