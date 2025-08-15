@@ -15,6 +15,7 @@ from .assignment import AssignmentView
 from .expert import ExpertsListView
 from .attachment import UploadAttachmentView, DownloadAttachmentView, DeleteAttachmentView, EditAttachmentView
 from .topic import TopicListView
+from .audit_history import AuditHistoryListView
 
 __all__ = [
     "AssignmentView",
@@ -45,4 +46,5 @@ __all__ = [
     "DeleteAttachmentView",
     "EditAttachmentView",
     "TopicListView",
+    "AuditHistoryListView"
 ]
