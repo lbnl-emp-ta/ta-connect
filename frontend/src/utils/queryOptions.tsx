@@ -10,6 +10,7 @@ import {
   TAAssignment,
   TAExpert,
   TAIdentity,
+  TANote,
   TAOwner,
   TARequest,
   TARequestDetail,
@@ -134,6 +135,20 @@ export const topicsQueryOptions = () =>
     queryKey: ['topics'],
     queryFn: () => {
       return fetchData<TATopic[]>(`${apiUrl}/topics/`);
+    },
+  });
+
+export const notesQueryOptions = (requestId: string, identity?: Identity) =>
+  queryOptions({
+    staleTime: 120_000, // stale after 2 minutes
+    retry: false,
+    queryKey: ['requests', requestId, 'notes', identity],
+    queryFn: () => {
+      if (identity) {
+        return fetchData<TANote[]>(`${apiUrl}/requests/${requestId}/list-notes/`, identity);
+      } else {
+        return null;
+      }
     },
   });
 
@@ -286,6 +301,56 @@ export const useDeleteAttachmentMutation = (
       setShowToast(true);
       setToastMessage(
         <ToastMessage icon={<CheckCircleIcon />}>Deleted attachment from request</ToastMessage>
+      );
+    },
+    onError: (error: Error) => {
+      setShowToast(true);
+      setToastMessage(<ToastMessage icon={<ErrorIcon />}>{error.message}</ToastMessage>);
+    },
+    ...options,
+  });
+};
+
+export const useCreateNoteMutation = (
+  requestId: string,
+  identity?: Identity,
+  options?: UseMutationOptions<unknown, Error, Partial<TANote>, unknown>
+) => {
+  const { setShowToast, setToastMessage } = useToastContext();
+  return useMutation({
+    mutationKey: ['requests', 'add-note', requestId, identity],
+    mutationFn: (data: Partial<TANote>) =>
+      postData(`${apiUrl}/requests/${requestId}/add-note/`, data, identity),
+    onSuccess: () => {
+      queryClient.invalidateQueries();
+      setShowToast(true);
+      setToastMessage(
+        <ToastMessage icon={<CheckCircleIcon />}>Added note to request</ToastMessage>
+      );
+    },
+    onError: (error: Error) => {
+      setShowToast(true);
+      setToastMessage(<ToastMessage icon={<ErrorIcon />}>{error.message}</ToastMessage>);
+    },
+    ...options,
+  });
+};
+
+export const useDeleteNoteMutation = (
+  requestId: string,
+  identity?: Identity,
+  options?: UseMutationOptions<unknown, Error, string, unknown>
+) => {
+  const { setShowToast, setToastMessage } = useToastContext();
+  return useMutation({
+    mutationKey: ['requests', 'add-note', requestId, identity],
+    mutationFn: (noteId: string) =>
+      deleteData(`${apiUrl}/requests/${requestId}/delete-note/${noteId}/`, identity),
+    onSuccess: () => {
+      queryClient.invalidateQueries();
+      setShowToast(true);
+      setToastMessage(
+        <ToastMessage icon={<CheckCircleIcon />}>Deleted note from request</ToastMessage>
       );
     },
     onError: (error: Error) => {

@@ -44,6 +44,10 @@ export const RequestAttachments: React.FC<RequestAttachmentsProps> = ({
   const [attachmentTitle, setAttachmentTitle] = useState('');
   const [attachmentDescription, setAttachmentDescription] = useState('');
 
+  attachments?.sort(
+    (a, b) => new Date(b.uploaded_at).getTime() - new Date(a.uploaded_at).getTime()
+  );
+
   const handleFileChange = (file: File | null) => {
     if (file) {
       setSelectedFile(file);
@@ -140,7 +144,7 @@ export const RequestAttachments: React.FC<RequestAttachmentsProps> = ({
                 <Typography sx={{ flex: 1 }}>{attachment.title}</Typography>
                 <Typography fontSize="small">{formatDatetime(attachment.uploaded_at)}</Typography>
               </Stack>
-              <Typography variant="body2" color="grey.500">
+              <Typography variant="caption" color="textSecondary">
                 {attachment.description || 'No description'}
               </Typography>
             </Stack>
@@ -151,7 +155,7 @@ export const RequestAttachments: React.FC<RequestAttachmentsProps> = ({
         ))}
       {attachments.length === 0 && (
         <Stack direction="row" spacing={2} alignItems="center">
-          <span>No attachments available.</span>
+          <span>No attachments for this request.</span>
         </Stack>
       )}
       <Dialog fullWidth maxWidth="sm" open={showUploadDialog} onClose={handleUploadDialogClose}>
