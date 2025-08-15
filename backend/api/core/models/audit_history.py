@@ -21,7 +21,7 @@ class AuditHistory(models.Model):
     
     def __str__(self):
         if hasattr(self, "request"):
-            return f"Audit History for Request #{self.request.pk}"
+            return f"{self.action_type} Audit History for Request #{self.request.pk}"
         else:
             return f"Audit History #{self.pk}"
 
