@@ -30,6 +30,9 @@ class AuditHistoryListView(views.APIView):
             return Response(data={"message": "Insufficient authorization to view audit history for given request"}, status=status.HTTP_400_BAD_REQUEST)
         
         audit_histories = AuditHistory.objects.filter(request=request_obj) 
+        if not audit_histories.exists():
+            return Response(data=list(), status=status.HTTP_204_NO_CONTENT)
+
         serializer = AuditHistorySerializer(audit_histories, many=True)
 
         return Response(data=serializer.data, status=status.HTTP_200_OK)
