@@ -105,3 +105,60 @@ export async function postData<T>(url: string, data?: T, identity?: Identity): P
     }
   }
 }
+
+export async function postForm(
+  url: string,
+  formData?: FormData,
+  identity?: Identity
+): Promise<void> {
+  try {
+    const response = await fetch(url, {
+      method: 'POST',
+      credentials: 'include',
+      headers: {
+        'X-CSRFToken': getCSRFToken() || '',
+        Context: identity ? JSON.stringify(identity) : '',
+      },
+      body: formData,
+    });
+
+    if (!response.ok) {
+      const errorData = (await response.json()) as TAError;
+      let errorMessage =
+        typeof errorData.message === 'string'
+          ? errorData.message
+          : 'An unknown error has occurred.';
+      throw Error(errorMessage);
+    }
+  } catch (error) {
+    if (error instanceof Error) {
+      throw Error(error.message);
+    }
+  }
+}
+
+export async function deleteData(url: string, identity?: Identity): Promise<void> {
+  try {
+    const response = await fetch(url, {
+      method: 'DELETE',
+      credentials: 'include',
+      headers: {
+        'X-CSRFToken': getCSRFToken() || '',
+        Context: identity ? JSON.stringify(identity) : '',
+      },
+    });
+
+    if (!response.ok) {
+      const errorData = (await response.json()) as TAError;
+      let errorMessage =
+        typeof errorData.message === 'string'
+          ? errorData.message
+          : 'An unknown error has occurred.';
+      throw Error(errorMessage);
+    }
+  } catch (error) {
+    if (error instanceof Error) {
+      throw Error(error.message);
+    }
+  }
+}

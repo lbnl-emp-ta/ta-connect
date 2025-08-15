@@ -51,3 +51,13 @@ export const formatDate = (dateString: string): string => {
     day: '2-digit',
   });
 };
+
+export const downloadBlob = (blob: Blob, filename: string): void => {
+  var url = window.URL.createObjectURL(blob);
+  var a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+};

@@ -11,9 +11,9 @@ urlpatterns = [
     path('requests/<int:id>/cancel/', RequestCancelView.as_view(), name="mark-complete"),
     path('requests/assign/', AssignmentView.as_view(), name="assignment"),
     path('requests/<int:request_id>/upload-attachment/', UploadAttachmentView.as_view(), name="upload-attachment"),
-    path('requests/<int:request_id>/download-attachment/<str:filename>/', DownloadAttachmentView.as_view(), name="download-attachment"),
-    path('requests/<int:request_id>/delete-attachment/<str:filename>/', DeleteAttachmentView.as_view(), name="delete-attachment"),
-    path('requests/<int:request_id>/edit-attachment/<str:filename>/', EditAttachmentView.as_view(), name="edit-attachment"),
+    path('requests/<int:request_id>/edit-attachment/<int:attachment_id>/', EditAttachmentView.as_view(), name="edit-attachment"),
+    path('requests/<int:request_id>/download-attachment/<int:attachment_id>/', DownloadAttachmentView.as_view(), name="download-attachment"),
+    path('requests/<int:request_id>/delete-attachment/<int:attachment_id>/', DeleteAttachmentView.as_view(), name="delete-attachment"),
 
     path('requests/<int:request_id>/list-notes/', NoteListView.as_view(), name="list-notes"),
     path('requests/<int:request_id>/add-note/', NoteCreateView.as_view(), name="add-note"),
@@ -40,7 +40,9 @@ urlpatterns = [
     path('customers/', CustomerCreateView.as_view(), name="customer-create"),
     path('customer-request-relationships/', CustomerRequestRelationshipListCreateView.as_view(), name="customer-request-relationship-create"),
     
-    path('cohorts/', CohortCreateView.as_view(), name="cohort-create"),
-    path('cohorts/add-customer/', CohortAddCustomerView.as_view(), name="cohort-customer-add"),
+    # path('cohorts/', CohortCreateView.as_view(), name="cohort-create"),
+    # path('cohorts/add-customer/', CohortAddCustomerView.as_view(), name="cohort-customer-add"),
 
+    path('topics/', TopicListView.as_view(), name="topic-list"),
+    
 ]
