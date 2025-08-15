@@ -13,9 +13,11 @@ from .role import RoleSerializer
 from .request_status import RequestStatusSerializer
 from .owner import OwnerSerializer
 from .request import RequestSerializer, RequestListSerializer, RequestDetailSerializer, RequestExpertListSerializer
+from .topic import TopicSerializer
 from .customer_request_relationship import CustomerRequestRelationshipSerializer
 from .cohort import CohortSerializer
 from .topic import TopicSerializer
+from .attachment import AttachmentUploadSerializer, AttachmentEditSerializer, AttachmentSerializer
 
 __all__ = [
     "UserLeanSerializer",
@@ -39,4 +41,7 @@ __all__ = [
     "CustomerRequestRelationshipSerializer",
     "CohortSerializer",
     "TopicSerializer",
+    "AttachmentUploadSerializer",
+    "AttachmentEditSerializer",
+    "AttachmentSerializer",
 ]

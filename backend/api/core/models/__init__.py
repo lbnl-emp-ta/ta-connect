@@ -6,6 +6,7 @@ from .lab import Lab
 from .program import Program
 from .owner import Owner
 from .receipt import Receipt
+from .topic import Topic
 from .request import Request
 from .state import State
 from .organization_type import OrganizationType
@@ -24,8 +25,8 @@ from .available_system_role import AvailableSystemRole
 from .available_program_role import AvailableProgramRole
 from .available_lab_role import AvailableLabRole
 from .available_reception_role import AvailableReceptionRole
-from .topic import Topic
 from .expertise import Expertise
+from .attachment import Attachment
 
 __all__ = [
     "RequestStatus",
@@ -56,4 +57,5 @@ __all__ = [
     "AvailableReceptionRole",
     "Topic",
     "Expertise",
+    "Attachment",
 ]
