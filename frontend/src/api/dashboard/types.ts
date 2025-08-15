@@ -32,6 +32,15 @@ export interface TATopic {
   description: string;
 }
 
+export interface TANote {
+  id: number;
+  content: string;
+  timestamp: string;
+  author?: number;
+  author_name: string;
+  request: number;
+}
+
 export interface TADepth {
   id: number;
   name: string;
