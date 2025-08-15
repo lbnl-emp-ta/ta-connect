@@ -4,7 +4,7 @@ from .transmission_planning_region import TransmissionPlanningRegionSerializer
 from .organization_type import OrganizationTypeSerializer
 from .organization import OrganizationSerializer
 from .customer_type import CustomerTypeSerializer
-from .customer import CustomerSerializer
+from .customer import CustomerSerializer, CustomerEditSerializer
 from .depth import DepthSerializer
 from .lab import LabSerializer
 from .program import ProgramSerializer
@@ -29,6 +29,7 @@ __all__ = [
     "OwnerSerializer",
     "RequestSerializer",
     "CustomerSerializer",
+    "CustomerEditSerializer",
     "RequestListSerializer",
     "RequestDetailSerializer",
     "RequestExpertListSerializer",

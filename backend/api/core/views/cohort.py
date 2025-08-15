@@ -1,19 +1,44 @@
+from rest_framework import generics, authentication, permissions
 from django.db import IntegrityError
 from rest_framework import generics, views, response, status
 
 from core.models import Cohort, Customer
 from core.serializers import CohortSerializer
+from core.permissions import IsAdmin, IsCoordinator, IsProgramLead
+
+from allauth.headless.contrib.rest_framework.authentication import (
+    XSessionTokenAuthentication,
+)
 
 class CohortCreateView(generics.CreateAPIView):
     queryset = Cohort.objects.all()
     serializer_class = CohortSerializer
 
+    authentication_classes = [
+        authentication.SessionAuthentication,
+        XSessionTokenAuthentication,
+    ]
 
-#TODO: MORE TESTS NEEDED!!!!!!!!
+    permission_classes = [
+        permissions.IsAuthenticated,
+        IsAdmin|IsCoordinator|IsProgramLead
+    ]
+
+
 class CohortAddCustomerView(views.APIView):
     """
     Add a Customer to a Cohort.
     """
+
+    authentication_classes = [
+        authentication.SessionAuthentication,
+        XSessionTokenAuthentication,
+    ]
+
+    permission_classes = [
+        permissions.IsAuthenticated,
+        IsAdmin|IsCoordinator|IsProgramLead
+    ]
         
     def post(self, request):
         if not request.data.get("cohort"):
