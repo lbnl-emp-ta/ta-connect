@@ -12,7 +12,7 @@ class ActionType(models.TextChoices):
 
 
 class AuditHistory(models.Model):
-    request = models.ForeignKey(Request, on_delete=models.PROTECT) 
+    request = models.OneToOneField(Request, on_delete=models.PROTECT) 
     user = models.ForeignKey(User, on_delete=models.PROTECT)
     role = models.ForeignKey(Role, on_delete=models.PROTECT)
     action_type = models.CharField(max_length=64, choices=ActionType)
