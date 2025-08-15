@@ -1,0 +1,13 @@
+from rest_framework import serializers
+
+from core.models import *
+
+class NoteSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Note
+        fields = "__all__"
+    
+class NoteCreateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Note
+        fields = ['author', 'request', 'content']
