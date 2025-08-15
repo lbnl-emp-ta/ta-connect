@@ -3,14 +3,14 @@ from .depth import Depth
 from .user import User
 from .reception import Reception
 from .lab import Lab
+from .organization_type import OrganizationType
+from .organization import Organization
 from .topic import Topic
 from .program import Program
 from .owner import Owner
 from .receipt import Receipt
 from .request import Request
 from .state import State
-from .organization_type import OrganizationType
-from .organization import Organization
 from .transmission_planning_region import TransmissionPlanningRegion
 from .customer import Customer
 from .customer_type import CustomerType
