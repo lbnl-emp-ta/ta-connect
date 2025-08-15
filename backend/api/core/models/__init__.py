@@ -3,10 +3,10 @@ from .depth import Depth
 from .user import User
 from .reception import Reception
 from .lab import Lab
+from .topic import Topic
 from .program import Program
 from .owner import Owner
 from .receipt import Receipt
-from .topic import Topic
 from .request import Request
 from .state import State
 from .organization_type import OrganizationType
