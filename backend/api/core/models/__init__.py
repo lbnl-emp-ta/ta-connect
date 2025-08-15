@@ -28,6 +28,7 @@ from .available_reception_role import AvailableReceptionRole
 from .expertise import Expertise
 from .attachment import Attachment
 from .audit_history import AuditHistory
+from .shared_funding_group import SharedFundingGroup
 
 __all__ = [
     "RequestStatus",
@@ -59,5 +60,6 @@ __all__ = [
     "Topic",
     "Expertise",
     "Attachment",
-    "AuditHistory"
+    "AuditHistory",
+    "SharedFundingGroup",
 ]
