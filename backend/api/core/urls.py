@@ -6,10 +6,12 @@ urlpatterns = [
     
     path('requests/', RequestListView.as_view(), name="request-list"),
     path('requests/<int:id>', RequestDetailView.as_view(), name="request-detail"),
+
+    path('requests/assign/', AssignmentView.as_view(), name="assignment"),
     path('requests/<int:id>/mark-complete/', RequestMarkCompleteView.as_view(), name="mark-complete"),
     path('requests/<int:id>/closeout-complete/', RequestCloseoutCompleteView.as_view(), name="closeout-complete"),
     path('requests/<int:id>/cancel/', RequestCancelView.as_view(), name="mark-complete"),
-    path('requests/assign/', AssignmentView.as_view(), name="assignment"),
+    
     path('requests/<int:request_id>/upload-attachment/', UploadAttachmentView.as_view(), name="upload-attachment"),
     path('requests/<int:request_id>/edit-attachment/<int:attachment_id>/', EditAttachmentView.as_view(), name="edit-attachment"),
     path('requests/<int:request_id>/download-attachment/<int:attachment_id>/', DownloadAttachmentView.as_view(), name="download-attachment"),
@@ -25,7 +27,7 @@ urlpatterns = [
     path('experts/', ExpertsListView.as_view(), name="experts-list"),
     path('depths/', DepthListView.as_view(), name="depth-list"),
     path('states/', StateListView.as_view(), name="state-list"),
-    path('organizations/', OrganizationListView.as_view(), name="organization-list-create"),
+    path('organizations/', OrganizationListView.as_view(), name="organization-list"),
     path('organization-types/', OrganizationTypeListView.as_view(), name="organization-type-list"),
     path('transmission-planning-regions/', TransmissionPlanningRegionListView.as_view(), name="transmission-planning-regions-list"),
     path('customer-request-relationships/', CustomerRequestRelationshipListView.as_view(), name="customer-request-relationship-list"),
