@@ -85,7 +85,7 @@ function RouteComponent() {
                   Login
                 </Typography>
                 <SocialLoginButton name="Google" id="google" startIcon={<GoogleIcon />} />
-                <SocialLoginButton name="Microsoft" id="microsft" startIcon={<MicrosoftIcon />} />
+                {/* <SocialLoginButton name="Microsoft" id="microsft" startIcon={<MicrosoftIcon />} /> */}
                 <Typography
                   sx={{
                     borderTop: '1px solid',
