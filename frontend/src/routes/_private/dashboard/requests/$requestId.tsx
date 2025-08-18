@@ -1,6 +1,6 @@
 import EastIcon from '@mui/icons-material/East';
 import WestIcon from '@mui/icons-material/West';
-import { Button, Grid, Paper, Stack, Tab, Tabs, Typography } from '@mui/material';
+import { Badge, Button, Grid, Paper, Stack, Tab, Tabs, Typography } from '@mui/material';
 import { useQuery, useSuspenseQuery } from '@tanstack/react-query';
 import { createFileRoute } from '@tanstack/react-router';
 import { useState } from 'react';
@@ -15,11 +15,13 @@ import { RequestInfoPanel } from '../../../../features/requests/RequestInfoPanel
 import { useRequestsContext } from '../../../../features/requests/RequestsContext';
 import {
   expertsQueryOptions,
+  notesQueryOptions,
   ownersQueryOptions,
   requestDetailQueryOptions,
   topicsQueryOptions,
 } from '../../../../utils/queryOptions';
 import { RequestAttachments } from '../../../../features/requests/RequestAttachments';
+import { RequestNotes } from '../../../../features/requests/RequestNotes';
 
 export const Route = createFileRoute('/_private/dashboard/requests/$requestId')({
   loader: async ({ context, params }) => {
@@ -28,6 +30,9 @@ export const Route = createFileRoute('/_private/dashboard/requests/$requestId')(
     );
     await context.queryClient.ensureQueryData(ownersQueryOptions(context.identity));
     await context.queryClient.ensureQueryData(topicsQueryOptions());
+    await context.queryClient.ensureQueryData(
+      notesQueryOptions(params.requestId, context.identity)
+    );
     if (
       context.detailedIdentity?.role.name === 'Lab Lead' ||
       context.detailedIdentity?.role.name === 'Admin'
@@ -43,6 +48,9 @@ function SelectedRequest() {
   const { identity, detailedIdentity } = useIdentityContext();
   const { data: selectedRequest } = useSuspenseQuery(
     requestDetailQueryOptions(params.requestId, identity)
+  );
+  const { data: selectedRequestNotes } = useSuspenseQuery(
+    notesQueryOptions(params.requestId, identity)
   );
   console.log('Selected Request:', selectedRequest);
   const { data: owners } = useSuspenseQuery(ownersQueryOptions(identity));
@@ -61,7 +69,7 @@ function SelectedRequest() {
   });
   const nextIndex = currentIndex < sortedRequests.length - 1 ? currentIndex + 1 : null;
   const previousIndex = currentIndex > 0 ? currentIndex - 1 : null;
-  const [tabValue, setTabValue] = useState<string | number>('attachments');
+  const [tabValue, setTabValue] = useState<string | number>('notes');
 
   const handleTabChange = (_event: React.SyntheticEvent, newValue: string | number) => {
     setTabValue(newValue);
@@ -145,7 +153,29 @@ function SelectedRequest() {
                   indicatorColor="primary"
                 >
                   <Tab
-                    label="Attachments"
+                    label={
+                      <Stack direction="row" spacing={2} alignItems="center">
+                        <span>Notes</span>
+                        {selectedRequestNotes?.length ? (
+                          <Badge badgeContent={selectedRequestNotes.length} color="primary" />
+                        ) : null}
+                      </Stack>
+                    }
+                    value="notes"
+                    onClick={(event) => handleTabChange(event, 'notes')}
+                  />
+                  <Tab
+                    label={
+                      <Stack direction="row" spacing={2} alignItems="center">
+                        <span>Attachments</span>
+                        {selectedRequest.attachments?.length ? (
+                          <Badge
+                            badgeContent={selectedRequest.attachments.length}
+                            color="primary"
+                          />
+                        ) : null}
+                      </Stack>
+                    }
                     value="attachments"
                     onClick={(event) => handleTabChange(event, 'attachments')}
                   />
@@ -157,6 +187,9 @@ function SelectedRequest() {
                 </Tabs>
               }
             >
+              <TabPanel value={tabValue} index="notes">
+                <RequestNotes requestId={selectedRequest.id} notes={selectedRequestNotes} />
+              </TabPanel>
               <TabPanel value={tabValue} index="attachments">
                 <RequestAttachments
                   requestId={selectedRequest.id}
