@@ -64,13 +64,19 @@ function Initializer() {
             height: 40,
           }}
         >
+          <Box sx={{ flexGrow: 1 }}>
+            <Link to="/dashboard">
+              <Typography variant="h6" sx={{ color: 'primary.main' }}>
+                TA Connect
+              </Typography>
+            </Link>
+          </Box>
           <Link to="/dashboard">
             <Typography sx={{ color: 'primary.main' }}>Dashboard</Typography>
           </Link>
           <Link to="/intake">
             <Typography sx={{ color: 'primary.main' }}>Intake</Typography>
           </Link>
-          <Box sx={{ margin: 'auto' }} />
           {user ? (
             <div>
               <Button
