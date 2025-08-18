@@ -1,6 +1,5 @@
 import pytest
 from rest_framework.test import APIClient
-from allauth.account.forms import SignupForm
 
 from core.models import *
 

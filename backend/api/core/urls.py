@@ -30,7 +30,7 @@ urlpatterns = [
     path('organizations/', OrganizationListView.as_view(), name="organization-list"),
     path('organization-types/', OrganizationTypeListView.as_view(), name="organization-type-list"),
     path('transmission-planning-regions/', TransmissionPlanningRegionListView.as_view(), name="transmission-planning-regions-list"),
-    path('customer-request-relationships/', CustomerRequestRelationshipListView.as_view(), name="customer-request-relationship-list"),
+    path('customer-request-relationships/', CustomerRequestRelationshipListView.as_view(), name="customer-request-relationships-list"),
     path('topics/', TopicListView.as_view(), name="topic-list"),
     
 ]
