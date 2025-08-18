@@ -6,6 +6,7 @@ import { createRootRouteWithContext } from '@tanstack/react-router';
 import { authSessionQueryOptions, useLogoutMutation } from '../utils/queryOptions';
 import { Identity } from '../features/identity/IdentityContext';
 import { TAIdentity } from '../api/dashboard/types';
+import { SessionAuthenticatedResponse } from '../api/types';
 
 export interface MyRouterContext {
   queryClient: QueryClient;
@@ -22,9 +23,9 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
 
 function Initializer() {
   const {
-    data: { isAuthenticated },
+    data: { meta, data },
   } = useSuspenseQuery(authSessionQueryOptions());
-
+  const user = meta.is_authenticated ? (data as SessionAuthenticatedResponse['data']).user : null;
   const logoutMutation = useLogoutMutation();
 
   function handleLogout(e: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
@@ -57,7 +58,7 @@ function Initializer() {
             <Typography sx={{ color: 'primary.main' }}>Intake</Typography>
           </Link>
           <Box sx={{ margin: 'auto' }} />
-          {isAuthenticated ? (
+          {user ? (
             <Button
               variant="text"
               onClick={handleLogout}
@@ -65,7 +66,7 @@ function Initializer() {
                 color: 'primary.main',
               }}
             >
-              Logout
+              {user.name || user.email}
             </Button>
           ) : (
             <Box

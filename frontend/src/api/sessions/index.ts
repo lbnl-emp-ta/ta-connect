@@ -1,6 +1,8 @@
 import { SessionAuthenticatedResponse, SessionUnauthenticatedResponse } from '../types';
 
-async function getSession(): Promise<{ isAuthenticated: boolean }> {
+async function getSession(): Promise<
+  SessionAuthenticatedResponse | SessionUnauthenticatedResponse
+> {
   const response = await fetch(
     `${import.meta.env.VITE_BACKEND_URL}/_allauth/browser/v1/auth/session`,
     {
@@ -11,13 +13,12 @@ async function getSession(): Promise<{ isAuthenticated: boolean }> {
   const data = (await response.json()) as
     | SessionAuthenticatedResponse
     | SessionUnauthenticatedResponse;
-  console.log('getSession response', data);
   const okCodes = [200, 401, 410];
   if (okCodes.indexOf(data.status) === -1) {
     throw new Error(JSON.stringify(data));
   }
 
-  return { isAuthenticated: data.meta.is_authenticated };
+  return data;
 }
 
 export const sessionsApi = { getSession };

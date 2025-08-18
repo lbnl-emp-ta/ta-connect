@@ -14,10 +14,10 @@ export const Route = createFileRoute('/(public)/account/provider/callback')({
 function CallbackComponent() {
   const { error } = Route.useSearch();
   const {
-    data: { isAuthenticated },
+    data: { meta },
   } = useSuspenseQuery(authSessionQueryOptions());
 
-  if (!isAuthenticated) {
+  if (!meta.is_authenticated) {
     return <Navigate to="/login" />;
   }
 
