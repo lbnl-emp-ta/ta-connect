@@ -43,7 +43,7 @@ export const RequestNotes: React.FC<RequestNotesProps> = ({ requestId, notes }) 
     setNoteDescription('');
   };
 
-  const handleUploadSubmit: React.FormEventHandler<HTMLFormElement> = (event) => {
+  const handleSubmit: React.FormEventHandler<HTMLFormElement> = (event) => {
     event.preventDefault();
     createNoteMutation.mutate({
       author: identity?.user,
@@ -115,7 +115,7 @@ export const RequestNotes: React.FC<RequestNotesProps> = ({ requestId, notes }) 
       )}
       <Dialog fullWidth maxWidth="sm" open={showAddDialog} onClose={handleUploadDialogClose}>
         {!createNoteMutation.isPending && (
-          <form onSubmit={handleUploadSubmit}>
+          <form onSubmit={handleSubmit}>
             <DialogTitle>Add Note</DialogTitle>
             <DialogContent>
               <Stack sx={{ marginTop: 2 }}>
@@ -142,7 +142,7 @@ export const RequestNotes: React.FC<RequestNotesProps> = ({ requestId, notes }) 
           <DialogContent>
             <Stack direction="row" spacing={2} alignItems="center">
               <CircularProgress size={24} />
-              <Typography>Uploading attachment</Typography>
+              <Typography>Adding note</Typography>
             </Stack>
           </DialogContent>
         )}
@@ -151,7 +151,7 @@ export const RequestNotes: React.FC<RequestNotesProps> = ({ requestId, notes }) 
         {!deleteNoteMutation.isPending && (
           <>
             <DialogContent>
-              <Typography>Are you sure you want to delete this attachment?</Typography>
+              <Typography>Are you sure you want to delete this note?</Typography>
             </DialogContent>
             <DialogActions>
               <Button variant="outlined" onClick={() => setShowDeleteDialog(false)}>
@@ -167,7 +167,7 @@ export const RequestNotes: React.FC<RequestNotesProps> = ({ requestId, notes }) 
           <DialogContent>
             <Stack direction="row" spacing={2} alignItems="center">
               <CircularProgress size={24} />
-              <Typography>Deleting attachment</Typography>
+              <Typography>Deleting note</Typography>
             </Stack>
           </DialogContent>
         )}
