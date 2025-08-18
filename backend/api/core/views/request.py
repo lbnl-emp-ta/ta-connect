@@ -218,6 +218,20 @@ class RequestDetailView(BaseUserAwareRequest):
         response_data["customers"] = customer_serializer.data
         response_data["owner"] = OwnerSerializer().format_owner(found_request.owner)
 
+        response_data["attachments"] = list() 
+        for attachment in found_request.attachment_set.all():
+            attachment_data = dict()
+            attachment_data["id"] = attachment.pk
+            attachment_data["title"] = attachment.title
+            attachment_data["uploaded_at"] = attachment.uploaded_at
+            attachment_data["description"] = attachment.description
+            response_data["attachments"].append(attachment_data)
+
+        
+        if found_request.expert is not None:
+            response_data["expert"] = UserLeanSerializer(found_request.expert).data
+
+
         return Response(data=response_data, status=status.HTTP_200_OK)
 
     """
@@ -321,17 +335,6 @@ class RequestDetailView(BaseUserAwareRequest):
                 return Response(data={"message": "Insufficient privillege to update 'projected completion date' field"}, status=status.HTTP_401_UNAUTHORIZED)
 
             patch_data["proj_completion_date"] = body.get("proj_completion_date")
-
-        # if body.get("owner"):
-            
-        #     maybe_owner = None
-        #     try:
-        #         maybe_owner = Owner.objects.get(pk=body.get("owner"))
-        #     except Owner.DoesNotExist:
-        #         return Response(data={"message": "Provided owner does not exist."}, status=status.HTTP_400_BAD_REQUEST)
-
-        #     patch_data["owner"] = maybe_owner.pk 
-        
             
         if "status" in body:
             if body.get("status") is None:
@@ -344,7 +347,23 @@ class RequestDetailView(BaseUserAwareRequest):
                 return Response(data={"message": "Provided status does not exist."}, status=status.HTTP_400_BAD_REQUEST)
 
             patch_data["status"] = maybe_status.name 
-    
+        
+        # Topics are done a special way (not using patch serializer) because they are 
+        # stored as a Many-to-Many relationship in the database.
+        if "topics" in body:
+            current_topics = maybe_request.topics.all()
+            maybe_request.topics.clear()
+            
+            topics = body.get("topics", list())
+            for topic_name in topics:
+                try:
+                    topic = Topic.objects.get(name=topic_name)
+                except Topic.DoesNotExist:
+                    maybe_request.topics.set(current_topics)
+                    return Response(data={"message": "One of the provided topics does not exist."}, status=status.HTTP_400_BAD_REQUEST)
+
+                maybe_request.topics.add(topic)
+                
         
        # do partial save with accumulated patch 
         patch_serializer = RequestSerializer(instance=maybe_request, data=patch_data, partial=True)

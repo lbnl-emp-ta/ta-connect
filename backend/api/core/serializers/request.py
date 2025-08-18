@@ -47,6 +47,23 @@ class RequestListSerializer(serializers.Serializer):
     
     expert = UserLeanSerializer(required=False) 
 
+class RequestExpertListSerializer(serializers.ModelSerializer):
+    status = serializers.SlugRelatedField(
+        slug_field="name", 
+        required=False, 
+        queryset=RequestStatus.objects.all()
+    )
+
+    depth = serializers.SlugRelatedField(
+        slug_field="name",
+        required=False,
+        queryset=Depth.objects.all()
+    )
+
+    class Meta:
+        model = Request 
+        fields = ['id', 'date_created', 'status', 'depth']
+
 class RequestSerializer(serializers.Serializer):
     id = serializers.IntegerField()
     # owner field added later
@@ -73,7 +90,7 @@ class RequestSerializer(serializers.Serializer):
     proj_start_date = serializers.DateField(required=False, allow_null=True)
     proj_completion_date = serializers.DateField(required=False, allow_null=True)
     actual_completion_date = serializers.DateField(required=False, allow_null=True)
-    # customers field added later
+    topics = TopicSerializer(many=True)
 
     
     @classmethod
