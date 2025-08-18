@@ -1,6 +1,6 @@
 import EastIcon from '@mui/icons-material/East';
 import WestIcon from '@mui/icons-material/West';
-import { Button, Grid, Paper, Stack, Tab, Tabs, Typography } from '@mui/material';
+import { Badge, Button, Grid, Paper, Stack, Tab, Tabs, Typography } from '@mui/material';
 import { useQuery, useSuspenseQuery } from '@tanstack/react-query';
 import { createFileRoute } from '@tanstack/react-router';
 import { useState } from 'react';
@@ -153,12 +153,29 @@ function SelectedRequest() {
                   indicatorColor="primary"
                 >
                   <Tab
-                    label="Notes"
+                    label={
+                      <Stack direction="row" spacing={2} alignItems="center">
+                        <span>Notes</span>
+                        {selectedRequestNotes?.length ? (
+                          <Badge badgeContent={selectedRequestNotes.length} color="primary" />
+                        ) : null}
+                      </Stack>
+                    }
                     value="notes"
                     onClick={(event) => handleTabChange(event, 'notes')}
                   />
                   <Tab
-                    label="Attachments"
+                    label={
+                      <Stack direction="row" spacing={2} alignItems="center">
+                        <span>Attachments</span>
+                        {selectedRequest.attachments?.length ? (
+                          <Badge
+                            badgeContent={selectedRequest.attachments.length}
+                            color="primary"
+                          />
+                        ) : null}
+                      </Stack>
+                    }
                     value="attachments"
                     onClick={(event) => handleTabChange(event, 'attachments')}
                   />
