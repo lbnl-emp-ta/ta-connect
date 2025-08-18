@@ -1,20 +1,10 @@
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
-import {
-  Alert,
-  AlertTitle,
-  Box,
-  Button,
-  Container,
-  Link,
-  Paper,
-  Stack,
-  Typography,
-} from '@mui/material';
+import { Alert, AlertTitle, Box, Button, Container, Link, Stack, Typography } from '@mui/material';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { createFileRoute } from '@tanstack/react-router';
-import { identitiesQueryOptions } from '../../utils/queryOptions';
 import { RolePanel } from '../../features/profile/RolePanel';
 import { useUser } from '../../hooks/useUser';
+import { identitiesQueryOptions } from '../../utils/queryOptions';
 
 export const Route = createFileRoute('/_private/profile')({
   component: ProfilePage,

@@ -92,11 +92,10 @@ function Initializer() {
                   vertical: 'bottom',
                   horizontal: 'right',
                 }}
-                sx={{
-                  width: 500,
-                }}
               >
-                <MenuItem onClick={handleProfileClick}>Profile</MenuItem>
+                <MenuItem onClick={handleProfileClick} sx={{ width: 200 }}>
+                  Profile
+                </MenuItem>
                 <MenuItem onClick={handleLogout}>Logout</MenuItem>
               </Menu>
             </div>
