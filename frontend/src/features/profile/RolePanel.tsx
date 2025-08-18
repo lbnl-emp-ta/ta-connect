@@ -1,4 +1,4 @@
-import { Box, Button, Paper, Stack, Typography } from '@mui/material';
+import { Paper, Stack, Typography } from '@mui/material';
 import { TAIdentity } from '../../api/dashboard/types';
 
 interface RolePanelProps {
@@ -22,11 +22,11 @@ export const RolePanel: React.FC<RolePanelProps> = ({ identity }) => {
             <Typography>{identity.instance.description}</Typography>
           </>
         )}
-        {identity.role.name !== 'Expert' && (
+        {/* {identity.role.name !== 'Expert' && (
           <Box sx={{ flexGrow: 1, textAlign: 'right' }}>
             <Button variant="outlined">Add member</Button>
           </Box>
-        )}
+        )} */}
       </Stack>
     </Paper>
   );
