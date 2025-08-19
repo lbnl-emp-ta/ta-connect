@@ -31,17 +31,17 @@ urlpatterns = [
     path('states/', StateListView.as_view(), name="state-list"),
     path('states/<int:pk>', StateRetrieveView.as_view(), name="state-retrieve"),
     
-    path('organizations/', OrganizationListCreateView.as_view(), name="organization-list-create"),
+    path('organizations/', OrganizationListView.as_view(), name="organization-list-create"),
     path('organization-types/', OrganizationTypeListView.as_view(), name="organization-type-list"),
     path('organization-types/<int:pk>', OrganizationTypeRetrieveView.as_view(), name="organization-type-retrieve"),
 
     path('transmission-planning-regions/', TransmissionPlanningRegionListView.as_view(), name="transmission-planning-regions-list"),
     
-    path('customers/', CustomerCreateView.as_view(), name="customer-create"),
-    path('customer-request-relationships/', CustomerRequestRelationshipListCreateView.as_view(), name="customer-request-relationship-create"),
+    path('customers/<int:customer_id>', CustomerEditView.as_view(), name="customer-edit"),
+    path('customer-request-relationships/', CustomerRequestRelationshipListView.as_view(), name="customer-request-relationship-create"),
     
-    # path('cohorts/', CohortCreateView.as_view(), name="cohort-create"),
-    # path('cohorts/add-customer/', CohortAddCustomerView.as_view(), name="cohort-customer-add"),
+    path('cohorts/', CohortCreateView.as_view(), name="cohort-create"),
+    path('cohorts/add-customer/', CohortAddCustomerView.as_view(), name="cohort-customer-add"),
 
     path('topics/', TopicListView.as_view(), name="topic-list"),
     
