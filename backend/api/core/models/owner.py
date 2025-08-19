@@ -36,6 +36,17 @@ class Owner(models.Model):
         )
 
         return owner.pk
+    
+    def get_instance_model(self):
+        match self.domain_type:
+            case DOMAINTYPE.RECEPTION:
+                return self.reception
+            
+            case DOMAINTYPE.LAB:
+                return self.lab 
+            
+            case DOMAINTYPE.PROGRAM:
+                return self.program 
 
     def __str__(self):
         match self.domain_type:
