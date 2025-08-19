@@ -223,8 +223,8 @@ MEDIA_URL = '/media/'
 EMAIL_BACKEND = 'core.backends.email_backend.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = '587'
-EMAIL_HOST_USER = os.getenv('EMAIL_HOST_AUTH_USER') 
-EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
+EMAIL_HOST_USER = os.getenv('TACONNECT_EMAIL_HOST_AUTH_USER') 
+EMAIL_HOST_PASSWORD = os.getenv('TACONNECT_EMAIL_HOST_PASSWORD')
 EMAIL_USE_TLS = True
 
 

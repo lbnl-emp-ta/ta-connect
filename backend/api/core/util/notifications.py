@@ -11,7 +11,7 @@ def send_email_notification(subject: str, message: str, recipient_list: list[str
             send_mail(
                 subject=subject, 
                 message=message, 
-                from_email=os.getenv("EMAIL_HOST_FROM_USER"),
+                from_email=os.getenv("TACONNECT_EMAIL_HOST_FROM_USER"),
                 recipient_list=recipient_list, 
                 fail_silently=False
             ) 
@@ -19,7 +19,7 @@ def send_email_notification(subject: str, message: str, recipient_list: list[str
     else:
         email = dict()
         email["to"] = recipient_list
-        email["from"] = os.getenv("EMAIL_HOST_FROM_USER")
+        email["from"] = os.getenv("TACONNECT_EMAIL_HOST_FROM_USER")
         email["subject"] = subject
         email["message"] = message
 
