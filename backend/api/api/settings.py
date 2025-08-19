@@ -134,7 +134,37 @@ ACCOUNT_USER_MODEL_USERNAME_FIELD = None
 ACCOUNT_SIGNUP_FIELDS = ['email*', 'password1*', 'password2*']
 ACCOUNT_LOGIN_METHODS= {'email'}
 ACCOUNT_EMAIL_VERIFICATION = "none"
+ACCOUNT_ADAPTER = 'core.adapters.CustomAccountAdapter'
+SOCIALACCOUNT_ADAPTER = 'core.adapters.CustomSocialAccountAdapter'
+SOCIALACCOUNT_AUTO_SIGNUP = True
 
+SOCIALACCOUNT_PROVIDERS = {
+    "google": {
+        "APPS": [
+            {
+                "client_id": os.getenv("TACONNECT_GOOGLE_CLIENT_ID"),
+                "secret": os.getenv("TACONNECT_GOOGLE_CLIENT_SECRET"),
+                "key": "",
+                "settings": {
+                    "scope": [
+                        "profile",
+                        "email",
+                    ],
+                    "auth_params": {
+                        "access_type": "online",
+                        # Force Google to show the page for account selection
+                        "prompt": "select_account",
+                    },
+                },
+            },
+        ],
+        "SCOPE": [
+            "profile",
+            "email",
+        ],
+        "VERIFIED_EMAIL": True
+    }
+}
 
 HEADLESS_ONLY = True
 HEADLESS_SERVE_SPECIFICATION = True
@@ -145,6 +175,7 @@ HEADLESS_FRONTEND_URLS = {
     "account_signup": "/account/signup",
     "socialaccount_login_error": "/account/provider/callback",
 }
+HEADLESS_ADAPTER = 'core.adapters.CustomHeadlessAdapter'
 
 TEMPLATES = [
     {
