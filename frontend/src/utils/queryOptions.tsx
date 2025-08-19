@@ -4,16 +4,19 @@ import { queryOptions, useMutation, UseMutationOptions } from '@tanstack/react-q
 import { loginMutation } from '../api/accounts/login';
 import { logoutMutation } from '../api/accounts/logout';
 import { signupMutation } from '../api/accounts/signup';
-import { deleteData, fetchData, patchRequest, postData, postForm } from '../api/dashboard';
+import { deleteData, fetchData, patchData, postData, postForm } from '../api/dashboard';
 import {
   CustomerRequestRelationship,
   TAAssignment,
+  TACustomer,
+  TACustomerMutation,
   TAExpert,
   TAIdentity,
   TANote,
   TAOwner,
   TARequest,
   TARequestDetail,
+  TARequestDetailMutation,
   TARequestsResponse,
   TAStatus,
   TATopic,
@@ -32,14 +35,6 @@ import { useToastContext } from '../features/toasts/ToastContext';
 import { ToastMessage } from '../features/toasts/ToastMessage';
 
 export const apiUrl = import.meta.env.VITE_API_URL as string;
-
-// const onSuccess = (message: string) => {
-//   return () => {
-//     queryClient.invalidateQueries();
-//     setShowToast(true);
-//     setToastMessage(<ToastMessage icon={<CheckCircleIcon />}>{message}</ToastMessage>);
-//   };
-// };
 
 export const authSessionQueryOptions = () =>
   queryOptions({
@@ -203,10 +198,28 @@ export const useLogoutMutation = () => {
   });
 };
 
+export const useCustomerMutation = (customerId: string, identity?: Identity) => {
+  return useMutation({
+    mutationKey: ['customers', 'update', customerId, identity],
+    mutationFn: (data: Partial<TACustomerMutation>) =>
+      patchData<TACustomerMutation>(
+        `${import.meta.env.VITE_API_URL}/customers/${customerId}`,
+        data,
+        identity
+      ),
+    onSuccess: () => queryClient.invalidateQueries(),
+  });
+};
+
 export const useRequestMutation = (requestId: string, identity?: Identity) => {
   return useMutation({
     mutationKey: ['requests', 'update', requestId, identity],
-    mutationFn: (data: Partial<TARequest>) => patchRequest(requestId, data, identity),
+    mutationFn: (data: Partial<TARequestDetailMutation>) =>
+      patchData<TARequestDetailMutation>(
+        `${import.meta.env.VITE_API_URL}/requests/${requestId}`,
+        data,
+        identity
+      ),
     onSuccess: () => queryClient.invalidateQueries(),
   });
 };

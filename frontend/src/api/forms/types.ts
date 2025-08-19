@@ -5,11 +5,13 @@ export interface State {
 }
 
 export interface OrganiztionType {
+  id: number;
   name: string;
   description: string;
 }
 
 export interface TransmissionPlanningRegion {
+  id: number;
   name: string;
 }
 

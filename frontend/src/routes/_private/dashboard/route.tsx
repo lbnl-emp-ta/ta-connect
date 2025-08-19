@@ -68,7 +68,6 @@ function DashboardComponent() {
     }
   }, [detailedIdentity, identities, setDetailedIdentity, setIdentity]);
 
-  console.log('Identities:', identities);
   if (!identities || identities.length === 0) {
     return <Navigate to="/profile" />;
   }
