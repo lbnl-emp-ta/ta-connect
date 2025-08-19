@@ -1,9 +1,21 @@
+
 import pytest
 from rest_framework.test import APIClient
 
+from django.core.management import call_command
+
 from core.models import *
+from core.fixtures.populate_db import fixture_list 
+from core.constants import ROLE
 
 TEST_USER_PASSWORD = "Password123?"
+
+
+@pytest.fixture(scope="session")
+def django_db_setup(django_db_setup, django_db_blocker):
+    with django_db_blocker.unblock():
+        for fixture in fixture_list:
+            call_command("loaddata", fixture)
 
 
 @pytest.fixture(scope="session")
@@ -11,13 +23,15 @@ def api_client():
     return APIClient()
 
 @pytest.fixture(scope="function")
-def test_user(django_db_blocker):
+def test_user(django_db_blocker, db_setup):
     with django_db_blocker.unblock():
         _test_user, _ = User.objects.get_or_create_user(
             email="testuser@gmail.com",
             password=TEST_USER_PASSWORD
         )
 
+        print(Role.objects.all())
+        
         return _test_user
     
 
