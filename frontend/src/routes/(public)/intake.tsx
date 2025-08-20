@@ -22,7 +22,7 @@ import {
 import { ChangeEventHandler, useEffect, useState } from 'react';
 import {
   IntakeFormData,
-  OrganiztionType,
+  OrganizationType,
   State,
   TransmissionPlanningRegion,
 } from '../../api/forms/types';
@@ -221,7 +221,7 @@ function IntakeForm() {
                 onChange={(e) => setOrgTypeName(e.target.value)}
                 name="org-type-radio-group"
               >
-                {orgTypes.map((type: OrganiztionType) => (
+                {orgTypes.map((type: OrganizationType) => (
                   <FormControlLabel
                     key={type.name}
                     value={type.name}

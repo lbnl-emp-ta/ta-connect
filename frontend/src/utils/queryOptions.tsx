@@ -24,7 +24,8 @@ import {
 import { submitIntakeMutation } from '../api/forms';
 import {
   IntakeFormData,
-  OrganiztionType,
+  Organization,
+  OrganizationType,
   State,
   TransmissionPlanningRegion,
 } from '../api/forms/types';
@@ -154,11 +155,18 @@ export const statesQueryOptions = () =>
     queryFn: () => fetchData<State[]>(`${apiUrl}/states/`),
   });
 
+export const organizationQueryOptions = () =>
+  queryOptions({
+    staleTime: 120_000, // stale after 2 minutes
+    queryKey: ['organization'],
+    queryFn: () => fetchData<Organization[]>(`${apiUrl}/organizations/`),
+  });
+
 export const organizationTypesQueryOptions = () =>
   queryOptions({
     staleTime: 120_000, // stale after 2 minutes
     queryKey: ['organizationTypes'],
-    queryFn: () => fetchData<OrganiztionType[]>(`${apiUrl}/organization-types/`),
+    queryFn: () => fetchData<OrganizationType[]>(`${apiUrl}/organization-types/`),
   });
 
 export const transmissionPlanningRegionsQueryOptions = () =>

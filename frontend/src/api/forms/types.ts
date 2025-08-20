@@ -4,10 +4,17 @@ export interface State {
   abbreviation: string;
 }
 
-export interface OrganiztionType {
+export interface OrganizationType {
   id: number;
   name: string;
   description: string;
+}
+
+export interface Organization {
+  id: number;
+  name: string;
+  address: string;
+  type: OrganizationType;
 }
 
 export interface TransmissionPlanningRegion {

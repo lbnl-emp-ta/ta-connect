@@ -9,7 +9,6 @@ import {
   IconButton,
   MenuItem,
   Select,
-  SelectChangeEvent,
   Stack,
   Table,
   TableBody,
@@ -19,20 +18,20 @@ import {
   TextField,
   Typography,
 } from '@mui/material';
+import { useSuspenseQuery } from '@tanstack/react-query';
+import { ChangeEvent, useCallback, useEffect, useState } from 'react';
 import { TACustomer, TACustomerMutation } from '../../api/dashboard/types';
 import { InfoPanel } from '../../components/InfoPanel';
 import {
-  organizationTypesQueryOptions,
+  organizationQueryOptions,
   statesQueryOptions,
   transmissionPlanningRegionsQueryOptions,
   useCustomerMutation,
 } from '../../utils/queryOptions';
+import { isValidEmail, isValidUSTelephone } from '../../utils/utils';
 import { useIdentityContext } from '../identity/IdentityContext';
-import { ChangeEvent, useCallback, useEffect, useState } from 'react';
 import { useToastContext } from '../toasts/ToastContext';
 import { ToastMessage } from '../toasts/ToastMessage';
-import { isValidEmail, isValidUSTelephone } from '../../utils/utils';
-import { useSuspenseQuery } from '@tanstack/react-query';
 
 interface RequestCustomerPanelProps {
   customer?: TACustomer;
@@ -40,7 +39,7 @@ interface RequestCustomerPanelProps {
 
 export const RequestCustomerPanel: React.FC<RequestCustomerPanelProps> = ({ customer }) => {
   const { identity } = useIdentityContext();
-  const { data: allOrganizations } = useSuspenseQuery(organizationTypesQueryOptions());
+  const { data: allOrganizations } = useSuspenseQuery(organizationQueryOptions());
   const { data: allTpr } = useSuspenseQuery(transmissionPlanningRegionsQueryOptions());
   const { data: allStates } = useSuspenseQuery(statesQueryOptions());
   const updateCustomerMutation = useCustomerMutation(customer?.id.toString() || '', identity);
@@ -302,7 +301,7 @@ export const RequestCustomerPanel: React.FC<RequestCustomerPanelProps> = ({ cust
                 </TableCell>
               </TableRow>
               <TableRow>
-                <TableCell>TPR</TableCell>
+                <TableCell>Transmission Planning Region</TableCell>
                 <TableCell>
                   {!editing && <>{customer.tpr.name}</>}
                   {editing && (
