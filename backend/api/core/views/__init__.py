@@ -12,7 +12,6 @@ from .organization import OrganizationListView
 from .transmission_planning_region import TransmissionPlanningRegionListView
 from .customer import CustomerEditView
 from .customer_request_relationship import CustomerRequestRelationshipListView
-from .cohort import CohortCreateView, CohortAddCustomerView
 from .intake_form import ProcessIntakeForm
 from .identity import IdentityListView
 from .status import StatusListView
@@ -44,8 +43,6 @@ __all__ = [
     "TransmissionPlanningRegionListView",
     "CustomerEditView",
     "CustomerRequestRelationshipListView",
-    "CohortCreateView",
-    "CohortAddCustomerView",
     "ProcessIntakeForm",
     "UploadAttachmentView",
     "DownloadAttachmentView",
