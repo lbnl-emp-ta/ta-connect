@@ -134,7 +134,37 @@ ACCOUNT_USER_MODEL_USERNAME_FIELD = None
 ACCOUNT_SIGNUP_FIELDS = ['email*', 'password1*', 'password2*']
 ACCOUNT_LOGIN_METHODS= {'email'}
 ACCOUNT_EMAIL_VERIFICATION = "none"
+ACCOUNT_ADAPTER = 'core.adapters.CustomAccountAdapter'
+SOCIALACCOUNT_ADAPTER = 'core.adapters.CustomSocialAccountAdapter'
+SOCIALACCOUNT_AUTO_SIGNUP = True
 
+SOCIALACCOUNT_PROVIDERS = {
+    "google": {
+        "APPS": [
+            {
+                "client_id": os.getenv("TACONNECT_GOOGLE_CLIENT_ID"),
+                "secret": os.getenv("TACONNECT_GOOGLE_CLIENT_SECRET"),
+                "key": "",
+                "settings": {
+                    "scope": [
+                        "profile",
+                        "email",
+                    ],
+                    "auth_params": {
+                        "access_type": "online",
+                        # Force Google to show the page for account selection
+                        "prompt": "select_account",
+                    },
+                },
+            },
+        ],
+        "SCOPE": [
+            "profile",
+            "email",
+        ],
+        "VERIFIED_EMAIL": True
+    }
+}
 
 HEADLESS_ONLY = True
 HEADLESS_SERVE_SPECIFICATION = True
@@ -145,6 +175,7 @@ HEADLESS_FRONTEND_URLS = {
     "account_signup": "/account/signup",
     "socialaccount_login_error": "/account/provider/callback",
 }
+HEADLESS_ADAPTER = 'core.adapters.CustomHeadlessAdapter'
 
 TEMPLATES = [
     {
@@ -206,7 +237,6 @@ USE_I18N = True
 
 USE_TZ = True
 
-
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
@@ -220,3 +250,14 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 MEDIA_ROOT = BASE_DIR / 'media'
 MEDIA_URL = '/media/'
+
+EMAIL_BACKEND = 'core.backends.email_backend.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = '587'
+EMAIL_HOST_USER = os.getenv('TACONNECT_EMAIL_HOST_AUTH_USER') 
+EMAIL_HOST_PASSWORD = os.getenv('TACONNECT_EMAIL_HOST_PASSWORD')
+EMAIL_USE_TLS = True
+
+
+# Custom setting for development
+ENABLE_EMAIL_SENDING = os.getenv('TACONNECT_ENABLE_EMAIL_SENDING') 

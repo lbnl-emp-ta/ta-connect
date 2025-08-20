@@ -1,11 +1,14 @@
-import { Link, Outlet } from '@tanstack/react-router';
+import AccountCircleIcon from '@mui/icons-material/AccountCircle';
+import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
+import { AppBar, Box, Button, Menu, MenuItem, Stack, Toolbar, Typography } from '@mui/material';
+import { type QueryClient } from '@tanstack/react-query';
+import { createRootRouteWithContext, Link, Outlet, useNavigate } from '@tanstack/react-router';
 import { TanStackRouterDevtools } from '@tanstack/react-router-devtools';
-import { AppBar, Box, Button, Stack, Toolbar, Typography } from '@mui/material';
-import { useSuspenseQuery, type QueryClient } from '@tanstack/react-query';
-import { createRootRouteWithContext } from '@tanstack/react-router';
-import { authSessionQueryOptions, useLogoutMutation } from '../utils/queryOptions';
-import { Identity } from '../features/identity/IdentityContext';
+import { useState } from 'react';
 import { TAIdentity } from '../api/dashboard/types';
+import { Identity } from '../features/identity/IdentityContext';
+import { useUser } from '../hooks/useUser';
+import { authSessionQueryOptions, useLogoutMutation } from '../utils/queryOptions';
 
 export interface MyRouterContext {
   queryClient: QueryClient;
@@ -21,16 +24,28 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
 });
 
 function Initializer() {
-  const {
-    data: { isAuthenticated },
-  } = useSuspenseQuery(authSessionQueryOptions());
-
+  const user = useUser();
+  const navigate = useNavigate();
   const logoutMutation = useLogoutMutation();
+  const [userMenuAnchorEl, setUserMenuAnchorEl] = useState<null | HTMLElement>(null);
+  const userMenuOpen = Boolean(userMenuAnchorEl);
 
-  function handleLogout(e: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
-    e.preventDefault();
+  const handleUserMenuClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+    setUserMenuAnchorEl(event.currentTarget);
+  };
+
+  const handleUserMenuClose = () => {
+    setUserMenuAnchorEl(null);
+  };
+
+  const handleProfileClick = () => {
+    handleUserMenuClose();
+    navigate({ to: '/profile' });
+  };
+
+  const handleLogout = () => {
     logoutMutation.mutate();
-  }
+  };
 
   return (
     <Stack spacing={0} sx={{ minHeight: '100vh' }}>
@@ -46,45 +61,54 @@ function Initializer() {
             gap: 5,
             color: 'primary.main',
             bgcolor: 'white',
-            // minHeight: 100,
             height: 40,
           }}
         >
+          <Box sx={{ flexGrow: 1 }}>
+            <Link to="/dashboard">
+              <Typography variant="h6" sx={{ color: 'primary.main' }}>
+                TA Connect
+              </Typography>
+            </Link>
+          </Box>
           <Link to="/dashboard">
             <Typography sx={{ color: 'primary.main' }}>Dashboard</Typography>
           </Link>
           <Link to="/intake">
             <Typography sx={{ color: 'primary.main' }}>Intake</Typography>
           </Link>
-          <Box sx={{ margin: 'auto' }} />
-          {isAuthenticated ? (
-            <Button
-              variant="text"
-              onClick={handleLogout}
-              sx={{
-                color: 'primary.main',
-              }}
-            >
-              Logout
-            </Button>
+          {user ? (
+            <div>
+              <Button
+                variant="text"
+                onClick={handleUserMenuClick}
+                startIcon={<AccountCircleIcon />}
+                endIcon={<KeyboardArrowDownIcon />}
+                sx={{
+                  color: 'primary.main',
+                }}
+              >
+                {user.name || user.email}
+              </Button>
+              <Menu
+                anchorEl={userMenuAnchorEl}
+                open={userMenuOpen}
+                onClose={handleUserMenuClose}
+                anchorOrigin={{
+                  vertical: 'bottom',
+                  horizontal: 'right',
+                }}
+              >
+                <MenuItem onClick={handleProfileClick} sx={{ width: 200 }}>
+                  Profile
+                </MenuItem>
+                <MenuItem onClick={handleLogout}>Logout</MenuItem>
+              </Menu>
+            </div>
           ) : (
-            <Box
-              sx={{
-                display: 'flex',
-                gap: 5,
-              }}
-            >
-              <Link to="/login" search={{ redirect: '/' }}>
-                <Typography variant="h6" color={'primary.main'}>
-                  Login
-                </Typography>
-              </Link>
-              <Link to="/signup">
-                <Typography variant="h6" color={'primary.main'}>
-                  Signup
-                </Typography>
-              </Link>
-            </Box>
+            <Link to="/login" search={{ redirect: '/' }}>
+              <Typography color="primary">Login</Typography>
+            </Link>
           )}
         </Toolbar>
       </AppBar>

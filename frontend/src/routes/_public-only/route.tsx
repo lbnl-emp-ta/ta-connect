@@ -8,11 +8,11 @@ export const Route = createFileRoute('/_public-only')({
 
 function PublicOnlyRoute() {
   const {
-    data: { isAuthenticated },
+    data: { meta },
   } = useSuspenseQuery(authSessionQueryOptions());
 
   // authenticated users should not access public-only routes
-  if (isAuthenticated) {
+  if (meta.is_authenticated) {
     return <Navigate to="/dashboard" />;
   }
 

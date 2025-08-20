@@ -27,10 +27,26 @@ urlpatterns = [
     path('experts/', ExpertsListView.as_view(), name="experts-list"),
     path('depths/', DepthListView.as_view(), name="depth-list"),
     path('states/', StateListView.as_view(), name="state-list"),
+<<<<<<< HEAD
     path('organizations/', OrganizationListView.as_view(), name="organization-list"),
+=======
+    path('states/<int:pk>', StateRetrieveView.as_view(), name="state-retrieve"),
+    
+    path('organizations/', OrganizationListView.as_view(), name="organization-list-create"),
+>>>>>>> main
     path('organization-types/', OrganizationTypeListView.as_view(), name="organization-type-list"),
     path('transmission-planning-regions/', TransmissionPlanningRegionListView.as_view(), name="transmission-planning-regions-list"),
+<<<<<<< HEAD
     path('customer-request-relationships/', CustomerRequestRelationshipListView.as_view(), name="customer-request-relationships-list"),
+=======
+    
+    path('customers/<int:customer_id>', CustomerEditView.as_view(), name="customer-edit"),
+    path('customer-request-relationships/', CustomerRequestRelationshipListView.as_view(), name="customer-request-relationship-create"),
+    
+    path('cohorts/', CohortCreateView.as_view(), name="cohort-create"),
+    path('cohorts/add-customer/', CohortAddCustomerView.as_view(), name="cohort-customer-add"),
+
+>>>>>>> main
     path('topics/', TopicListView.as_view(), name="topic-list"),
     
 ]

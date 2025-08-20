@@ -6,6 +6,7 @@ export interface SessionAuthenticatedResponse {
       has_usable_password: boolean;
       id: number;
       email: string;
+      name: string;
     };
     methods: [
       {
