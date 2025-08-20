@@ -7,7 +7,7 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-      DJANGO_SETTINGS_MODULE: your_project.settings  # Change to your actual settings module
+      DJANGO_SETTINGS_MODULE: api.settings
       SECRET_KEY: secret_key 
 
     steps:
