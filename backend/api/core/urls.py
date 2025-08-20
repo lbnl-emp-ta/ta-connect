@@ -29,7 +29,6 @@ urlpatterns = [
     path('states/', StateListView.as_view(), name="state-list"),
     path('organizations/', OrganizationListView.as_view(), name="organization-list"),
     
-    path('organizations/', OrganizationListView.as_view(), name="organization-list-create"),
     path('organization-types/', OrganizationTypeListView.as_view(), name="organization-type-list"),
     path('transmission-planning-regions/', TransmissionPlanningRegionListView.as_view(), name="transmission-planning-regions-list"),
     path('customer-request-relationships/', CustomerRequestRelationshipListView.as_view(), name="customer-request-relationships-list"),
