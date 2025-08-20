@@ -36,6 +36,8 @@ import { useIdentityContext } from '../../../features/identity/IdentityContext';
 import { useToastContext } from '../../../features/toasts/ToastContext';
 import { identitiesQueryOptions } from '../../../utils/queryOptions';
 import { AppLink } from '../../../components/AppLink';
+import { a11yProps } from '../../../utils/utils';
+import { RequestsProvider } from '../../../features/requests/RequestsContext';
 
 export const Route = createFileRoute('/_private/dashboard')({
   beforeLoad({ location }) {
@@ -109,6 +111,10 @@ function DashboardComponent() {
           paddingLeft: 3,
           paddingRight: 3,
           paddingTop: 1,
+          position: 'sticky',
+          top: 48,
+          left: 0,
+          zIndex: 2,
         }}
       >
         <Tabs
@@ -132,6 +138,7 @@ function DashboardComponent() {
               marginRight: 2,
               '&.MuiButtonBase-root': { paddingLeft: 0, paddingRight: 0, textTransform: 'none' },
             }}
+            {...a11yProps('requests')}
           />
           <Tab
             value="experts"
@@ -147,6 +154,7 @@ function DashboardComponent() {
             sx={{
               '&.MuiButtonBase-root': { paddingLeft: 0, paddingRight: 0, textTransform: 'none' },
             }}
+            {...a11yProps('experts')}
           />
         </Tabs>
         <Box sx={{ flexGrow: 1 }} />
@@ -177,8 +185,10 @@ function DashboardComponent() {
           ))}
         </Select>
       </Stack>
-      <Box component="main" sx={{ flex: 1, overflow: 'hidden', paddingTop: 2 }}>
-        <Outlet />
+      <Box component="main" sx={{ flex: 1, overflow: 'hidden', padding: 3 }}>
+        <RequestsProvider>
+          <Outlet />
+        </RequestsProvider>
       </Box>
       <Snackbar
         open={showToast}
