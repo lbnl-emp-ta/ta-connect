@@ -51,17 +51,18 @@ function Initializer() {
     <Stack spacing={0} sx={{ minHeight: '100vh' }}>
       <AppBar
         position="sticky"
+        elevation={0}
         sx={{
           zIndex: (theme) => theme.zIndex.drawer + 1,
         }}
       >
         <Toolbar
+          variant="dense"
           sx={{
             display: 'flex',
             gap: 5,
             color: 'primary.main',
             bgcolor: 'white',
-            height: 40,
           }}
         >
           <Box sx={{ flexGrow: 1 }}>

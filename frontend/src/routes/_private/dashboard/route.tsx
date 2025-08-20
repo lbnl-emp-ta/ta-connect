@@ -4,6 +4,8 @@ import PeopleIcon from '@mui/icons-material/People';
 import {
   Box,
   IconButton,
+  InputAdornment,
+  Link,
   List,
   ListItem,
   ListItemButton,
@@ -15,15 +17,25 @@ import {
   Snackbar,
   SnackbarCloseReason,
   Stack,
+  Tab,
+  Tabs,
   Typography,
 } from '@mui/material';
 import { useSuspenseQuery } from '@tanstack/react-query';
-import { createFileRoute, Navigate, Outlet, redirect, useNavigate } from '@tanstack/react-router';
-import { useEffect } from 'react';
+import {
+  createFileRoute,
+  Navigate,
+  Outlet,
+  redirect,
+  useLocation,
+  useNavigate,
+} from '@tanstack/react-router';
+import { useEffect, useState } from 'react';
 import { TAIdentity } from '../../../api/dashboard/types';
 import { useIdentityContext } from '../../../features/identity/IdentityContext';
 import { useToastContext } from '../../../features/toasts/ToastContext';
 import { identitiesQueryOptions } from '../../../utils/queryOptions';
+import { AppLink } from '../../../components/AppLink';
 
 export const Route = createFileRoute('/_private/dashboard')({
   beforeLoad({ location }) {
@@ -39,9 +51,15 @@ export const Route = createFileRoute('/_private/dashboard')({
 
 function DashboardComponent() {
   const navigate = useNavigate();
+  const location = useLocation();
   const { detailedIdentity, setIdentity, setDetailedIdentity } = useIdentityContext();
   const { showToast, toastMessage, setShowToast } = useToastContext();
   const { data: identities } = useSuspenseQuery(identitiesQueryOptions());
+  const [tabValue, setTabValue] = useState<string | number>();
+
+  const handleTabChange = (_event: React.SyntheticEvent, newValue: string | number) => {
+    setTabValue(newValue);
+  };
 
   const handleIdentityChange = (event: SelectChangeEvent<TAIdentity | null>) => {
     setDetailedIdentity(event.target.value as TAIdentity);
@@ -68,80 +86,97 @@ function DashboardComponent() {
     }
   }, [detailedIdentity, identities, setDetailedIdentity, setIdentity]);
 
+  useEffect(() => {
+    if (location.pathname.startsWith('/dashboard/requests')) {
+      setTabValue('requests');
+    } else if (location.pathname.startsWith('/dashboard/experts')) {
+      setTabValue('experts');
+    }
+  }, [location.pathname]);
+
   if (!identities || identities.length === 0) {
     return <Navigate to="/profile" />;
   }
 
   return (
-    <Stack direction="row" spacing={0} sx={{ width: '100%' }}>
-      <Box
+    <Stack spacing={0} sx={{ width: '100%' }}>
+      <Stack
+        direction="row"
         sx={{
-          bgcolor: 'primary.main',
-          width: 240,
+          backgroundColor: 'white',
+          borderBottom: '1px solid',
+          borderColor: 'grey.300',
+          paddingLeft: 3,
+          paddingRight: 3,
+          paddingTop: 1,
         }}
       >
-        <Stack
-          spacing={1}
+        <Tabs
+          onChange={handleTabChange}
+          value={tabValue}
+          textColor="secondary"
+          indicatorColor="secondary"
+        >
+          <Tab
+            value="requests"
+            disableRipple
+            label={
+              <AppLink to="/dashboard/requests" sx={{ color: 'inherit' }}>
+                <Stack direction="row" spacing={1} alignItems="center">
+                  <AssignmentIcon />
+                  <Typography>Requests</Typography>
+                </Stack>
+              </AppLink>
+            }
+            sx={{
+              marginRight: 2,
+              '&.MuiButtonBase-root': { paddingLeft: 0, paddingRight: 0, textTransform: 'none' },
+            }}
+          />
+          <Tab
+            value="experts"
+            disableRipple
+            label={
+              <AppLink to="/dashboard/experts" sx={{ color: 'inherit' }}>
+                <Stack direction="row" spacing={1} alignItems="center">
+                  <PeopleIcon />
+                  <Typography>Experts</Typography>
+                </Stack>
+              </AppLink>
+            }
+            sx={{
+              '&.MuiButtonBase-root': { paddingLeft: 0, paddingRight: 0, textTransform: 'none' },
+            }}
+          />
+        </Tabs>
+        <Box sx={{ flexGrow: 1 }} />
+        <Select
+          value={detailedIdentity || ''}
+          size="small"
+          onChange={handleIdentityChange}
+          startAdornment={<InputAdornment position="start">Viewing as:</InputAdornment>}
           sx={{
-            borderBottom: '1px solid',
-            borderBottomColor: 'grey.500',
-            padding: 2,
-            width: '100%',
+            backgroundColor: 'white',
+            marginBottom: '0.5rem !important',
           }}
         >
-          <Typography color="primary.contrastText">Viewing as:</Typography>
-          <Select
-            sx={{
-              width: 'stretch',
-              bgcolor: 'white',
-            }}
-            value={detailedIdentity || ''}
-            onChange={handleIdentityChange}
-          >
-            {identities?.map((identity) => (
-              // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-explicit-any
-              <MenuItem key={identity.role.id} value={identity as any}>
-                <Stack direction="row" spacing={1}>
-                  {identity.location === 'Reception' && <span>{identity.location}</span>}
-                  <span>{identity.role.name}</span>
-                  {identity.instance && (
-                    <>
-                      <span>|</span>
-                      <span>{identity.instance.name}</span>
-                    </>
-                  )}
-                </Stack>
-              </MenuItem>
-            ))}
-          </Select>
-        </Stack>
-        <List sx={{ bgcolor: 'primary.main', color: 'white' }}>
-          <ListItem key={'Requests'} disablePadding>
-            <ListItemButton
-              onClick={() => {
-                void navigate({ to: '/dashboard/requests' });
-              }}
-            >
-              <ListItemIcon>
-                <AssignmentIcon />
-              </ListItemIcon>
-              <ListItemText primary={'Requests'} />
-            </ListItemButton>
-          </ListItem>
-          <ListItem key={'Experts'} disablePadding>
-            <ListItemButton
-              onClick={() => {
-                void navigate({ to: '/dashboard/experts' });
-              }}
-            >
-              <ListItemIcon>
-                <PeopleIcon />
-              </ListItemIcon>
-              <ListItemText primary={'Experts'} />
-            </ListItemButton>
-          </ListItem>
-        </List>
-      </Box>
+          {identities?.map((identity) => (
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-explicit-any
+            <MenuItem key={identity.role.id} value={identity as any}>
+              <Stack direction="row" spacing={1}>
+                {identity.location === 'Reception' && <span>{identity.location}</span>}
+                <span>{identity.role.name}</span>
+                {identity.instance && (
+                  <>
+                    <span>|</span>
+                    <span>{identity.instance.name}</span>
+                  </>
+                )}
+              </Stack>
+            </MenuItem>
+          ))}
+        </Select>
+      </Stack>
       <Box component="main" sx={{ flex: 1, overflow: 'hidden', paddingTop: 2 }}>
         <Outlet />
       </Box>
