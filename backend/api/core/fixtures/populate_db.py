@@ -1,6 +1,7 @@
 import subprocess
 
 fixture_list = [
+    "user_fixture.json",
     "states_fixture.json",
     "transmission_planning_regions_fixture.json",
     "organization_type_fixture.json",
