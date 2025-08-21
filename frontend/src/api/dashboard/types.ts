@@ -26,6 +26,16 @@ export interface TACustomer {
   requests: number[];
 }
 
+export interface TACustomerMutation {
+  org?: number;
+  tpr?: number;
+  email?: string;
+  name?: string;
+  phone?: string;
+  title?: string;
+  state?: number;
+}
+
 export interface TATopic {
   id: number;
   name: string;

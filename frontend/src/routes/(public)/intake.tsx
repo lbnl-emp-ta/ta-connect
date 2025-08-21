@@ -22,7 +22,7 @@ import {
 import { ChangeEventHandler, useEffect, useState } from 'react';
 import {
   IntakeFormData,
-  OrganiztionType,
+  OrganizationType,
   State,
   TransmissionPlanningRegion,
 } from '../../api/forms/types';
@@ -33,7 +33,7 @@ import {
   useSubmitIntakeMutation,
 } from '../../utils/queryOptions';
 import { useSuspenseQuery } from '@tanstack/react-query';
-import { isValidUSTelephone } from '../../utils/utils';
+import { isValidEmail, isValidUSTelephone } from '../../utils/utils';
 
 export const Route = createFileRoute('/(public)/intake')({
   loader: async ({ context }) => {
@@ -103,22 +103,12 @@ function IntakeForm() {
     setPhone(e.target.value);
   };
 
-  function handleEmailChange(newEmail: string) {
-    function validateEmail(email: string) {
-      const re =
-        /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-      if (re.test(email) || email === '') {
-        setEmailError(false);
-        setEmailHelperText('');
-      } else {
-        setEmailError(true);
-        setEmailHelperText('Not a valid email.');
-      }
-    }
-
-    validateEmail(newEmail);
+  const handleEmailChange = (newEmail: string) => {
+    const isValid = isValidEmail(newEmail);
+    setEmailError(!isValid);
+    setEmailHelperText(isValid ? '' : 'Not a valid email address.');
     setEmail(newEmail);
-  }
+  };
 
   useEffect(() => {
     document.title = 'TA CONNECT - Intake Form';
@@ -231,7 +221,7 @@ function IntakeForm() {
                 onChange={(e) => setOrgTypeName(e.target.value)}
                 name="org-type-radio-group"
               >
-                {orgTypes.map((type: OrganiztionType) => (
+                {orgTypes.map((type: OrganizationType) => (
                   <FormControlLabel
                     key={type.name}
                     value={type.name}

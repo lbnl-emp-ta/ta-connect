@@ -13,7 +13,7 @@ export const Route = createFileRoute('/_private/profile')({
 function ProfilePage() {
   const user = useUser();
   const { data: identities } = useSuspenseQuery(identitiesQueryOptions());
-  console.log('Identities:', identities);
+
   return (
     <Container sx={{ marginTop: 2 }}>
       <Stack direction="row" spacing={2} alignItems="center" sx={{ marginBottom: 2 }}>
