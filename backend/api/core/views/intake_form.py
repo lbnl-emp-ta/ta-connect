@@ -1,3 +1,5 @@
+from django.db import transaction
+
 from rest_framework.generics import CreateAPIView
 from rest_framework import status
 from rest_framework.response import Response
@@ -6,8 +8,6 @@ from core.models import *
 
 class ProcessIntakeForm(CreateAPIView):
     def post(self, request):
-        success = False
-
         name = request.data.get("name", None)
         email = request.data.get("email", None)
         phone = request.data.get("phone", None)
@@ -19,55 +19,49 @@ class ProcessIntakeForm(CreateAPIView):
         organization_type = request.data.get("organizationType", None)
         ta_depth = request.data.get("taDepth", None)
         desc = request.data.get("description", None)
+        cohort = request.data.get("cohort", None)
         
-        
-        _customer_request_relationship = None
-        _request = None
-        
-        _customer = None
-        _customer_created = False
-        
-        _org = None
-        _org_created = False
         try:
-            _request = Request.objects.create(
-                description=desc, 
-                depth=Depth.objects.filter(name=ta_depth).first()
-            )
-            
-            _org_created = False
-            _org = Organization.objects.filter(name=organization).first()
-            if (not _org):
-                _org = Organization.objects.create(
-                    name=organization, 
-                    address=organization_address, 
-                    type=OrganizationType.objects.filter(name=organization_type).first()
+            with transaction.atomic():
+                _request = Request.objects.create(
+                    description=desc, 
+                    depth=Depth.objects.get(name=ta_depth)
                 )
-                _org_created = True
+
+                
+                if not Organization.objects.filter(name=organization).exists():
+                    _org = Organization.objects.create(
+                        name=organization, 
+                        address=organization_address, 
+                        type=OrganizationType.objects.get(name=organization_type)
+                    )
             
-            _customer = Customer.objects.filter(email=email).first()
+                if(not Customer.objects.filter(email=email).exists()):
+                    _customer = Customer.objects.create(
+                        org = _org,
+                        state = State.objects.get(abbreviation=state_abbr),
+                        tpr = TransmissionPlanningRegion.objects.get(name=tpr),
+                        email=email,
+                        name=name,
+                        phone=phone,
+                        title=title
+                    )
+                
+                if cohort:
+                    _cohort = Cohort.objects.create(request=_request, description="")
+                    for participant in cohort:
+                        CohortParticipant.objects.create(name=participant["name"], 
+                                                        email=participant["email"], 
+                                                        state=State.objects.get(abbreviation=participant["state"]), 
+                                                        cohort=_cohort) 
             
-            _customer_created = False
-            if(not _customer):
-                _customer = Customer.objects.create(
-                    org = _org,
-                    state = State.objects.filter(abbreviation=state_abbr).first(),
-                    tpr = TransmissionPlanningRegion.objects.filter(name=tpr).first(),
-                    email=email,
-                    name=name,
-                    phone=phone,
-                    title=title
+                CustomerRequestRelationship.objects.create(
+                    request=_request,
+                    customer=_customer,
+                    customer_type = CustomerType.objects.get(name="Primary Contact")
                 )
-                _customer_created = True
-            
-            _customer_request_relationship = CustomerRequestRelationship.objects.create(
-                request=_request,
-                customer=_customer,
-                customer_type = CustomerType.objects.get(name="Primary Contact")
-            )
-            
-            success = True
-            return Response({
+                
+                response_data = {
                     "name": _customer.name,
                     "email": _customer.email,
                     "phone": _customer.phone,
@@ -78,30 +72,21 @@ class ProcessIntakeForm(CreateAPIView):
                     "organizationAddress": _customer.org.address,
                     "organizationType": _customer.org.type.name,
                     "tadepth": _request.depth.name,
-                    "description": _request.description
-                }, 
-                status=status.HTTP_201_CREATED
-            )
+                    "description": _request.description,
+                }
+                
+                if cohort:
+                    response_data["cohort"] = {
+                        "request": _cohort.request,
+                        "name": _cohort.name,
+                        "description": _cohort.description,
+                        "participants": participant
+                    }
+            
+                return Response(response_data, status=status.HTTP_201_CREATED)
             
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
-        
-        finally:
-
-            # If the processing the intake form was successful,
-            # no need to delete aritfacts.
-            if (not success):
-                if(_customer_request_relationship):
-                    _customer_request_relationship.delete()
-                
-                if(_request):
-                    _request.delete()
-                
-                if (_customer_created and _customer):
-                    _customer.delete()
-                    
-                if (_org_created and _org):
-                    _org.delete() 
 
             
             
