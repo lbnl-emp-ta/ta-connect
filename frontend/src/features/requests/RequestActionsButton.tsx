@@ -103,18 +103,18 @@ export const RequestActionsButton: React.FC<RequestActionsButtonProps> = ({ requ
         onClose={handleActionsMenuClose}
         aria-labelledby="actions-menu-button"
       >
-        <MenuItem onClick={handleActionsMenuClose}>
+        {/* <MenuItem onClick={handleActionsMenuClose}>
           <ListItemIcon>
             <EditIcon />
           </ListItemIcon>
           <ListItemText>Edit</ListItemText>
-        </MenuItem>
-        <MenuItem onClick={handleActionsMenuClose}>
+        </MenuItem> */}
+        {/* <MenuItem onClick={handleActionsMenuClose}>
           <ListItemIcon>
             <DateRangeIcon />
           </ListItemIcon>
           <ListItemText>Set Dates</ListItemText>
-        </MenuItem>
+        </MenuItem> */}
         <MenuItem onClick={handleFinishCloseout}>
           <ListItemIcon>
             <ArticleIcon />
