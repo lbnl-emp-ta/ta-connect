@@ -86,6 +86,7 @@ function DashboardComponent() {
     } else {
       setDetailedIdentity(identities ? identities[0] : null);
     }
+    navigate({ to: '/dashboard/requests', params: {} });
   }, [detailedIdentity, identities, setDetailedIdentity, setIdentity]);
 
   useEffect(() => {
