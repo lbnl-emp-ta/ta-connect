@@ -29,14 +29,18 @@ class ProcessIntakeForm(CreateAPIView):
                 )
 
                 
-                if not Organization.objects.filter(name=organization).exists():
+                _org = Organization.objects.filter(name=organization)
+                if not _org.exists():
                     _org = Organization.objects.create(
                         name=organization, 
                         address=organization_address, 
                         type=OrganizationType.objects.get(name=organization_type)
                     )
+                else:
+                    _org = _org.first()
             
-                if(not Customer.objects.filter(email=email).exists()):
+                _customer = Customer.objects.filter(email=email)
+                if(not _customer.exists()):
                     _customer = Customer.objects.create(
                         org = _org,
                         state = State.objects.get(abbreviation=state_abbr),
@@ -46,7 +50,10 @@ class ProcessIntakeForm(CreateAPIView):
                         phone=phone,
                         title=title
                     )
+                else: 
+                    _customer = _customer.first()
                 
+                _cohort = None
                 if cohort:
                     _cohort = Cohort.objects.create(request=_request, description="")
                     for participant in cohort:
