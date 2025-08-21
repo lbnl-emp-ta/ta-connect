@@ -1,15 +1,9 @@
-import {
-  DataGrid,
-  GridRowSelectionModel,
-  gridSortedRowEntriesSelector,
-  useGridApiRef,
-} from '@mui/x-data-grid';
-import { useNavigate, useParams } from '@tanstack/react-router';
-import { useEffect, useState } from 'react';
-import { TARequest } from '../../api/dashboard/types';
-import { useRequestsContext } from './RequestsContext';
 import { Chip, Paper, Stack, Typography } from '@mui/material';
+import { useNavigate, useParams } from '@tanstack/react-router';
+import { useEffect } from 'react';
+import { TARequest } from '../../api/dashboard/types';
 import { formatDatetime } from '../../utils/utils';
+import { useRequestsContext } from './RequestsContext';
 
 interface RequestsListProps {
   requests: TARequest[];
@@ -19,8 +13,6 @@ export const RequestsList: React.FC<RequestsListProps> = ({ requests }) => {
   const navigate = useNavigate();
   const { sortedRequests, sortField, setSortedRequests } = useRequestsContext();
   const params = useParams({ strict: false });
-  const [rowSelectionModel, setRowSelectionModel] = useState<GridRowSelectionModel>();
-  const apiRef = useGridApiRef();
 
   const handleItemClick = (request: TARequest) => {
     navigate({
@@ -33,14 +25,15 @@ export const RequestsList: React.FC<RequestsListProps> = ({ requests }) => {
       const sortDirection = sortField.startsWith('-') ? 'desc' : 'asc';
       const sortFieldName = sortField.replace('-', '') as keyof TARequest;
       requests.sort((a, b) => {
-        if (a[sortFieldName] && b[sortFieldName] && a[sortFieldName] < b[sortFieldName]) {
+        if (a[sortFieldName]! < b[sortFieldName]!) {
           return sortDirection === 'asc' ? -1 : 1;
         }
-        if (a[sortFieldName] && b[sortFieldName] && a[sortFieldName] > b[sortFieldName]) {
+        if (a[sortFieldName]! > b[sortFieldName]!) {
           return sortDirection === 'asc' ? 1 : -1;
         }
         return 0;
       });
+      setSortedRequests([...requests]);
     }
   }, [sortField]);
 
@@ -49,19 +42,6 @@ export const RequestsList: React.FC<RequestsListProps> = ({ requests }) => {
       setSortedRequests(requests);
     }
   }, [setSortedRequests, requests]);
-
-  /**
-   * If a request ID is in the URL params,
-   * set that request as selected in the table.
-   */
-  useEffect(() => {
-    if (params.requestId) {
-      setRowSelectionModel({
-        type: 'include',
-        ids: new Set<string | number>([params.requestId ? parseInt(params.requestId) : '']),
-      });
-    }
-  }, [params.requestId]);
 
   return (
     <Stack spacing={1}>

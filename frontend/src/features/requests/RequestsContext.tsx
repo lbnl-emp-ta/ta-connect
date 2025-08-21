@@ -12,7 +12,7 @@ const RequestsContext = createContext<RequestsContextType | undefined>(undefined
 
 export const RequestsProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [sortedRequests, setSortedRequests] = useState<TARequest[]>([]);
-  const [sortField, setSortField] = useState('date_created');
+  const [sortField, setSortField] = useState('-date_created');
 
   const value = useMemo(() => {
     return { sortedRequests, setSortedRequests, sortField, setSortField };

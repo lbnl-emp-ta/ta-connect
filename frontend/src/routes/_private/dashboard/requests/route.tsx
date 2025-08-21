@@ -12,11 +12,7 @@ import {
   Tabs,
   Typography,
 } from '@mui/material';
-import {
-  RequestsProvider,
-  useRequestsContext,
-} from '../../../../features/requests/RequestsContext';
-import { RequestsTable } from '../../../../features/requests/RequestsTable';
+import { useRequestsContext } from '../../../../features/requests/RequestsContext';
 import { requestsQueryOptions } from '../../../../utils/queryOptions';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { useIdentityContext } from '../../../../features/identity/IdentityContext';
@@ -105,8 +101,8 @@ function RequestsPage() {
                 }
                 onChange={(e) => setSortField(e.target.value)}
               >
-                <MenuItem value="date_created">Sort by newest first</MenuItem>
-                <MenuItem value="-date_created">Sort by oldest first</MenuItem>
+                <MenuItem value="-date_created">Sort by newest first</MenuItem>
+                <MenuItem value="date_created">Sort by oldest first</MenuItem>
                 <MenuItem value="status">Sort by status</MenuItem>
               </Select>
             </Stack>
