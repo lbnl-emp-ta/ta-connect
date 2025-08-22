@@ -19,4 +19,5 @@ class CustomerRequestRelationshipListView(generics.ListAPIView):
 
     permission_classes = [
         permissions.IsAuthenticated,
+        (IsAdmin | IsCoordinator | IsProgramLead | IsLabLead | IsExpert),
     ]

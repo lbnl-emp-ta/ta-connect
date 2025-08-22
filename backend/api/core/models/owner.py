@@ -1,4 +1,4 @@
-from django.db import IntegrityError, models, transaction
+from django.db import IntegrityError, models
 from django.db.models import CheckConstraint, Q
 from django.db.models.signals import post_save
 from django.dispatch import receiver
@@ -7,6 +7,9 @@ from django.dispatch import receiver
 from core.models import * 
 from core.constants import DOMAINTYPE
 
+# Keeps track of where a Request is assigned. Each instance of Reception(should only be one), Program,
+# and Lab will have an Owner instance generated as soon as they come into existance. If a Reception/Lab/Program
+# is a person, the associated Owner instance is its bag that holds a Request.
 class Owner(models.Model):
     class DomainType(models.TextChoices):
         Reception = "reception"
@@ -78,6 +81,7 @@ class Owner(models.Model):
         ]
         db_table = "owner"
 
+# These are what ensure each Program and Lab have an Owner
 @receiver(post_save, sender=Lab)
 def create_owner_on_lab_save(sender, instance, created, **kwargs):
     if created:
