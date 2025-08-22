@@ -30,6 +30,8 @@ from .expertise import Expertise
 from .attachment import Attachment
 from .note import Note
 
+# If you don't add new models to this list, they wont be recognized when
+# you try to run migrations.
 __all__ = [
     "RequestStatus",
     "Receipt",
