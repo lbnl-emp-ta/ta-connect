@@ -58,6 +58,7 @@ function DashboardComponent() {
   const { showToast, toastMessage, setShowToast } = useToastContext();
   const { data: identities } = useSuspenseQuery(identitiesQueryOptions());
   const [tabValue, setTabValue] = useState<string | number>();
+  const [identitiesMenuOpen, setIdentitiesMenuOpen] = useState(false);
 
   const handleTabChange = (_event: React.SyntheticEvent, newValue: string | number) => {
     setTabValue(newValue);
@@ -162,8 +163,20 @@ function DashboardComponent() {
         <Select
           value={detailedIdentity || ''}
           size="small"
+          open={identitiesMenuOpen}
+          onOpen={() => setIdentitiesMenuOpen(true)}
+          // onAbort={() => setIdentitiesMenuOpen(false)}
+          onClose={() => setIdentitiesMenuOpen(false)}
           onChange={handleIdentityChange}
-          startAdornment={<InputAdornment position="start">Viewing as:</InputAdornment>}
+          startAdornment={
+            <InputAdornment
+              position="start"
+              onClick={() => setIdentitiesMenuOpen(true)}
+              sx={{ cursor: 'pointer' }}
+            >
+              Viewing as:
+            </InputAdornment>
+          }
           sx={{
             backgroundColor: 'white',
             marginBottom: '0.5rem !important',
