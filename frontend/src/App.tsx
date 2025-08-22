@@ -9,6 +9,7 @@ import { routeTree } from './routeTree.gen';
 import { theme } from './theme';
 import { useIdentityContext } from './features/identity/IdentityContext';
 import { ToastProvider } from './features/toasts/ToastContext';
+import { RequestsProvider } from './features/requests/RequestsContext';
 
 export const queryClient = new QueryClient();
 
@@ -44,8 +45,13 @@ const App: React.FC = () => {
       <LocalizationProvider dateAdapter={AdapterDayjs}>
         <ThemeProvider theme={theme}>
           <ToastProvider>
-            <CssBaseline />
-            <RouterProvider router={router} context={{ queryClient, identity, detailedIdentity }} />
+            <RequestsProvider>
+              <CssBaseline />
+              <RouterProvider
+                router={router}
+                context={{ queryClient, identity, detailedIdentity }}
+              />
+            </RequestsProvider>
           </ToastProvider>
         </ThemeProvider>
       </LocalizationProvider>

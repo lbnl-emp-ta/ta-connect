@@ -5,12 +5,6 @@ import {
   Box,
   IconButton,
   InputAdornment,
-  Link,
-  List,
-  ListItem,
-  ListItemButton,
-  ListItemIcon,
-  ListItemText,
   MenuItem,
   Select,
   SelectChangeEvent,
@@ -32,12 +26,12 @@ import {
 } from '@tanstack/react-router';
 import { useEffect, useState } from 'react';
 import { TAIdentity } from '../../../api/dashboard/types';
+import { AppLink } from '../../../components/AppLink';
 import { useIdentityContext } from '../../../features/identity/IdentityContext';
+import { useRequestsContext } from '../../../features/requests/RequestsContext';
 import { useToastContext } from '../../../features/toasts/ToastContext';
 import { identitiesQueryOptions } from '../../../utils/queryOptions';
-import { AppLink } from '../../../components/AppLink';
 import { a11yProps } from '../../../utils/utils';
-import { RequestsProvider } from '../../../features/requests/RequestsContext';
 
 export const Route = createFileRoute('/_private/dashboard')({
   beforeLoad({ location }) {
@@ -54,8 +48,9 @@ export const Route = createFileRoute('/_private/dashboard')({
 function DashboardComponent() {
   const navigate = useNavigate();
   const location = useLocation();
-  const { detailedIdentity, setIdentity, setDetailedIdentity } = useIdentityContext();
+  const { identity, detailedIdentity, setIdentity, setDetailedIdentity } = useIdentityContext();
   const { showToast, toastMessage, setShowToast } = useToastContext();
+  const { setSortedRequests } = useRequestsContext();
   const { data: identities } = useSuspenseQuery(identitiesQueryOptions());
   const [tabValue, setTabValue] = useState<string | number>();
   const [identitiesMenuOpen, setIdentitiesMenuOpen] = useState(false);
@@ -72,7 +67,6 @@ function DashboardComponent() {
     if (reason === 'clickaway') {
       return;
     }
-
     setShowToast(false);
   };
 
@@ -84,10 +78,13 @@ function DashboardComponent() {
         location: detailedIdentity.location,
         instance: detailedIdentity.instance?.id,
       });
+      if (identity && detailedIdentity.role.id !== identity?.role) {
+        setSortedRequests([]);
+        navigate({ to: '/dashboard/requests', params: {} });
+      }
     } else {
       setDetailedIdentity(identities ? identities[0] : null);
     }
-    navigate({ to: '/dashboard/requests', params: {} });
   }, [detailedIdentity, identities, setDetailedIdentity, setIdentity]);
 
   useEffect(() => {
@@ -165,7 +162,6 @@ function DashboardComponent() {
           size="small"
           open={identitiesMenuOpen}
           onOpen={() => setIdentitiesMenuOpen(true)}
-          // onAbort={() => setIdentitiesMenuOpen(false)}
           onClose={() => setIdentitiesMenuOpen(false)}
           onChange={handleIdentityChange}
           startAdornment={
@@ -200,9 +196,7 @@ function DashboardComponent() {
         </Select>
       </Stack>
       <Box component="main" sx={{ flex: 1, overflow: 'hidden', padding: 3 }}>
-        <RequestsProvider>
-          <Outlet />
-        </RequestsProvider>
+        <Outlet />
       </Box>
       <Snackbar
         open={showToast}
