@@ -15,7 +15,7 @@ export const RequestsList: React.FC<RequestsListProps> = ({ requests }) => {
   const params = useParams({ strict: false });
   const isSelected = (request: TARequest) => params.requestId === request.id.toString();
   const [page, setPage] = useState(1);
-  const itemsPerPage = 2;
+  const itemsPerPage = 10;
   const pageCount = Math.ceil(sortedRequests.length / itemsPerPage);
   const paginatedRequests = useMemo(() => {
     return sortedRequests.slice((page - 1) * itemsPerPage, page * itemsPerPage);

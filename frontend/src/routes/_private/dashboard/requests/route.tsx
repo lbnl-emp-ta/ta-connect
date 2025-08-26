@@ -18,7 +18,7 @@ import { useSuspenseQuery } from '@tanstack/react-query';
 import { useIdentityContext } from '../../../../features/identity/IdentityContext';
 import { TabPanel } from '../../../../components/TabPanel';
 import { a11yProps } from '../../../../utils/utils';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { RequestsList } from '../../../../features/requests/RequestsList';
 
 export const Route = createFileRoute('/_private/dashboard/requests')({
@@ -37,6 +37,10 @@ function RequestsPage() {
   const handleChangeTab = (_event: React.SyntheticEvent, newValue: string | number) => {
     setTabValue(newValue);
   };
+
+  useEffect(() => {
+    setTabValue('actionable-requests');
+  }, [identity]);
 
   return (
     <Stack direction="row" sx={{ height: '100%' }}>
