@@ -1,6 +1,6 @@
 import { Chip, Pagination, Paper, Stack, Typography } from '@mui/material';
 import { useNavigate, useParams } from '@tanstack/react-router';
-import { useCallback, useEffect } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { TARequest } from '../../api/dashboard/types';
 import { formatDatetime } from '../../utils/utils';
 import { useRequestsContext } from './RequestsContext';
@@ -14,6 +14,16 @@ export const RequestsList: React.FC<RequestsListProps> = ({ requests }) => {
   const { sortedRequests, sortField, setSortedRequests } = useRequestsContext();
   const params = useParams({ strict: false });
   const isSelected = (request: TARequest) => params.requestId === request.id.toString();
+  const [page, setPage] = useState(1);
+  const itemsPerPage = 2;
+  const pageCount = Math.ceil(sortedRequests.length / itemsPerPage);
+  const paginatedRequests = useMemo(() => {
+    return sortedRequests.slice((page - 1) * itemsPerPage, page * itemsPerPage);
+  }, [page, sortedRequests]);
+
+  const handlePageChange = (_event: React.ChangeEvent<unknown>, value: number) => {
+    setPage(value);
+  };
 
   const sortRequests = useCallback(() => {
     const sortDirection = sortField.startsWith('-') ? 'desc' : 'asc';
@@ -36,16 +46,28 @@ export const RequestsList: React.FC<RequestsListProps> = ({ requests }) => {
     });
   };
 
+  // Ensure the correct page is selected based on the position
+  // of the selected request in the sortedRequests array
+  useEffect(() => {
+    const requestIndex = sortedRequests.findIndex((r) => r.id.toString() === params.requestId);
+    if (requestIndex !== -1) {
+      const newPage = Math.floor(requestIndex / itemsPerPage) + 1;
+      setPage(newPage);
+    } else {
+      setPage(1);
+    }
+  }, [params.requestId, sortedRequests]);
+
   useEffect(() => {
     if (sortField) {
       sortRequests();
     }
   }, [sortField, requests]);
 
+  // If there are no requests, redirect to the requests page
+  // This occurs if a request is assigned or removed and
+  // it's the only request in the list.
   useEffect(() => {
-    // If there are no requests, redirect to the requests page
-    // This occurs if a request is assigned or removed and
-    // it's the only request in the list.
     if (requests.length === 0) {
       navigate({
         to: `/dashboard/requests`,
@@ -55,7 +77,7 @@ export const RequestsList: React.FC<RequestsListProps> = ({ requests }) => {
 
   return (
     <Stack spacing={1}>
-      {sortedRequests.map((request) => (
+      {paginatedRequests.map((request) => (
         <Paper
           key={request.id}
           onClick={() => handleItemClick(request)}
@@ -69,7 +91,7 @@ export const RequestsList: React.FC<RequestsListProps> = ({ requests }) => {
             paddingTop: 1,
             transition: 'background-color 0.5s',
             '&:hover': {
-              backgroundColor: 'grey.100',
+              backgroundColor: isSelected(request) ? 'primary.light' : 'grey.100',
             },
           }}
         >
@@ -93,7 +115,13 @@ export const RequestsList: React.FC<RequestsListProps> = ({ requests }) => {
       {sortedRequests.length === 0 && (
         <Typography variant="body1">No requests found in this category.</Typography>
       )}
-      <Pagination count={10} variant="outlined" color="primary" />
+      <Pagination
+        count={pageCount}
+        page={page}
+        onChange={handlePageChange}
+        variant="outlined"
+        color="primary"
+      />
     </Stack>
   );
 };
