@@ -1,4 +1,4 @@
-import { Chip, Paper, Stack, Typography } from '@mui/material';
+import { Chip, Pagination, Paper, Stack, Typography } from '@mui/material';
 import { useNavigate, useParams } from '@tanstack/react-router';
 import { useCallback, useEffect } from 'react';
 import { TARequest } from '../../api/dashboard/types';
@@ -13,6 +13,7 @@ export const RequestsList: React.FC<RequestsListProps> = ({ requests }) => {
   const navigate = useNavigate();
   const { sortedRequests, sortField, setSortedRequests } = useRequestsContext();
   const params = useParams({ strict: false });
+  const isSelected = (request: TARequest) => params.requestId === request.id.toString();
 
   const sortRequests = useCallback(() => {
     const sortDirection = sortField.startsWith('-') ? 'desc' : 'asc';
@@ -59,33 +60,40 @@ export const RequestsList: React.FC<RequestsListProps> = ({ requests }) => {
           key={request.id}
           onClick={() => handleItemClick(request)}
           sx={{
-            border: params.requestId === request.id.toString() ? '2px solid' : 'none',
+            backgroundColor: isSelected(request) ? 'primary.light' : 'white',
+            border: isSelected(request) ? '2px solid' : 'none',
             cursor: 'pointer',
-            padding: 2,
+            paddingBottom: 1,
+            paddingLeft: 2,
+            paddingRight: 2,
+            paddingTop: 1,
             transition: 'background-color 0.5s',
             '&:hover': {
               backgroundColor: 'grey.100',
             },
           }}
         >
-          <Stack direction="row">
-            <Typography variant="h6" sx={{ flexGrow: 1 }}>
-              {request.customer_name}
-            </Typography>
-            <Typography>#{request.id}</Typography>
-          </Stack>
-          <Stack direction="row" alignItems="center">
-            <Chip label={request.status} />
-            <Typography variant="body2">{request.depth}</Typography>
-            <Typography variant="body2" sx={{ flexGrow: 1, textAlign: 'right' }}>
-              {formatDatetime(request.date_created)}
-            </Typography>
+          <Stack spacing={1}>
+            <Stack direction="row">
+              <Typography component="h4" fontWeight="bold" sx={{ flexGrow: 1 }}>
+                {request.customer_name}
+              </Typography>
+              <Typography>#{request.id}</Typography>
+            </Stack>
+            <Stack direction="row" alignItems="center">
+              <Chip label={request.status} />
+              <Typography variant="body2">{request.depth}</Typography>
+              <Typography variant="body2" sx={{ flexGrow: 1, textAlign: 'right' }}>
+                {formatDatetime(request.date_created)}
+              </Typography>
+            </Stack>
           </Stack>
         </Paper>
       ))}
       {sortedRequests.length === 0 && (
         <Typography variant="body1">No requests found in this category.</Typography>
       )}
+      <Pagination count={10} variant="outlined" color="primary" />
     </Stack>
   );
 };

@@ -18,7 +18,7 @@ export const theme = createTheme({
       main: '#345a64',
       // Exclude light, dark, or contrastText to have them
       // calculated automatically based on the main color.
-      // light: '#42a5f5',
+      light: '#D6E6EA',
       // dark: '#1565c0',
       contrastText: '#fff',
     },
