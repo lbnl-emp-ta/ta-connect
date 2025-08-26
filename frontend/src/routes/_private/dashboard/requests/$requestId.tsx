@@ -86,29 +86,29 @@ function SelectedRequest() {
               requestId: previousId.toString(),
             }}
           >
-            <Button variant="outlined" color="primary" startIcon={<WestIcon />}>
-              Previous Request
+            <Button variant="outlined" color="primary">
+              <WestIcon />
             </Button>
           </AppLink>
         )}
         {previousId === null && (
           <span>
-            <Button variant="outlined" color="primary" startIcon={<WestIcon />} disabled>
-              Previous Request
+            <Button variant="outlined" color="primary" disabled>
+              <WestIcon />
             </Button>
           </span>
         )}
         {nextId !== null && (
           <AppLink to={'/dashboard/requests/$requestId'} params={{ requestId: nextId.toString() }}>
-            <Button variant="outlined" color="primary" startIcon={<EastIcon />}>
-              Next Request
+            <Button variant="outlined" color="primary">
+              <EastIcon />
             </Button>
           </AppLink>
         )}
         {nextId === null && (
           <span>
-            <Button variant="outlined" color="primary" startIcon={<EastIcon />} disabled>
-              Next Request
+            <Button variant="outlined" color="primary" disabled>
+              <EastIcon />
             </Button>
           </span>
         )}
@@ -132,10 +132,10 @@ function SelectedRequest() {
         )}
       </Stack>
       <Grid container spacing={1}>
-        <Grid size={6}>
+        <Grid size={{ lg: 6, md: 12 }}>
           <RequestInfoPanel request={selectedRequest!} />
         </Grid>
-        <Grid size={6}>
+        <Grid size={{ lg: 6, md: 12 }}>
           <Stack>
             <RequestCustomerPanel customer={selectedRequest?.customers[0]} />
             <InfoPanel
