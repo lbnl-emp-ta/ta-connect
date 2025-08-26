@@ -1,6 +1,6 @@
 import { Chip, Paper, Stack, Typography } from '@mui/material';
 import { useNavigate, useParams } from '@tanstack/react-router';
-import { useEffect } from 'react';
+import { useCallback, useEffect } from 'react';
 import { TARequest } from '../../api/dashboard/types';
 import { formatDatetime } from '../../utils/utils';
 import { useRequestsContext } from './RequestsContext';
@@ -14,6 +14,21 @@ export const RequestsList: React.FC<RequestsListProps> = ({ requests }) => {
   const { sortedRequests, sortField, setSortedRequests } = useRequestsContext();
   const params = useParams({ strict: false });
 
+  const sortRequests = useCallback(() => {
+    const sortDirection = sortField.startsWith('-') ? 'desc' : 'asc';
+    const sortFieldName = sortField.replace('-', '') as keyof TARequest;
+    requests.sort((a, b) => {
+      if (a[sortFieldName]! < b[sortFieldName]!) {
+        return sortDirection === 'asc' ? -1 : 1;
+      }
+      if (a[sortFieldName]! > b[sortFieldName]!) {
+        return sortDirection === 'asc' ? 1 : -1;
+      }
+      return 0;
+    });
+    setSortedRequests([...requests]);
+  }, [sortField, requests, setSortedRequests]);
+
   const handleItemClick = (request: TARequest) => {
     navigate({
       to: `/dashboard/requests/${request.id}`,
@@ -22,24 +37,18 @@ export const RequestsList: React.FC<RequestsListProps> = ({ requests }) => {
 
   useEffect(() => {
     if (sortField) {
-      const sortDirection = sortField.startsWith('-') ? 'desc' : 'asc';
-      const sortFieldName = sortField.replace('-', '') as keyof TARequest;
-      requests.sort((a, b) => {
-        if (a[sortFieldName]! < b[sortFieldName]!) {
-          return sortDirection === 'asc' ? -1 : 1;
-        }
-        if (a[sortFieldName]! > b[sortFieldName]!) {
-          return sortDirection === 'asc' ? 1 : -1;
-        }
-        return 0;
-      });
-      setSortedRequests([...requests]);
+      sortRequests();
     }
-  }, [sortField]);
+  }, [sortField, requests]);
 
   useEffect(() => {
     if (requests) {
       setSortedRequests(requests);
+      if (requests.length === 0) {
+        void navigate({
+          to: `/dashboard/requests`,
+        });
+      }
     }
   }, [setSortedRequests, requests]);
 

@@ -12,6 +12,7 @@ import {
   Stack,
   TextField,
 } from '@mui/material';
+import { useNavigate } from '@tanstack/react-router';
 import { useState } from 'react';
 import { TAAssignment, TAExpert, TAOwner, TARequestDetail } from '../../api/dashboard/types';
 import { queryClient } from '../../App';
@@ -19,6 +20,7 @@ import { useAssignmentMutation } from '../../utils/queryOptions';
 import { useIdentityContext } from '../identity/IdentityContext';
 import { useToastContext } from '../toasts/ToastContext';
 import { ToastMessage } from '../toasts/ToastMessage';
+import { useRequestsContext } from './RequestsContext';
 
 interface RequestAssignButtonProps {
   requestId: TARequestDetail['id'];
@@ -31,7 +33,9 @@ export const RequestAssignButton: React.FC<RequestAssignButtonProps> = ({
   owners,
   experts,
 }) => {
+  const navigate = useNavigate();
   const { identity } = useIdentityContext();
+  const { nextId, previousId } = useRequestsContext();
   const { setShowToast, setToastMessage } = useToastContext();
   const assignRequestMutation = useAssignmentMutation(requestId.toString(), identity, {
     onSuccess: () => {
@@ -40,6 +44,17 @@ export const RequestAssignButton: React.FC<RequestAssignButtonProps> = ({
       setToastMessage(
         <ToastMessage icon={<CheckCircleIcon />}>Request assignment saved</ToastMessage>
       );
+      if (nextId) {
+        navigate({
+          to: `/dashboard/requests/$requestId`,
+          params: { requestId: nextId.toString() },
+        });
+      } else if (previousId) {
+        navigate({
+          to: `/dashboard/requests/$requestId`,
+          params: { requestId: previousId.toString() },
+        });
+      }
     },
     onError: (error: Error) => {
       setShowToast(true);
