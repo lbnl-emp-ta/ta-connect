@@ -42,15 +42,15 @@ export const RequestsList: React.FC<RequestsListProps> = ({ requests }) => {
   }, [sortField, requests]);
 
   useEffect(() => {
-    if (requests) {
-      setSortedRequests(requests);
-      if (requests.length === 0) {
-        void navigate({
-          to: `/dashboard/requests`,
-        });
-      }
+    // If there are no requests, redirect to the requests page
+    // This occurs if a request is assigned or removed and
+    // it's the only request in the list.
+    if (requests.length === 0) {
+      navigate({
+        to: `/dashboard/requests`,
+      });
     }
-  }, [setSortedRequests, requests]);
+  }, [requests]);
 
   return (
     <Stack spacing={1}>

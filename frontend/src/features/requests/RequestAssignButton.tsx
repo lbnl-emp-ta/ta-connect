@@ -6,6 +6,7 @@ import {
   Button,
   capitalize,
   Chip,
+  CircularProgress,
   ListItemText,
   Menu,
   MenuItem,
@@ -38,6 +39,17 @@ export const RequestAssignButton: React.FC<RequestAssignButtonProps> = ({
   const { nextId, previousId } = useRequestsContext();
   const { setShowToast, setToastMessage } = useToastContext();
   const assignRequestMutation = useAssignmentMutation(requestId.toString(), identity, {
+    onMutate: () => {
+      setShowToast(true);
+      setToastMessage(
+        <ToastMessage>
+          <Stack direction="row" alignItems="center">
+            <CircularProgress size="1.25rem" color="info" />
+            <span>Assigning request</span>
+          </Stack>
+        </ToastMessage>
+      );
+    },
     onSuccess: () => {
       queryClient.invalidateQueries();
       setShowToast(true);
@@ -79,6 +91,7 @@ export const RequestAssignButton: React.FC<RequestAssignButtonProps> = ({
       mutationData.expert = entity.id;
     }
     assignRequestMutation.mutate(mutationData);
+    handleAssignMenuClose();
   };
 
   return (
