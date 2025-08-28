@@ -1,0 +1,38 @@
+name: Django Backend Tests 
+
+on: [push, pull_request]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    env:
+      DJANGO_SETTINGS_MODULE: api.settings
+      SECRET_KEY: secret_key 
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.13'  
+
+    - name: Install dependencies
+      working-directory: backend/api
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+
+    - name: Run migrations
+      working-directory: backend/api
+      run: |
+        python manage.py migrate
+
+    - name: Run tests with pytest
+      working-directory: backend/api
+      run: |
+        pytest
+
+

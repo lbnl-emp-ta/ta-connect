@@ -80,7 +80,7 @@ export const RequestAttachments: React.FC<RequestAttachmentsProps> = ({
     uploadAttachmentMutation.mutate(formData);
   };
 
-  const handleDownload = (attachmentId: number) => {
+  const handleDownload = (attachmentId: number, attachmentTitle: string) => {
     fetch(`${apiUrl}/requests/${requestId}/download-attachment/${attachmentId}`, {
       credentials: 'include',
       headers: {
@@ -89,8 +89,8 @@ export const RequestAttachments: React.FC<RequestAttachmentsProps> = ({
         Context: identity ? JSON.stringify(identity) : '',
       },
     })
-      .then((response) => response.blob())
-      .then((blob) => downloadBlob(blob, `attachment_${attachmentId}`));
+      .then((response) => {return response.blob();})
+      .then((blob) => downloadBlob(blob, `${attachmentTitle}`));
   };
 
   const handleInitiateDelete = (attachmentId: number) => {
@@ -136,7 +136,7 @@ export const RequestAttachments: React.FC<RequestAttachmentsProps> = ({
             alignItems="center"
             sx={{ border: '1px solid', borderColor: 'grey.300', padding: 1, overflow: 'auto' }}
           >
-            <IconButton onClick={() => handleDownload(attachment.id)}>
+            <IconButton onClick={() => handleDownload(attachment.id, attachment.title)}>
               <DownloadIcon />
             </IconButton>
             <Stack spacing={0} flexGrow={1}>

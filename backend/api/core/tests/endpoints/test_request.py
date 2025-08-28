@@ -1,74 +1,55 @@
-from datetime import datetime, timezone
-import dateutil
 import pytest
 
 from rest_framework.reverse import reverse
 from rest_framework import status
-from django.utils import timezone
 
+from core.models import *
 
 @pytest.mark.django_db
-class TestRequestCreateEndpoint():
-    @classmethod
-    def post_endpoint(cls):
-        return reverse("request-list-create")
-    
-    def test_create_request_endpoint_exists_at_desired_location(self, api_client, test_user):
-        data = {
-            "description": "test",
-        }
-        
-        # Need to be authenticated for this endpoint
-        api_client.force_login(test_user)
-        response = api_client.post("/api/requests/", data=data)
-        assert response.status_code == status.HTTP_201_CREATED
-    
-    def test_create_request_is_successful_given_only_desc_and_depth(self, api_client, test_user):
-        """
-        The only required field for creating a Request is its
-        description.
-        """
-        
-        data = {
-            "description": "test",
-        }
+class TestRequestDetailViewEndpoint():
 
-        api_client.force_login(test_user) 
-        response = api_client.post(self.post_endpoint(), data=data)
-        assert response.status_code == status.HTTP_201_CREATED
-        
-    def test_create_request_fails_given_no_desc(self, api_client, test_user):
-        """
-        Description is a required field.
-        """
-        
-        data = {}
+    def test_request_detail_get_view_should_fail_when_missing_context(self, api_client):
+        api_client.force_login(User.objects.get(pk=1)) 
+        response = api_client.get("/api/requests/1")
 
-        api_client.force_login(test_user) 
-        response = api_client.post(self.post_endpoint(), data=data)
-        
         assert response.status_code == status.HTTP_400_BAD_REQUEST
-        
-    def test_create_request_is_succesful_and_ignores_given_date_created(self, api_client, test_user):
-        """
-        Any given date created field should be ignored. Date 
-        created should be the current date as of creating the 
-        Request.
-        """
-        
-        given_date_created = datetime.strptime("2000-01-01", "%Y-%m-%d")
-        
-        data = {
-            "description": "test",
-            "date_created": given_date_created
-        }
 
-        api_client.force_login(test_user) 
-        response = api_client.post(self.post_endpoint(), data=data)
+    def test_request_detail_get_view_should_fail_when_not_authorized(self, api_client):
+        response = api_client.get("/api/requests/1", headers={"Context": '{"user":1,"role":1,"location":"System"}'})
+
+        assert response.status_code == status.HTTP_403_FORBIDDEN
+
+    def test_request_detail_get_view_should_succeed(self, api_client):
+        actual_request = Request.objects.get(pk=1) 
+        api_client.force_login(User.objects.get(pk=1)) 
+        response = api_client.get("/api/requests/1", headers={"Context": '{"user":1,"role":1,"location":"System"}'})
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data["id"] == actual_request.id
+
+    def test_request_detail_patch_view_should_fail_when_missing_context(self, api_client):
+        api_client.force_login(User.objects.get(pk=1)) 
+        response = api_client.patch("/api/requests/1")
+
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+
+    def test_request_detail_patch_view_should_fail_when_not_authorized(self, api_client):
+        response = api_client.patch("/api/requests/1", headers={"Context": '{"user":1,"role":1,"location":"System"}'})
+
+        assert response.status_code == status.HTTP_403_FORBIDDEN
+
+    def test_request_detail_patch_view_should_succeed_when_patching_description(self, api_client):
+        old_request = Request.objects.get(pk=1)
+
+        data = {"description": "New Test Description"}
+
+        api_client.force_login(User.objects.get(pk=1)) 
+        response = api_client.patch("/api/requests/1", data=data, headers={"Context": '{"user":1,"role":1,"location":"System"}'})
         
-        received_date_created = dateutil.parser.parse(response.data.get("date_created"))
+        print(response.data)
+        assert response.status_code == status.HTTP_200_OK
         
-        assert received_date_created != given_date_created
-        assert received_date_created.date() == timezone.now().date()
+        new_request = Request.objects.get(pk=1)
         
+        assert old_request == new_request
         

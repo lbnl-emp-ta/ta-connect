@@ -16,6 +16,7 @@ from .customer import Customer
 from .customer_type import CustomerType
 from .customer_request_relationship import CustomerRequestRelationship
 from .cohort import Cohort
+from .cohort_participant import CohortParticipant
 from .role import Role
 from .system_role_assignment import SystemRoleAssignment
 from .lab_role_assignment import LabRoleAssignment
@@ -29,6 +30,8 @@ from .expertise import Expertise
 from .attachment import Attachment
 from .note import Note
 
+# If you don't add new models to this list, they wont be recognized when
+# you try to run migrations.
 __all__ = [
     "RequestStatus",
     "Receipt",
@@ -42,6 +45,7 @@ __all__ = [
     "CustomerType",
     "CustomerRequestRelationship",
     "Cohort",
+    "CohortParticipant",
     "User",
     "Reception",
     "Program",
