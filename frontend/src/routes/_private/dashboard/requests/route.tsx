@@ -97,7 +97,6 @@ function RequestsPage() {
               </Tabs>
               <Select
                 value={sortField}
-                color="info"
                 startAdornment={
                   <InputAdornment position="start">
                     <SortIcon />
@@ -105,9 +104,9 @@ function RequestsPage() {
                 }
                 onChange={(e) => setSortField(e.target.value)}
               >
-                <MenuItem value="-date_created">Sort by newest first</MenuItem>
-                <MenuItem value="date_created">Sort by oldest first</MenuItem>
-                <MenuItem value="status">Sort by status</MenuItem>
+                <MenuItem value="-date_created">Newest first</MenuItem>
+                <MenuItem value="date_created">Oldest first</MenuItem>
+                <MenuItem value="status">Status</MenuItem>
               </Select>
             </Stack>
             <TabPanel value={tabValue} index="actionable-requests">

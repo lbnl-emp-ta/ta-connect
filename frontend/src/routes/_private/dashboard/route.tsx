@@ -126,7 +126,14 @@ function DashboardComponent() {
             value="requests"
             disableRipple
             label={
-              <AppLink to="/dashboard/requests" sx={{ color: 'inherit' }}>
+              <AppLink
+                to="/dashboard/requests"
+                sx={{
+                  color: 'inherit',
+                  transition: '0.25s',
+                  '&:hover': { color: 'secondary.dark' },
+                }}
+              >
                 <Stack direction="row" spacing={1} alignItems="center">
                   <AssignmentIcon />
                   <Typography>Requests</Typography>
@@ -143,7 +150,14 @@ function DashboardComponent() {
             value="experts"
             disableRipple
             label={
-              <AppLink to="/dashboard/experts" sx={{ color: 'inherit' }}>
+              <AppLink
+                to="/dashboard/experts"
+                sx={{
+                  color: 'inherit',
+                  transition: '0.25s',
+                  '&:hover': { color: 'secondary.dark' },
+                }}
+              >
                 <Stack direction="row" spacing={1} alignItems="center">
                   <PeopleIcon />
                   <Typography>Experts</Typography>
