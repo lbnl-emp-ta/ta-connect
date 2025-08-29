@@ -59,15 +59,13 @@ function SelectedRequest() {
     ...expertsQueryOptions(identity),
     enabled: canAssignExperts,
   });
-
-  const { sortedRequests } = useRequestsContext();
+  const { sortedRequests, setCurrentIndex, nextId, previousId } = useRequestsContext();
   const currentIndex = sortedRequests.findIndex((request) => {
     if (params?.requestId) {
       return request.id === parseInt(params.requestId);
     }
   });
-  const nextIndex = currentIndex < sortedRequests.length - 1 ? currentIndex + 1 : null;
-  const previousIndex = currentIndex > 0 ? currentIndex - 1 : null;
+  setCurrentIndex(currentIndex);
   const [tabValue, setTabValue] = useState<string | number>('notes');
 
   const handleTabChange = (_event: React.SyntheticEvent, newValue: string | number) => {
@@ -81,39 +79,36 @@ function SelectedRequest() {
   return (
     <Paper sx={{ padding: 2 }}>
       <Stack direction="row" sx={{ marginBottom: 2 }}>
-        {previousIndex !== null && (
+        {previousId !== null && (
           <AppLink
             to={'/dashboard/requests/$requestId'}
             params={{
-              requestId: sortedRequests[previousIndex].id.toString(),
+              requestId: previousId.toString(),
             }}
           >
-            <Button variant="outlined" color="primary" startIcon={<WestIcon />}>
-              Previous Request
+            <Button variant="outlined" color="primary">
+              <WestIcon />
             </Button>
           </AppLink>
         )}
-        {previousIndex === null && (
+        {previousId === null && (
           <span>
-            <Button variant="outlined" color="primary" startIcon={<WestIcon />} disabled>
-              Previous Request
+            <Button variant="outlined" color="primary" disabled>
+              <WestIcon />
             </Button>
           </span>
         )}
-        {nextIndex !== null && (
-          <AppLink
-            to={'/dashboard/requests/$requestId'}
-            params={{ requestId: sortedRequests[nextIndex].id.toString() }}
-          >
-            <Button variant="outlined" color="primary" startIcon={<EastIcon />}>
-              Next Request
+        {nextId !== null && (
+          <AppLink to={'/dashboard/requests/$requestId'} params={{ requestId: nextId.toString() }}>
+            <Button variant="outlined" color="primary">
+              <EastIcon />
             </Button>
           </AppLink>
         )}
-        {nextIndex === null && (
+        {nextId === null && (
           <span>
-            <Button variant="outlined" color="primary" startIcon={<EastIcon />} disabled>
-              Next Request
+            <Button variant="outlined" color="primary" disabled>
+              <EastIcon />
             </Button>
           </span>
         )}
@@ -137,10 +132,10 @@ function SelectedRequest() {
         )}
       </Stack>
       <Grid container spacing={1}>
-        <Grid size={6}>
+        <Grid size={{ lg: 6, md: 12 }}>
           <RequestInfoPanel request={selectedRequest!} />
         </Grid>
-        <Grid size={6}>
+        <Grid size={{ lg: 6, md: 12 }}>
           <Stack>
             <RequestCustomerPanel customer={selectedRequest?.customers[0]} />
             <InfoPanel
