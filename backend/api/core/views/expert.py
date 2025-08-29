@@ -51,9 +51,10 @@ class ExpertsListView(views.APIView):
             data["email"] = assignment.user.email
             data["lab"] = LabSerializer(assignment.instance).data
 
-            expertise_list = Expertise.objects.filter(user=assignment.user.pk)
-            expertise = dict()
-            for expertise_entry in expertise_list:
+            expertise_list = list()
+            expertise_entries = Expertise.objects.filter(user=assignment.user.pk)
+            for expertise_entry in expertise_entries:
+                expertise = dict()
                 maybe_topic = None
                 maybe_depth = None
                 try:
@@ -67,8 +68,9 @@ class ExpertsListView(views.APIView):
 
                 expertise["topic"] = topic_serializer.data
                 expertise["depth"] = depth_serializer.data 
+                expertise_list.append(expertise)
 
-            data["expertise"] = expertise
+            data["expertises"] = expertise_list
 
             request_data = RequestExpertListSerializer(Request.objects.filter(expert=User.objects.get(pk=self.request.user.id)), many=True).data
             data["requests"] = request_data
