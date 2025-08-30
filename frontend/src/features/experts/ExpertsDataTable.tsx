@@ -1,8 +1,9 @@
 import { Chip, Paper, Stack, Tooltip } from '@mui/material';
 import { DataGrid, GridColDef, GridRenderCellParams } from '@mui/x-data-grid';
 import { TAExpert, TAExpertise } from '../../api/dashboard/types';
+import { ExpertsToolbar } from './ExpertsToolbar';
 
-interface RequestsListProps {
+interface ExpertsDataTableProps {
   experts: TAExpert[];
 }
 
@@ -51,13 +52,15 @@ const columns: GridColDef[] = [
   },
 ];
 
-export const ExpertsDataTable: React.FC<RequestsListProps> = ({ experts }) => {
+export const ExpertsDataTable: React.FC<ExpertsDataTableProps> = ({ experts }) => {
   return (
     <Paper>
       <DataGrid
         rows={experts || []}
         columns={columns}
         showToolbar
+        slots={{ toolbar: ExpertsToolbar }}
+        slotProps={{ toolbar: { experts: experts } }}
         sx={{ backgroundColor: 'white' }}
       />
     </Paper>
