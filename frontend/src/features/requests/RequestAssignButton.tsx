@@ -157,8 +157,8 @@ export const RequestAssignButton: React.FC<RequestAssignButtonProps> = ({
             onKeyDown={(e) => e.stopPropagation()}
           />
         </Box>
-        <MenuItem>
-          <AppLink to="/dashboard/experts">
+        <AppLink to="/dashboard/experts">
+          <MenuItem>
             <ListItemText sx={{ color: 'secondary.main' }}>
               <Typography variant="body2">
                 <Stack direction="row" alignItems="center">
@@ -167,8 +167,8 @@ export const RequestAssignButton: React.FC<RequestAssignButtonProps> = ({
                 </Stack>
               </Typography>
             </ListItemText>
-          </AppLink>
-        </MenuItem>
+          </MenuItem>
+        </AppLink>
         {filteredOwners?.map((owner) => (
           <MenuItem key={owner.id} onClick={() => handleAssignment(owner)}>
             <Stack direction="row" spacing={1}>
