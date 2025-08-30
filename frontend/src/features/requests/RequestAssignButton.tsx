@@ -12,6 +12,7 @@ import {
   MenuItem,
   Stack,
   TextField,
+  Typography,
 } from '@mui/material';
 import { useNavigate } from '@tanstack/react-router';
 import { useState } from 'react';
@@ -22,6 +23,7 @@ import { useIdentityContext } from '../identity/IdentityContext';
 import { useToastContext } from '../toasts/ToastContext';
 import { ToastMessage } from '../toasts/ToastMessage';
 import { useRequestsContext } from './RequestsContext';
+import { AppLink } from '../../components/AppLink';
 
 interface RequestAssignButtonProps {
   requestId: TARequestDetail['id'];
@@ -155,6 +157,18 @@ export const RequestAssignButton: React.FC<RequestAssignButtonProps> = ({
             onKeyDown={(e) => e.stopPropagation()}
           />
         </Box>
+        <MenuItem>
+          <AppLink to="/dashboard/experts">
+            <ListItemText sx={{ color: 'secondary.main' }}>
+              <Typography variant="body2">
+                <Stack direction="row" alignItems="center">
+                  <span>Explore experts</span>
+                  <EastIcon />
+                </Stack>
+              </Typography>
+            </ListItemText>
+          </AppLink>
+        </MenuItem>
         {filteredOwners?.map((owner) => (
           <MenuItem key={owner.id} onClick={() => handleAssignment(owner)}>
             <Stack direction="row" spacing={1}>
