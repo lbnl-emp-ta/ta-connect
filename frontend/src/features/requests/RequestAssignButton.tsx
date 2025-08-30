@@ -160,7 +160,7 @@ export const RequestAssignButton: React.FC<RequestAssignButtonProps> = ({
         <AppLink to="/dashboard/experts">
           <MenuItem>
             <ListItemText sx={{ color: 'secondary.main' }}>
-              <Typography variant="body2">
+              <Typography variant="body2" component="div">
                 <Stack direction="row" alignItems="center">
                   <span>Explore experts</span>
                   <EastIcon />

@@ -3,7 +3,7 @@ import WestIcon from '@mui/icons-material/West';
 import { Badge, Button, Grid, Paper, Stack, Tab, Tabs, Typography } from '@mui/material';
 import { useQuery, useSuspenseQuery } from '@tanstack/react-query';
 import { createFileRoute } from '@tanstack/react-router';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { AppLink } from '../../../../components/AppLink';
 import { InfoPanel } from '../../../../components/InfoPanel';
 import { TabPanel } from '../../../../components/TabPanel';
@@ -65,12 +65,15 @@ function SelectedRequest() {
       return request.id === parseInt(params.requestId);
     }
   });
-  setCurrentIndex(currentIndex);
   const [tabValue, setTabValue] = useState<string | number>('notes');
 
   const handleTabChange = (_event: React.SyntheticEvent, newValue: string | number) => {
     setTabValue(newValue);
   };
+
+  useEffect(() => {
+    setCurrentIndex(currentIndex);
+  }, [currentIndex, setCurrentIndex]);
 
   if (!selectedRequest) {
     return <Typography variant="h6">Loading request details...</Typography>;
