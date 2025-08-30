@@ -92,6 +92,7 @@ export interface TARequest {
   date_created: string;
   customer_email: string;
   customer_name: string;
+  customer_state_abbreviation: string;
   expert: Partial<TAExpert> | null;
   proj_start_date: string | null;
   proj_completion_date: string | null;
