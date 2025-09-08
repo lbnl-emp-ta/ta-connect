@@ -64,9 +64,11 @@ MIDDLEWARE = [
 ]
 
 CORS_ALLOWED_ORIGIN_REGEXES = [
-    # match localhost with any port
+    "http://taconnect.lbl.gov:1337",
+    "http://taconnect.lbl.gov",
     "http://taconnect-local.lbl.gov",
     "http://taconnect-local.lbl.gov:1337",
+    # match localhost with any port
     r"^http:\/\/localhost:*([0-9]+)?$",
     r"^https:\/\/localhost:*([0-9]+)?$",
 ]
@@ -77,16 +79,19 @@ CORS_ALLOW_HEADERS = (
     "context",
 )
 
-CSRF_TRUSTED_ORIGINS = ["http://taconnect-local.lbl.gov:1337",
-                        "http://taconnect-local.lbl.gov",
-                        "http://127.0.0.1",
-                        "http://127.0.0.1:80",
-                        "http://localhost",
-                        "http://localhost:5173", 
-                        "http://127.0.0.1:5173", 
-                        "http://localhost:8000", 
-                        "http://127.0.0.1:8000", 
-                        ]
+CSRF_TRUSTED_ORIGINS = [
+    "http://taconnect.lbl.gov:1337",
+    "http://taconnect.lbl.gov",
+    "http://taconnect-local.lbl.gov:1337",
+    "http://taconnect-local.lbl.gov",
+    "http://127.0.0.1",
+    "http://127.0.0.1:80",
+    "http://localhost",
+    "http://localhost:5173", 
+    "http://127.0.0.1:5173", 
+    "http://localhost:8000", 
+    "http://127.0.0.1:8000", 
+]
 
 CORS_ALLOW_CREDENTIALS = True
 # CSRF_COOKIE_SECURE = False
@@ -95,27 +100,34 @@ CORS_ALLOW_CREDENTIALS = True
 # SESSION_COOKIE_SAMESITE = 'None'
 # CSRF_USE_SESSIONS = True
 
-CORS_ORIGIN_WHITELIST = ["http://127.0.0.1",
-                        "http://127.0.0.1:80",
-                        "http://localhost",
-                        "http://localhost:5173", 
-                        "http://127.0.0.1:5173", 
-                        "http://localhost:8000", 
-                        "http://127.0.0.1:8000", 
-                        "http://taconnect-local.lbl.gov:1337",
-                        "http://taconnect-local.lbl.gov"]
+CORS_ORIGIN_WHITELIST = [
+    "http://127.0.0.1",
+    "http://127.0.0.1:80",
+    "http://localhost",
+    "http://localhost:5173", 
+    "http://127.0.0.1:5173", 
+    "http://localhost:8000", 
+    "http://127.0.0.1:8000", 
+    "http://taconnect-local.lbl.gov:1337",
+    "http://taconnect-local.lbl.gov",
+    "http://taconnect.lbl.gov:1337",
+    "http://taconnect.lbl.gov"
+]
 
 SITE_ID = 2
 
-ALLOWED_HOSTS = ["localhost", 
-                 "localhost:80", 
-                 "127.0.0.1",
-                 "127.0.0.1:80", 
-                 "localhost:5173", 
-                 "localhost:8000", 
-                 "taconnect-local.lbl.gov:1337",
-                 "taconnect-local.lbl.gov",
-                 ]
+ALLOWED_HOSTS = [
+    "localhost", 
+    "localhost:80", 
+    "127.0.0.1",
+    "127.0.0.1:80", 
+    "localhost:5173", 
+    "localhost:8000", 
+    "taconnect-local.lbl.gov:1337",
+    "taconnect-local.lbl.gov",
+    "taconnect.lbl.gov:1337",
+    "taconnect.lbl.gov",
+]
 
 ROOT_URLCONF = 'api.urls'
 
