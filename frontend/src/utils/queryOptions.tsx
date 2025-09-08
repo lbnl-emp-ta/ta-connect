@@ -8,13 +8,11 @@ import { deleteData, fetchData, patchData, postData, postForm } from '../api/das
 import {
   CustomerRequestRelationship,
   TAAssignment,
-  TACustomer,
   TACustomerMutation,
   TAExpert,
   TAIdentity,
   TANote,
   TAOwner,
-  TARequest,
   TARequestDetail,
   TARequestDetailMutation,
   TARequestsResponse,

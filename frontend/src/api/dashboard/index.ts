@@ -1,6 +1,6 @@
 import { Identity } from '../../features/identity/IdentityContext';
 import { getCSRFToken } from '../../utils/cookies';
-import { TAError, TARequest } from './types';
+import { TAError } from './types';
 
 /**
  * Generic wrapper for fetch requests that injects the user CSRF token and identity context.

@@ -1,9 +1,8 @@
 import GoogleIcon from '@mui/icons-material/Google';
-import MicrosoftIcon from '@mui/icons-material/Microsoft';
 import { Box, Container, Grid, Link, Paper, Stack, Typography } from '@mui/material';
 import { createFileRoute } from '@tanstack/react-router';
-import { SocialLoginButton } from '../../components/SocialLoginButton';
 import imagePath from '../../assets/lbnl.png';
+import { SocialLoginButton } from '../../components/SocialLoginButton';
 
 export const Route = createFileRoute('/_public-only/login')({
   beforeLoad: ({ context }) => {

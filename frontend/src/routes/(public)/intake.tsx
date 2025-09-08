@@ -201,11 +201,11 @@ function IntakeForm() {
                     required={true}
                     defaultValue=""
                     value={
-                      tprName === undefined || tprName === null || tprs.length === 0 ? '' : tprName
+                      tprName === undefined || tprName === null || tprs?.length === 0 ? '' : tprName
                     }
                     onChange={(e) => setTPRName(e.target.value as React.SetStateAction<string>)}
                   >
-                    {tprs.map((region: TransmissionPlanningRegion) => (
+                    {tprs?.map((region: TransmissionPlanningRegion) => (
                       <MenuItem key={region.name} value={region.name}>
                         {region.name}
                       </MenuItem>
@@ -214,7 +214,7 @@ function IntakeForm() {
                 </FormControl>
                 <Autocomplete
                   disablePortal
-                  options={states}
+                  options={states || []}
                   getOptionLabel={(option: State) => option.name}
                   sx={{ width: 300 }}
                   renderInput={(params) => <TextField {...params} required={true} label="State" />}
@@ -247,7 +247,7 @@ function IntakeForm() {
                     onChange={(e) => setOrgTypeName(e.target.value)}
                     name="org-type-radio-group"
                   >
-                    {orgTypes.map((type: OrganizationType) => (
+                    {orgTypes?.map((type: OrganizationType) => (
                       <FormControlLabel
                         key={type.name}
                         value={type.name}
