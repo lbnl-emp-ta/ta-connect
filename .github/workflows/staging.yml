@@ -34,10 +34,10 @@ jobs:
         uses: appleboy/scp-action@master
         with:
           host: ${{ secrets.SSH_HOST }}
-          username: ${{ secrets.SSH_USERNAME }}
+          username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           source: "./backend"
-          target: "/home/${{ secrets.SSH_USERNAME }}/taconnect-staging/backend"
+          target: "/home/${{ secrets.SSH_USER }}/taconnect-staging/backend"
 
       - name: Install frontend dependencies
         run: npm install --prefix ./frontend
