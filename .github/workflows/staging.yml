@@ -57,7 +57,7 @@ jobs:
           source: "./frontend/dist"
           target: "/home/${{ secrets.SSH_USER }}/taconnect-staging/frontend/dist"
 
-      - name: Restart application server (optional)
+      - name: Restart application server
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.SSH_HOST }}
