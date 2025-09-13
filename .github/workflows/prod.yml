@@ -54,7 +54,7 @@ jobs:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
-          source: "./frontend/dist"
+          source: "./frontend/dist/*"
           target: "/home/${{ secrets.SSH_USER }}/taconnect-prod/frontend/dist"
 
       - name: Restart application server
