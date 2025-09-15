@@ -1,29 +1,28 @@
+import CancelIcon from '@mui/icons-material/Cancel';
+import FileDownloadIcon from '@mui/icons-material/FileDownload';
+import FilterListIcon from '@mui/icons-material/FilterList';
+import SearchIcon from '@mui/icons-material/Search';
+import ViewColumnIcon from '@mui/icons-material/ViewColumn';
+import Badge from '@mui/material/Badge';
+import Divider from '@mui/material/Divider';
+import InputAdornment from '@mui/material/InputAdornment';
+import Menu from '@mui/material/Menu';
+import MenuItem from '@mui/material/MenuItem';
 import { styled } from '@mui/material/styles';
+import TextField from '@mui/material/TextField';
+import Tooltip from '@mui/material/Tooltip';
 import {
-  Toolbar,
-  ToolbarButton,
   ColumnsPanelTrigger,
-  FilterPanelTrigger,
   ExportCsv,
   ExportPrint,
+  FilterPanelTrigger,
   QuickFilter,
-  QuickFilterControl,
   QuickFilterClear,
+  QuickFilterControl,
   QuickFilterTrigger,
+  Toolbar,
+  ToolbarButton,
 } from '@mui/x-data-grid';
-import Tooltip from '@mui/material/Tooltip';
-import Menu from '@mui/material/Menu';
-import Badge from '@mui/material/Badge';
-import ViewColumnIcon from '@mui/icons-material/ViewColumn';
-import FilterListIcon from '@mui/icons-material/FilterList';
-import FileDownloadIcon from '@mui/icons-material/FileDownload';
-import MenuItem from '@mui/material/MenuItem';
-import Divider from '@mui/material/Divider';
-import TextField from '@mui/material/TextField';
-import InputAdornment from '@mui/material/InputAdornment';
-import CancelIcon from '@mui/icons-material/Cancel';
-import SearchIcon from '@mui/icons-material/Search';
-import Typography from '@mui/material/Typography';
 import { useRef, useState } from 'react';
 import { TAExpert } from '../../api/dashboard/types';
 import { ExpertsDataHeader } from './ExpertsDataHeader';
