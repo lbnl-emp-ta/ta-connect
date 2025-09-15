@@ -12,6 +12,7 @@ import {
   MenuItem,
   Stack,
   TextField,
+  Typography,
 } from '@mui/material';
 import { useNavigate } from '@tanstack/react-router';
 import { useState } from 'react';
@@ -22,6 +23,7 @@ import { useIdentityContext } from '../identity/IdentityContext';
 import { useToastContext } from '../toasts/ToastContext';
 import { ToastMessage } from '../toasts/ToastMessage';
 import { useRequestsContext } from './RequestsContext';
+import { AppLink } from '../../components/AppLink';
 
 interface RequestAssignButtonProps {
   requestId: TARequestDetail['id'];
@@ -38,6 +40,9 @@ export const RequestAssignButton: React.FC<RequestAssignButtonProps> = ({
   const { identity } = useIdentityContext();
   const { nextId, previousId } = useRequestsContext();
   const { setShowToast, setToastMessage } = useToastContext();
+  const [filteredOwners, setFilteredOwners] = useState(owners);
+  const [filteredExperts, setFilteredExperts] = useState(experts);
+  const [searchTerm, setSearchTerm] = useState('');
   const assignRequestMutation = useAssignmentMutation(requestId.toString(), identity, {
     onMutate: () => {
       setShowToast(true);
@@ -81,17 +86,35 @@ export const RequestAssignButton: React.FC<RequestAssignButtonProps> = ({
 
   const handleAssignMenuClose = () => {
     setAssignAnchorEl(null);
+    setSearchTerm('');
   };
 
   const handleAssignment = (entity: TAOwner | TAExpert) => {
     const mutationData: TAAssignment = { request: requestId };
     if (Object.prototype.hasOwnProperty.call(entity, 'domain_id')) {
       mutationData.owner = entity.id;
-    } else if (Object.prototype.hasOwnProperty.call(entity, 'expertise')) {
+    } else if (Object.prototype.hasOwnProperty.call(entity, 'expertises')) {
       mutationData.expert = entity.id;
     }
     assignRequestMutation.mutate(mutationData);
     handleAssignMenuClose();
+  };
+
+  const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const newSearchTerm = event.target.value.toLowerCase();
+    const newFilteredOwners = owners?.filter((owner) => {
+      const includesName = owner?.domain_name?.toLowerCase().includes(newSearchTerm);
+      const includesDescription = owner?.domain_description?.toLowerCase().includes(newSearchTerm);
+      return includesName || includesDescription;
+    });
+    const newFilteredExperts = experts?.filter((expert) => {
+      const includesEmail = expert.email.toLowerCase().includes(newSearchTerm);
+      const includesName = expert.name.toLowerCase().includes(newSearchTerm);
+      return includesEmail || includesName;
+    });
+    setSearchTerm(event.target.value);
+    setFilteredOwners(newFilteredOwners);
+    setFilteredExperts(newFilteredExperts);
   };
 
   return (
@@ -124,9 +147,29 @@ export const RequestAssignButton: React.FC<RequestAssignButtonProps> = ({
         aria-labelledby="assign-menu-button"
       >
         <Box sx={{ padding: 1 }}>
-          <TextField variant="outlined" size="small" placeholder="Search Owners" fullWidth />
+          <TextField
+            variant="outlined"
+            size="small"
+            placeholder="Search assignees"
+            fullWidth
+            value={searchTerm}
+            onChange={handleSearch}
+            onKeyDown={(e) => e.stopPropagation()}
+          />
         </Box>
-        {owners?.map((owner) => (
+        <AppLink to="/dashboard/experts">
+          <MenuItem>
+            <ListItemText sx={{ color: 'secondary.main' }}>
+              <Typography variant="body2" component="div">
+                <Stack direction="row" alignItems="center">
+                  <span>Explore experts</span>
+                  <EastIcon />
+                </Stack>
+              </Typography>
+            </ListItemText>
+          </MenuItem>
+        </AppLink>
+        {filteredOwners?.map((owner) => (
           <MenuItem key={owner.id} onClick={() => handleAssignment(owner)}>
             <Stack direction="row" spacing={1}>
               <ListItemText>{owner.domain_name}</ListItemText>
@@ -134,10 +177,10 @@ export const RequestAssignButton: React.FC<RequestAssignButtonProps> = ({
             </Stack>
           </MenuItem>
         ))}
-        {experts?.map((expert) => (
+        {filteredExperts?.map((expert) => (
           <MenuItem key={expert.id} onClick={() => handleAssignment(expert)}>
             <Stack direction="row" spacing={1}>
-              <ListItemText>{expert.name}</ListItemText>
+              <ListItemText>{expert.email}</ListItemText>
               <Chip label="Expert" size="small" />
             </Stack>
           </MenuItem>

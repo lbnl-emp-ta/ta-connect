@@ -104,11 +104,16 @@ export async function postData<T>(url: string, data?: T, identity?: Identity): P
     });
 
     if (!response.ok) {
-      throw Error(`Request status: ${response.status}`);
+      const errorData = (await response.json()) as TAError;
+      let errorMessage =
+        typeof errorData.message === 'string'
+          ? errorData.message
+          : 'An unknown error has occurred.';
+      throw Error(errorMessage);
     }
   } catch (error) {
     if (error instanceof Error) {
-      console.error(error.message);
+      throw Error(error.message);
     }
   }
 }

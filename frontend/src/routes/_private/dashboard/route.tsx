@@ -52,7 +52,15 @@ function DashboardComponent() {
   const { showToast, toastMessage, setShowToast } = useToastContext();
   const { setSortedRequests } = useRequestsContext();
   const { data: identities } = useSuspenseQuery(identitiesQueryOptions());
-  const [tabValue, setTabValue] = useState<string | number>();
+  const [tabValue, setTabValue] = useState<string | number>(() => {
+    if (location.pathname.startsWith('/dashboard/requests')) {
+      return 'requests';
+    }
+    if (location.pathname.startsWith('/dashboard/experts')) {
+      return 'experts';
+    }
+    return 'requests';
+  });
   const [identitiesMenuOpen, setIdentitiesMenuOpen] = useState(false);
 
   const handleTabChange = (_event: React.SyntheticEvent, newValue: string | number) => {

@@ -98,7 +98,7 @@ export const RequestsList: React.FC<RequestsListProps> = ({ requests }) => {
           <Stack spacing={1}>
             <Stack direction="row">
               <Typography component="h4" fontWeight="bold" sx={{ flexGrow: 1 }}>
-                {request.customer_name}
+                {request.customer_state_abbreviation} - {request.customer_name}
               </Typography>
               <Typography>#{request.id}</Typography>
             </Stack>
