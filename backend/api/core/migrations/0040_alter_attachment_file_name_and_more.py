@@ -15,11 +15,6 @@ class Migration(migrations.Migration):
     operations = [
         migrations.AlterField(
             model_name='attachment',
-            name='file_name',
-            field=models.CharField(max_length=255),
-        ),
-        migrations.AlterField(
-            model_name='attachment',
             name='user_who_uploaded',
             field=models.ForeignKey(null=True, on_delete=django.db.models.deletion.PROTECT, to=settings.AUTH_USER_MODEL),
         ),
