@@ -197,7 +197,7 @@ class RequestDetailView(BaseUserAwareRequest):
         try:
             found_request = queryset.get(pk=id)        
         except:
-            return Response(data={"message": "Request with given ID does not exist"}, status=status.HTTP_404_NOT_FOUND)
+            return Response(data={"message": "Request with given ID does not exist"}, status=status.HTTP_400_BAD_REQUEST)
 
         customers = found_request.customers 
         customer_serializer = CustomerSerializer(customers, many=True)
@@ -240,12 +240,10 @@ class RequestDetailView(BaseUserAwareRequest):
     def patch(self, request, id=None):
         queryset = self.get_queryset()
 
-        maybe_context = self.request.headers.get("Context")
-        if maybe_context is None:
+        context = self.request.headers.get("Context")
+        if context is None:
             return Response(data={"message": "Please provide context object header with request"}, status=status.HTTP_400_BAD_REQUEST)
             
-        context = json.loads(maybe_context)
-
         if id is None:
             return Response(data={"message": "Please provide a Request ID"}, status=status.HTTP_400_BAD_REQUEST)
         
@@ -255,7 +253,7 @@ class RequestDetailView(BaseUserAwareRequest):
         except Request.DoesNotExist:
             return Response(data={"message": "Request with given ID does not exist"}, status=status.HTTP_404_NOT_FOUND)
 
-        body = json.loads(request.body)
+        body = request.data
 
         patch_data = dict()
 

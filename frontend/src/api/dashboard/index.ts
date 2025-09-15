@@ -1,6 +1,6 @@
 import { Identity } from '../../features/identity/IdentityContext';
 import { getCSRFToken } from '../../utils/cookies';
-import { TAError, TARequest } from './types';
+import { TAError } from './types';
 
 /**
  * Generic wrapper for fetch requests that injects the user CSRF token and identity context.
@@ -34,12 +34,11 @@ export async function fetchData<T>(url: string, identity?: Identity): Promise<T 
   }
 }
 
-export async function patchRequest<T>(
-  requestId: string,
-  data: Partial<TARequest>,
+export async function patchData<T>(
+  url: string,
+  data: Partial<T>,
   identity?: Identity
 ): Promise<T | void> {
-  const url = `${import.meta.env.VITE_API_URL}/requests/${requestId}`;
   try {
     const response = await fetch(url, {
       method: 'PATCH',
@@ -64,6 +63,14 @@ export async function patchRequest<T>(
         typeof errorData.message === 'string'
           ? errorData.message
           : 'An unknown error has occurred.';
+      if (!errorData.message && typeof errorData === 'object') {
+        errorMessage = '';
+        for (const [_, value] of Object.entries(errorData)) {
+          if (Array.isArray(value)) {
+            errorMessage += `${value.join('; ')} `;
+          }
+        }
+      }
       if (typeof errorData.message === 'object') {
         errorMessage = '';
         for (const [_, value] of Object.entries(errorData.message)) {

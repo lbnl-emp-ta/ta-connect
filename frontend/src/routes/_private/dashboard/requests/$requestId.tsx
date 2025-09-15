@@ -1,6 +1,6 @@
 import EastIcon from '@mui/icons-material/East';
 import WestIcon from '@mui/icons-material/West';
-import { Button, Grid, Paper, Stack, Tab, Tabs, Typography } from '@mui/material';
+import { Badge, Button, Grid, Paper, Stack, Tab, Tabs, Typography } from '@mui/material';
 import { useQuery, useSuspenseQuery } from '@tanstack/react-query';
 import { createFileRoute } from '@tanstack/react-router';
 import { useState } from 'react';
@@ -15,11 +15,13 @@ import { RequestInfoPanel } from '../../../../features/requests/RequestInfoPanel
 import { useRequestsContext } from '../../../../features/requests/RequestsContext';
 import {
   expertsQueryOptions,
+  notesQueryOptions,
   ownersQueryOptions,
   requestDetailQueryOptions,
   topicsQueryOptions,
 } from '../../../../utils/queryOptions';
 import { RequestAttachments } from '../../../../features/requests/RequestAttachments';
+import { RequestNotes } from '../../../../features/requests/RequestNotes';
 
 export const Route = createFileRoute('/_private/dashboard/requests/$requestId')({
   loader: async ({ context, params }) => {
@@ -28,6 +30,9 @@ export const Route = createFileRoute('/_private/dashboard/requests/$requestId')(
     );
     await context.queryClient.ensureQueryData(ownersQueryOptions(context.identity));
     await context.queryClient.ensureQueryData(topicsQueryOptions());
+    await context.queryClient.ensureQueryData(
+      notesQueryOptions(params.requestId, context.identity)
+    );
     if (
       context.detailedIdentity?.role.name === 'Lab Lead' ||
       context.detailedIdentity?.role.name === 'Admin'
@@ -44,7 +49,9 @@ function SelectedRequest() {
   const { data: selectedRequest } = useSuspenseQuery(
     requestDetailQueryOptions(params.requestId, identity)
   );
-  console.log('Selected Request:', selectedRequest);
+  const { data: selectedRequestNotes } = useSuspenseQuery(
+    notesQueryOptions(params.requestId, identity)
+  );
   const { data: owners } = useSuspenseQuery(ownersQueryOptions(identity));
   const canAssignExperts =
     detailedIdentity?.role.name === 'Lab Lead' || detailedIdentity?.role.name === 'Admin';
@@ -52,16 +59,14 @@ function SelectedRequest() {
     ...expertsQueryOptions(identity),
     enabled: canAssignExperts,
   });
-
-  const { sortedRequests } = useRequestsContext();
+  const { sortedRequests, setCurrentIndex, nextId, previousId } = useRequestsContext();
   const currentIndex = sortedRequests.findIndex((request) => {
     if (params?.requestId) {
       return request.id === parseInt(params.requestId);
     }
   });
-  const nextIndex = currentIndex < sortedRequests.length - 1 ? currentIndex + 1 : null;
-  const previousIndex = currentIndex > 0 ? currentIndex - 1 : null;
-  const [tabValue, setTabValue] = useState<string | number>('attachments');
+  setCurrentIndex(currentIndex);
+  const [tabValue, setTabValue] = useState<string | number>('notes');
 
   const handleTabChange = (_event: React.SyntheticEvent, newValue: string | number) => {
     setTabValue(newValue);
@@ -74,39 +79,36 @@ function SelectedRequest() {
   return (
     <Paper sx={{ padding: 2 }}>
       <Stack direction="row" sx={{ marginBottom: 2 }}>
-        {previousIndex !== null && (
+        {previousId !== null && (
           <AppLink
             to={'/dashboard/requests/$requestId'}
             params={{
-              requestId: sortedRequests[previousIndex].id.toString(),
+              requestId: previousId.toString(),
             }}
           >
-            <Button variant="outlined" color="primary" startIcon={<WestIcon />}>
-              Previous Request
+            <Button variant="outlined" color="primary">
+              <WestIcon />
             </Button>
           </AppLink>
         )}
-        {previousIndex === null && (
+        {previousId === null && (
           <span>
-            <Button variant="outlined" color="primary" startIcon={<WestIcon />} disabled>
-              Previous Request
+            <Button variant="outlined" color="primary" disabled>
+              <WestIcon />
             </Button>
           </span>
         )}
-        {nextIndex !== null && (
-          <AppLink
-            to={'/dashboard/requests/$requestId'}
-            params={{ requestId: sortedRequests[nextIndex].id.toString() }}
-          >
-            <Button variant="outlined" color="primary" startIcon={<EastIcon />}>
-              Next Request
+        {nextId !== null && (
+          <AppLink to={'/dashboard/requests/$requestId'} params={{ requestId: nextId.toString() }}>
+            <Button variant="outlined" color="primary">
+              <EastIcon />
             </Button>
           </AppLink>
         )}
-        {nextIndex === null && (
+        {nextId === null && (
           <span>
-            <Button variant="outlined" color="primary" startIcon={<EastIcon />} disabled>
-              Next Request
+            <Button variant="outlined" color="primary" disabled>
+              <EastIcon />
             </Button>
           </span>
         )}
@@ -130,10 +132,10 @@ function SelectedRequest() {
         )}
       </Stack>
       <Grid container spacing={1}>
-        <Grid size={6}>
+        <Grid size={{ lg: 6, md: 12 }}>
           <RequestInfoPanel request={selectedRequest!} />
         </Grid>
-        <Grid size={6}>
+        <Grid size={{ lg: 6, md: 12 }}>
           <Stack>
             <RequestCustomerPanel customer={selectedRequest?.customers[0]} />
             <InfoPanel
@@ -145,7 +147,29 @@ function SelectedRequest() {
                   indicatorColor="primary"
                 >
                   <Tab
-                    label="Attachments"
+                    label={
+                      <Stack direction="row" spacing={2} alignItems="center">
+                        <span>Notes</span>
+                        {selectedRequestNotes?.length ? (
+                          <Badge badgeContent={selectedRequestNotes.length} color="primary" />
+                        ) : null}
+                      </Stack>
+                    }
+                    value="notes"
+                    onClick={(event) => handleTabChange(event, 'notes')}
+                  />
+                  <Tab
+                    label={
+                      <Stack direction="row" spacing={2} alignItems="center">
+                        <span>Attachments</span>
+                        {selectedRequest.attachments?.length ? (
+                          <Badge
+                            badgeContent={selectedRequest.attachments.length}
+                            color="primary"
+                          />
+                        ) : null}
+                      </Stack>
+                    }
                     value="attachments"
                     onClick={(event) => handleTabChange(event, 'attachments')}
                   />
@@ -157,6 +181,9 @@ function SelectedRequest() {
                 </Tabs>
               }
             >
+              <TabPanel value={tabValue} index="notes">
+                <RequestNotes requestId={selectedRequest.id} notes={selectedRequestNotes} />
+              </TabPanel>
               <TabPanel value={tabValue} index="attachments">
                 <RequestAttachments
                   requestId={selectedRequest.id}

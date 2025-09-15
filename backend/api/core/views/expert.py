@@ -3,6 +3,7 @@ import json
 from rest_framework import views, status, authentication, permissions
 from rest_framework.response import Response
 
+from core.views.request import BaseUserAwareRequest
 from core.models import *
 from core.serializers import *
 from core.permissions import *
@@ -68,6 +69,10 @@ class ExpertsListView(views.APIView):
                 expertise["depth"] = depth_serializer.data 
 
             data["expertise"] = expertise
+
+            request_data = RequestExpertListSerializer(Request.objects.filter(expert=User.objects.get(pk=self.request.user.id)), many=True).data
+            data["requests"] = request_data
+
             experts_data.append(data)
         
         return Response(data=experts_data, status=status.HTTP_200_OK)

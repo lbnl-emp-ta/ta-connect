@@ -1,129 +1,106 @@
-import { Grid, Box, Button, Container, Divider, TextField, Typography } from '@mui/material';
+import GoogleIcon from '@mui/icons-material/Google';
+import { Box, Container, Grid, Link, Paper, Stack, Typography } from '@mui/material';
 import { createFileRoute } from '@tanstack/react-router';
-import { useState } from 'react';
-import { useLoginMutation } from '../../utils/queryOptions';
-import { getCSRFToken } from '../../utils/cookies';
+import imagePath from '../../assets/lbnl.png';
+import { SocialLoginButton } from '../../components/SocialLoginButton';
 
 export const Route = createFileRoute('/_public-only/login')({
+  beforeLoad: ({ context }) => {
+    context.queryClient.invalidateQueries({
+      queryKey: ['identities'],
+    });
+  },
   component: RouteComponent,
 });
 
 function RouteComponent() {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-
-  const loginMutation = useLoginMutation();
-
-  function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault();
-    loginMutation.mutate({ email, password });
-  }
-
   return (
-    <Container
-      sx={{
-        display: 'flex',
-        alignItems: 'center',
-      }}
-      component="section"
-      maxWidth="xs"
-    >
-      <Box
-        className="form"
-        sx={{
-          marginTop: 0,
-          padding: 3,
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          width: 'auto',
+    <Container sx={{ marginTop: 6 }}>
+      <Grid
+        container
+        spacing={4}
+        direction={{
+          xs: 'column-reverse',
+          sm: 'column-reverse',
+          md: 'row',
         }}
+        // sx={(theme) => ({
+        //   [theme.breakpoints.down('sm')]: {
+        //     flexDirection: 'column-reverse',
+        //   },
+        // })}
       >
-        <Typography component="h1" variant="h5">
-          Login
-        </Typography>
-        <Divider
+        <Grid
+          size={{ sm: 12, md: 6 }}
           sx={{
-            marginTop: 2,
-            marginBottom: 2,
+            position: 'relative',
           }}
-        />
-        <Box component="form" onSubmit={handleSubmit}>
-          <Grid container spacing={2}>
-            <Grid size={12}>
-              <TextField
-                required
-                fullWidth
-                id="email"
-                label="Email Address"
-                name="email"
-                autoComplete="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-              />
-            </Grid>
-            <Grid size={12}>
-              <TextField
-                required
-                fullWidth
-                name="password"
-                label="Password"
-                type="password"
-                id="password"
-                autoComplete="new-password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-              />
-            </Grid>
-          </Grid>
-          <Button
-            type="submit"
-            fullWidth
-            variant="contained"
+        >
+          <img src={imagePath} style={{ borderRadius: 4, width: '100%', height: 'auto' }} />
+          <Stack
             sx={{
-              marginTop: 2,
-              marginBottom: 2,
+              backgroundColor: 'rgba(0, 0, 0, 0.5)',
+              padding: '1rem',
+              color: 'white',
+              position: 'absolute',
+              top: '50%',
+              transform: 'translateY(-50%)',
+              left: '1.5rem',
+              right: '1.5rem',
+              zIndex: 2,
             }}
           >
-            Submit
-          </Button>
-          <LoginWithSocialButton name="Google" id="googleauth2" />
-        </Box>
-      </Box>
+            <Typography variant="h2" component="h1" fontWeight="bold">
+              TA Connect
+            </Typography>
+            <Typography fontWeight="bold">
+              A technical assistance tracking and reporting platform that enables partnered national
+              laboratories, each hosting various TA programs, to coordinate their efforts.
+            </Typography>
+          </Stack>
+        </Grid>
+        <Grid
+          size={{ sm: 12, md: 6 }}
+          sx={{
+            display: 'flex',
+            flexGrow: 1,
+            justifyContent: 'center',
+          }}
+        >
+          <Box>
+            <Paper sx={{ padding: 4 }}>
+              <Stack>
+                <Typography
+                  component="h2"
+                  variant="h5"
+                  sx={{
+                    borderBottom: '1px solid',
+                    borderBottomColor: 'grey.400',
+                    textAlign: 'center',
+                    marginBottom: 2,
+                    paddingBottom: 2,
+                  }}
+                >
+                  Login
+                </Typography>
+                <SocialLoginButton name="Google" id="google" startIcon={<GoogleIcon />} />
+                {/* <SocialLoginButton name="Microsoft" id="microsft" startIcon={<MicrosoftIcon />} /> */}
+                <Typography
+                  sx={{
+                    borderTop: '1px solid',
+                    borderTopColor: 'grey.400',
+                    marginTop: 2,
+                    paddingTop: 2,
+                  }}
+                >
+                  For more information about the State TA Program visit the{' '}
+                  <Link href="https://emp.lbl.gov/projects/state-TA-program">program website</Link>.
+                </Typography>
+              </Stack>
+            </Paper>
+          </Box>
+        </Grid>
+      </Grid>
     </Container>
-  );
-}
-
-interface LoginWithSocialButtonProps {
-  name: string;
-  id: string;
-}
-
-export default function LoginWithSocialButton({ name, id }: LoginWithSocialButtonProps) {
-  function handleClick() {
-    const form = document.createElement('form');
-    form.style.display = 'none';
-    form.method = 'POST';
-    form.action = `${import.meta.env.VITE_API_URL}/_allauth/browser/v1/auth/provider/redirect`;
-    const data = {
-      provider: id,
-      callback_url: 'http://taconnect-local.lbl.gov:1337/api/account/provider/callback',
-      csrfmiddlewaretoken: getCSRFToken() || '',
-      process: 'login',
-    };
-
-    Object.entries(data).forEach(([k, v]) => {
-      const input = document.createElement('input');
-      input.name = k;
-      input.value = v;
-      form.appendChild(input);
-    });
-    document.body.appendChild(form);
-    form.submit();
-  }
-  return (
-    <Button onClick={handleClick} fullWidth variant="contained">
-      Login with {name}
-    </Button>
   );
 }

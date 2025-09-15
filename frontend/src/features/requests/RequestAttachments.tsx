@@ -44,6 +44,10 @@ export const RequestAttachments: React.FC<RequestAttachmentsProps> = ({
   const [attachmentTitle, setAttachmentTitle] = useState('');
   const [attachmentDescription, setAttachmentDescription] = useState('');
 
+  attachments?.sort(
+    (a, b) => new Date(b.uploaded_at).getTime() - new Date(a.uploaded_at).getTime()
+  );
+
   const handleFileChange = (file: File | null) => {
     if (file) {
       setSelectedFile(file);
@@ -76,7 +80,7 @@ export const RequestAttachments: React.FC<RequestAttachmentsProps> = ({
     uploadAttachmentMutation.mutate(formData);
   };
 
-  const handleDownload = (attachmentId: number) => {
+  const handleDownload = (attachmentId: number, attachmentTitle: string) => {
     fetch(`${apiUrl}/requests/${requestId}/download-attachment/${attachmentId}`, {
       credentials: 'include',
       headers: {
@@ -85,8 +89,8 @@ export const RequestAttachments: React.FC<RequestAttachmentsProps> = ({
         Context: identity ? JSON.stringify(identity) : '',
       },
     })
-      .then((response) => response.blob())
-      .then((blob) => downloadBlob(blob, `attachment_${attachmentId}`));
+      .then((response) => {return response.blob();})
+      .then((blob) => downloadBlob(blob, `${attachmentTitle}`));
   };
 
   const handleInitiateDelete = (attachmentId: number) => {
@@ -132,7 +136,7 @@ export const RequestAttachments: React.FC<RequestAttachmentsProps> = ({
             alignItems="center"
             sx={{ border: '1px solid', borderColor: 'grey.300', padding: 1, overflow: 'auto' }}
           >
-            <IconButton onClick={() => handleDownload(attachment.id)}>
+            <IconButton onClick={() => handleDownload(attachment.id, attachment.title)}>
               <DownloadIcon />
             </IconButton>
             <Stack spacing={0} flexGrow={1}>
@@ -140,7 +144,7 @@ export const RequestAttachments: React.FC<RequestAttachmentsProps> = ({
                 <Typography sx={{ flex: 1 }}>{attachment.title}</Typography>
                 <Typography fontSize="small">{formatDatetime(attachment.uploaded_at)}</Typography>
               </Stack>
-              <Typography variant="body2" color="grey.500">
+              <Typography variant="caption" color="textSecondary">
                 {attachment.description || 'No description'}
               </Typography>
             </Stack>
@@ -151,7 +155,7 @@ export const RequestAttachments: React.FC<RequestAttachmentsProps> = ({
         ))}
       {attachments.length === 0 && (
         <Stack direction="row" spacing={2} alignItems="center">
-          <span>No attachments available.</span>
+          <span>No attachments for this request.</span>
         </Stack>
       )}
       <Dialog fullWidth maxWidth="sm" open={showUploadDialog} onClose={handleUploadDialogClose}>

@@ -3,8 +3,6 @@ import ArticleIcon from '@mui/icons-material/Article';
 import AssignmentTurnedInIcon from '@mui/icons-material/AssignmentTurnedIn';
 import CancelIcon from '@mui/icons-material/Cancel';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
-import DateRangeIcon from '@mui/icons-material/DateRange';
-import EditIcon from '@mui/icons-material/Edit';
 import ErrorIcon from '@mui/icons-material/Error';
 import { Button, ListItemIcon, ListItemText, Menu, MenuItem } from '@mui/material';
 import { useState } from 'react';
@@ -103,18 +101,18 @@ export const RequestActionsButton: React.FC<RequestActionsButtonProps> = ({ requ
         onClose={handleActionsMenuClose}
         aria-labelledby="actions-menu-button"
       >
-        <MenuItem onClick={handleActionsMenuClose}>
+        {/* <MenuItem onClick={handleActionsMenuClose}>
           <ListItemIcon>
             <EditIcon />
           </ListItemIcon>
           <ListItemText>Edit</ListItemText>
-        </MenuItem>
-        <MenuItem onClick={handleActionsMenuClose}>
+        </MenuItem> */}
+        {/* <MenuItem onClick={handleActionsMenuClose}>
           <ListItemIcon>
             <DateRangeIcon />
           </ListItemIcon>
           <ListItemText>Set Dates</ListItemText>
-        </MenuItem>
+        </MenuItem> */}
         <MenuItem onClick={handleFinishCloseout}>
           <ListItemIcon>
             <ArticleIcon />

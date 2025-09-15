@@ -26,10 +26,29 @@ export interface TACustomer {
   requests: number[];
 }
 
+export interface TACustomerMutation {
+  org?: number;
+  tpr?: number;
+  email?: string;
+  name?: string;
+  phone?: string;
+  title?: string;
+  state?: number;
+}
+
 export interface TATopic {
   id: number;
   name: string;
   description: string;
+}
+
+export interface TANote {
+  id: number;
+  content: string;
+  timestamp: string;
+  author?: number;
+  author_name: string;
+  request: number;
 }
 
 export interface TADepth {

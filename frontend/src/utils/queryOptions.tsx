@@ -4,15 +4,17 @@ import { queryOptions, useMutation, UseMutationOptions } from '@tanstack/react-q
 import { loginMutation } from '../api/accounts/login';
 import { logoutMutation } from '../api/accounts/logout';
 import { signupMutation } from '../api/accounts/signup';
-import { deleteData, fetchData, patchRequest, postData, postForm } from '../api/dashboard';
+import { deleteData, fetchData, patchData, postData, postForm } from '../api/dashboard';
 import {
   CustomerRequestRelationship,
   TAAssignment,
+  TACustomerMutation,
   TAExpert,
   TAIdentity,
+  TANote,
   TAOwner,
-  TARequest,
   TARequestDetail,
+  TARequestDetailMutation,
   TARequestsResponse,
   TAStatus,
   TATopic,
@@ -20,7 +22,8 @@ import {
 import { submitIntakeMutation } from '../api/forms';
 import {
   IntakeFormData,
-  OrganiztionType,
+  Organization,
+  OrganizationType,
   State,
   TransmissionPlanningRegion,
 } from '../api/forms/types';
@@ -31,14 +34,6 @@ import { useToastContext } from '../features/toasts/ToastContext';
 import { ToastMessage } from '../features/toasts/ToastMessage';
 
 export const apiUrl = import.meta.env.VITE_API_URL as string;
-
-// const onSuccess = (message: string) => {
-//   return () => {
-//     queryClient.invalidateQueries();
-//     setShowToast(true);
-//     setToastMessage(<ToastMessage icon={<CheckCircleIcon />}>{message}</ToastMessage>);
-//   };
-// };
 
 export const authSessionQueryOptions = () =>
   queryOptions({
@@ -137,6 +132,20 @@ export const topicsQueryOptions = () =>
     },
   });
 
+export const notesQueryOptions = (requestId: string, identity?: Identity) =>
+  queryOptions({
+    staleTime: 120_000, // stale after 2 minutes
+    retry: false,
+    queryKey: ['requests', requestId, 'notes', identity],
+    queryFn: () => {
+      if (identity) {
+        return fetchData<TANote[]>(`${apiUrl}/requests/${requestId}/list-notes/`, identity);
+      } else {
+        return null;
+      }
+    },
+  });
+
 export const statesQueryOptions = () =>
   queryOptions({
     staleTime: 120_000, // stale after 2 minutes
@@ -144,11 +153,18 @@ export const statesQueryOptions = () =>
     queryFn: () => fetchData<State[]>(`${apiUrl}/states/`),
   });
 
+export const organizationQueryOptions = () =>
+  queryOptions({
+    staleTime: 120_000, // stale after 2 minutes
+    queryKey: ['organization'],
+    queryFn: () => fetchData<Organization[]>(`${apiUrl}/organizations/`),
+  });
+
 export const organizationTypesQueryOptions = () =>
   queryOptions({
     staleTime: 120_000, // stale after 2 minutes
     queryKey: ['organizationTypes'],
-    queryFn: () => fetchData<OrganiztionType[]>(`${apiUrl}/organization-types/`),
+    queryFn: () => fetchData<OrganizationType[]>(`${apiUrl}/organization-types/`),
   });
 
 export const transmissionPlanningRegionsQueryOptions = () =>
@@ -188,10 +204,28 @@ export const useLogoutMutation = () => {
   });
 };
 
+export const useCustomerMutation = (customerId: string, identity?: Identity) => {
+  return useMutation({
+    mutationKey: ['customers', 'update', customerId, identity],
+    mutationFn: (data: Partial<TACustomerMutation>) =>
+      patchData<TACustomerMutation>(
+        `${import.meta.env.VITE_API_URL}/customers/${customerId}`,
+        data,
+        identity
+      ),
+    onSuccess: () => queryClient.invalidateQueries(),
+  });
+};
+
 export const useRequestMutation = (requestId: string, identity?: Identity) => {
   return useMutation({
     mutationKey: ['requests', 'update', requestId, identity],
-    mutationFn: (data: Partial<TARequest>) => patchRequest(requestId, data, identity),
+    mutationFn: (data: Partial<TARequestDetailMutation>) =>
+      patchData<TARequestDetailMutation>(
+        `${import.meta.env.VITE_API_URL}/requests/${requestId}`,
+        data,
+        identity
+      ),
     onSuccess: () => queryClient.invalidateQueries(),
   });
 };
@@ -286,6 +320,56 @@ export const useDeleteAttachmentMutation = (
       setShowToast(true);
       setToastMessage(
         <ToastMessage icon={<CheckCircleIcon />}>Deleted attachment from request</ToastMessage>
+      );
+    },
+    onError: (error: Error) => {
+      setShowToast(true);
+      setToastMessage(<ToastMessage icon={<ErrorIcon />}>{error.message}</ToastMessage>);
+    },
+    ...options,
+  });
+};
+
+export const useCreateNoteMutation = (
+  requestId: string,
+  identity?: Identity,
+  options?: UseMutationOptions<unknown, Error, Partial<TANote>, unknown>
+) => {
+  const { setShowToast, setToastMessage } = useToastContext();
+  return useMutation({
+    mutationKey: ['requests', 'add-note', requestId, identity],
+    mutationFn: (data: Partial<TANote>) =>
+      postData(`${apiUrl}/requests/${requestId}/add-note/`, data, identity),
+    onSuccess: () => {
+      queryClient.invalidateQueries();
+      setShowToast(true);
+      setToastMessage(
+        <ToastMessage icon={<CheckCircleIcon />}>Added note to request</ToastMessage>
+      );
+    },
+    onError: (error: Error) => {
+      setShowToast(true);
+      setToastMessage(<ToastMessage icon={<ErrorIcon />}>{error.message}</ToastMessage>);
+    },
+    ...options,
+  });
+};
+
+export const useDeleteNoteMutation = (
+  requestId: string,
+  identity?: Identity,
+  options?: UseMutationOptions<unknown, Error, string, unknown>
+) => {
+  const { setShowToast, setToastMessage } = useToastContext();
+  return useMutation({
+    mutationKey: ['requests', 'add-note', requestId, identity],
+    mutationFn: (noteId: string) =>
+      deleteData(`${apiUrl}/requests/${requestId}/delete-note/${noteId}/`, identity),
+    onSuccess: () => {
+      queryClient.invalidateQueries();
+      setShowToast(true);
+      setToastMessage(
+        <ToastMessage icon={<CheckCircleIcon />}>Deleted note from request</ToastMessage>
       );
     },
     onError: (error: Error) => {

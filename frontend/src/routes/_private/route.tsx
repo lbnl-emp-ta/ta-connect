@@ -8,11 +8,11 @@ export const Route = createFileRoute('/_private')({
 
 function PrivateRoute() {
   const {
-    data: { isAuthenticated },
+    data: { meta },
   } = useSuspenseQuery(authSessionQueryOptions());
 
   // non-authenticated users should not access private routes
-  if (!isAuthenticated) {
+  if (!meta.is_authenticated) {
     return <Navigate to="/login" />;
   }
   return <Outlet />;

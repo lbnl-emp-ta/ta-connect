@@ -64,9 +64,15 @@ MIDDLEWARE = [
 ]
 
 CORS_ALLOWED_ORIGIN_REGEXES = [
-    # match localhost with any port
+    "http://api.taconnect.lbl.gov",
+    "http://api.staging.taconnect.lbl.gov",
+    "http://staging.taconnect-local.lbl.gov",
+    "http://staging.taconnect.lbl.gov",
+    "http://taconnect.lbl.gov:1337",
+    "http://taconnect.lbl.gov",
     "http://taconnect-local.lbl.gov",
     "http://taconnect-local.lbl.gov:1337",
+    # match localhost with any port
     r"^http:\/\/localhost:*([0-9]+)?$",
     r"^https:\/\/localhost:*([0-9]+)?$",
 ]
@@ -77,16 +83,23 @@ CORS_ALLOW_HEADERS = (
     "context",
 )
 
-CSRF_TRUSTED_ORIGINS = ["http://taconnect-local.lbl.gov:1337",
-                        "http://taconnect-local.lbl.gov",
-                        "http://127.0.0.1",
-                        "http://127.0.0.1:80",
-                        "http://localhost",
-                        "http://localhost:5173", 
-                        "http://127.0.0.1:5173", 
-                        "http://localhost:8000", 
-                        "http://127.0.0.1:8000", 
-                        ]
+CSRF_TRUSTED_ORIGINS = [
+    "http://api.taconnect.lbl.gov",
+    "http://api.staging.taconnect.lbl.gov",
+    "http://staging.taconnect-local.lbl.gov",
+    "http://staging.taconnect.lbl.gov",
+    "http://taconnect.lbl.gov:1337",
+    "http://taconnect.lbl.gov",
+    "http://taconnect-local.lbl.gov:1337",
+    "http://taconnect-local.lbl.gov",
+    "http://127.0.0.1",
+    "http://127.0.0.1:80",
+    "http://localhost",
+    "http://localhost:5173", 
+    "http://127.0.0.1:5173", 
+    "http://localhost:8000", 
+    "http://127.0.0.1:8000",
+]
 
 CORS_ALLOW_CREDENTIALS = True
 # CSRF_COOKIE_SECURE = False
@@ -95,27 +108,41 @@ CORS_ALLOW_CREDENTIALS = True
 # SESSION_COOKIE_SAMESITE = 'None'
 # CSRF_USE_SESSIONS = True
 
-CORS_ORIGIN_WHITELIST = ["http://127.0.0.1",
-                        "http://127.0.0.1:80",
-                        "http://localhost",
-                        "http://localhost:5173", 
-                        "http://127.0.0.1:5173", 
-                        "http://localhost:8000", 
-                        "http://127.0.0.1:8000", 
-                        "http://taconnect-local.lbl.gov:1337",
-                        "http://taconnect-local.lbl.gov"]
+CORS_ORIGIN_WHITELIST = [
+    "http://127.0.0.1",
+    "http://127.0.0.1:80",
+    "http://localhost",
+    "http://localhost:5173", 
+    "http://127.0.0.1:5173", 
+    "http://localhost:8000", 
+    "http://127.0.0.1:8000", 
+    "http://taconnect-local.lbl.gov:1337",
+    "http://taconnect-local.lbl.gov",
+    "http://taconnect.lbl.gov:1337",
+    "http://staging.taconnect-local.lbl.gov",
+    "http://staging.taconnect.lbl.gov",
+    "http://api.taconnect.lbl.gov",
+    "http://api.staging.taconnect.lbl.gov",
+]
 
 SITE_ID = 2
 
-ALLOWED_HOSTS = ["localhost", 
-                 "localhost:80", 
-                 "127.0.0.1",
-                 "127.0.0.1:80", 
-                 "localhost:5173", 
-                 "localhost:8000", 
-                 "taconnect-local.lbl.gov:1337",
-                 "taconnect-local.lbl.gov",
-                 ]
+ALLOWED_HOSTS = [
+    "localhost", 
+    "localhost:80", 
+    "127.0.0.1",
+    "127.0.0.1:80", 
+    "localhost:5173", 
+    "localhost:8000", 
+    "taconnect-local.lbl.gov:1337",
+    "taconnect-local.lbl.gov",
+    "taconnect.lbl.gov:1337",
+    "taconnect.lbl.gov",
+    "api.taconnect.lbl.gov",
+    "staging.taconnect-local.lbl.gov",
+    "staging.taconnect.lbl.gov",
+    "api.staging.taconnect.lbl.gov",
+]
 
 ROOT_URLCONF = 'api.urls'
 
@@ -134,7 +161,37 @@ ACCOUNT_USER_MODEL_USERNAME_FIELD = None
 ACCOUNT_SIGNUP_FIELDS = ['email*', 'password1*', 'password2*']
 ACCOUNT_LOGIN_METHODS= {'email'}
 ACCOUNT_EMAIL_VERIFICATION = "none"
+ACCOUNT_ADAPTER = 'core.adapters.CustomAccountAdapter'
+SOCIALACCOUNT_ADAPTER = 'core.adapters.CustomSocialAccountAdapter'
+SOCIALACCOUNT_AUTO_SIGNUP = True
 
+SOCIALACCOUNT_PROVIDERS = {
+    "google": {
+        "APPS": [
+            {
+                "client_id": os.getenv("TACONNECT_GOOGLE_CLIENT_ID"),
+                "secret": os.getenv("TACONNECT_GOOGLE_CLIENT_SECRET"),
+                "key": "",
+                "settings": {
+                    "scope": [
+                        "profile",
+                        "email",
+                    ],
+                    "auth_params": {
+                        "access_type": "online",
+                        # Force Google to show the page for account selection
+                        "prompt": "select_account",
+                    },
+                },
+            },
+        ],
+        "SCOPE": [
+            "profile",
+            "email",
+        ],
+        "VERIFIED_EMAIL": True
+    }
+}
 
 HEADLESS_ONLY = True
 HEADLESS_SERVE_SPECIFICATION = True
@@ -145,6 +202,7 @@ HEADLESS_FRONTEND_URLS = {
     "account_signup": "/account/signup",
     "socialaccount_login_error": "/account/provider/callback",
 }
+HEADLESS_ADAPTER = 'core.adapters.CustomHeadlessAdapter'
 
 TEMPLATES = [
     {
@@ -206,11 +264,10 @@ USE_I18N = True
 
 USE_TZ = True
 
-
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
-STATIC_ROOT = '/var/www/taconnect/static/'
+STATIC_ROOT = BASE_DIR / 'static'
 STATIC_URL = 'static/'
 
 # Default primary key field type
@@ -220,3 +277,14 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 MEDIA_ROOT = BASE_DIR / 'media'
 MEDIA_URL = '/media/'
+
+EMAIL_BACKEND = 'core.backends.email_backend.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = '587'
+EMAIL_HOST_USER = os.getenv('TACONNECT_EMAIL_HOST_AUTH_USER') 
+EMAIL_HOST_PASSWORD = os.getenv('TACONNECT_EMAIL_HOST_PASSWORD')
+EMAIL_USE_TLS = True
+
+
+# Custom setting for development
+ENABLE_EMAIL_SENDING = os.getenv('TACONNECT_ENABLE_EMAIL_SENDING') 

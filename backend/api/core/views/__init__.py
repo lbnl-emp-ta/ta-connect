@@ -1,12 +1,17 @@
 from .request import RequestListView, RequestDetailView, RequestMarkCompleteView, RequestCancelView, RequestCloseoutCompleteView
-from .depth import DepthListView, DepthRetrieveView
-from .state import StateListView, StateRetrieveView
-from .organization_type import OrganizationTypeListView, OrganizationTypeRetrieveView
-from .organization import OrganizationListCreateView
+from .depth import DepthListView
+from .state import StateListView
+from .organization_type import OrganizationTypeListView
+from .organization import OrganizationListView
 from .transmission_planning_region import TransmissionPlanningRegionListView
-from .customer import CustomerCreateView
-from .customer_request_relationship import CustomerRequestRelationshipListCreateView
-from .cohort import CohortCreateView, CohortAddCustomerView
+from .customer_request_relationship import CustomerRequestRelationshipListView
+from .depth import DepthListView
+from .state import StateListView
+from .organization_type import OrganizationTypeListView
+from .organization import OrganizationListView
+from .transmission_planning_region import TransmissionPlanningRegionListView
+from .customer import CustomerEditView
+from .customer_request_relationship import CustomerRequestRelationshipListView
 from .intake_form import ProcessIntakeForm
 from .identity import IdentityListView
 from .status import StatusListView
@@ -14,6 +19,7 @@ from .owner import OwnerListView
 from .assignment import AssignmentView
 from .expert import ExpertsListView
 from .attachment import UploadAttachmentView, DownloadAttachmentView, DeleteAttachmentView, EditAttachmentView
+from .note import NoteListView, NoteCreateView, NoteDeleteView
 from .topic import TopicListView
 from .audit_history import AuditHistoryListView
 
@@ -29,22 +35,23 @@ __all__ = [
     "RequestCloseoutCompleteView",
     "RequestCancelView",
     "DepthListView",
-    "DepthRetrieveView",
     "StateListView",
-    "StateRetrieveView",
     "OrganizationTypeListView",
-    "OrganizationTypeRetrieveView",
-    "OrganizationListCreateView",
+    "OrganizationListView",
     "TransmissionPlanningRegionListView",
-    "CustomerCreateView",
-    "CustomerRequestRelationshipListCreateView",
-    "CohortCreateView",
-    "CohortAddCustomerView",
+    "CustomerRequestRelationshipListView",
+    "OrganizationListView",
+    "TransmissionPlanningRegionListView",
+    "CustomerEditView",
+    "CustomerRequestRelationshipListView",
     "ProcessIntakeForm",
     "UploadAttachmentView",
     "DownloadAttachmentView",
     "DeleteAttachmentView",
     "EditAttachmentView",
+    "NoteListView",
+    "NoteCreateView",
+    "NoteDeleteView",
     "TopicListView",
     "AuditHistoryListView"
 ]

@@ -57,17 +57,13 @@ export const RequestInfoPanel: React.FC<RequestInfoPanelProps> = ({ request }) =
   const resetFormValues = useCallback(() => {
     if (request) {
       setDepth(request.depth);
-
       setProjectedStartDate(request.proj_start_date ? dayjs(request.proj_start_date) : undefined);
-
       setProjectedCompletionDate(
         request.proj_completion_date ? dayjs(request.proj_completion_date) : undefined
       );
-
       setActualCompletionDate(
         request.actual_completion_date ? dayjs(request.actual_completion_date) : undefined
       );
-
       setTopics(request.topics || []);
       setDescription(request.description || '');
     }

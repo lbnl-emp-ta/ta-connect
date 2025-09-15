@@ -4,7 +4,7 @@ from .transmission_planning_region import TransmissionPlanningRegionSerializer
 from .organization_type import OrganizationTypeSerializer
 from .organization import OrganizationSerializer
 from .customer_type import CustomerTypeSerializer
-from .customer import CustomerSerializer
+from .customer import CustomerSerializer, CustomerEditSerializer
 from .depth import DepthSerializer
 from .lab import LabSerializer
 from .program import ProgramSerializer
@@ -13,12 +13,12 @@ from .role import RoleSerializer
 from .request_status import RequestStatusSerializer
 from .owner import OwnerSerializer
 from .topic import TopicSerializer
-from .request import RequestSerializer, RequestListSerializer, RequestDetailSerializer
+from .request import RequestSerializer, RequestListSerializer, RequestDetailSerializer, RequestExpertListSerializer
 from .customer_request_relationship import CustomerRequestRelationshipSerializer
 from .cohort import CohortSerializer
-from .topic import TopicSerializer
 from .attachment import AttachmentUploadSerializer, AttachmentEditSerializer, AttachmentSerializer
 from .audit_history import AuditHistorySerializer
+from .note import NoteSerializer, NoteCreateSerializer
 
 __all__ = [
     "UserLeanSerializer",
@@ -30,8 +30,10 @@ __all__ = [
     "OwnerSerializer",
     "RequestSerializer",
     "CustomerSerializer",
+    "CustomerEditSerializer",
     "RequestListSerializer",
     "RequestDetailSerializer",
+    "RequestExpertListSerializer",
     "DepthSerializer",
     "StateSerializer",
     "OrganizationTypeSerializer",
@@ -45,4 +47,6 @@ __all__ = [
     "AttachmentEditSerializer",
     "AttachmentSerializer",
     "AuditHistorySerializer",
+    "NoteSerializer",
+    "NoteCreateSerializer",
 ]
