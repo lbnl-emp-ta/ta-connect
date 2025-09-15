@@ -3,14 +3,14 @@ from .depth import Depth
 from .user import User
 from .reception import Reception
 from .lab import Lab
+from .organization_type import OrganizationType
+from .organization import Organization
+from .topic import Topic
 from .program import Program
 from .owner import Owner
 from .receipt import Receipt
-from .topic import Topic
 from .request import Request
 from .state import State
-from .organization_type import OrganizationType
-from .organization import Organization
 from .transmission_planning_region import TransmissionPlanningRegion
 from .customer import Customer
 from .customer_type import CustomerType
@@ -28,6 +28,8 @@ from .available_lab_role import AvailableLabRole
 from .available_reception_role import AvailableReceptionRole
 from .expertise import Expertise
 from .attachment import Attachment
+from .audit_history import AuditHistory
+from .shared_funding_group import SharedFundingGroup
 from .note import Note
 
 # If you don't add new models to this list, they wont be recognized when
@@ -63,5 +65,7 @@ __all__ = [
     "Topic",
     "Expertise",
     "Attachment",
+    "AuditHistory",
+    "SharedFundingGroup",
     "Note",
 ]

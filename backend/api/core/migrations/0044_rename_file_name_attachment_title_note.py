@@ -12,11 +12,6 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RenameField(
-            model_name='attachment',
-            old_name='file_name',
-            new_name='title',
-        ),
         migrations.CreateModel(
             name='Note',
             fields=[

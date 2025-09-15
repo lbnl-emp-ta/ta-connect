@@ -17,6 +17,7 @@ from .request import RequestSerializer, RequestListSerializer, RequestDetailSeri
 from .customer_request_relationship import CustomerRequestRelationshipSerializer
 from .cohort import CohortSerializer
 from .attachment import AttachmentUploadSerializer, AttachmentEditSerializer, AttachmentSerializer
+from .audit_history import AuditHistorySerializer
 from .note import NoteSerializer, NoteCreateSerializer
 
 __all__ = [
@@ -45,6 +46,7 @@ __all__ = [
     "AttachmentUploadSerializer",
     "AttachmentEditSerializer",
     "AttachmentSerializer",
+    "AuditHistorySerializer",
     "NoteSerializer",
     "NoteCreateSerializer",
 ]
