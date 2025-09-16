@@ -64,9 +64,7 @@ MIDDLEWARE = [
 ]
 
 CORS_ALLOWED_ORIGIN_REGEXES = [
-    "https://api.taconnect.lbl.gov",
-    "https://api.staging.taconnect.lbl.gov",
-    "https://staging.taconnect-local.lbl.gov",
+    "https://staging.taconnect.lbl.gov:1337",
     "https://staging.taconnect.lbl.gov",
     "https://taconnect.lbl.gov:1337",
     "https://taconnect.lbl.gov",
@@ -82,9 +80,7 @@ CORS_ALLOW_HEADERS = (
 )
 
 CSRF_TRUSTED_ORIGINS = [
-    "https://api.taconnect.lbl.gov",
-    "https://api.staging.taconnect.lbl.gov",
-    "https://staging.taconnect-local.lbl.gov",
+    "https://staging.taconnect.lbl.gov:1337",
     "https://staging.taconnect.lbl.gov",
     "https://taconnect.lbl.gov:1337",
     "https://taconnect.lbl.gov",
@@ -112,9 +108,10 @@ CORS_ORIGIN_WHITELIST = [
     "http://127.0.0.1:5173", 
     "http://localhost:8000", 
     "http://127.0.0.1:8000", 
+    "https://taconnect.lbl.gov",
     "https://taconnect.lbl.gov:1337",
-    "https://staging.taconnect-local.lbl.gov",
     "https://staging.taconnect.lbl.gov",
+    "https://staging.taconnect.lbl.gov:1337",
     "https://api.taconnect.lbl.gov",
     "https://api.staging.taconnect.lbl.gov",
 ]
