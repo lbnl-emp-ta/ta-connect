@@ -36,7 +36,7 @@ jobs:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
-          source: "./backend"
+          source: "./backend/*"
           target: "/home/${{ secrets.SSH_USER }}/taconnect-prod/backend"
 
       - name: Install frontend dependencies
