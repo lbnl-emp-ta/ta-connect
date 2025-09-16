@@ -44,8 +44,8 @@ jobs:
 
       - name: Build React app
         env:
-          VITE_API_URL: "http://api.staging.taconnect.lbl.gov:1337/api"
-          VITE_BACKEND_URL: "http://api.staging.taconnect.lbl.gov:1337"
+          VITE_API_URL: "https://api.staging.taconnect.lbl.gov:1337/api"
+          VITE_BACKEND_URL: "https://api.staging.taconnect.lbl.gov:1337"
         run: npm run build --prefix ./frontend
 
       - name: Deploy frontend with SCP
