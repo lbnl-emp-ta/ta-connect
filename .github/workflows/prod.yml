@@ -36,8 +36,8 @@ jobs:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
-          source: "./backend/*"
-          target: "/home/${{ secrets.SSH_USER }}/taconnect-prod/backend"
+          source: "./backend"
+          target: "/home/${{ secrets.SSH_USER }}/taconnect-prod/"
 
       - name: Install frontend dependencies
         run: npm install --prefix ./frontend
@@ -54,8 +54,8 @@ jobs:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
-          source: "./frontend/dist/*"
-          target: "/home/${{ secrets.SSH_USER }}/taconnect-prod/frontend/dist"
+          source: "./frontend/dist"
+          target: "/home/${{ secrets.SSH_USER }}/taconnect-prod/"
 
       - name: Restart application server
         uses: appleboy/ssh-action@master
