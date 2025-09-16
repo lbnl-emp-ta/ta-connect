@@ -133,6 +133,7 @@ ALLOWED_HOSTS = [
     "staging.taconnect-local.lbl.gov",
     "staging.taconnect.lbl.gov",
     "api.staging.taconnect.lbl.gov",
+    "api.staging.taconnect.lbl.gov:1337",
 ]
 
 ROOT_URLCONF = 'api.urls'
