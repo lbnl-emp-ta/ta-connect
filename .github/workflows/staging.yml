@@ -64,5 +64,5 @@ jobs:
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
-            sudo systemctl restart gunicorn
+            sudo systemctl restart gunicorn-staging
             sudo systemctl restart nginx
