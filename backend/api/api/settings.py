@@ -64,14 +64,12 @@ MIDDLEWARE = [
 ]
 
 CORS_ALLOWED_ORIGIN_REGEXES = [
-    "http://api.taconnect.lbl.gov",
-    "http://api.staging.taconnect.lbl.gov",
-    "http://staging.taconnect-local.lbl.gov",
-    "http://staging.taconnect.lbl.gov",
-    "http://taconnect.lbl.gov:1337",
-    "http://taconnect.lbl.gov",
-    "http://taconnect-local.lbl.gov",
-    "http://taconnect-local.lbl.gov:1337",
+    "https://api.taconnect.lbl.gov",
+    "https://api.staging.taconnect.lbl.gov",
+    "https://staging.taconnect-local.lbl.gov",
+    "https://staging.taconnect.lbl.gov",
+    "https://taconnect.lbl.gov:1337",
+    "https://taconnect.lbl.gov",
     # match localhost with any port
     r"^http:\/\/localhost:*([0-9]+)?$",
     r"^https:\/\/localhost:*([0-9]+)?$",
@@ -84,14 +82,12 @@ CORS_ALLOW_HEADERS = (
 )
 
 CSRF_TRUSTED_ORIGINS = [
-    "http://api.taconnect.lbl.gov",
-    "http://api.staging.taconnect.lbl.gov",
-    "http://staging.taconnect-local.lbl.gov",
-    "http://staging.taconnect.lbl.gov",
-    "http://taconnect.lbl.gov:1337",
-    "http://taconnect.lbl.gov",
-    "http://taconnect-local.lbl.gov:1337",
-    "http://taconnect-local.lbl.gov",
+    "https://api.taconnect.lbl.gov",
+    "https://api.staging.taconnect.lbl.gov",
+    "https://staging.taconnect-local.lbl.gov",
+    "https://staging.taconnect.lbl.gov",
+    "https://taconnect.lbl.gov:1337",
+    "https://taconnect.lbl.gov",
     "http://127.0.0.1",
     "http://127.0.0.1:80",
     "http://localhost",
@@ -116,13 +112,11 @@ CORS_ORIGIN_WHITELIST = [
     "http://127.0.0.1:5173", 
     "http://localhost:8000", 
     "http://127.0.0.1:8000", 
-    "http://taconnect-local.lbl.gov:1337",
-    "http://taconnect-local.lbl.gov",
-    "http://taconnect.lbl.gov:1337",
-    "http://staging.taconnect-local.lbl.gov",
-    "http://staging.taconnect.lbl.gov",
-    "http://api.taconnect.lbl.gov",
-    "http://api.staging.taconnect.lbl.gov",
+    "https://taconnect.lbl.gov:1337",
+    "https://staging.taconnect-local.lbl.gov",
+    "https://staging.taconnect.lbl.gov",
+    "https://api.taconnect.lbl.gov",
+    "https://api.staging.taconnect.lbl.gov",
 ]
 
 SITE_ID = 2
