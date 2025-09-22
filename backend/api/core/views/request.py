@@ -3,8 +3,10 @@ from django.db import transaction
 from rest_framework import views, status, permissions, authentication
 from rest_framework.response import Response
 
+from core.utils import create_audit_history
 from core.serializers import * 
 from core.models import * 
+from core.models.audit_history import ActionType
 from core.permissions import *
 from core.constants import ROLE, REQUEST_STATUS
 
@@ -227,10 +229,18 @@ class RequestDetailView(BaseUserAwareRequest):
             attachment_data["description"] = attachment.description
             response_data["attachments"].append(attachment_data)
 
-        
+        response_data["audit_history"] = list() 
+        for audit in found_request.audithistory_set.all().order_by('-date'):
+            audit_data = dict()
+            audit_data["user"] = audit.user.name
+            audit_data["role"] = audit.role.name
+            audit_data["action_type"] = audit.action_type
+            audit_data["description"] = audit.description
+            audit_data["date"] = audit.date
+            response_data["audit_history"].append(audit_data)
+
         if found_request.expert is not None:
             response_data["expert"] = UserLeanSerializer(found_request.expert).data
-
 
         return Response(data=response_data, status=status.HTTP_200_OK)
 
@@ -366,7 +376,8 @@ class RequestDetailView(BaseUserAwareRequest):
        # do partial save with accumulated patch 
         patch_serializer = RequestSerializer(instance=maybe_request, data=patch_data, partial=True)
         if(patch_serializer.is_valid()):
-            patch_serializer.save() 
+            patch_serializer.save()
+            create_audit_history(request, maybe_request, ActionType.EditRequestDetails, f"Edited request: {str(patch_data)[:20]}...")
         else:
             return Response(data={"message": patch_serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -430,6 +441,8 @@ class RequestMarkCompleteView(BaseUserAwareRequest):
             found_request.owner = None
             found_request.expert = None
             found_request.save()
+            create_audit_history(request, found_request, ActionType.StatusChange, f"Status changed to Completed")
+            create_audit_history(request, found_request, ActionType.Assignment, f"Removed all assignments")
         except Exception as e:
             return Response(data={"message": f"{e}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
@@ -463,6 +476,8 @@ class RequestCancelView(BaseUserAwareRequest):
 
                 found_request.receipt.save()
                 found_request.save()
+                create_audit_history(request, found_request, ActionType.StatusChange, f"Status changed to Unable to Address")
+                create_audit_history(request, found_request, ActionType.Assignment, f"Removed all assignments")
 
         except Exception as e:
             return Response(data={"message": f"{e}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
@@ -493,6 +508,7 @@ class RequestCloseoutCompleteView(BaseUserAwareRequest):
             # Effectively this "assigns" back up to Lab
             found_request.expert = None 
             found_request.save()
+            create_audit_history(request, found_request, ActionType.StatusChange, f"Status changed to Closeout Completed")
 
         except Exception as e:
             return Response(data={"message": f"{e}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

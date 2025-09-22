@@ -6,9 +6,11 @@ from rest_framework import views, authentication, permissions, status
 from rest_framework.response import Response
 from rest_framework.parsers import MultiPartParser, FormParser
 
+from core.utils import create_audit_history
 from core.views.request import BaseUserAwareRequest
 from core.serializers import AttachmentUploadSerializer, AttachmentEditSerializer, AttachmentSerializer
-from core.models import Attachment, Request, User
+from core.models import Attachment, Request
+from core.models.audit_history import ActionType
 from core.permissions import *
 
 from allauth.headless.contrib.rest_framework.authentication import (
@@ -60,7 +62,9 @@ class UploadAttachmentView(views.APIView):
         if not serializer.is_valid():
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         
-        serializer.save()
+        attachment = serializer.save()
+        create_audit_history(request, request_obj, ActionType.AddAttachment, f"Uploaded attachment: {attachment.title}")
+        
         return Response(data={"message": "Attachment successfully uploaded"}, status=status.HTTP_201_CREATED)
 
 class DownloadAttachmentView(views.APIView):
@@ -128,7 +132,9 @@ class DeleteAttachmentView(views.APIView):
             can_delete = True
              
         if can_delete:
+            attachment_title = attachment.title  # Store title before deletion
             attachment.delete()
+            create_audit_history(request, request_obj, ActionType.RemoveAttachment, f"Deleted attachment: {attachment_title}")
         else:
             return Response(data={"message": "Insufficient authorization to delete attachment for given request"}, status=status.HTTP_400_BAD_REQUEST)
 

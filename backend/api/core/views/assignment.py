@@ -6,11 +6,13 @@ from allauth.headless.contrib.rest_framework.authentication import (
     XSessionTokenAuthentication,
 )
 
+from core.utils import create_audit_history
 from core.util.notifications import send_email_notification
 from core.util.email_prompts import generic_template
 from core.permissions import IsAdmin, IsLabLead
 from core.views.owner import OwnerListView
 from core.models import *
+from core.models.audit_history import ActionType
 from core.constants import DOMAINTYPE, ROLE
 
 class AssignmentView(views.APIView):
@@ -111,6 +113,7 @@ class AssignmentView(views.APIView):
                 with transaction.atomic():
                     ta_request.save()
                     ta_request.receipt.save()
+                    create_audit_history(request, ta_request, ActionType.Assignment, f"Assigned to {str(new_owner)}")
 
             except Exception as e:
                 return Response(data={"message": f"{e}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
@@ -144,6 +147,7 @@ class AssignmentView(views.APIView):
                 with transaction.atomic():
                     ta_request.receipt.save()
                     ta_request.save()
+                    create_audit_history(request, ta_request, ActionType.Assignment, f"Assigned to {str(expert.email)} as expert")
             except:
                 return Response(data={"message": f"{e}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         

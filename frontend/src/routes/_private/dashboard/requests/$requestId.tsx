@@ -22,6 +22,7 @@ import {
 } from '../../../../utils/queryOptions';
 import { RequestAttachments } from '../../../../features/requests/RequestAttachments';
 import { RequestNotes } from '../../../../features/requests/RequestNotes';
+import { RequestAuditHistory } from '../../../../features/requests/RequestAuditHistory';
 
 export const Route = createFileRoute('/_private/dashboard/requests/$requestId')({
   loader: async ({ context, params }) => {
@@ -49,6 +50,7 @@ function SelectedRequest() {
   const { data: selectedRequest } = useSuspenseQuery(
     requestDetailQueryOptions(params.requestId, identity)
   );
+  console.log(selectedRequest);
   const { data: selectedRequestNotes } = useSuspenseQuery(
     notesQueryOptions(params.requestId, identity)
   );
@@ -194,7 +196,7 @@ function SelectedRequest() {
                 />
               </TabPanel>
               <TabPanel value={tabValue} index="audit-history">
-                Audit history
+                <RequestAuditHistory auditHistoryItems={selectedRequest.audit_history} />
               </TabPanel>
             </InfoPanel>
           </Stack>

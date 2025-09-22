@@ -4,11 +4,14 @@ from core.models import *
 
 # Example audit history actions
 class ActionType(models.TextChoices):
-    Assignment="Assignment"
-    AddAttachment="Add Attachment"
-    RemoveAttachment="Remove Attachment"
-    EditRequestInfo="Edit Request Information"
-    EditCustomerInfo="Edit Customer Information"
+    Assignment="Assignment change"
+    AddAttachment="Add attachment"
+    RemoveAttachment="Remove attachment"
+    AddNote="Add note"
+    RemoveNote="Remove note"
+    EditRequestDetails="Edit request details"
+    EditCustomerDetails="Edit customer details"
+    StatusChange="Status change"
 
 
 class AuditHistory(models.Model):
