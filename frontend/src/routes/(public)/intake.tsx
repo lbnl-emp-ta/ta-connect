@@ -114,7 +114,7 @@ function IntakeForm() {
   };
 
   useEffect(() => {
-    document.title = 'TA CONNECT - Intake Form';
+    document.title = 'TA Connect - Intake Form';
   }, []);
 
   if (submitIntakeMutation.status !== 'idle') {

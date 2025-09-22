@@ -107,6 +107,10 @@ function DashboardComponent() {
     return <Navigate to="/profile" />;
   }
 
+  useEffect(() => {
+    document.title = 'TA Connect - Dashboard';
+  }, []);
+
   return (
     <Stack spacing={0} sx={{ width: '100%' }}>
       <Stack
