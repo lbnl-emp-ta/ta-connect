@@ -42,6 +42,14 @@ export interface TATopic {
   description: string;
 }
 
+export interface TAAuditHistoryItem {
+  action_type: string;
+  date: string;
+  description: string;
+  role: string;
+  user: string;
+}
+
 export interface TANote {
   id: number;
   content: string;
@@ -123,6 +131,7 @@ export interface TARequestDetail {
   actual_completion_date: string | null;
   topics: TATopic[];
   attachments: TAAttachment[];
+  audit_history: TAAuditHistoryItem[];
 }
 
 export interface TARequestDetailMutation {
