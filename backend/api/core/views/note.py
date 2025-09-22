@@ -1,6 +1,8 @@
 from rest_framework import views, authentication, permissions, status
 from rest_framework.response import Response
 
+from core.models.audit_history import ActionType
+from core.utils import create_audit_history
 from core.permissions import IsAdmin
 from core.models import Note, Request
 from core.serializers import NoteSerializer, NoteCreateSerializer
@@ -80,6 +82,7 @@ class NoteCreateView(views.APIView):
             return Response(data=serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
         response_note = serializer.save()
+        create_audit_history(request, request_obj, ActionType.AddNote, f"Added note: {response_note.content[:10]}...")
 
         return Response(data=(NoteSerializer(response_note)).data, status=status.HTTP_200_OK)
 
@@ -109,5 +112,6 @@ class NoteDeleteView(views.APIView):
             return Response(data={"message":"Note with given ID does not exist"}, status=status.HTTP_400_BAD_REQUEST)
 
         note_obj.delete()
+        create_audit_history(request, note_obj.request, ActionType.RemoveNote, f"Removed note: {note_obj.content[:10]}...")
 
         return Response(data={"message": "Note deleted successfully"}, status=status.HTTP_204_NO_CONTENT)
