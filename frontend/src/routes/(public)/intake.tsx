@@ -1,6 +1,5 @@
 import '../../styles.css';
 
-import { createFileRoute } from '@tanstack/react-router';
 import {
   Autocomplete,
   Button,
@@ -16,11 +15,12 @@ import {
   RadioGroup,
   Select,
   Stack,
-  Switch,
   TextField,
   Typography,
 } from '@mui/material';
+import { createFileRoute } from '@tanstack/react-router';
 
+import { useSuspenseQuery } from '@tanstack/react-query';
 import { ChangeEventHandler, useEffect, useState } from 'react';
 import {
   IntakeFormData,
@@ -28,15 +28,14 @@ import {
   State,
   TransmissionPlanningRegion,
 } from '../../api/forms/types';
+import { AppLink } from '../../components/AppLink';
 import {
   organizationTypesQueryOptions,
   statesQueryOptions,
   transmissionPlanningRegionsQueryOptions,
   useSubmitIntakeMutation,
 } from '../../utils/queryOptions';
-import { useSuspenseQuery } from '@tanstack/react-query';
 import { isValidEmail, isValidUSTelephone } from '../../utils/utils';
-import { AppLink } from '../../components/AppLink';
 
 export const Route = createFileRoute('/(public)/intake')({
   loader: async ({ context }) => {
