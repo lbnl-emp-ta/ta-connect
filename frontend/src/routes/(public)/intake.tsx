@@ -322,9 +322,6 @@ function IntakeForm() {
               </Stack>
               <Divider />
               <Stack spacing={2}>
-                <FormControl>
-                  <FormControlLabel control={<Switch />} label="Send me a copy of my responses" />
-                </FormControl>
                 <Button type="submit" variant="contained">
                   Submit
                 </Button>
