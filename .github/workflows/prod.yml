@@ -25,10 +25,9 @@ jobs:
       - name: Install backend dependencies
         run: pip install -r backend/api/requirements.txt
 
-      - name: Collect static files and migrate database
+      - name: Collect static files
         run: |
           python backend/api/manage.py collectstatic --noinput
-          python backend/api/manage.py migrate
 
       - name: Deploy backend with SCP
         uses: appleboy/scp-action@master
@@ -57,12 +56,14 @@ jobs:
           source: "./frontend/dist"
           target: "/home/${{ secrets.SSH_USER }}/taconnect-prod/"
 
-      - name: Restart application server
+      - name: Run migrations and restart application server
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
+            source /home/${{ secrets.SSH_USER }}/taconnect-prod/ta-prod-env/bin/activate
+            python /home/${{ secrets.SSH_USER }}/taconnect-prod/backend/api/manage.py migrate
             sudo systemctl restart gunicorn-prod
             sudo systemctl restart nginx

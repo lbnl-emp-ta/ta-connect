@@ -5,6 +5,7 @@ import { createFileRoute } from '@tanstack/react-router';
 import { RolePanel } from '../../features/profile/RolePanel';
 import { useUser } from '../../hooks/useUser';
 import { identitiesQueryOptions } from '../../utils/queryOptions';
+import { useEffect } from 'react';
 
 export const Route = createFileRoute('/_private/profile')({
   component: ProfilePage,
@@ -13,6 +14,10 @@ export const Route = createFileRoute('/_private/profile')({
 function ProfilePage() {
   const user = useUser();
   const { data: identities } = useSuspenseQuery(identitiesQueryOptions());
+
+  useEffect(() => {
+    document.title = `TA Connect - ${user?.name || 'Profile'}`;
+  }, []);
 
   return (
     <Container sx={{ marginTop: 2 }}>
