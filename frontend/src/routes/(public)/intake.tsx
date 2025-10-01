@@ -63,7 +63,6 @@ function IntakeForm() {
   const [orgTypeName, setOrgTypeName] = useState<string>('');
 
   const [desc, setDesc] = useState<string>('');
-  const [taDepth, setTADepth] = useState<string>('');
 
   const [tprName, setTPRName] = useState<string>('');
 
@@ -87,7 +86,6 @@ function IntakeForm() {
       organization: orgName,
       organizationAddress: orgAddress,
       organizationType: orgTypeName,
-      taDepth: taDepth,
       description: desc,
     };
     submitIntakeMutation.mutate(formData);

@@ -32,6 +32,5 @@ export interface IntakeFormData {
   organization: string;
   organizationAddress: string;
   organizationType: string;
-  taDepth: string;
   description: string;
 }
