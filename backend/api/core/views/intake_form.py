@@ -17,7 +17,6 @@ class ProcessIntakeForm(CreateAPIView):
         organization = request.data.get("organization", None)
         organization_address = request.data.get("organizationAddress", None)
         organization_type = request.data.get("organizationType", None)
-        ta_depth = request.data.get("taDepth", None)
         desc = request.data.get("description", None)
         cohort = request.data.get("cohort", None)
         
@@ -25,7 +24,6 @@ class ProcessIntakeForm(CreateAPIView):
             with transaction.atomic():
                 _request = Request.objects.create(
                     description=desc, 
-                    depth=Depth.objects.get(name=ta_depth)
                 )
 
                 
@@ -78,7 +76,6 @@ class ProcessIntakeForm(CreateAPIView):
                     "organization": _customer.org.name,
                     "organizationAddress": _customer.org.address,
                     "organizationType": _customer.org.type.name,
-                    "tadepth": _request.depth.name,
                     "description": _request.description,
                 }
                 
