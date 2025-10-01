@@ -117,6 +117,7 @@ export interface TARequestDetail {
   id: number;
   status: string;
   depth: string;
+  depth_options: string[];
   description: string;
   date_created: string;
   customers: TACustomer[];

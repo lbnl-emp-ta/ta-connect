@@ -219,6 +219,23 @@ class RequestDetailView(BaseUserAwareRequest):
         response_data = response_data | request_serializer.data 
         response_data["customers"] = customer_serializer.data
         response_data["owner"] = OwnerSerializer().format_owner(found_request.owner)
+        
+        # Determine depth options based on request owner type
+        depth_options = []
+        if found_request.owner:
+            if found_request.owner.domain_type == Owner.DomainType.Program:
+                # When owner is a program, show depths associated with that program
+                program = found_request.owner.program
+                if program:
+                    depth_options = list(program.depths.values_list('name', flat=True))
+            elif found_request.owner.domain_type == Owner.DomainType.Lab:
+                # When owner is a lab, show depths associated with the program that the request receipt is associated with
+                if found_request.receipt and found_request.receipt.program:
+                    program = found_request.receipt.program
+                    depth_options = list(program.depths.values_list('name', flat=True))
+            # When owner is reception (or system admin), depth_options remains empty
+        
+        response_data["depth_options"] = depth_options
 
         response_data["attachments"] = list() 
         for attachment in found_request.attachment_set.all():

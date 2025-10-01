@@ -244,9 +244,11 @@ export const RequestInfoPanel: React.FC<RequestInfoPanelProps> = ({ request }) =
                     {!editing && <>{request.depth || 'Unknown'}</>}
                     {editing && (
                       <Select value={depth} onChange={handleDepthChange}>
-                        <MenuItem value="Help Desk">Help Desk</MenuItem>
-                        <MenuItem value="Expert Match">Expert Match</MenuItem>
-                        <MenuItem value="Unsure">Unsure</MenuItem>
+                        {request.depth_options.map((option) => (
+                          <MenuItem key={option} value={option}>
+                            {option}
+                          </MenuItem>
+                        ))}
                       </Select>
                     )}
                   </TableCell>

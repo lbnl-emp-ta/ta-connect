@@ -63,7 +63,6 @@ function IntakeForm() {
   const [orgTypeName, setOrgTypeName] = useState<string>('');
 
   const [desc, setDesc] = useState<string>('');
-  const [taDepth, setTADepth] = useState<string>('');
 
   const [tprName, setTPRName] = useState<string>('');
 
@@ -87,7 +86,6 @@ function IntakeForm() {
       organization: orgName,
       organizationAddress: orgAddress,
       organizationType: orgTypeName,
-      taDepth: taDepth,
       description: desc,
     };
     submitIntakeMutation.mutate(formData);
@@ -260,30 +258,6 @@ function IntakeForm() {
               <Divider />
               <Stack spacing={2}>
                 <Typography variant="h4">Technical Assistance Information</Typography>
-                <FormControl>
-                  <Stack spacing={2}>
-                    <FormLabel id="ta-depth-radio-group">Techinical Assistance Depth</FormLabel>
-                    <Typography variant="body2">
-                      What kind of Technical Assistance are you looking for? If you don't know
-                      select "Unsure".
-                    </Typography>
-                  </Stack>
-                  <RadioGroup
-                    aria-labelledby="ta-depth-radio-group"
-                    defaultValue={'Unsure'}
-                    value={taDepth}
-                    onChange={(e) => setTADepth(e.target.value)}
-                    name="ta-depth-radio-group"
-                  >
-                    <FormControlLabel value="Help Desk" control={<Radio />} label="Help Desk" />
-                    <FormControlLabel
-                      value="Expert Match"
-                      control={<Radio />}
-                      label="Expert Match"
-                    />
-                    <FormControlLabel value="Unsure" control={<Radio />} label="Unsure" />
-                  </RadioGroup>
-                </FormControl>
                 <FormControl>
                   <Stack spacing={2}>
                     <FormLabel id="urgency-radio-group">Urgency</FormLabel>
