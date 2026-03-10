@@ -84,7 +84,18 @@ function RouteComponent() {
                   Login
                 </Typography>
                 <SocialLoginButton name="Google" id="google" startIcon={<GoogleIcon />} />
-                {/* <SocialLoginButton name="Microsoft" id="microsft" startIcon={<MicrosoftIcon />} /> */}
+                <SocialLoginButton
+                  name="ORCiD"
+                  id="orcid"
+                  startIcon={
+                    <img
+                      data-v-485a4326=""
+                      width="24px"
+                      alt="ORCID logo"
+                      src="https://orcid.org/assets/vectors/orcid.logo.icon.svg"
+                    />
+                  }
+                />
                 <Typography
                   sx={{
                     borderTop: '1px solid',

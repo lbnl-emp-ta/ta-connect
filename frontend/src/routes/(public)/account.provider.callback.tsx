@@ -17,17 +17,20 @@ function CallbackComponent() {
     data: { meta },
   } = useSuspenseQuery(authSessionQueryOptions());
 
+  // Check for OAuth errors BEFORE checking auth status — a provider error
+  // means the login was rejected, so the user will never be authenticated here.
+  if (error) {
+    return (
+      <div>
+        <p>Login failed: <strong>{error}</strong></p>
+        <a href="/login">Back to login</a>
+      </div>
+    );
+  }
+
   if (!meta.is_authenticated) {
     return <Navigate to="/login" />;
   }
 
-  if (!error) {
-    return <Navigate to={'/dashboard'} />;
-  }
-
-  return (
-    <div>
-      <p>Processing login...</p>
-    </div>
-  );
+  return <Navigate to={'/dashboard'} />;
 }

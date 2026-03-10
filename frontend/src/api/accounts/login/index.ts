@@ -52,6 +52,7 @@ export function redirectToProvider(
   callbackUrl: string,
   process: 'login' | 'connect'
 ) {
+  console.log(window.location.host);
   postForm('/_allauth/browser/v1/auth/provider/redirect', {
     provider: providerId,
     process,
