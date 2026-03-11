@@ -173,18 +173,13 @@ SOCIALACCOUNT_PROVIDERS = {
                 "key": "",
                 "settings": {
                     "scope": [
-                        "profile",
-                        "email",
+                        "/authenticate",
                     ],
-                    "auth_params": {
-                        "access_type": "online",
-                    },
                 },
             },
         ],
         "SCOPE": [
-            "profile",
-            "email",
+            "/authenticate",
         ],
         "VERIFIED_EMAIL": True
     },

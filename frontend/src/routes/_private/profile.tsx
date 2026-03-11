@@ -1,11 +1,23 @@
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
-import { Alert, AlertTitle, Box, Button, Container, Link, Stack, Typography } from '@mui/material';
+import EditIcon from '@mui/icons-material/Edit';
+import {
+  Alert,
+  AlertTitle,
+  Box,
+  Button,
+  Container,
+  IconButton,
+  Link,
+  Stack,
+  Typography,
+} from '@mui/material';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { createFileRoute } from '@tanstack/react-router';
 import { RolePanel } from '../../features/profile/RolePanel';
 import { useUser } from '../../hooks/useUser';
 import { identitiesQueryOptions } from '../../utils/queryOptions';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
+import { EmailDialog } from '../../features/profile/EmailDialog';
 
 export const Route = createFileRoute('/_private/profile')({
   component: ProfilePage,
@@ -14,6 +26,15 @@ export const Route = createFileRoute('/_private/profile')({
 function ProfilePage() {
   const user = useUser();
   const { data: identities } = useSuspenseQuery(identitiesQueryOptions());
+  const [isEmailDialogOpen, setIsEmailDialogOpen] = useState(false);
+
+  const handleOpenEmailDialog = () => {
+    setIsEmailDialogOpen(true);
+  };
+
+  const handleCloseEmailDialog = () => {
+    setIsEmailDialogOpen(false);
+  };
 
   useEffect(() => {
     document.title = `TA Connect - ${user?.name || 'Profile'}`;
@@ -27,7 +48,15 @@ function ProfilePage() {
           <Typography variant="h2" component="h1">
             {user?.name}
           </Typography>
-          <Typography>{user?.email}</Typography>
+          <Stack direction="row" spacing={1} alignItems="center">
+            <Typography variant="body1" color="text.secondary">
+              {user?.email}
+            </Typography>
+            <IconButton size="small" onClick={handleOpenEmailDialog}>
+              <EditIcon />
+            </IconButton>
+            <EmailDialog open={isEmailDialogOpen} onClose={handleCloseEmailDialog} />
+          </Stack>
         </Box>
       </Stack>
       <Stack spacing={2}>

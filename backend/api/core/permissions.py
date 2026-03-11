@@ -22,7 +22,7 @@ def get_location_role_assignment_class(location):
 
 def has_role(request, role_name):
         maybe_context = request.headers.get("Context")
-        if maybe_context is None:
+        if not maybe_context:
             return False
 
         context = json.loads(maybe_context)

@@ -3,6 +3,13 @@ import { createFileRoute, Navigate } from '@tanstack/react-router';
 import { authSessionQueryOptions } from '../../utils/queryOptions';
 
 export const Route = createFileRoute('/(public)/account/provider/callback')({
+  loader: async ({ context }) => {
+    // Force a fresh auth session fetch — the OAuth redirect is a full page
+    // navigation, so the stale cache still shows unauthenticated even though
+    // the backend just logged us in.
+    await context.queryClient.invalidateQueries({ queryKey: ['authSession'] });
+    await context.queryClient.fetchQuery(authSessionQueryOptions());
+  },
   component: CallbackComponent,
   validateSearch: (search: Record<string, unknown>) => {
     return {
@@ -22,7 +29,9 @@ function CallbackComponent() {
   if (error) {
     return (
       <div>
-        <p>Login failed: <strong>{error}</strong></p>
+        <p>
+          Login failed: <strong>{error}</strong>
+        </p>
         <a href="/login">Back to login</a>
       </div>
     );

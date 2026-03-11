@@ -22,6 +22,7 @@ urlpatterns = [
     path('requests/<int:request_id>/add-note/', NoteCreateView.as_view(), name="add-note"),
     path('requests/<int:request_id>/delete-note/<int:note_id>/', NoteDeleteView.as_view(), name="delete-note"),
 
+    path('users/<int:user_id>', UserEditView.as_view(), name="user-edit"),
     path('identities/', IdentityListView.as_view(), name="identities-list"),
     path('statuses/', StatusListView.as_view(), name="statuses-list"),
     path('owners/', OwnerListView.as_view(), name="owners-list"),

@@ -18,6 +18,7 @@ import {
   TARequestsResponse,
   TAStatus,
   TATopic,
+  TAUserMutation,
 } from '../api/dashboard/types';
 import { submitIntakeMutation } from '../api/forms';
 import {
@@ -201,6 +202,15 @@ export const useLogoutMutation = () => {
   return useMutation({
     mutationFn: logoutMutation,
     onSettled: () => queryClient.invalidateQueries({ queryKey: ['authSession'] }),
+  });
+};
+
+export const useUserMutation = (userId: string) => {
+  return useMutation({
+    mutationKey: ['users', 'update', userId],
+    mutationFn: (data: Partial<TAUserMutation>) =>
+      patchData<TAUserMutation>(`${import.meta.env.VITE_API_URL}/users/${userId}`, data),
+    onSuccess: () => queryClient.invalidateQueries(),
   });
 };
 
