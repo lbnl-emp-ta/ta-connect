@@ -1,15 +1,11 @@
 import AssignmentIcon from '@mui/icons-material/Assignment';
-import ClearIcon from '@mui/icons-material/Clear';
 import PeopleIcon from '@mui/icons-material/People';
 import {
   Box,
-  IconButton,
   InputAdornment,
   MenuItem,
   Select,
   SelectChangeEvent,
-  Snackbar,
-  SnackbarCloseReason,
   Stack,
   Tab,
   Tabs,
@@ -29,7 +25,6 @@ import { TAIdentity } from '../../../api/dashboard/types';
 import { AppLink } from '../../../components/AppLink';
 import { useIdentityContext } from '../../../features/identity/IdentityContext';
 import { useRequestsContext } from '../../../features/requests/RequestsContext';
-import { useToastContext } from '../../../features/toasts/ToastContext';
 import { identitiesQueryOptions } from '../../../utils/queryOptions';
 import { a11yProps } from '../../../utils/utils';
 
@@ -49,7 +44,6 @@ function DashboardComponent() {
   const navigate = useNavigate();
   const location = useLocation();
   const { identity, detailedIdentity, setIdentity, setDetailedIdentity } = useIdentityContext();
-  const { showToast, toastMessage, setShowToast } = useToastContext();
   const { setSortedRequests } = useRequestsContext();
   const { data: identities } = useSuspenseQuery(identitiesQueryOptions());
   const [tabValue, setTabValue] = useState<string | number>(() => {
@@ -69,13 +63,6 @@ function DashboardComponent() {
 
   const handleIdentityChange = (event: SelectChangeEvent<TAIdentity | null>) => {
     setDetailedIdentity(event.target.value as TAIdentity);
-  };
-
-  const handleToastClose = (_event: React.SyntheticEvent | Event, reason?: SnackbarCloseReason) => {
-    if (reason === 'clickaway') {
-      return;
-    }
-    setShowToast(false);
   };
 
   useEffect(() => {
@@ -224,18 +211,6 @@ function DashboardComponent() {
       <Box component="main" sx={{ flex: 1, overflow: 'hidden', padding: 3 }}>
         <Outlet />
       </Box>
-      <Snackbar
-        open={showToast}
-        autoHideDuration={6000}
-        message={toastMessage}
-        onClose={handleToastClose}
-        action={
-          <IconButton size="small" aria-label="close" color="inherit" onClick={handleToastClose}>
-            <ClearIcon fontSize="small" />
-          </IconButton>
-        }
-        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
-      />
     </Stack>
   );
 }

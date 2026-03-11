@@ -28,7 +28,8 @@ function ProfilePage() {
   const { data: identities } = useSuspenseQuery(identitiesQueryOptions());
   const [isEmailDialogOpen, setIsEmailDialogOpen] = useState(false);
 
-  const handleOpenEmailDialog = () => {
+  const handleOpenEmailDialog = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.currentTarget.blur();
     setIsEmailDialogOpen(true);
   };
 

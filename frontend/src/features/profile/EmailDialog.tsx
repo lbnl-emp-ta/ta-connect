@@ -6,10 +6,15 @@ import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import ErrorIcon from '@mui/icons-material/Error';
 import { useUserMutation } from '../../utils/queryOptions';
 import { useUser } from '../../hooks/useUser';
 import { TAUser, TAUserMutation } from '../../api/dashboard/types';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { useToastContext } from '../toasts/ToastContext';
+import { ToastMessage } from '../toasts/ToastMessage';
+import { CircularProgress } from '@mui/material';
 
 interface EmailDialogProps {
   open: boolean;
@@ -22,6 +27,7 @@ export const EmailDialog: React.FC<EmailDialogProps> = ({ open, onClose }) => {
   const [name, setName] = useState<TAUser['name']>(user?.name);
   const [email, setEmail] = useState<TAUser['email']>(user?.email);
   const [phone, setPhone] = useState<TAUser['phone']>(user?.phone);
+  const { setShowToast, setToastMessage, setToastAutoHideDuration } = useToastContext();
 
   /**
    * Handle submission of edited request information.
@@ -44,6 +50,33 @@ export const EmailDialog: React.FC<EmailDialogProps> = ({ open, onClose }) => {
     onClose();
   };
 
+  useEffect(() => {
+    if (updateUserMutation.isPending) {
+      setShowToast(true);
+      setToastAutoHideDuration(null);
+      setToastMessage(
+        <ToastMessage icon={<CircularProgress />}>Saving user information</ToastMessage>
+      );
+    } else if (updateUserMutation.isSuccess) {
+      setShowToast(true);
+      setToastAutoHideDuration(6000);
+      setToastMessage(
+        <ToastMessage icon={<CheckCircleIcon />}>User information saved</ToastMessage>
+      );
+    } else if (updateUserMutation.isError) {
+      setShowToast(true);
+      setToastAutoHideDuration(6000);
+      setToastMessage(
+        <ToastMessage icon={<ErrorIcon />}>{updateUserMutation.error.message}</ToastMessage>
+      );
+    }
+  }, [
+    updateUserMutation.isPending,
+    updateUserMutation.isSuccess,
+    updateUserMutation.isError,
+    updateUserMutation.error?.message,
+  ]);
+
   return (
     <Dialog open={open} onClose={onClose}>
       <DialogTitle>Subscribe</DialogTitle>
@@ -54,7 +87,6 @@ export const EmailDialog: React.FC<EmailDialogProps> = ({ open, onClose }) => {
         </DialogContentText>
         <form onSubmit={handleSubmit} id="subscription-form">
           <TextField
-            autoFocus
             required
             margin="dense"
             id="name"
@@ -71,7 +103,7 @@ export const EmailDialog: React.FC<EmailDialogProps> = ({ open, onClose }) => {
       <DialogActions>
         <Button onClick={onClose}>Cancel</Button>
         <Button type="submit" form="subscription-form">
-          Subscribe
+          Save
         </Button>
       </DialogActions>
     </Dialog>
