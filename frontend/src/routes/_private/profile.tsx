@@ -17,7 +17,7 @@ import { RolePanel } from '../../features/profile/RolePanel';
 import { useUser } from '../../hooks/useUser';
 import { identitiesQueryOptions } from '../../utils/queryOptions';
 import { useEffect, useState } from 'react';
-import { EmailDialog } from '../../features/profile/EmailDialog';
+import { UserInfoDialog } from '../../features/profile/UserInfoDialog';
 
 export const Route = createFileRoute('/_private/profile')({
   component: ProfilePage,
@@ -26,15 +26,16 @@ export const Route = createFileRoute('/_private/profile')({
 function ProfilePage() {
   const user = useUser();
   const { data: identities } = useSuspenseQuery(identitiesQueryOptions());
-  const [isEmailDialogOpen, setIsEmailDialogOpen] = useState(false);
+  const hasPlaceholderEmail = !!user?.email?.endsWith('@orcid.placeholder');
+  const [isUserInfoDialogOpen, setIsUserInfoDialogOpen] = useState(false);
 
-  const handleOpenEmailDialog = (e: React.MouseEvent<HTMLButtonElement>) => {
+  const handleOpenUserInfolDialog = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.currentTarget.blur();
-    setIsEmailDialogOpen(true);
+    setIsUserInfoDialogOpen(true);
   };
 
-  const handleCloseEmailDialog = () => {
-    setIsEmailDialogOpen(false);
+  const handleCloseUserInfoDialog = () => {
+    setIsUserInfoDialogOpen(false);
   };
 
   useEffect(() => {
@@ -51,12 +52,17 @@ function ProfilePage() {
           </Typography>
           <Stack direction="row" spacing={1} alignItems="center">
             <Typography variant="body1" color="text.secondary">
-              {user?.email}
+              {hasPlaceholderEmail ? 'Missing email address' : user?.email}
             </Typography>
-            <IconButton size="small" onClick={handleOpenEmailDialog}>
+            <IconButton size="small" onClick={handleOpenUserInfolDialog}>
               <EditIcon />
             </IconButton>
-            <EmailDialog open={isEmailDialogOpen} onClose={handleCloseEmailDialog} />
+            <UserInfoDialog
+              open={isUserInfoDialogOpen}
+              setOpen={setIsUserInfoDialogOpen}
+              onClose={handleCloseUserInfoDialog}
+              hasPlaceholderEmail={hasPlaceholderEmail}
+            />
           </Stack>
         </Box>
       </Stack>
