@@ -15,6 +15,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { useToastContext } from '../toasts/ToastContext';
 import { ToastMessage } from '../toasts/ToastMessage';
 import { CircularProgress, Stack } from '@mui/material';
+import { PhoneInput } from '../../components/PhoneInput';
 
 interface UserInfoDialogProps {
   open: boolean;
@@ -143,14 +144,13 @@ export const UserInfoDialog: React.FC<UserInfoDialogProps> = ({
               value={name}
               onChange={(e) => setName(e.target.value)}
             />
-            <TextField
+            <PhoneInput
               required
               id="phone"
               name="phone"
               label="Phone Number"
               type="tel"
               fullWidth
-              variant="standard"
               value={phone}
               onChange={(e) => setPhone(e.target.value)}
             />
