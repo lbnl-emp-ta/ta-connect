@@ -3,6 +3,7 @@ import { Box, Container, Grid, Link, Paper, Stack, Typography } from '@mui/mater
 import { createFileRoute } from '@tanstack/react-router';
 import imagePath from '../../assets/lbnl.png';
 import { SocialLoginButton } from '../../components/SocialLoginButton';
+import { AppLink } from '../../components/AppLink';
 
 export const Route = createFileRoute('/_public-only/login')({
   beforeLoad: ({ context }) => {
@@ -83,19 +84,25 @@ function RouteComponent() {
                 >
                   Login
                 </Typography>
-                <SocialLoginButton name="Google" id="google" startIcon={<GoogleIcon />} />
-                <SocialLoginButton
-                  name="ORCiD"
-                  id="orcid"
-                  startIcon={
-                    <img
-                      data-v-485a4326=""
-                      width="24px"
-                      alt="ORCID logo"
-                      src="https://orcid.org/assets/vectors/orcid.logo.icon.svg"
-                    />
-                  }
-                />
+                <Stack spacing={1}>
+                  <SocialLoginButton
+                    name="ORCiD"
+                    id="orcid"
+                    startIcon={
+                      <img
+                        data-v-485a4326=""
+                        width="24px"
+                        alt="ORCID logo"
+                        src="https://orcid.org/assets/vectors/orcid.logo.icon.svg"
+                      />
+                    }
+                  />
+                  <Typography textAlign="center" fontSize="0.875rem">
+                    <Link href="https://orcid.org/" target="_blank">
+                      What is ORCiD?
+                    </Link>
+                  </Typography>
+                </Stack>
                 <Typography
                   sx={{
                     borderTop: '1px solid',
@@ -105,7 +112,10 @@ function RouteComponent() {
                   }}
                 >
                   For more information about the State TA Program visit the{' '}
-                  <Link href="https://emp.lbl.gov/projects/state-TA-program">program website</Link>.
+                  <Link href="https://emp.lbl.gov/projects/state-TA-program" target="_blank">
+                    program website
+                  </Link>
+                  .
                 </Typography>
               </Stack>
             </Paper>
