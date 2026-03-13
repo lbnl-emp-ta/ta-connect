@@ -22,13 +22,6 @@ class CustomSocialAccountAdapter(DefaultSocialAccountAdapter):
             name = f"{given_names} {family_name}"
             if name:
                 user.name = name
-        
-        # Get the name from Google's extra_data
-        if sociallogin.account.provider == 'google':
-            extra_data = sociallogin.account.extra_data
-            name = extra_data.get('name', '')
-            if name:
-                user.name = name
 
         return user
     
@@ -37,16 +30,6 @@ class CustomSocialAccountAdapter(DefaultSocialAccountAdapter):
         Invoked just after a user successfully authenticates via a
         social provider, but before the login is actually processed.
         """
-        if sociallogin.account.provider == 'google':
-            # Update existing user's name if it's empty
-            try:
-                user = User.objects.get(email=sociallogin.account.extra_data.get('email'))
-                if not user.name:
-                    user.name = sociallogin.account.extra_data.get('name', '')
-                    user.save()
-            except User.DoesNotExist:
-                pass
-
         if sociallogin.account.provider == 'orcid':
             # ORCID only returns an email if the user has made it public.
             # If no email is provided, generate a placeholder from the ORCID iD

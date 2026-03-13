@@ -46,7 +46,6 @@ INSTALLED_APPS = [
     'allauth.headless',
     'allauth.socialaccount',
     'allauth.socialaccount.providers.orcid',
-    'allauth.socialaccount.providers.google',
     'rest_framework',
     'core',
 ]
@@ -180,31 +179,6 @@ SOCIALACCOUNT_PROVIDERS = {
         ],
         "SCOPE": [
             "/authenticate",
-        ],
-        "VERIFIED_EMAIL": True
-    },
-    "google": {
-        "APPS": [
-            {
-                "client_id": os.getenv("TACONNECT_GOOGLE_CLIENT_ID"),
-                "secret": os.getenv("TACONNECT_GOOGLE_CLIENT_SECRET"),
-                "key": "",
-                "settings": {
-                    "scope": [
-                        "profile",
-                        "email",
-                    ],
-                    "auth_params": {
-                        "access_type": "online",
-                        # Force Google to show the page for account selection
-                        "prompt": "select_account",
-                    },
-                },
-            },
-        ],
-        "SCOPE": [
-            "profile",
-            "email",
         ],
         "VERIFIED_EMAIL": True
     }
