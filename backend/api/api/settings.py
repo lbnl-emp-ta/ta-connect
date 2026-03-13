@@ -45,7 +45,7 @@ INSTALLED_APPS = [
     'allauth.account',
     'allauth.headless',
     'allauth.socialaccount',
-    'allauth.socialaccount.providers.google',
+    'allauth.socialaccount.providers.orcid',
     'rest_framework',
     'core',
 ]
@@ -69,6 +69,8 @@ CORS_ALLOWED_ORIGIN_REGEXES = [
     "https://taconnect.lbl.gov:1337",
     "https://taconnect.lbl.gov",
     # match localhost with any port
+    r"^http:\/\/127.0.0.1:*([0-9]+)?$",
+    r"^https:\/\/127.0.0.1:*([0-9]+)?$",
     r"^http:\/\/localhost:*([0-9]+)?$",
     r"^https:\/\/localhost:*([0-9]+)?$",
 ]
@@ -93,7 +95,7 @@ CSRF_TRUSTED_ORIGINS = [
     "http://127.0.0.1:8000",
 ]
 
-CSRF_COOKIE_DOMAIN = os.getenv('TACONNECT_FRONTEND_DOMAIN', 'localhost')
+CSRF_COOKIE_DOMAIN = os.getenv('TACONNECT_FRONTEND_DOMAIN', '127.0.0.1')
 
 CORS_ALLOW_CREDENTIALS = True
 # CSRF_COOKIE_SECURE = False
@@ -125,8 +127,10 @@ ALLOWED_HOSTS = [
     "localhost:80", 
     "127.0.0.1",
     "127.0.0.1:80", 
-    "localhost:5173", 
-    "localhost:8000", 
+    "localhost:5173",
+    "127.0.0.1:5173",
+    "localhost:8000",
+    "127.0.0.1:8000", 
     "taconnect-local.lbl.gov:1337",
     "taconnect-local.lbl.gov",
     "taconnect.lbl.gov:1337",
@@ -160,28 +164,21 @@ SOCIALACCOUNT_ADAPTER = 'core.adapters.CustomSocialAccountAdapter'
 SOCIALACCOUNT_AUTO_SIGNUP = True
 
 SOCIALACCOUNT_PROVIDERS = {
-    "google": {
+    "orcid": {
         "APPS": [
             {
-                "client_id": os.getenv("TACONNECT_GOOGLE_CLIENT_ID"),
-                "secret": os.getenv("TACONNECT_GOOGLE_CLIENT_SECRET"),
+                "client_id": os.getenv("TACONNECT_ORCID_CLIENT_ID"),
+                "secret": os.getenv("TACONNECT_ORCID_CLIENT_SECRET"),
                 "key": "",
                 "settings": {
                     "scope": [
-                        "profile",
-                        "email",
+                        "/authenticate",
                     ],
-                    "auth_params": {
-                        "access_type": "online",
-                        # Force Google to show the page for account selection
-                        "prompt": "select_account",
-                    },
                 },
             },
         ],
         "SCOPE": [
-            "profile",
-            "email",
+            "/authenticate",
         ],
         "VERIFIED_EMAIL": True
     }
@@ -189,12 +186,15 @@ SOCIALACCOUNT_PROVIDERS = {
 
 HEADLESS_ONLY = True
 HEADLESS_SERVE_SPECIFICATION = True
+
+FRONTEND_URL = os.getenv('TACONNECT_FRONTEND_URL', 'http://127.0.0.1:5173')
+
 HEADLESS_FRONTEND_URLS = {
-    "account_confirm_email": "/account/verify-email/{key}",
-    "account_reset_password": "/account/password/reset",
-    "account_reset_password_from_key": "/account/password/reset/key/{key}",
-    "account_signup": "/account/signup",
-    "socialaccount_login_error": "/account/provider/callback",
+    "account_confirm_email": f"{FRONTEND_URL}/account/verify-email/{{key}}",
+    "account_reset_password": f"{FRONTEND_URL}/account/password/reset",
+    "account_reset_password_from_key": f"{FRONTEND_URL}/account/password/reset/key/{{key}}",
+    "account_signup": f"{FRONTEND_URL}/account/signup",
+    "socialaccount_login_error": f"{FRONTEND_URL}/account/provider/callback",
 }
 HEADLESS_ADAPTER = 'core.adapters.CustomHeadlessAdapter'
 

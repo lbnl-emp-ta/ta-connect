@@ -162,6 +162,21 @@ export interface TAIdentity {
   };
 }
 
+export interface TAUser {
+  display: string;
+  has_usable_password: boolean;
+  id: number;
+  email?: string;
+  name?: string;
+  phone?: string;
+}
+
+export interface TAUserMutation {
+  email?: string;
+  name?: string;
+  phone?: string;
+}
+
 export interface TARequestsResponse {
   actionable: TARequest[];
   downstream: TARequest[];

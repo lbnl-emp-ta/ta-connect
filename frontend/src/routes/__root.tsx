@@ -1,6 +1,19 @@
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
+import ClearIcon from '@mui/icons-material/Clear';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
-import { AppBar, Box, Button, Menu, MenuItem, Stack, Toolbar, Typography } from '@mui/material';
+import {
+  AppBar,
+  Box,
+  Button,
+  IconButton,
+  Menu,
+  MenuItem,
+  Snackbar,
+  SnackbarCloseReason,
+  Stack,
+  Toolbar,
+  Typography,
+} from '@mui/material';
 import { type QueryClient } from '@tanstack/react-query';
 import { createRootRouteWithContext, Link, Outlet, useNavigate } from '@tanstack/react-router';
 import { TanStackRouterDevtools } from '@tanstack/react-router-devtools';
@@ -9,6 +22,7 @@ import { TAIdentity } from '../api/dashboard/types';
 import { Identity } from '../features/identity/IdentityContext';
 import { useUser } from '../hooks/useUser';
 import { authSessionQueryOptions, useLogoutMutation } from '../utils/queryOptions';
+import { useToastContext } from '../features/toasts/ToastContext';
 
 export interface MyRouterContext {
   queryClient: QueryClient;
@@ -29,6 +43,7 @@ function Initializer() {
   const logoutMutation = useLogoutMutation();
   const [userMenuAnchorEl, setUserMenuAnchorEl] = useState<null | HTMLElement>(null);
   const userMenuOpen = Boolean(userMenuAnchorEl);
+  const { showToast, toastMessage, toastAutoHideDuration, setShowToast } = useToastContext();
 
   const handleUserMenuClick = (event: React.MouseEvent<HTMLButtonElement>) => {
     setUserMenuAnchorEl(event.currentTarget);
@@ -45,6 +60,13 @@ function Initializer() {
 
   const handleLogout = () => {
     logoutMutation.mutate();
+  };
+
+  const handleToastClose = (_event: React.SyntheticEvent | Event, reason?: SnackbarCloseReason) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+    setShowToast(false);
   };
 
   return (
@@ -116,6 +138,18 @@ function Initializer() {
       <Box sx={{ display: 'flex', flex: 1 }}>
         <Outlet />
         <TanStackRouterDevtools />
+        <Snackbar
+          open={showToast}
+          autoHideDuration={toastAutoHideDuration}
+          message={toastMessage}
+          onClose={handleToastClose}
+          action={
+            <IconButton size="small" aria-label="close" color="inherit" onClick={handleToastClose}>
+              <ClearIcon fontSize="small" />
+            </IconButton>
+          }
+          anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+        />
       </Box>
     </Stack>
   );

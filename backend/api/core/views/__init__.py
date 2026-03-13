@@ -22,6 +22,7 @@ from .attachment import UploadAttachmentView, DownloadAttachmentView, DeleteAtta
 from .note import NoteListView, NoteCreateView, NoteDeleteView
 from .topic import TopicListView
 from .audit_history import AuditHistoryListView
+from .user import UserEditView
 
 __all__ = [
     "AssignmentView",
@@ -53,5 +54,6 @@ __all__ = [
     "NoteCreateView",
     "NoteDeleteView",
     "TopicListView",
-    "AuditHistoryListView"
+    "AuditHistoryListView",
+    "UserEditView"
 ]

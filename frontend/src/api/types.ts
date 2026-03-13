@@ -1,13 +1,9 @@
+import { TAUser } from './dashboard/types';
+
 export interface SessionAuthenticatedResponse {
   status: number;
   data: {
-    user: {
-      display: string;
-      has_usable_password: boolean;
-      id: number;
-      email: string;
-      name: string;
-    };
+    user: TAUser;
     methods: [
       {
         method: string;
