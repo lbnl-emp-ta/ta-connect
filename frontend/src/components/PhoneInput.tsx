@@ -29,11 +29,13 @@ interface PhoneInputProps extends InputProps {
   label?: string;
 }
 
-export const PhoneInput: React.FC<PhoneInputProps> = ({ label, ...otherProps }) => {
+export const PhoneInput: React.FC<PhoneInputProps> = ({ label, id, required, ...otherProps }) => {
   return (
     <FormControl variant="standard">
-      <InputLabel htmlFor="formatted-text-mask-input">{label}</InputLabel>
-      <Input {...otherProps} inputComponent={TextMaskCustom as any} />
+      <InputLabel htmlFor={id} required={required}>
+        {label}
+      </InputLabel>
+      <Input {...otherProps} id={id} required={required} inputComponent={TextMaskCustom as any} />
     </FormControl>
   );
 };

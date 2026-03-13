@@ -8,13 +8,13 @@ import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import ErrorIcon from '@mui/icons-material/Error';
-import { useUserMutation } from '../../utils/queryOptions';
+import { useLogoutMutation, useUserMutation } from '../../utils/queryOptions';
 import { useUser } from '../../hooks/useUser';
 import { TAUser, TAUserMutation } from '../../api/dashboard/types';
 import { useEffect, useMemo, useState } from 'react';
 import { useToastContext } from '../toasts/ToastContext';
 import { ToastMessage } from '../toasts/ToastMessage';
-import { CircularProgress, Stack } from '@mui/material';
+import { Box, CircularProgress, Stack } from '@mui/material';
 import { PhoneInput } from '../../components/PhoneInput';
 
 interface UserInfoDialogProps {
@@ -32,6 +32,7 @@ export const UserInfoDialog: React.FC<UserInfoDialogProps> = ({
 }) => {
   const user = useUser();
   const updateUserMutation = useUserMutation(user?.id.toString() || '');
+  const logoutMutation = useLogoutMutation();
   const [name, setName] = useState<TAUser['name']>(user?.name);
   const [email, setEmail] = useState<TAUser['email']>(!hasPlaceholderEmail ? user?.email : '');
   const [phone, setPhone] = useState<TAUser['phone']>(user?.phone);
@@ -75,6 +76,10 @@ export const UserInfoDialog: React.FC<UserInfoDialogProps> = ({
     setEmail(user?.email || '');
     setPhone(user?.phone || '');
     onClose();
+  };
+
+  const handleLogout = () => {
+    logoutMutation.mutate();
   };
 
   useEffect(() => {
@@ -157,11 +162,14 @@ export const UserInfoDialog: React.FC<UserInfoDialogProps> = ({
           </Stack>
         </form>
       </DialogContent>
-      <DialogActions>
-        {!hasMissingInfo && <Button onClick={handleCancel}>Cancel</Button>}
-        <Button type="submit" form="profile-form">
-          Save
-        </Button>
+      <DialogActions sx={{ justifyContent: 'space-between' }}>
+        <Box>{hasMissingInfo && <Button onClick={handleLogout}>Logout</Button>}</Box>
+        <Box>
+          {!hasMissingInfo && <Button onClick={handleCancel}>Cancel</Button>}
+          <Button variant="contained" type="submit" form="profile-form">
+            Save
+          </Button>
+        </Box>
       </DialogActions>
     </Dialog>
   );
