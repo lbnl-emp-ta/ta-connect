@@ -314,7 +314,7 @@ class RequestDetailView(BaseUserAwareRequest):
             patch_data["depth"] = maybe_depth.name
 
         if "actual_completion_date" in body:
-            if not (IsAdmin().has_permission(request, None) or IsProgramLead().has_permission(request, None)):
+            if not (IsAnyRoleOnRequest().has_permission(request, None)):
                 return Response(data={"message": "Insufficient privillege to update 'actual completion date' field"}, status=status.HTTP_401_UNAUTHORIZED)
 
             patch_data["actual_completion_date"] = body.get("actual_completion_date") 
@@ -351,13 +351,13 @@ class RequestDetailView(BaseUserAwareRequest):
             patch_data["expert"] = maybe_expert.email 
         
         if "proj_start_date" in body:
-            if not(IsAdmin().has_permission(request, None) or IsProgramLead().has_permission(request, None) or IsLabLead().has_permission(request, None) or IsExpert().has_permission(request, None)):
+            if not(IsAnyRoleOnRequest().has_permission(request, None)):
                 return Response(data={"message": "Insufficient privillege to update 'projected start date' field"}, status=status.HTTP_401_UNAUTHORIZED)
 
             patch_data["proj_start_date"] = body.get("proj_start_date")
 
         if "proj_completion_date" in body:
-            if not(IsAdmin().has_permission(request, None) or IsProgramLead().has_permission(request, None) or IsLabLead().has_permission(request, None) or IsExpert().has_permission(request, None)):
+            if not(IsAnyRoleOnRequest().has_permission(request, None)):
                 return Response(data={"message": "Insufficient privillege to update 'projected completion date' field"}, status=status.HTTP_401_UNAUTHORIZED)
 
             patch_data["proj_completion_date"] = body.get("proj_completion_date")
@@ -377,6 +377,8 @@ class RequestDetailView(BaseUserAwareRequest):
         # Topics are done a special way (not using patch serializer) because they are 
         # stored as a Many-to-Many relationship in the database.
         if "topics" in body:
+            if not(IsAdmin().has_permission(request, None) or IsProgramLead().has_permission(request, None) or IsCoordinator().has_permission(request, None) or IsLabLead().has_permission(request, None)):
+                return Response(data={"message": "Insufficient privillege to update 'topics' field"}, status=status.HTTP_401_UNAUTHORIZED)
             current_topics = maybe_request.topics.all()
             maybe_request.topics.clear()
             
