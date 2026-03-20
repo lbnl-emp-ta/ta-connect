@@ -10,16 +10,16 @@ export interface Identity {
 
 interface IdentityContextType {
   identity?: Identity;
-  detailedIdentity?: TAIdentity | null;
+  detailedIdentity?: TAIdentity;
   setIdentity: React.Dispatch<React.SetStateAction<Identity | undefined>>;
-  setDetailedIdentity: React.Dispatch<React.SetStateAction<TAIdentity | null | undefined>>;
+  setDetailedIdentity: React.Dispatch<React.SetStateAction<TAIdentity | undefined>>;
 }
 
 const IdentityContext = createContext<IdentityContextType | undefined>(undefined);
 
 export const IdentityProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [identity, setIdentity] = useState<Identity>();
-  const [detailedIdentity, setDetailedIdentity] = useState<TAIdentity | null>();
+  const [detailedIdentity, setDetailedIdentity] = useState<TAIdentity>();
 
   const value = useMemo(() => {
     return { identity, detailedIdentity, setIdentity, setDetailedIdentity };

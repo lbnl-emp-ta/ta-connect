@@ -1,3 +1,5 @@
+import { TAIdentity, TARole } from '../api/dashboard/types';
+
 /**
  * Validates a US telephone number (10 digits, allows common formatting)
  */
@@ -74,4 +76,27 @@ export const downloadBlob = (blob: Blob, filename: string): void => {
   document.body.appendChild(a);
   a.click();
   a.remove();
+};
+
+type PermissionAction = 'edit-depth';
+
+export const hasPermission = (action: PermissionAction, detailedIdentity?: TAIdentity): boolean => {
+  if (!detailedIdentity || !detailedIdentity.role) return false;
+  switch (detailedIdentity.role.name) {
+    case TARole.Admin:
+      return true;
+    case TARole.Coordinator:
+      return true;
+    case TARole.Expert:
+      if (action === 'edit-depth') {
+        return false;
+      }
+      return true;
+    case TARole.LabLead:
+      return true;
+    case TARole.ProgramLead:
+      return true;
+    default:
+      return false;
+  }
 };

@@ -46,6 +46,7 @@ function DashboardComponent() {
   const { identity, detailedIdentity, setIdentity, setDetailedIdentity } = useIdentityContext();
   const { setSortedRequests } = useRequestsContext();
   const { data: identities } = useSuspenseQuery(identitiesQueryOptions());
+  console.log('Identities:', identities);
   const [tabValue, setTabValue] = useState<string | number>(() => {
     if (location.pathname.startsWith('/dashboard/requests')) {
       return 'requests';

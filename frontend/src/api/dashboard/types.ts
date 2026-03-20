@@ -144,6 +144,14 @@ export interface TARequestDetailMutation {
   topics: string[];
 }
 
+export enum TARole {
+  Admin = 'Admin',
+  Coordinator = 'Coordinator',
+  Expert = 'Expert',
+  LabLead = 'Lab Lead',
+  ProgramLead = 'Program Lead',
+}
+
 export interface TAIdentity {
   user: {
     id: number;
@@ -151,7 +159,7 @@ export interface TAIdentity {
   };
   role: {
     id: number;
-    name: string;
+    name: TARole;
     description: string;
   };
   location: string;
