@@ -333,7 +333,7 @@ export const RequestInfoPanel: React.FC<RequestInfoPanelProps> = ({ request }) =
                 <TableRow>
                   <TableCell>Topics</TableCell>
                   <TableCell>
-                    {!editing && (
+                    {(!editing || !hasPermission('edit-depth', detailedIdentity)) && (
                       <Grid container spacing={1}>
                         {request.topics && request.topics.length > 0 ? (
                           request.topics.map((topic) => (
@@ -351,7 +351,7 @@ export const RequestInfoPanel: React.FC<RequestInfoPanelProps> = ({ request }) =
                         )}
                       </Grid>
                     )}
-                    {editing && (
+                    {editing && hasPermission('edit-topics', detailedIdentity) && (
                       <Autocomplete
                         multiple
                         options={allTopics || []}
@@ -373,12 +373,12 @@ export const RequestInfoPanel: React.FC<RequestInfoPanelProps> = ({ request }) =
             <Stack direction="row" alignItems="center" justifyContent="space-between">
               <Typography fontSize="0.875rem">Description</Typography>
             </Stack>
-            {!editing && (
+            {(!editing || !hasPermission('edit-description', detailedIdentity)) && (
               <Typography fontSize="0.875rem">
                 {request.description || 'No description for this request.'}
               </Typography>
             )}
-            {editing && (
+            {editing && hasPermission('edit-topics', detailedIdentity) && (
               <TextField
                 fullWidth
                 multiline
