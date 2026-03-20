@@ -275,6 +275,7 @@ class RequestDetailView(BaseUserAwareRequest):
             return Response(data={"message": "Please provide a Request ID"}, status=status.HTTP_400_BAD_REQUEST)
         
         maybe_request = None
+        print("queryset:", queryset)
         try:
             maybe_request = queryset.get(pk=id)        
         except Request.DoesNotExist:

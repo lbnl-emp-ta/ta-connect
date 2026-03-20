@@ -40,8 +40,6 @@ interface RequestInfoPanelProps {
 
 export const RequestInfoPanel: React.FC<RequestInfoPanelProps> = ({ request }) => {
   const { identity, detailedIdentity } = useIdentityContext();
-  console.log('Identity:', identity);
-  console.log('Detailed Identity', detailedIdentity);
   const updateRequestMutation = useRequestMutation(request?.id.toString() || '', identity);
   const { data: allTopics } = useSuspenseQuery(topicsQueryOptions());
   const [editing, setEditing] = useState(false);

@@ -99,14 +99,6 @@ class RequestSerializer(serializers.Serializer):
             return True
         
         return False
-    
-    def validate_proj_start_date(self, value):
-        if value is None:
-            return value
-
-        if RequestSerializer.date_in_past(value):
-            raise serializers.ValidationError("Projected start date cannot be in the past")
-        return value
             
     
     def validate_proj_completion_date(self, value):

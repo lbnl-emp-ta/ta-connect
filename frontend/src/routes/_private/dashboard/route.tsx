@@ -46,7 +46,6 @@ function DashboardComponent() {
   const { identity, detailedIdentity, setIdentity, setDetailedIdentity } = useIdentityContext();
   const { setSortedRequests } = useRequestsContext();
   const { data: identities } = useSuspenseQuery(identitiesQueryOptions());
-  console.log('Identities:', identities);
   const [tabValue, setTabValue] = useState<string | number>(() => {
     if (location.pathname.startsWith('/dashboard/requests')) {
       return 'requests';
@@ -79,7 +78,7 @@ function DashboardComponent() {
         navigate({ to: '/dashboard/requests', params: {} });
       }
     } else {
-      setDetailedIdentity(identities ? identities[0] : null);
+      setDetailedIdentity(identities ? identities[0] : undefined);
     }
   }, [detailedIdentity, identities, setDetailedIdentity, setIdentity]);
 
