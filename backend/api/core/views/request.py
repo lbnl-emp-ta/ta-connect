@@ -1,4 +1,4 @@
-from django.db import transaction
+from django.db import transaction, IntegrityError
 
 from rest_framework import views, status, permissions, authentication
 from rest_framework.response import Response
@@ -394,7 +394,15 @@ class RequestDetailView(BaseUserAwareRequest):
        # do partial save with accumulated patch 
         patch_serializer = RequestSerializer(instance=maybe_request, data=patch_data, partial=True)
         if(patch_serializer.is_valid()):
-            patch_serializer.save()
+            try:
+                patch_serializer.save()
+            except IntegrityError as e:
+                error_msg = str(e)
+                for constraint in Request._meta.constraints:
+                    if constraint.name in error_msg:
+                        error_msg = constraint.violation_error_message
+                        break
+                return Response(data={"message": error_msg}, status=status.HTTP_400_BAD_REQUEST)
             create_audit_history(request, maybe_request, ActionType.EditRequestDetails, f"Edited request: {str(patch_data)[:20]}...")
         else:
             return Response(data={"message": patch_serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
