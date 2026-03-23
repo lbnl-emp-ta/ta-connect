@@ -1,4 +1,4 @@
-from django.db import transaction
+from django.db import transaction, IntegrityError
 
 from rest_framework import views, status, permissions, authentication
 from rest_framework.response import Response
@@ -265,8 +265,6 @@ class RequestDetailView(BaseUserAwareRequest):
     Used for Edit action.
     """
     def patch(self, request, id=None):
-        queryset = self.get_queryset()
-
         context = self.request.headers.get("Context")
         if context is None:
             return Response(data={"message": "Please provide context object header with request"}, status=status.HTTP_400_BAD_REQUEST)
@@ -274,6 +272,8 @@ class RequestDetailView(BaseUserAwareRequest):
         if id is None:
             return Response(data={"message": "Please provide a Request ID"}, status=status.HTTP_400_BAD_REQUEST)
         
+        queryset = self.get_actionable() | self.get_downstream()
+
         maybe_request = None
         try:
             maybe_request = queryset.get(pk=id)        
@@ -313,7 +313,7 @@ class RequestDetailView(BaseUserAwareRequest):
             patch_data["depth"] = maybe_depth.name
 
         if "actual_completion_date" in body:
-            if not (IsAdmin().has_permission(request, None) or IsProgramLead().has_permission(request, None)):
+            if not (IsAnyRoleOnRequest().has_permission(request, None)):
                 return Response(data={"message": "Insufficient privillege to update 'actual completion date' field"}, status=status.HTTP_401_UNAUTHORIZED)
 
             patch_data["actual_completion_date"] = body.get("actual_completion_date") 
@@ -350,13 +350,13 @@ class RequestDetailView(BaseUserAwareRequest):
             patch_data["expert"] = maybe_expert.email 
         
         if "proj_start_date" in body:
-            if not(IsAdmin().has_permission(request, None) or IsProgramLead().has_permission(request, None) or IsLabLead().has_permission(request, None) or IsExpert().has_permission(request, None)):
+            if not(IsAnyRoleOnRequest().has_permission(request, None)):
                 return Response(data={"message": "Insufficient privillege to update 'projected start date' field"}, status=status.HTTP_401_UNAUTHORIZED)
 
             patch_data["proj_start_date"] = body.get("proj_start_date")
 
         if "proj_completion_date" in body:
-            if not(IsAdmin().has_permission(request, None) or IsProgramLead().has_permission(request, None) or IsLabLead().has_permission(request, None) or IsExpert().has_permission(request, None)):
+            if not(IsAnyRoleOnRequest().has_permission(request, None)):
                 return Response(data={"message": "Insufficient privillege to update 'projected completion date' field"}, status=status.HTTP_401_UNAUTHORIZED)
 
             patch_data["proj_completion_date"] = body.get("proj_completion_date")
@@ -376,6 +376,8 @@ class RequestDetailView(BaseUserAwareRequest):
         # Topics are done a special way (not using patch serializer) because they are 
         # stored as a Many-to-Many relationship in the database.
         if "topics" in body:
+            if not(IsAdmin().has_permission(request, None) or IsProgramLead().has_permission(request, None) or IsCoordinator().has_permission(request, None) or IsLabLead().has_permission(request, None)):
+                return Response(data={"message": "Insufficient privillege to update 'topics' field"}, status=status.HTTP_401_UNAUTHORIZED)
             current_topics = maybe_request.topics.all()
             maybe_request.topics.clear()
             
@@ -393,7 +395,15 @@ class RequestDetailView(BaseUserAwareRequest):
        # do partial save with accumulated patch 
         patch_serializer = RequestSerializer(instance=maybe_request, data=patch_data, partial=True)
         if(patch_serializer.is_valid()):
-            patch_serializer.save()
+            try:
+                patch_serializer.save()
+            except IntegrityError as e:
+                error_msg = str(e)
+                for constraint in Request._meta.constraints:
+                    if constraint.name in error_msg:
+                        error_msg = constraint.violation_error_message
+                        break
+                return Response(data={"message": error_msg}, status=status.HTTP_400_BAD_REQUEST)
             create_audit_history(request, maybe_request, ActionType.EditRequestDetails, f"Edited request: {str(patch_data)[:20]}...")
         else:
             return Response(data={"message": patch_serializer.errors}, status=status.HTTP_400_BAD_REQUEST)

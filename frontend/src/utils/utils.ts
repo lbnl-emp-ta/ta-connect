@@ -1,3 +1,5 @@
+import { TAIdentity, TARole } from '../api/dashboard/types';
+
 /**
  * Validates a US telephone number (10 digits, allows common formatting)
  */
@@ -74,4 +76,34 @@ export const downloadBlob = (blob: Blob, filename: string): void => {
   document.body.appendChild(a);
   a.click();
   a.remove();
+};
+
+type PermissionAction = 'edit-depth' | 'edit-topics' | 'edit-description';
+
+/**
+ * Frontend function for checking if a user has permission to perform a certain action based on their role.
+ * Note that this is used purely for changing UI elements and is not a substitute for backend permission checks.
+ * The backend is the source of truth for permissions.
+ */
+export const hasPermission = (action: PermissionAction, detailedIdentity?: TAIdentity): boolean => {
+  if (!detailedIdentity || !detailedIdentity.role) return false;
+  switch (detailedIdentity.role.name) {
+    case TARole.Admin:
+      return true;
+    case TARole.Coordinator:
+      return true;
+    case TARole.Expert:
+      switch (action) {
+        case 'edit-depth':
+        case 'edit-topics':
+        case 'edit-description':
+          return false;
+      }
+    case TARole.LabLead:
+      return true;
+    case TARole.ProgramLead:
+      return true;
+    default:
+      return false;
+  }
 };

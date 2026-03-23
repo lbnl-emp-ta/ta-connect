@@ -28,7 +28,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { TARequestDetail, TARequestDetailMutation, TATopic } from '../../api/dashboard/types';
 import { InfoPanel } from '../../components/InfoPanel';
 import { topicsQueryOptions, useRequestMutation } from '../../utils/queryOptions';
-import { capitalize, formatDatetime } from '../../utils/utils';
+import { capitalize, formatDatetime, hasPermission } from '../../utils/utils';
 import { useIdentityContext } from '../identity/IdentityContext';
 import { useToastContext } from '../toasts/ToastContext';
 import { ToastMessage } from '../toasts/ToastMessage';
@@ -39,7 +39,7 @@ interface RequestInfoPanelProps {
 }
 
 export const RequestInfoPanel: React.FC<RequestInfoPanelProps> = ({ request }) => {
-  const { identity } = useIdentityContext();
+  const { identity, detailedIdentity } = useIdentityContext();
   const updateRequestMutation = useRequestMutation(request?.id.toString() || '', identity);
   const { data: allTopics } = useSuspenseQuery(topicsQueryOptions());
   const [editing, setEditing] = useState(false);
@@ -241,8 +241,10 @@ export const RequestInfoPanel: React.FC<RequestInfoPanelProps> = ({ request }) =
                 <TableRow>
                   <TableCell>Depth</TableCell>
                   <TableCell>
-                    {!editing && <>{request.depth || 'Unknown'}</>}
-                    {editing && (
+                    {(!editing || !hasPermission('edit-depth', detailedIdentity)) && (
+                      <>{request.depth || 'Unknown'}</>
+                    )}
+                    {editing && hasPermission('edit-depth', detailedIdentity) && (
                       <Select value={depth} onChange={handleDepthChange}>
                         {request.depth_options.map((option) => (
                           <MenuItem key={option} value={option}>
@@ -331,7 +333,7 @@ export const RequestInfoPanel: React.FC<RequestInfoPanelProps> = ({ request }) =
                 <TableRow>
                   <TableCell>Topics</TableCell>
                   <TableCell>
-                    {!editing && (
+                    {(!editing || !hasPermission('edit-depth', detailedIdentity)) && (
                       <Grid container spacing={1}>
                         {request.topics && request.topics.length > 0 ? (
                           request.topics.map((topic) => (
@@ -349,7 +351,7 @@ export const RequestInfoPanel: React.FC<RequestInfoPanelProps> = ({ request }) =
                         )}
                       </Grid>
                     )}
-                    {editing && (
+                    {editing && hasPermission('edit-topics', detailedIdentity) && (
                       <Autocomplete
                         multiple
                         options={allTopics || []}
@@ -371,12 +373,12 @@ export const RequestInfoPanel: React.FC<RequestInfoPanelProps> = ({ request }) =
             <Stack direction="row" alignItems="center" justifyContent="space-between">
               <Typography fontSize="0.875rem">Description</Typography>
             </Stack>
-            {!editing && (
+            {(!editing || !hasPermission('edit-description', detailedIdentity)) && (
               <Typography fontSize="0.875rem">
                 {request.description || 'No description for this request.'}
               </Typography>
             )}
-            {editing && (
+            {editing && hasPermission('edit-topics', detailedIdentity) && (
               <TextField
                 fullWidth
                 multiline

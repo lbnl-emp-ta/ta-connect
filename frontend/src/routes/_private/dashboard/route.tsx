@@ -78,7 +78,7 @@ function DashboardComponent() {
         navigate({ to: '/dashboard/requests', params: {} });
       }
     } else {
-      setDetailedIdentity(identities ? identities[0] : null);
+      setDetailedIdentity(identities ? identities[0] : undefined);
     }
   }, [detailedIdentity, identities, setDetailedIdentity, setIdentity]);
 
