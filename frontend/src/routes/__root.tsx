@@ -1,5 +1,5 @@
 import ClearIcon from '@mui/icons-material/Clear';
-import { Box, IconButton, Snackbar, SnackbarCloseReason, Stack } from '@mui/material';
+import { IconButton, Snackbar, SnackbarCloseReason, Stack } from '@mui/material';
 import { type QueryClient } from '@tanstack/react-query';
 import { createRootRouteWithContext, Outlet } from '@tanstack/react-router';
 import { TanStackRouterDevtools } from '@tanstack/react-router-devtools';
