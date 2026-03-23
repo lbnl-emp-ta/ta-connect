@@ -10,363 +10,386 @@
 
 // Import Routes
 
-import { Route as rootRoute } from './routes/__root';
-import { Route as PublicOnlyRouteImport } from './routes/_public-only/route';
-import { Route as PrivateRouteImport } from './routes/_private/route';
-import { Route as IndexImport } from './routes/index';
-import { Route as PublicOnlySignupImport } from './routes/_public-only/signup';
-import { Route as PublicOnlyLoginImport } from './routes/_public-only/login';
-import { Route as PrivateProfileImport } from './routes/_private/profile';
-import { Route as publicIntakeImport } from './routes/(public)/intake';
-import { Route as PrivateDashboardRouteImport } from './routes/_private/dashboard/route';
-import { Route as PrivateDashboardExpertsImport } from './routes/_private/dashboard/experts';
-import { Route as PrivateDashboardRequestsRouteImport } from './routes/_private/dashboard/requests/route';
-import { Route as PrivateDashboardRequestsIndexImport } from './routes/_private/dashboard/requests/index';
-import { Route as PrivateDashboardRequestsRequestIdImport } from './routes/_private/dashboard/requests/$requestId';
-import { Route as publicAccountProviderCallbackImport } from './routes/(public)/account.provider.callback';
+import { Route as rootRoute } from './routes/__root'
+import { Route as WithNavRouteImport } from './routes/_with-nav/route'
+import { Route as IndexImport } from './routes/index'
+import { Route as publicIntakeImport } from './routes/(public)/intake'
+import { Route as WithNavPublicOnlyRouteImport } from './routes/_with-nav/_public-only/route'
+import { Route as WithNavPrivateRouteImport } from './routes/_with-nav/_private/route'
+import { Route as WithNavPublicOnlyLoginImport } from './routes/_with-nav/_public-only/login'
+import { Route as WithNavPrivateProfileImport } from './routes/_with-nav/_private/profile'
+import { Route as WithNavPrivateDashboardRouteImport } from './routes/_with-nav/_private/dashboard/route'
+import { Route as WithNavPrivateDashboardExpertsImport } from './routes/_with-nav/_private/dashboard/experts'
+import { Route as publicAccountProviderCallbackImport } from './routes/(public)/account.provider.callback'
+import { Route as WithNavPrivateDashboardRequestsRouteImport } from './routes/_with-nav/_private/dashboard/requests/route'
+import { Route as WithNavPrivateDashboardRequestsIndexImport } from './routes/_with-nav/_private/dashboard/requests/index'
+import { Route as WithNavPrivateDashboardRequestsRequestIdImport } from './routes/_with-nav/_private/dashboard/requests/$requestId'
 
 // Create/Update Routes
 
-const PublicOnlyRouteRoute = PublicOnlyRouteImport.update({
-  id: '/_public-only',
+const WithNavRouteRoute = WithNavRouteImport.update({
+  id: '/_with-nav',
   getParentRoute: () => rootRoute,
-} as any);
-
-const PrivateRouteRoute = PrivateRouteImport.update({
-  id: '/_private',
-  getParentRoute: () => rootRoute,
-} as any);
+} as any)
 
 const IndexRoute = IndexImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRoute,
-} as any);
-
-const PublicOnlySignupRoute = PublicOnlySignupImport.update({
-  id: '/signup',
-  path: '/signup',
-  getParentRoute: () => PublicOnlyRouteRoute,
-} as any);
-
-const PublicOnlyLoginRoute = PublicOnlyLoginImport.update({
-  id: '/login',
-  path: '/login',
-  getParentRoute: () => PublicOnlyRouteRoute,
-} as any);
-
-const PrivateProfileRoute = PrivateProfileImport.update({
-  id: '/profile',
-  path: '/profile',
-  getParentRoute: () => PrivateRouteRoute,
-} as any);
+} as any)
 
 const publicIntakeRoute = publicIntakeImport.update({
   id: '/(public)/intake',
   path: '/intake',
   getParentRoute: () => rootRoute,
-} as any);
+} as any)
 
-const PrivateDashboardRouteRoute = PrivateDashboardRouteImport.update({
-  id: '/dashboard',
-  path: '/dashboard',
-  getParentRoute: () => PrivateRouteRoute,
-} as any);
+const WithNavPublicOnlyRouteRoute = WithNavPublicOnlyRouteImport.update({
+  id: '/_public-only',
+  getParentRoute: () => WithNavRouteRoute,
+} as any)
 
-const PrivateDashboardExpertsRoute = PrivateDashboardExpertsImport.update({
-  id: '/experts',
-  path: '/experts',
-  getParentRoute: () => PrivateDashboardRouteRoute,
-} as any);
+const WithNavPrivateRouteRoute = WithNavPrivateRouteImport.update({
+  id: '/_private',
+  getParentRoute: () => WithNavRouteRoute,
+} as any)
 
-const PrivateDashboardRequestsRouteRoute = PrivateDashboardRequestsRouteImport.update({
-  id: '/requests',
-  path: '/requests',
-  getParentRoute: () => PrivateDashboardRouteRoute,
-} as any);
+const WithNavPublicOnlyLoginRoute = WithNavPublicOnlyLoginImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => WithNavPublicOnlyRouteRoute,
+} as any)
 
-const PrivateDashboardRequestsIndexRoute = PrivateDashboardRequestsIndexImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => PrivateDashboardRequestsRouteRoute,
-} as any);
+const WithNavPrivateProfileRoute = WithNavPrivateProfileImport.update({
+  id: '/profile',
+  path: '/profile',
+  getParentRoute: () => WithNavPrivateRouteRoute,
+} as any)
 
-const PrivateDashboardRequestsRequestIdRoute = PrivateDashboardRequestsRequestIdImport.update({
-  id: '/$requestId',
-  path: '/$requestId',
-  getParentRoute: () => PrivateDashboardRequestsRouteRoute,
-} as any);
+const WithNavPrivateDashboardRouteRoute =
+  WithNavPrivateDashboardRouteImport.update({
+    id: '/dashboard',
+    path: '/dashboard',
+    getParentRoute: () => WithNavPrivateRouteRoute,
+  } as any)
 
-const publicAccountProviderCallbackRoute = publicAccountProviderCallbackImport.update({
-  id: '/(public)/account/provider/callback',
-  path: '/account/provider/callback',
-  getParentRoute: () => rootRoute,
-} as any);
+const WithNavPrivateDashboardExpertsRoute =
+  WithNavPrivateDashboardExpertsImport.update({
+    id: '/experts',
+    path: '/experts',
+    getParentRoute: () => WithNavPrivateDashboardRouteRoute,
+  } as any)
+
+const publicAccountProviderCallbackRoute =
+  publicAccountProviderCallbackImport.update({
+    id: '/(public)/account/provider/callback',
+    path: '/account/provider/callback',
+    getParentRoute: () => rootRoute,
+  } as any)
+
+const WithNavPrivateDashboardRequestsRouteRoute =
+  WithNavPrivateDashboardRequestsRouteImport.update({
+    id: '/requests',
+    path: '/requests',
+    getParentRoute: () => WithNavPrivateDashboardRouteRoute,
+  } as any)
+
+const WithNavPrivateDashboardRequestsIndexRoute =
+  WithNavPrivateDashboardRequestsIndexImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => WithNavPrivateDashboardRequestsRouteRoute,
+  } as any)
+
+const WithNavPrivateDashboardRequestsRequestIdRoute =
+  WithNavPrivateDashboardRequestsRequestIdImport.update({
+    id: '/$requestId',
+    path: '/$requestId',
+    getParentRoute: () => WithNavPrivateDashboardRequestsRouteRoute,
+  } as any)
 
 // Populate the FileRoutesByPath interface
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
     '/': {
-      id: '/';
-      path: '/';
-      fullPath: '/';
-      preLoaderRoute: typeof IndexImport;
-      parentRoute: typeof rootRoute;
-    };
-    '/_private': {
-      id: '/_private';
-      path: '';
-      fullPath: '';
-      preLoaderRoute: typeof PrivateRouteImport;
-      parentRoute: typeof rootRoute;
-    };
-    '/_public-only': {
-      id: '/_public-only';
-      path: '';
-      fullPath: '';
-      preLoaderRoute: typeof PublicOnlyRouteImport;
-      parentRoute: typeof rootRoute;
-    };
-    '/_private/dashboard': {
-      id: '/_private/dashboard';
-      path: '/dashboard';
-      fullPath: '/dashboard';
-      preLoaderRoute: typeof PrivateDashboardRouteImport;
-      parentRoute: typeof PrivateRouteImport;
-    };
+      id: '/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof IndexImport
+      parentRoute: typeof rootRoute
+    }
+    '/_with-nav': {
+      id: '/_with-nav'
+      path: ''
+      fullPath: ''
+      preLoaderRoute: typeof WithNavRouteImport
+      parentRoute: typeof rootRoute
+    }
+    '/_with-nav/_private': {
+      id: '/_with-nav/_private'
+      path: ''
+      fullPath: ''
+      preLoaderRoute: typeof WithNavPrivateRouteImport
+      parentRoute: typeof WithNavRouteImport
+    }
+    '/_with-nav/_public-only': {
+      id: '/_with-nav/_public-only'
+      path: ''
+      fullPath: ''
+      preLoaderRoute: typeof WithNavPublicOnlyRouteImport
+      parentRoute: typeof WithNavRouteImport
+    }
     '/(public)/intake': {
-      id: '/(public)/intake';
-      path: '/intake';
-      fullPath: '/intake';
-      preLoaderRoute: typeof publicIntakeImport;
-      parentRoute: typeof rootRoute;
-    };
-    '/_private/profile': {
-      id: '/_private/profile';
-      path: '/profile';
-      fullPath: '/profile';
-      preLoaderRoute: typeof PrivateProfileImport;
-      parentRoute: typeof PrivateRouteImport;
-    };
-    '/_public-only/login': {
-      id: '/_public-only/login';
-      path: '/login';
-      fullPath: '/login';
-      preLoaderRoute: typeof PublicOnlyLoginImport;
-      parentRoute: typeof PublicOnlyRouteImport;
-    };
-    '/_public-only/signup': {
-      id: '/_public-only/signup';
-      path: '/signup';
-      fullPath: '/signup';
-      preLoaderRoute: typeof PublicOnlySignupImport;
-      parentRoute: typeof PublicOnlyRouteImport;
-    };
-    '/_private/dashboard/requests': {
-      id: '/_private/dashboard/requests';
-      path: '/requests';
-      fullPath: '/dashboard/requests';
-      preLoaderRoute: typeof PrivateDashboardRequestsRouteImport;
-      parentRoute: typeof PrivateDashboardRouteImport;
-    };
-    '/_private/dashboard/experts': {
-      id: '/_private/dashboard/experts';
-      path: '/experts';
-      fullPath: '/dashboard/experts';
-      preLoaderRoute: typeof PrivateDashboardExpertsImport;
-      parentRoute: typeof PrivateDashboardRouteImport;
-    };
+      id: '/(public)/intake'
+      path: '/intake'
+      fullPath: '/intake'
+      preLoaderRoute: typeof publicIntakeImport
+      parentRoute: typeof rootRoute
+    }
+    '/_with-nav/_private/dashboard': {
+      id: '/_with-nav/_private/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof WithNavPrivateDashboardRouteImport
+      parentRoute: typeof WithNavPrivateRouteImport
+    }
+    '/_with-nav/_private/profile': {
+      id: '/_with-nav/_private/profile'
+      path: '/profile'
+      fullPath: '/profile'
+      preLoaderRoute: typeof WithNavPrivateProfileImport
+      parentRoute: typeof WithNavPrivateRouteImport
+    }
+    '/_with-nav/_public-only/login': {
+      id: '/_with-nav/_public-only/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof WithNavPublicOnlyLoginImport
+      parentRoute: typeof WithNavPublicOnlyRouteImport
+    }
+    '/_with-nav/_private/dashboard/requests': {
+      id: '/_with-nav/_private/dashboard/requests'
+      path: '/requests'
+      fullPath: '/dashboard/requests'
+      preLoaderRoute: typeof WithNavPrivateDashboardRequestsRouteImport
+      parentRoute: typeof WithNavPrivateDashboardRouteImport
+    }
     '/(public)/account/provider/callback': {
-      id: '/(public)/account/provider/callback';
-      path: '/account/provider/callback';
-      fullPath: '/account/provider/callback';
-      preLoaderRoute: typeof publicAccountProviderCallbackImport;
-      parentRoute: typeof rootRoute;
-    };
-    '/_private/dashboard/requests/$requestId': {
-      id: '/_private/dashboard/requests/$requestId';
-      path: '/$requestId';
-      fullPath: '/dashboard/requests/$requestId';
-      preLoaderRoute: typeof PrivateDashboardRequestsRequestIdImport;
-      parentRoute: typeof PrivateDashboardRequestsRouteImport;
-    };
-    '/_private/dashboard/requests/': {
-      id: '/_private/dashboard/requests/';
-      path: '/';
-      fullPath: '/dashboard/requests/';
-      preLoaderRoute: typeof PrivateDashboardRequestsIndexImport;
-      parentRoute: typeof PrivateDashboardRequestsRouteImport;
-    };
+      id: '/(public)/account/provider/callback'
+      path: '/account/provider/callback'
+      fullPath: '/account/provider/callback'
+      preLoaderRoute: typeof publicAccountProviderCallbackImport
+      parentRoute: typeof rootRoute
+    }
+    '/_with-nav/_private/dashboard/experts': {
+      id: '/_with-nav/_private/dashboard/experts'
+      path: '/experts'
+      fullPath: '/dashboard/experts'
+      preLoaderRoute: typeof WithNavPrivateDashboardExpertsImport
+      parentRoute: typeof WithNavPrivateDashboardRouteImport
+    }
+    '/_with-nav/_private/dashboard/requests/$requestId': {
+      id: '/_with-nav/_private/dashboard/requests/$requestId'
+      path: '/$requestId'
+      fullPath: '/dashboard/requests/$requestId'
+      preLoaderRoute: typeof WithNavPrivateDashboardRequestsRequestIdImport
+      parentRoute: typeof WithNavPrivateDashboardRequestsRouteImport
+    }
+    '/_with-nav/_private/dashboard/requests/': {
+      id: '/_with-nav/_private/dashboard/requests/'
+      path: '/'
+      fullPath: '/dashboard/requests/'
+      preLoaderRoute: typeof WithNavPrivateDashboardRequestsIndexImport
+      parentRoute: typeof WithNavPrivateDashboardRequestsRouteImport
+    }
   }
 }
 
 // Create and export the route tree
 
-interface PrivateDashboardRequestsRouteRouteChildren {
-  PrivateDashboardRequestsRequestIdRoute: typeof PrivateDashboardRequestsRequestIdRoute;
-  PrivateDashboardRequestsIndexRoute: typeof PrivateDashboardRequestsIndexRoute;
+interface WithNavPrivateDashboardRequestsRouteRouteChildren {
+  WithNavPrivateDashboardRequestsRequestIdRoute: typeof WithNavPrivateDashboardRequestsRequestIdRoute
+  WithNavPrivateDashboardRequestsIndexRoute: typeof WithNavPrivateDashboardRequestsIndexRoute
 }
 
-const PrivateDashboardRequestsRouteRouteChildren: PrivateDashboardRequestsRouteRouteChildren = {
-  PrivateDashboardRequestsRequestIdRoute: PrivateDashboardRequestsRequestIdRoute,
-  PrivateDashboardRequestsIndexRoute: PrivateDashboardRequestsIndexRoute,
-};
+const WithNavPrivateDashboardRequestsRouteRouteChildren: WithNavPrivateDashboardRequestsRouteRouteChildren =
+  {
+    WithNavPrivateDashboardRequestsRequestIdRoute:
+      WithNavPrivateDashboardRequestsRequestIdRoute,
+    WithNavPrivateDashboardRequestsIndexRoute:
+      WithNavPrivateDashboardRequestsIndexRoute,
+  }
 
-const PrivateDashboardRequestsRouteRouteWithChildren =
-  PrivateDashboardRequestsRouteRoute._addFileChildren(PrivateDashboardRequestsRouteRouteChildren);
+const WithNavPrivateDashboardRequestsRouteRouteWithChildren =
+  WithNavPrivateDashboardRequestsRouteRoute._addFileChildren(
+    WithNavPrivateDashboardRequestsRouteRouteChildren,
+  )
 
-interface PrivateDashboardRouteRouteChildren {
-  PrivateDashboardRequestsRouteRoute: typeof PrivateDashboardRequestsRouteRouteWithChildren;
-  PrivateDashboardExpertsRoute: typeof PrivateDashboardExpertsRoute;
+interface WithNavPrivateDashboardRouteRouteChildren {
+  WithNavPrivateDashboardRequestsRouteRoute: typeof WithNavPrivateDashboardRequestsRouteRouteWithChildren
+  WithNavPrivateDashboardExpertsRoute: typeof WithNavPrivateDashboardExpertsRoute
 }
 
-const PrivateDashboardRouteRouteChildren: PrivateDashboardRouteRouteChildren = {
-  PrivateDashboardRequestsRouteRoute: PrivateDashboardRequestsRouteRouteWithChildren,
-  PrivateDashboardExpertsRoute: PrivateDashboardExpertsRoute,
-};
+const WithNavPrivateDashboardRouteRouteChildren: WithNavPrivateDashboardRouteRouteChildren =
+  {
+    WithNavPrivateDashboardRequestsRouteRoute:
+      WithNavPrivateDashboardRequestsRouteRouteWithChildren,
+    WithNavPrivateDashboardExpertsRoute: WithNavPrivateDashboardExpertsRoute,
+  }
 
-const PrivateDashboardRouteRouteWithChildren = PrivateDashboardRouteRoute._addFileChildren(
-  PrivateDashboardRouteRouteChildren
-);
+const WithNavPrivateDashboardRouteRouteWithChildren =
+  WithNavPrivateDashboardRouteRoute._addFileChildren(
+    WithNavPrivateDashboardRouteRouteChildren,
+  )
 
-interface PrivateRouteRouteChildren {
-  PrivateDashboardRouteRoute: typeof PrivateDashboardRouteRouteWithChildren;
-  PrivateProfileRoute: typeof PrivateProfileRoute;
+interface WithNavPrivateRouteRouteChildren {
+  WithNavPrivateDashboardRouteRoute: typeof WithNavPrivateDashboardRouteRouteWithChildren
+  WithNavPrivateProfileRoute: typeof WithNavPrivateProfileRoute
 }
 
-const PrivateRouteRouteChildren: PrivateRouteRouteChildren = {
-  PrivateDashboardRouteRoute: PrivateDashboardRouteRouteWithChildren,
-  PrivateProfileRoute: PrivateProfileRoute,
-};
-
-const PrivateRouteRouteWithChildren = PrivateRouteRoute._addFileChildren(PrivateRouteRouteChildren);
-
-interface PublicOnlyRouteRouteChildren {
-  PublicOnlyLoginRoute: typeof PublicOnlyLoginRoute;
-  PublicOnlySignupRoute: typeof PublicOnlySignupRoute;
+const WithNavPrivateRouteRouteChildren: WithNavPrivateRouteRouteChildren = {
+  WithNavPrivateDashboardRouteRoute:
+    WithNavPrivateDashboardRouteRouteWithChildren,
+  WithNavPrivateProfileRoute: WithNavPrivateProfileRoute,
 }
 
-const PublicOnlyRouteRouteChildren: PublicOnlyRouteRouteChildren = {
-  PublicOnlyLoginRoute: PublicOnlyLoginRoute,
-  PublicOnlySignupRoute: PublicOnlySignupRoute,
-};
+const WithNavPrivateRouteRouteWithChildren =
+  WithNavPrivateRouteRoute._addFileChildren(WithNavPrivateRouteRouteChildren)
 
-const PublicOnlyRouteRouteWithChildren = PublicOnlyRouteRoute._addFileChildren(
-  PublicOnlyRouteRouteChildren
-);
+interface WithNavPublicOnlyRouteRouteChildren {
+  WithNavPublicOnlyLoginRoute: typeof WithNavPublicOnlyLoginRoute
+}
+
+const WithNavPublicOnlyRouteRouteChildren: WithNavPublicOnlyRouteRouteChildren =
+  {
+    WithNavPublicOnlyLoginRoute: WithNavPublicOnlyLoginRoute,
+  }
+
+const WithNavPublicOnlyRouteRouteWithChildren =
+  WithNavPublicOnlyRouteRoute._addFileChildren(
+    WithNavPublicOnlyRouteRouteChildren,
+  )
+
+interface WithNavRouteRouteChildren {
+  WithNavPrivateRouteRoute: typeof WithNavPrivateRouteRouteWithChildren
+  WithNavPublicOnlyRouteRoute: typeof WithNavPublicOnlyRouteRouteWithChildren
+}
+
+const WithNavRouteRouteChildren: WithNavRouteRouteChildren = {
+  WithNavPrivateRouteRoute: WithNavPrivateRouteRouteWithChildren,
+  WithNavPublicOnlyRouteRoute: WithNavPublicOnlyRouteRouteWithChildren,
+}
+
+const WithNavRouteRouteWithChildren = WithNavRouteRoute._addFileChildren(
+  WithNavRouteRouteChildren,
+)
 
 export interface FileRoutesByFullPath {
-  '/': typeof IndexRoute;
-  '': typeof PublicOnlyRouteRouteWithChildren;
-  '/dashboard': typeof PrivateDashboardRouteRouteWithChildren;
-  '/intake': typeof publicIntakeRoute;
-  '/profile': typeof PrivateProfileRoute;
-  '/login': typeof PublicOnlyLoginRoute;
-  '/signup': typeof PublicOnlySignupRoute;
-  '/dashboard/requests': typeof PrivateDashboardRequestsRouteRouteWithChildren;
-  '/dashboard/experts': typeof PrivateDashboardExpertsRoute;
-  '/account/provider/callback': typeof publicAccountProviderCallbackRoute;
-  '/dashboard/requests/$requestId': typeof PrivateDashboardRequestsRequestIdRoute;
-  '/dashboard/requests/': typeof PrivateDashboardRequestsIndexRoute;
+  '/': typeof IndexRoute
+  '': typeof WithNavPublicOnlyRouteRouteWithChildren
+  '/intake': typeof publicIntakeRoute
+  '/dashboard': typeof WithNavPrivateDashboardRouteRouteWithChildren
+  '/profile': typeof WithNavPrivateProfileRoute
+  '/login': typeof WithNavPublicOnlyLoginRoute
+  '/dashboard/requests': typeof WithNavPrivateDashboardRequestsRouteRouteWithChildren
+  '/account/provider/callback': typeof publicAccountProviderCallbackRoute
+  '/dashboard/experts': typeof WithNavPrivateDashboardExpertsRoute
+  '/dashboard/requests/$requestId': typeof WithNavPrivateDashboardRequestsRequestIdRoute
+  '/dashboard/requests/': typeof WithNavPrivateDashboardRequestsIndexRoute
 }
 
 export interface FileRoutesByTo {
-  '/': typeof IndexRoute;
-  '': typeof PublicOnlyRouteRouteWithChildren;
-  '/dashboard': typeof PrivateDashboardRouteRouteWithChildren;
-  '/intake': typeof publicIntakeRoute;
-  '/profile': typeof PrivateProfileRoute;
-  '/login': typeof PublicOnlyLoginRoute;
-  '/signup': typeof PublicOnlySignupRoute;
-  '/dashboard/experts': typeof PrivateDashboardExpertsRoute;
-  '/account/provider/callback': typeof publicAccountProviderCallbackRoute;
-  '/dashboard/requests/$requestId': typeof PrivateDashboardRequestsRequestIdRoute;
-  '/dashboard/requests': typeof PrivateDashboardRequestsIndexRoute;
+  '/': typeof IndexRoute
+  '': typeof WithNavPublicOnlyRouteRouteWithChildren
+  '/intake': typeof publicIntakeRoute
+  '/dashboard': typeof WithNavPrivateDashboardRouteRouteWithChildren
+  '/profile': typeof WithNavPrivateProfileRoute
+  '/login': typeof WithNavPublicOnlyLoginRoute
+  '/account/provider/callback': typeof publicAccountProviderCallbackRoute
+  '/dashboard/experts': typeof WithNavPrivateDashboardExpertsRoute
+  '/dashboard/requests/$requestId': typeof WithNavPrivateDashboardRequestsRequestIdRoute
+  '/dashboard/requests': typeof WithNavPrivateDashboardRequestsIndexRoute
 }
 
 export interface FileRoutesById {
-  __root__: typeof rootRoute;
-  '/': typeof IndexRoute;
-  '/_private': typeof PrivateRouteRouteWithChildren;
-  '/_public-only': typeof PublicOnlyRouteRouteWithChildren;
-  '/_private/dashboard': typeof PrivateDashboardRouteRouteWithChildren;
-  '/(public)/intake': typeof publicIntakeRoute;
-  '/_private/profile': typeof PrivateProfileRoute;
-  '/_public-only/login': typeof PublicOnlyLoginRoute;
-  '/_public-only/signup': typeof PublicOnlySignupRoute;
-  '/_private/dashboard/requests': typeof PrivateDashboardRequestsRouteRouteWithChildren;
-  '/_private/dashboard/experts': typeof PrivateDashboardExpertsRoute;
-  '/(public)/account/provider/callback': typeof publicAccountProviderCallbackRoute;
-  '/_private/dashboard/requests/$requestId': typeof PrivateDashboardRequestsRequestIdRoute;
-  '/_private/dashboard/requests/': typeof PrivateDashboardRequestsIndexRoute;
+  __root__: typeof rootRoute
+  '/': typeof IndexRoute
+  '/_with-nav': typeof WithNavRouteRouteWithChildren
+  '/_with-nav/_private': typeof WithNavPrivateRouteRouteWithChildren
+  '/_with-nav/_public-only': typeof WithNavPublicOnlyRouteRouteWithChildren
+  '/(public)/intake': typeof publicIntakeRoute
+  '/_with-nav/_private/dashboard': typeof WithNavPrivateDashboardRouteRouteWithChildren
+  '/_with-nav/_private/profile': typeof WithNavPrivateProfileRoute
+  '/_with-nav/_public-only/login': typeof WithNavPublicOnlyLoginRoute
+  '/_with-nav/_private/dashboard/requests': typeof WithNavPrivateDashboardRequestsRouteRouteWithChildren
+  '/(public)/account/provider/callback': typeof publicAccountProviderCallbackRoute
+  '/_with-nav/_private/dashboard/experts': typeof WithNavPrivateDashboardExpertsRoute
+  '/_with-nav/_private/dashboard/requests/$requestId': typeof WithNavPrivateDashboardRequestsRequestIdRoute
+  '/_with-nav/_private/dashboard/requests/': typeof WithNavPrivateDashboardRequestsIndexRoute
 }
 
 export interface FileRouteTypes {
-  fileRoutesByFullPath: FileRoutesByFullPath;
+  fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
     | ''
-    | '/dashboard'
     | '/intake'
+    | '/dashboard'
     | '/profile'
     | '/login'
-    | '/signup'
     | '/dashboard/requests'
-    | '/dashboard/experts'
     | '/account/provider/callback'
+    | '/dashboard/experts'
     | '/dashboard/requests/$requestId'
-    | '/dashboard/requests/';
-  fileRoutesByTo: FileRoutesByTo;
+    | '/dashboard/requests/'
+  fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | ''
-    | '/dashboard'
     | '/intake'
+    | '/dashboard'
     | '/profile'
     | '/login'
-    | '/signup'
-    | '/dashboard/experts'
     | '/account/provider/callback'
+    | '/dashboard/experts'
     | '/dashboard/requests/$requestId'
-    | '/dashboard/requests';
+    | '/dashboard/requests'
   id:
     | '__root__'
     | '/'
-    | '/_private'
-    | '/_public-only'
-    | '/_private/dashboard'
+    | '/_with-nav'
+    | '/_with-nav/_private'
+    | '/_with-nav/_public-only'
     | '/(public)/intake'
-    | '/_private/profile'
-    | '/_public-only/login'
-    | '/_public-only/signup'
-    | '/_private/dashboard/requests'
-    | '/_private/dashboard/experts'
+    | '/_with-nav/_private/dashboard'
+    | '/_with-nav/_private/profile'
+    | '/_with-nav/_public-only/login'
+    | '/_with-nav/_private/dashboard/requests'
     | '/(public)/account/provider/callback'
-    | '/_private/dashboard/requests/$requestId'
-    | '/_private/dashboard/requests/';
-  fileRoutesById: FileRoutesById;
+    | '/_with-nav/_private/dashboard/experts'
+    | '/_with-nav/_private/dashboard/requests/$requestId'
+    | '/_with-nav/_private/dashboard/requests/'
+  fileRoutesById: FileRoutesById
 }
 
 export interface RootRouteChildren {
-  IndexRoute: typeof IndexRoute;
-  PrivateRouteRoute: typeof PrivateRouteRouteWithChildren;
-  PublicOnlyRouteRoute: typeof PublicOnlyRouteRouteWithChildren;
-  publicIntakeRoute: typeof publicIntakeRoute;
-  publicAccountProviderCallbackRoute: typeof publicAccountProviderCallbackRoute;
+  IndexRoute: typeof IndexRoute
+  WithNavRouteRoute: typeof WithNavRouteRouteWithChildren
+  publicIntakeRoute: typeof publicIntakeRoute
+  publicAccountProviderCallbackRoute: typeof publicAccountProviderCallbackRoute
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  PrivateRouteRoute: PrivateRouteRouteWithChildren,
-  PublicOnlyRouteRoute: PublicOnlyRouteRouteWithChildren,
+  WithNavRouteRoute: WithNavRouteRouteWithChildren,
   publicIntakeRoute: publicIntakeRoute,
   publicAccountProviderCallbackRoute: publicAccountProviderCallbackRoute,
-};
+}
 
 export const routeTree = rootRoute
   ._addFileChildren(rootRouteChildren)
-  ._addFileTypes<FileRouteTypes>();
+  ._addFileTypes<FileRouteTypes>()
 
 /* ROUTE_MANIFEST_START
 {
@@ -375,8 +398,7 @@ export const routeTree = rootRoute
       "filePath": "__root.tsx",
       "children": [
         "/",
-        "/_private",
-        "/_public-only",
+        "/_with-nav",
         "/(public)/intake",
         "/(public)/account/provider/callback"
       ]
@@ -384,65 +406,69 @@ export const routeTree = rootRoute
     "/": {
       "filePath": "index.tsx"
     },
-    "/_private": {
-      "filePath": "_private/route.tsx",
+    "/_with-nav": {
+      "filePath": "_with-nav/route.tsx",
       "children": [
-        "/_private/dashboard",
-        "/_private/profile"
+        "/_with-nav/_private",
+        "/_with-nav/_public-only"
       ]
     },
-    "/_public-only": {
-      "filePath": "_public-only/route.tsx",
+    "/_with-nav/_private": {
+      "filePath": "_with-nav/_private/route.tsx",
+      "parent": "/_with-nav",
       "children": [
-        "/_public-only/login",
-        "/_public-only/signup"
+        "/_with-nav/_private/dashboard",
+        "/_with-nav/_private/profile"
       ]
     },
-    "/_private/dashboard": {
-      "filePath": "_private/dashboard/route.tsx",
-      "parent": "/_private",
+    "/_with-nav/_public-only": {
+      "filePath": "_with-nav/_public-only/route.tsx",
+      "parent": "/_with-nav",
       "children": [
-        "/_private/dashboard/requests",
-        "/_private/dashboard/experts"
+        "/_with-nav/_public-only/login"
       ]
     },
     "/(public)/intake": {
       "filePath": "(public)/intake.tsx"
     },
-    "/_private/profile": {
-      "filePath": "_private/profile.tsx",
-      "parent": "/_private"
-    },
-    "/_public-only/login": {
-      "filePath": "_public-only/login.tsx",
-      "parent": "/_public-only"
-    },
-    "/_public-only/signup": {
-      "filePath": "_public-only/signup.tsx",
-      "parent": "/_public-only"
-    },
-    "/_private/dashboard/requests": {
-      "filePath": "_private/dashboard/requests/route.tsx",
-      "parent": "/_private/dashboard",
+    "/_with-nav/_private/dashboard": {
+      "filePath": "_with-nav/_private/dashboard/route.tsx",
+      "parent": "/_with-nav/_private",
       "children": [
-        "/_private/dashboard/requests/$requestId",
-        "/_private/dashboard/requests/"
+        "/_with-nav/_private/dashboard/requests",
+        "/_with-nav/_private/dashboard/experts"
       ]
     },
-    "/_private/dashboard/experts": {
-      "filePath": "_private/dashboard/experts.tsx",
-      "parent": "/_private/dashboard"
+    "/_with-nav/_private/profile": {
+      "filePath": "_with-nav/_private/profile.tsx",
+      "parent": "/_with-nav/_private"
+    },
+    "/_with-nav/_public-only/login": {
+      "filePath": "_with-nav/_public-only/login.tsx",
+      "parent": "/_with-nav/_public-only"
+    },
+    "/_with-nav/_private/dashboard/requests": {
+      "filePath": "_with-nav/_private/dashboard/requests/route.tsx",
+      "parent": "/_with-nav/_private/dashboard",
+      "children": [
+        "/_with-nav/_private/dashboard/requests/$requestId",
+        "/_with-nav/_private/dashboard/requests/"
+      ]
     },
     "/(public)/account/provider/callback": {
       "filePath": "(public)/account.provider.callback.tsx"
     },
-    "/_private/dashboard/requests/$requestId": {
-      "filePath": "_private/dashboard/requests/$requestId.tsx",
-      "parent": "/_private/dashboard/requests"
+    "/_with-nav/_private/dashboard/experts": {
+      "filePath": "_with-nav/_private/dashboard/experts.tsx",
+      "parent": "/_with-nav/_private/dashboard"
     },
-    "/_private/dashboard/requests/": {
-      "filePath": "_private/dashboard/requests/index.tsx",
-      "parent": "/_private/dashboard/requests"
+    "/_with-nav/_private/dashboard/requests/$requestId": {
+      "filePath": "_with-nav/_private/dashboard/requests/$requestId.tsx",
+      "parent": "/_with-nav/_private/dashboard/requests"
+    },
+    "/_with-nav/_private/dashboard/requests/": {
+      "filePath": "_with-nav/_private/dashboard/requests/index.tsx",
+      "parent": "/_with-nav/_private/dashboard/requests"
     }
   }
 }

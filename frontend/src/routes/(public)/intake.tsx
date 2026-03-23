@@ -2,6 +2,7 @@ import '../../styles.css';
 
 import {
   Autocomplete,
+  Box,
   Button,
   Container,
   Divider,
@@ -9,6 +10,7 @@ import {
   FormControlLabel,
   FormLabel,
   InputLabel,
+  Link,
   MenuItem,
   Paper,
   Radio,
@@ -302,6 +304,27 @@ function IntakeForm() {
             </Stack>
           </form>
         </Paper>
+        <Box component="footer" sx={{ mt: 4 }}>
+          <Typography variant="body2" color="text.secondary" align="center">
+            TA Connect
+          </Typography>
+          <Stack direction="row" justifyContent="center" alignItems="center">
+            <AppLink to="/">
+              <Typography variant="body2" align="center">
+                Dashboard
+              </Typography>
+            </AppLink>
+            <Box>|</Box>
+            <Link href="https://emp.lbl.gov/projects/state-TA-program" target="_blank">
+              <Typography variant="body2" align="center">
+                State Technical Assistance Program
+              </Typography>
+            </Link>
+          </Stack>
+          <Typography variant="body2" color="text.secondary" align="center">
+            Supported by Lawrence Berkeley National Laboratory
+          </Typography>
+        </Box>
       </Container>
     );
   }

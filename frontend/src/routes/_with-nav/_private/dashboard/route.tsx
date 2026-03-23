@@ -21,14 +21,14 @@ import {
   useNavigate,
 } from '@tanstack/react-router';
 import { useEffect, useState } from 'react';
-import { TAIdentity } from '../../../api/dashboard/types';
-import { AppLink } from '../../../components/AppLink';
-import { useIdentityContext } from '../../../features/identity/IdentityContext';
-import { useRequestsContext } from '../../../features/requests/RequestsContext';
-import { identitiesQueryOptions } from '../../../utils/queryOptions';
-import { a11yProps } from '../../../utils/utils';
+import { TAIdentity } from '@/api/dashboard/types';
+import { AppLink } from '@/components/AppLink';
+import { useIdentityContext } from '@/features/identity/IdentityContext';
+import { useRequestsContext } from '@/features/requests/RequestsContext';
+import { identitiesQueryOptions } from '@/utils/queryOptions';
+import { a11yProps } from '@/utils/utils';
 
-export const Route = createFileRoute('/_private/dashboard')({
+export const Route = createFileRoute('/_with-nav/_private/dashboard')({
   beforeLoad({ location }) {
     if (location.pathname === '/dashboard' || location.pathname === '/dashboard/') {
       throw redirect({ to: '/dashboard/requests' });

@@ -1,10 +1,10 @@
 import { createFileRoute, useNavigate } from '@tanstack/react-router';
 import { useEffect } from 'react';
-import { useRequestsContext } from '../../../../features/requests/RequestsContext';
+import { useRequestsContext } from '@/features/requests/RequestsContext';
 import { Stack, Typography } from '@mui/material';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 
-export const Route = createFileRoute('/_private/dashboard/requests/')({
+export const Route = createFileRoute('/_with-nav/_private/dashboard/requests/')({
   component: NoSelectedRequest,
 });
 

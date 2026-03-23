@@ -3,7 +3,6 @@ import ErrorIcon from '@mui/icons-material/Error';
 import { queryOptions, useMutation, UseMutationOptions } from '@tanstack/react-query';
 import { loginMutation } from '../api/accounts/login';
 import { logoutMutation } from '../api/accounts/logout';
-import { signupMutation } from '../api/accounts/signup';
 import { deleteData, fetchData, patchData, postData, postForm } from '../api/dashboard';
 import {
   CustomerRequestRelationship,
@@ -181,13 +180,6 @@ export const useSubmitIntakeMutation = () => {
     mutationKey: ['intake'],
     mutationFn: (formData: IntakeFormData) => submitIntakeMutation(formData),
     onSuccess: () => queryClient.invalidateQueries(),
-  });
-};
-
-export const useSignupMutation = () => {
-  return useMutation({
-    mutationFn: signupMutation,
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['authSession'] }),
   });
 };
 

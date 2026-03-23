@@ -1,8 +1,8 @@
 import { createFileRoute, Navigate, Outlet } from '@tanstack/react-router';
-import { authSessionQueryOptions } from '../../utils/queryOptions';
+import { authSessionQueryOptions } from '@/utils/queryOptions';
 import { useSuspenseQuery } from '@tanstack/react-query';
 
-export const Route = createFileRoute('/_public-only')({
+export const Route = createFileRoute('/_with-nav/_public-only')({
   component: PublicOnlyRoute,
 });
 
