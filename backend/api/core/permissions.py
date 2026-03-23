@@ -50,7 +50,7 @@ def has_role(request, role_name):
         if context.get("instance"):  
             assignments = location_role_assignment_class.objects.filter(user=user, role=role, instance=context.get("instance"))
 
-        elif (role_name == "Coordinator") or (role_name == "Admin"):
+        elif (role_name == "Coordinator") or (role_name == "Admin") or (role_name == "Program Lead"):
             assignments = location_role_assignment_class.objects.filter(user=user, role=role)
 
         else:

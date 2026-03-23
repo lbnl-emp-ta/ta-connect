@@ -265,8 +265,6 @@ class RequestDetailView(BaseUserAwareRequest):
     Used for Edit action.
     """
     def patch(self, request, id=None):
-        queryset = self.get_queryset()
-
         context = self.request.headers.get("Context")
         if context is None:
             return Response(data={"message": "Please provide context object header with request"}, status=status.HTTP_400_BAD_REQUEST)
@@ -274,8 +272,9 @@ class RequestDetailView(BaseUserAwareRequest):
         if id is None:
             return Response(data={"message": "Please provide a Request ID"}, status=status.HTTP_400_BAD_REQUEST)
         
+        queryset = self.get_actionable() | self.get_downstream()
+
         maybe_request = None
-        print("queryset:", queryset)
         try:
             maybe_request = queryset.get(pk=id)        
         except Request.DoesNotExist:
