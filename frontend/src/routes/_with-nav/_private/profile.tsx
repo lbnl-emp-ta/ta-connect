@@ -13,11 +13,11 @@ import {
 } from '@mui/material';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { createFileRoute } from '@tanstack/react-router';
-import { RolePanel } from '../../features/profile/RolePanel';
-import { useUser } from '../../hooks/useUser';
-import { identitiesQueryOptions } from '../../utils/queryOptions';
+import { RolePanel } from '@/features/profile/RolePanel';
+import { useUser } from '@/hooks/useUser';
+import { identitiesQueryOptions } from '@/utils/queryOptions';
 import { useEffect, useState } from 'react';
-import { UserInfoDialog } from '../../features/profile/UserInfoDialog';
+import { UserInfoDialog } from '@/features/profile/UserInfoDialog';
 
 export const Route = createFileRoute('/_with-nav/_private/profile')({
   component: ProfilePage,
