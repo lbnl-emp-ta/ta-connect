@@ -1,9 +1,9 @@
 import { Box, Container, Grid, Link, Paper, Stack, Typography } from '@mui/material';
 import { createFileRoute } from '@tanstack/react-router';
-import imagePath from '../../assets/lbnl.png';
-import { SocialLoginButton } from '../../components/SocialLoginButton';
+import imagePath from '@/assets/lbnl.png';
+import { SocialLoginButton } from '@/components/SocialLoginButton';
 
-export const Route = createFileRoute('/_public-only/login')({
+export const Route = createFileRoute('/_with-nav/_public-only/login')({
   beforeLoad: ({ context }) => {
     context.queryClient.invalidateQueries({
       queryKey: ['identities'],

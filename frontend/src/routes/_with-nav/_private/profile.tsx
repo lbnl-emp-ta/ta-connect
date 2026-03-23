@@ -19,7 +19,7 @@ import { identitiesQueryOptions } from '../../utils/queryOptions';
 import { useEffect, useState } from 'react';
 import { UserInfoDialog } from '../../features/profile/UserInfoDialog';
 
-export const Route = createFileRoute('/_private/profile')({
+export const Route = createFileRoute('/_with-nav/_private/profile')({
   component: ProfilePage,
 });
 

@@ -4,27 +4,27 @@ import { Badge, Button, Grid, Paper, Stack, Tab, Tabs, Typography } from '@mui/m
 import { useQuery, useSuspenseQuery } from '@tanstack/react-query';
 import { createFileRoute } from '@tanstack/react-router';
 import { useEffect, useState } from 'react';
-import { AppLink } from '../../../../components/AppLink';
-import { InfoPanel } from '../../../../components/InfoPanel';
-import { TabPanel } from '../../../../components/TabPanel';
-import { useIdentityContext } from '../../../../features/identity/IdentityContext';
-import { RequestActionsButton } from '../../../../features/requests/RequestActionsButton';
-import { RequestAssignButton } from '../../../../features/requests/RequestAssignButton';
-import { RequestCustomerPanel } from '../../../../features/requests/RequestCustomerPanel';
-import { RequestInfoPanel } from '../../../../features/requests/RequestInfoPanel';
-import { useRequestsContext } from '../../../../features/requests/RequestsContext';
+import { AppLink } from '@/components/AppLink';
+import { InfoPanel } from '@/components/InfoPanel';
+import { TabPanel } from '@/components/TabPanel';
+import { useIdentityContext } from '@/features/identity/IdentityContext';
+import { RequestActionsButton } from '@/features/requests/RequestActionsButton';
+import { RequestAssignButton } from '@/features/requests/RequestAssignButton';
+import { RequestCustomerPanel } from '@/features/requests/RequestCustomerPanel';
+import { RequestInfoPanel } from '@/features/requests/RequestInfoPanel';
+import { useRequestsContext } from '@/features/requests/RequestsContext';
 import {
   expertsQueryOptions,
   notesQueryOptions,
   ownersQueryOptions,
   requestDetailQueryOptions,
   topicsQueryOptions,
-} from '../../../../utils/queryOptions';
-import { RequestAttachments } from '../../../../features/requests/RequestAttachments';
-import { RequestNotes } from '../../../../features/requests/RequestNotes';
-import { RequestAuditHistory } from '../../../../features/requests/RequestAuditHistory';
+} from '@/utils/queryOptions';
+import { RequestAttachments } from '@/features/requests/RequestAttachments';
+import { RequestNotes } from '@/features/requests/RequestNotes';
+import { RequestAuditHistory } from '@/features/requests/RequestAuditHistory';
 
-export const Route = createFileRoute('/_private/dashboard/requests/$requestId')({
+export const Route = createFileRoute('/_with-nav/_private/dashboard/requests/$requestId')({
   loader: async ({ context, params }) => {
     await context.queryClient.ensureQueryData(
       requestDetailQueryOptions(params.requestId, context.identity)

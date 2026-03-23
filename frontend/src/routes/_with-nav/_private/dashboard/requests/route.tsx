@@ -12,16 +12,16 @@ import {
   Tabs,
   Typography,
 } from '@mui/material';
-import { useRequestsContext } from '../../../../features/requests/RequestsContext';
-import { requestsQueryOptions } from '../../../../utils/queryOptions';
+import { useRequestsContext } from '@/features/requests/RequestsContext';
+import { requestsQueryOptions } from '@/utils/queryOptions';
 import { useSuspenseQuery } from '@tanstack/react-query';
-import { useIdentityContext } from '../../../../features/identity/IdentityContext';
-import { TabPanel } from '../../../../components/TabPanel';
-import { a11yProps } from '../../../../utils/utils';
+import { useIdentityContext } from '@/features/identity/IdentityContext';
+import { TabPanel } from '@/components/TabPanel';
+import { a11yProps } from '@/utils/utils';
 import { useEffect, useState } from 'react';
-import { RequestsList } from '../../../../features/requests/RequestsList';
+import { RequestsList } from '@/features/requests/RequestsList';
 
-export const Route = createFileRoute('/_private/dashboard/requests')({
+export const Route = createFileRoute('/_with-nav/_private/dashboard/requests')({
   loader: async ({ context }) => {
     await context.queryClient.ensureQueryData(requestsQueryOptions(context.identity));
   },
