@@ -109,6 +109,7 @@ class RequestSerializer(serializers.Serializer):
             raise serializers.ValidationError("Projected completion date cannot be in the past")
         return value
     
+    
     def validate(self, data):
         if not (data.get("proj_start_date") and data.get("proj_completion_date")):
             return data
@@ -143,6 +144,7 @@ class RequestSerializer(serializers.Serializer):
         
         instance.save()
         return instance
+    
     
     class Meta:
         model = Request

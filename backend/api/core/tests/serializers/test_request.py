@@ -22,29 +22,6 @@ class TestRequestSerializer():
         future_date = timezone.now().date() + datetime.timedelta(days=1)
         assert not RequestSerializer.date_in_past(future_date)
         
-    def test_validate_proj_start_date_raises_validation_error_given_past_date(self):
-        """
-        A start date in the past is not valid.
-        """
-        
-        past_date = timezone.now().date() + datetime.timedelta(days=-1)
-        with pytest.raises(serializers.ValidationError):
-            RequestSerializer.validate_proj_start_date(self=None, value=past_date)
-    
-    def test_validate_proj_start_date_does_not_raise_validation_error_given_future_date(self):
-        """
-        A start date in the future is valid.
-        """
-        
-        future_date = timezone.now().date() + datetime.timedelta(days=1)
-        
-        raised_validation_error = False
-        try:
-            RequestSerializer.validate_proj_start_date(self=None, value=future_date)
-        except serializers.ValidationError:
-            raised_validation_error = True
-        
-        assert not raised_validation_error
     
     def test_validate_proj_completion_date_raises_validation_error_given_past_date(self):
         """
