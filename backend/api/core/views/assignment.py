@@ -171,22 +171,18 @@ class AssignmentView(views.APIView):
             except:
                 return Response(data={"message": f"{e}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         
-        # Send separate notification emails to each relevant person about the assignment
-        for recipient in recipients:
-            plain_text_message, html_message = assignment_email(
-                receipient_name=recipient["name"],
-                request_id=ta_request.id,
-                domain_type=ta_request.owner.domain_type,
-                program_name=ta_request.receipt.program.name if ta_request.receipt.program else "",
-                lab_name=ta_request.receipt.lab.name if ta_request.receipt.lab else "",
-                expert_id=ta_request.expert.id if ta_request.expert else None
-            )
+        # # Send separate notification emails to each relevant person about the assignment
+        # for recipient in recipients:
+        #     plain_text_message, html_message = assignment_email(
+        #         receipient_name=recipient["name"],
+        #         request=ta_request,
+        #     )
 
-            send_email_notification(
-                subject="TA Connect Assignment Notification",
-                plain_text_message=plain_text_message,
-                html_message=html_message,
-                recipient_list=[recipient["email"]]
-            )
+        #     send_email_notification(
+        #         subject="TA Connect Assignment Notification",
+        #         plain_text_message=plain_text_message,
+        #         html_message=html_message,
+        #         recipient_list=[recipient["email"]]
+        #     )
         
         return Response(status=status.HTTP_200_OK)

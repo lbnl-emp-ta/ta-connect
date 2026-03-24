@@ -1,7 +1,12 @@
 from django.db.models.signals import pre_save, post_save
 from django.dispatch import receiver
 
-from core.models import User
+from core.models import User, ReceptionRoleAssignment, Role, Request, Owner, ReceptionRoleAssignment, ProgramRoleAssignment, LabRoleAssignment
+
+_UNSET = object()
+from core.constants import DOMAINTYPE, ROLE
+from core.util.notifications import send_email_notification
+from core.util.email_prompts import new_request_email, assignment_email
 
 
 @receiver(pre_save, sender=User)
@@ -41,6 +46,26 @@ def sync_allauth_email_on_change(sender, instance, **kwargs):
         )
 
 
+@receiver(pre_save, sender="core.Request")
+def snapshot_request_assignment_fields(sender, instance, **kwargs):
+    """
+    Before saving a Request, snapshot the current owner_id and expert_id so
+    post_save handlers can detect whether those fields actually changed.
+    """
+    if not instance.pk:
+        instance._pre_save_owner_id = _UNSET
+        instance._pre_save_expert_id = _UNSET
+        return
+
+    try:
+        old = Request.objects.values("owner_id", "expert_id").get(pk=instance.pk)
+        instance._pre_save_owner_id = old["owner_id"]
+        instance._pre_save_expert_id = old["expert_id"]
+    except Request.DoesNotExist:
+        instance._pre_save_owner_id = _UNSET
+        instance._pre_save_expert_id = _UNSET
+
+
 @receiver(post_save, sender="core.Request")
 def notify_reception_on_new_request(sender, instance, created, **kwargs):
     """
@@ -49,11 +74,6 @@ def notify_reception_on_new_request(sender, instance, created, **kwargs):
     """
     if not created:
         return
-
-    from core.models import ReceptionRoleAssignment, Role
-    from core.constants import ROLE
-    from core.util.notifications import send_email_notification
-    from core.util.email_prompts import new_request_email
 
     coordinator_role = Role.objects.filter(name=ROLE.COORDINATOR).first()
     if not coordinator_role:
@@ -75,6 +95,65 @@ def notify_reception_on_new_request(sender, instance, created, **kwargs):
         plain_text_message, html_message = new_request_email(
             receipient_name=recipient["name"],
             request_id=instance.pk,
+        )
+        send_email_notification(
+            subject="TA Connect - New Request Submitted",
+            plain_text_message=plain_text_message,
+            html_message=html_message,
+            recipient_list=[recipient["email"]],
+        )
+
+
+@receiver(post_save, sender="core.Request")
+def notify_owners_on_assignment(sender, instance, created, **kwargs):
+    """
+    After a Request is assigned to a Coordinator, Program Lead, Lab Lead, or Expert,
+    email the relevant parties about the assignment.
+    Note that this excludes the initial assignment that happens when a new Request is created.
+    """
+    if created:
+        return
+
+    owner_changed = getattr(instance, "_pre_save_owner_id", _UNSET) != instance.owner_id
+    expert_changed = getattr(instance, "_pre_save_expert_id", _UNSET) != instance.expert_id
+    if not (owner_changed or expert_changed):
+        return
+
+    match instance.owner.domain_type:
+        case DOMAINTYPE.RECEPTION:
+            reception_assignments = ReceptionRoleAssignment.objects.filter(role=Role.objects.get(name=ROLE.COORDINATOR))
+            recipients = [
+                {
+                    "name": assignment.user.name,
+                    "email": assignment.user.email
+                } for assignment in reception_assignments
+            ]
+        case DOMAINTYPE.PROGRAM:
+            program_assignments = ProgramRoleAssignment.objects.filter(role=Role.objects.get(name=ROLE.PROGRAM_LEAD), instance=instance.owner.program)
+            recipients = [
+                {
+                    "name": assignment.user.name,
+                    "email": assignment.user.email
+                } for assignment in program_assignments
+            ]
+        case DOMAINTYPE.LAB:
+            lab_assignments = LabRoleAssignment.objects.filter(role=Role.objects.get(name=ROLE.LAB_LEAD), instance=instance.owner.lab, program=instance.receipt.program)
+            recipients = [
+                {
+                    "name": assignment.user.name,
+                    "email": assignment.user.email
+                } for assignment in lab_assignments
+            ]
+
+    primary_customer = instance.customers.filter(
+        customerrequestrelationship__customer_type__name="Primary Contact"
+    ).first()
+
+    for recipient in recipients:
+        plain_text_message, html_message = assignment_email(
+            receipient_name=recipient["name"],
+            request=instance,
+            customer=primary_customer
         )
         send_email_notification(
             subject="TA Connect - New Request Submitted",
