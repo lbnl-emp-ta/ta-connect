@@ -85,8 +85,6 @@ class AssignmentView(views.APIView):
                         # Who do we send notfication to
                         reception_assignments = ReceptionRoleAssignment.objects.filter(role=Role.objects.get(name=ROLE.COORDINATOR))
                         recipients = [assignment.user.email for assignment in reception_assignments]
-                        print("Recipients for reception assignment notification:")
-                        print(recipients)
 
                     case DOMAINTYPE.PROGRAM:
                         ta_request.owner = new_owner
@@ -97,8 +95,6 @@ class AssignmentView(views.APIView):
                         # Who do we send notfication to
                         program_assignments = ProgramRoleAssignment.objects.filter(role=Role.objects.get(name=ROLE.PROGRAM_LEAD), instance=new_owner.program)
                         recipients = [assignment.user.email for assignment in program_assignments]
-                        print("Recipients for program assignment notification:")
-                        print(recipients)
 
                     case DOMAINTYPE.LAB:
                         ta_request.owner = new_owner
@@ -109,8 +105,6 @@ class AssignmentView(views.APIView):
                         # Who do we send notfication to
                         lab_assignments = LabRoleAssignment.objects.filter(role=Role.objects.get(name=ROLE.LAB_LEAD), instance=new_owner.lab, program=ta_request.receipt.program)
                         recipients = [assignment.user.email for assignment in lab_assignments]
-                        print("Recipients for lab assignment notification:")
-                        print(recipients)
                     
                     # Should never happen!!
                     case _:
@@ -167,7 +161,7 @@ class AssignmentView(views.APIView):
         )
 
         send_email_notification(
-            subject="TACONNECT Assignment Notification",
+            subject="TA Connect Assignment Notification",
             plain_text_message=plain_text_message,
             html_message=html_message,
             recipient_list=recipients

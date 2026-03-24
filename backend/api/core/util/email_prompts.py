@@ -1,3 +1,4 @@
+from django.conf import settings
 from core.constants import DOMAINTYPE
 
 
@@ -23,6 +24,6 @@ def assignment_email(receipient_name: str, request_id: int, domain_type: DOMAINT
     plain_text_message = f"""Hello {receipient_name},\n\nYou have received this email because Request #{request_id} has been assigned to {expert_str}{location_str}.
 \n\nThank you,\nTA Connect"""
     
-    html_message = f"""<div>Hello {receipient_name},</div><p>You have received this email because <a href="https://taconnect.lbl.gov/dashboard/requests/{request_id}" target="_blank">Request #{request_id}</a> has been assigned to {expert_str}{location_str}.</p><div>Thank you,</div><div>TA Connect</div>"""
+    html_message = f"""<div>Hello {receipient_name},</div><p>You have received this email because <a href="{settings.FRONTEND_URL}/dashboard/requests/{request_id}" target="_blank">Request #{request_id}</a> has been assigned to {expert_str}{location_str}.</p><div>Thank you,</div><div>TA Connect</div>"""
     
     return plain_text_message, html_message
