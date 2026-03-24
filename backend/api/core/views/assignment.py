@@ -8,7 +8,7 @@ from allauth.headless.contrib.rest_framework.authentication import (
 
 from core.utils import create_audit_history
 from core.util.notifications import send_email_notification
-from core.util.email_prompts import generic_template
+from core.util.email_prompts import assignment_email
 from core.permissions import IsAdmin, IsLabLead
 from core.views.owner import OwnerListView
 from core.models import *
@@ -84,7 +84,9 @@ class AssignmentView(views.APIView):
                         
                         # Who do we send notfication to
                         reception_assignments = ReceptionRoleAssignment.objects.filter(role=Role.objects.get(name=ROLE.COORDINATOR))
-                        receipients = [assignment.user.email for assignment in reception_assignments] 
+                        recipients = [assignment.user.email for assignment in reception_assignments]
+                        print("Recipients for reception assignment notification:")
+                        print(recipients)
 
                     case DOMAINTYPE.PROGRAM:
                         ta_request.owner = new_owner
@@ -93,8 +95,10 @@ class AssignmentView(views.APIView):
                         ta_request.receipt.program = new_owner.program
 
                         # Who do we send notfication to
-                        program_assignments = ProgramRoleAssignment.objects.filter(role=Role.objects.get(name=ROLE.PROGRAM_LEAD))
-                        receipients = [assignment.user.email for assignment in program_assignments] 
+                        program_assignments = ProgramRoleAssignment.objects.filter(role=Role.objects.get(name=ROLE.PROGRAM_LEAD), instance=new_owner.program)
+                        recipients = [assignment.user.email for assignment in program_assignments]
+                        print("Recipients for program assignment notification:")
+                        print(recipients)
 
                     case DOMAINTYPE.LAB:
                         ta_request.owner = new_owner
@@ -103,8 +107,10 @@ class AssignmentView(views.APIView):
                         ta_request.receipt.lab = new_owner.lab
 
                         # Who do we send notfication to
-                        lab_assignments = LabRoleAssignment.objects.filter(role=Role.objects.get(name=ROLE.LAB_LEAD))
-                        receipients = [assignment.user.email for assignment in lab_assignments] 
+                        lab_assignments = LabRoleAssignment.objects.filter(role=Role.objects.get(name=ROLE.LAB_LEAD), instance=new_owner.lab, program=ta_request.receipt.program)
+                        recipients = [assignment.user.email for assignment in lab_assignments]
+                        print("Recipients for lab assignment notification:")
+                        print(recipients)
                     
                     # Should never happen!!
                     case _:
@@ -141,7 +147,7 @@ class AssignmentView(views.APIView):
             ta_request.receipt.expert = expert
             
             # Who do we send notification to
-            receipients = [expert.email]
+            recipients = [expert.email]
             
             try:
                 with transaction.atomic():
@@ -151,6 +157,20 @@ class AssignmentView(views.APIView):
             except:
                 return Response(data={"message": f"{e}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         
-        send_email_notification("TACONNECT Assignment Notification", generic_template(User.objects.get(pk=self.request.user.id).name.split(" ")[0], f"You have received this email because {ta_request} has been assigned to {"you in " if expert_id else ""}{ta_request.owner.__str__().replace(" Owner", "")}."), receipients)
+        plain_text_message, html_message = assignment_email(
+            receipient_name=User.objects.get(pk=self.request.user.id).name.split(" ")[0],
+            request_id=ta_request.id,
+            domain_type=ta_request.owner.domain_type,
+            program_name=ta_request.receipt.program.name if ta_request.receipt.program else "",
+            lab_name=ta_request.receipt.lab.name if ta_request.receipt.lab else "",
+            expert_id=ta_request.expert.id if ta_request.expert else None
+        )
+
+        send_email_notification(
+            subject="TACONNECT Assignment Notification",
+            plain_text_message=plain_text_message,
+            html_message=html_message,
+            recipient_list=recipients
+        )
         
         return Response(status=status.HTTP_200_OK)
