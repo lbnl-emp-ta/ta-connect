@@ -7,7 +7,7 @@ def generic_template(receipient_name: str, message: str) -> str:
     return template
 
 
-def assignment_email(receipient_name: str, request_id: int, domain_type: DOMAINTYPE, program_name: str,  lab_name: str, expert_id: int) -> str:
+def assignment_email(receipient_name: str, request_id: int, domain_type: DOMAINTYPE, program_name: str,  lab_name: str, expert_id: int) -> tuple[str, str]:
     expert_str = ""
     location_str = ""
     match domain_type:
@@ -26,4 +26,21 @@ def assignment_email(receipient_name: str, request_id: int, domain_type: DOMAINT
     
     html_message = f"""<div>Hello {receipient_name},</div><p>You have received this email because <a href="{settings.FRONTEND_URL}/dashboard/requests/{request_id}" target="_blank">Request #{request_id}</a> has been assigned to {expert_str}{location_str}.</p><div>Thank you,</div><div>TA Connect</div>"""
     
+    return plain_text_message, html_message
+
+
+def new_request_email(receipient_name: str, request_id: int) -> tuple[str, str]:
+    plain_text_message = (
+        f"Hello {receipient_name},\n\n"
+        f"A new request (Request #{request_id}) has been submitted and is awaiting review.\n\n"
+        f"Thank you,\nTA Connect"
+    )
+
+    html_message = (
+        f"<div>Hello {receipient_name},</div>"
+        f"<p>A new request has been submitted and is awaiting your review: "
+        f"<a href=\"{settings.FRONTEND_URL}/dashboard/requests/{request_id}\" target=\"_blank\">Request #{request_id}</a>.</p>"
+        f"<div>Thank you,</div><div>TA Connect</div>"
+    )
+
     return plain_text_message, html_message

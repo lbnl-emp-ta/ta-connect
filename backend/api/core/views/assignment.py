@@ -84,7 +84,12 @@ class AssignmentView(views.APIView):
                         
                         # Who do we send notfication to
                         reception_assignments = ReceptionRoleAssignment.objects.filter(role=Role.objects.get(name=ROLE.COORDINATOR))
-                        recipients = [assignment.user.email for assignment in reception_assignments]
+                        recipients = [
+                            {
+                                "name": assignment.user.name,
+                                "email": assignment.user.email
+                            } for assignment in reception_assignments
+                        ]
 
                     case DOMAINTYPE.PROGRAM:
                         ta_request.owner = new_owner
@@ -94,7 +99,12 @@ class AssignmentView(views.APIView):
 
                         # Who do we send notfication to
                         program_assignments = ProgramRoleAssignment.objects.filter(role=Role.objects.get(name=ROLE.PROGRAM_LEAD), instance=new_owner.program)
-                        recipients = [assignment.user.email for assignment in program_assignments]
+                        recipients = [
+                            {
+                                "name": assignment.user.name,
+                                "email": assignment.user.email
+                            } for assignment in program_assignments
+                        ]
 
                     case DOMAINTYPE.LAB:
                         ta_request.owner = new_owner
@@ -104,7 +114,12 @@ class AssignmentView(views.APIView):
 
                         # Who do we send notfication to
                         lab_assignments = LabRoleAssignment.objects.filter(role=Role.objects.get(name=ROLE.LAB_LEAD), instance=new_owner.lab, program=ta_request.receipt.program)
-                        recipients = [assignment.user.email for assignment in lab_assignments]
+                        recipients = [
+                            {
+                                "name": assignment.user.name,
+                                "email": assignment.user.email
+                            } for assignment in lab_assignments
+                        ]
                     
                     # Should never happen!!
                     case _:
@@ -141,7 +156,12 @@ class AssignmentView(views.APIView):
             ta_request.receipt.expert = expert
             
             # Who do we send notification to
-            recipients = [expert.email]
+            recipients = [
+                {
+                    "name": expert.name,
+                    "email": expert.email
+                }
+            ]
             
             try:
                 with transaction.atomic():
@@ -151,20 +171,22 @@ class AssignmentView(views.APIView):
             except:
                 return Response(data={"message": f"{e}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         
-        plain_text_message, html_message = assignment_email(
-            receipient_name=User.objects.get(pk=self.request.user.id).name.split(" ")[0],
-            request_id=ta_request.id,
-            domain_type=ta_request.owner.domain_type,
-            program_name=ta_request.receipt.program.name if ta_request.receipt.program else "",
-            lab_name=ta_request.receipt.lab.name if ta_request.receipt.lab else "",
-            expert_id=ta_request.expert.id if ta_request.expert else None
-        )
+        # Send separate notification emails to each relevant person about the assignment
+        for recipient in recipients:
+            plain_text_message, html_message = assignment_email(
+                receipient_name=recipient["name"],
+                request_id=ta_request.id,
+                domain_type=ta_request.owner.domain_type,
+                program_name=ta_request.receipt.program.name if ta_request.receipt.program else "",
+                lab_name=ta_request.receipt.lab.name if ta_request.receipt.lab else "",
+                expert_id=ta_request.expert.id if ta_request.expert else None
+            )
 
-        send_email_notification(
-            subject="TA Connect Assignment Notification",
-            plain_text_message=plain_text_message,
-            html_message=html_message,
-            recipient_list=recipients
-        )
+            send_email_notification(
+                subject="TA Connect Assignment Notification",
+                plain_text_message=plain_text_message,
+                html_message=html_message,
+                recipient_list=[recipient["email"]]
+            )
         
         return Response(status=status.HTTP_200_OK)
