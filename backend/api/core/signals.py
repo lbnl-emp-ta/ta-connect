@@ -1,3 +1,4 @@
+from django.db import transaction
 from django.db.models.signals import pre_save, post_save
 from django.dispatch import receiver
 
@@ -7,6 +8,21 @@ _UNSET = object()
 from core.constants import DOMAINTYPE, ROLE
 from core.util.notifications import send_email_notification
 from core.util.email_prompts import new_request_email, assignment_email, customer_status_email
+
+
+def _send_customer_status_emails(request, customers):
+    """Send a status update email to each customer in the given list."""
+    for customer in customers:
+        plain_text_message, html_message = customer_status_email(
+            receipient_name=customer.name,
+            request=request,
+        )
+        send_email_notification(
+            subject=f"TA Connect - Status Updated for Request #{request.pk}",
+            plain_text_message=plain_text_message,
+            html_message=html_message,
+            recipient_list=[customer.email],
+        )
 
 
 @receiver(pre_save, sender=User)
@@ -74,40 +90,50 @@ def notify_reception_on_new_request(sender, instance, created, **kwargs):
     """
     After a new Request is saved for the first time, email all Reception
     Coordinators so they know a request is awaiting review.
+
+    Deferred via transaction.on_commit so the CustomerRequestRelationship
+    is available when we try to send the email.
     """
     if not created:
         return
 
-    coordinator_role = Role.objects.filter(name=ROLE.COORDINATOR).first()
-    if not coordinator_role:
-        return
+    def send_notifications():
+        coordinator_role = Role.objects.filter(name=ROLE.COORDINATOR).first()
+        if not coordinator_role:
+            return
 
-    assignments = ReceptionRoleAssignment.objects.filter(role=coordinator_role).select_related("user")
-    recipients = [assignment.user.email for assignment in assignments]
-    recipients = [
-        {
-            "name": assignment.user.name,
-            "email": assignment.user.email
-        } for assignment in assignments
-    ]
+        assignments = ReceptionRoleAssignment.objects.filter(role=coordinator_role).select_related("user")
+        recipients = [
+            {
+                "name": assignment.user.name,
+                "email": assignment.user.email
+            } for assignment in assignments
+        ]
 
-    if not recipients:
-        return
-    
-    primary_customer = instance.customers.filter(customerrequestrelationship__customer_type__name="Primary Contact").first()
+        if not recipients:
+            return
 
-    for recipient in recipients:
-        plain_text_message, html_message = new_request_email(
-            receipient_name=recipient["name"],
-            request=instance,
-            customer=primary_customer,
-        )
-        send_email_notification(
-            subject="TA Connect - New Request Submitted",
-            plain_text_message=plain_text_message,
-            html_message=html_message,
-            recipient_list=[recipient["email"]],
-        )
+        primary_customer = instance.customers.filter(
+            customerrequestrelationship__customer_type__name="Primary Contact"
+        ).first()
+
+        for recipient in recipients:
+            plain_text_message, html_message = new_request_email(
+                receipient_name=recipient["name"],
+                request=instance,
+                customer=primary_customer,
+            )
+            send_email_notification(
+                subject="TA Connect - New Request Submitted",
+                plain_text_message=plain_text_message,
+                html_message=html_message,
+                recipient_list=[recipient["email"]],
+            )
+
+        if primary_customer:
+            _send_customer_status_emails(instance, [primary_customer])
+
+    transaction.on_commit(send_notifications)
 
 
 @receiver(post_save, sender="core.Request")
@@ -179,14 +205,4 @@ def notify_customer_on_status_change(sender, instance, created, **kwargs):
     if not status_changed:
         return
     
-    for customer in instance.customers.all():
-        plain_text_message, html_message = customer_status_email(
-            receipient_name=customer.name,
-            request=instance,
-        )
-        send_email_notification(
-            subject=f"TA Connect - Status Updated for Request #{instance.pk}",
-            plain_text_message=plain_text_message,
-            html_message=html_message,
-            recipient_list=[customer.email],
-        )
+    _send_customer_status_emails(instance, instance.customers.all())
