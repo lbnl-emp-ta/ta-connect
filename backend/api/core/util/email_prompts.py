@@ -3,11 +3,6 @@ from core.models import Customer, Request
 from core.constants import DOMAINTYPE
 
 
-def generic_template(receipient_name: str, message: str) -> str:
-    template = f"""Hello {receipient_name},\n\n{message}\n\nThank you,\nTA Connect"""
-    return template
-
-
 def assignment_email(receipient_name: str, request: Request, customer: Customer) -> tuple[str, str]:
     request_id = request.id
     domain_type = request.owner.domain_type
@@ -63,7 +58,7 @@ def assignment_email(receipient_name: str, request: Request, customer: Customer)
 def new_request_email(receipient_name: str, request: Request, customer: Customer) -> tuple[str, str]:
     program_name = request.receipt.program.name if request.receipt.program else ""
     lab_name = request.receipt.lab.name if request.receipt.lab else ""
-    
+
     plain_text_message = f"""
     Hello {receipient_name},
     
