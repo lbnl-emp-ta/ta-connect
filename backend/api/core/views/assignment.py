@@ -7,8 +7,6 @@ from allauth.headless.contrib.rest_framework.authentication import (
 )
 
 from core.utils import create_audit_history
-from core.util.notifications import send_email_notification
-from core.util.email_prompts import assignment_email
 from core.permissions import IsAdmin, IsLabLead
 from core.views.owner import OwnerListView
 from core.models import *
@@ -81,15 +79,6 @@ class AssignmentView(views.APIView):
                         ta_request.receipt.program = None
                         ta_request.receipt.lab = None
                         ta_request.receipt.expert = None
-                        
-                        # Who do we send notfication to
-                        reception_assignments = ReceptionRoleAssignment.objects.filter(role=Role.objects.get(name=ROLE.COORDINATOR))
-                        recipients = [
-                            {
-                                "name": assignment.user.name,
-                                "email": assignment.user.email
-                            } for assignment in reception_assignments
-                        ]
 
                     case DOMAINTYPE.PROGRAM:
                         ta_request.owner = new_owner
@@ -97,29 +86,11 @@ class AssignmentView(views.APIView):
 
                         ta_request.receipt.program = new_owner.program
 
-                        # Who do we send notfication to
-                        program_assignments = ProgramRoleAssignment.objects.filter(role=Role.objects.get(name=ROLE.PROGRAM_LEAD), instance=new_owner.program)
-                        recipients = [
-                            {
-                                "name": assignment.user.name,
-                                "email": assignment.user.email
-                            } for assignment in program_assignments
-                        ]
-
                     case DOMAINTYPE.LAB:
                         ta_request.owner = new_owner
                         ta_request.expert = None
 
                         ta_request.receipt.lab = new_owner.lab
-
-                        # Who do we send notfication to
-                        lab_assignments = LabRoleAssignment.objects.filter(role=Role.objects.get(name=ROLE.LAB_LEAD), instance=new_owner.lab, program=ta_request.receipt.program)
-                        recipients = [
-                            {
-                                "name": assignment.user.name,
-                                "email": assignment.user.email
-                            } for assignment in lab_assignments
-                        ]
                     
                     # Should never happen!!
                     case _:
@@ -155,14 +126,6 @@ class AssignmentView(views.APIView):
             ta_request.expert = expert
             ta_request.receipt.expert = expert
             
-            # Who do we send notification to
-            recipients = [
-                {
-                    "name": expert.name,
-                    "email": expert.email
-                }
-            ]
-            
             try:
                 with transaction.atomic():
                     ta_request.receipt.save()
@@ -170,19 +133,5 @@ class AssignmentView(views.APIView):
                     create_audit_history(request, ta_request, ActionType.Assignment, f"Assigned to {str(expert.email)} as expert")
             except:
                 return Response(data={"message": f"{e}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-        
-        # # Send separate notification emails to each relevant person about the assignment
-        # for recipient in recipients:
-        #     plain_text_message, html_message = assignment_email(
-        #         receipient_name=recipient["name"],
-        #         request=ta_request,
-        #     )
-
-        #     send_email_notification(
-        #         subject="TA Connect Assignment Notification",
-        #         plain_text_message=plain_text_message,
-        #         html_message=html_message,
-        #         recipient_list=[recipient["email"]]
-        #     )
         
         return Response(status=status.HTTP_200_OK)
