@@ -6,10 +6,15 @@ from core.constants import DOMAINTYPE
 def assignment_email(receipient_name: str, request: Request, customer: Customer) -> tuple[str, str]:
     request_id = request.id
     domain_type = request.owner.domain_type
-    program_name = request.receipt.program.name if request.receipt.program else ""
-    lab_name = request.receipt.lab.name if request.receipt.lab else ""
+    program_name = "Not assigned"
+    lab_name = "Not assigned"
     expert_str = ""
     location_str = ""
+
+    if request.receipt and request.receipt.program:
+        program_name = request.receipt.program.name
+    if request.receipt and request.receipt.lab:
+        lab_name = request.receipt.lab.name
 
     match domain_type:
         case DOMAINTYPE.RECEPTION:
@@ -41,8 +46,8 @@ def assignment_email(receipient_name: str, request: Request, customer: Customer)
             <li><strong>Request Status:</strong> {request.status}</li>
             <li><strong>Customer:</strong> {customer.name}</li>
             <li><strong>Customer Organization:</strong> {customer.org}</li>
-            <li><strong>Program Name:</strong> {program_name if program_name else "Not assigned"}</li>
-            <li><strong>Lab Name:</strong> {lab_name if lab_name else "Not assigned"}</li>
+            <li><strong>Program Name:</strong> {program_name}</li>
+            <li><strong>Lab Name:</strong> {lab_name}</li>
             <li><strong>Assigned Expert:</strong> {request.expert.name if request.expert else "Not assigned"}</li>
             <li><strong>Depth:</strong> {request.depth if request.depth else "Not assigned"}</li>
             <li><strong>Topics:</strong> {", ".join(topic.name for topic in request.topics.all()) or "Not assigned"}</li>
@@ -57,8 +62,12 @@ def assignment_email(receipient_name: str, request: Request, customer: Customer)
 
 
 def new_request_email(receipient_name: str, request: Request, customer: Customer) -> tuple[str, str]:
-    program_name = request.receipt.program.name if request.receipt.program else ""
-    lab_name = request.receipt.lab.name if request.receipt.lab else ""
+    program_name = "Not assigned"
+    lab_name = "Not assigned"
+    if request.receipt and request.receipt.program:
+        program_name = request.receipt.program.name
+    if request.receipt and request.receipt.lab:
+        lab_name = request.receipt.lab.name
 
     plain_text_message = f"""
     Hello {receipient_name},
@@ -79,8 +88,8 @@ def new_request_email(receipient_name: str, request: Request, customer: Customer
             <li><strong>Request Status:</strong> {request.status}</li>
             <li><strong>Customer:</strong> {customer.name}</li>
             <li><strong>Customer Organization:</strong> {customer.org}</li>
-            <li><strong>Program Name:</strong> {program_name if program_name else "Not assigned"}</li>
-            <li><strong>Lab Name:</strong> {lab_name if lab_name else "Not assigned"}</li>
+            <li><strong>Program Name:</strong> {program_name}</li>
+            <li><strong>Lab Name:</strong> {lab_name}</li>
             <li><strong>Assigned Expert:</strong> {request.expert.name if request.expert else "Not assigned"}</li>
             <li><strong>Depth:</strong> {request.depth if request.depth else "Not assigned"}</li>
             <li><strong>Topics:</strong> {", ".join(topic.name for topic in request.topics.all()) or "Not assigned"}</li>
@@ -95,8 +104,12 @@ def new_request_email(receipient_name: str, request: Request, customer: Customer
 
 
 def customer_status_email(receipient_name: str, request: Request) -> tuple[str, str]:
-    program_name = request.receipt.program.name if request.receipt.program else ""
-    lab_name = request.receipt.lab.name if request.receipt.lab else ""
+    program_name = "Not assigned"
+    lab_name = "Not assigned"
+    if request.receipt and request.receipt.program:
+        program_name = request.receipt.program.name
+    if request.receipt and request.receipt.lab:
+        lab_name = request.receipt.lab.name
 
     plain_text_message = f"""
     Hello {receipient_name},
@@ -115,8 +128,8 @@ def customer_status_email(receipient_name: str, request: Request) -> tuple[str, 
         <ul>
             <li><strong>Request ID:</strong> {request.id}</li>
             <li><strong>Request Status:</strong> {request.status}</li>
-            <li><strong>Program Name:</strong> {program_name if program_name else "Not assigned"}</li>
-            <li><strong>Lab Name:</strong> {lab_name if lab_name else "Not assigned"}</li>
+            <li><strong>Program Name:</strong> {program_name}</li>
+            <li><strong>Lab Name:</strong> {lab_name}</li>
             <li><strong>Assigned Expert:</strong> {request.expert.name if request.expert else "Not assigned"}</li>
             <li><strong>Depth:</strong> {request.depth if request.depth else "Not assigned"}</li>
             <li><strong>Topics:</strong> {", ".join(topic.name for topic in request.topics.all()) or "Not assigned"}</li>
