@@ -6,7 +6,7 @@ from core.models import User, ReceptionRoleAssignment, Role, Request, Owner, Rec
 _UNSET = object()
 from core.constants import DOMAINTYPE, ROLE
 from core.util.notifications import send_email_notification
-from core.util.email_prompts import new_request_email, assignment_email
+from core.util.email_prompts import new_request_email, assignment_email, customer_status_email
 
 
 @receiver(pre_save, sender=User)
@@ -49,19 +49,22 @@ def sync_allauth_email_on_change(sender, instance, **kwargs):
 @receiver(pre_save, sender="core.Request")
 def snapshot_request_assignment_fields(sender, instance, **kwargs):
     """
-    Before saving a Request, snapshot the current owner_id and expert_id so
+    Before saving a Request, snapshot the current status, owner_id, and expert_id so
     post_save handlers can detect whether those fields actually changed.
     """
     if not instance.pk:
+        instance._pre_save_status = _UNSET
         instance._pre_save_owner_id = _UNSET
         instance._pre_save_expert_id = _UNSET
         return
 
     try:
-        old = Request.objects.values("owner_id", "expert_id").get(pk=instance.pk)
+        old = Request.objects.values("status", "owner_id", "expert_id").get(pk=instance.pk)
+        instance._pre_save_status = old["status"]
         instance._pre_save_owner_id = old["owner_id"]
         instance._pre_save_expert_id = old["expert_id"]
     except Request.DoesNotExist:
+        instance._pre_save_status = _UNSET
         instance._pre_save_owner_id = _UNSET
         instance._pre_save_expert_id = _UNSET
 
@@ -159,8 +162,31 @@ def notify_owners_on_assignment(sender, instance, created, **kwargs):
             customer=primary_customer
         )
         send_email_notification(
-            subject="TA Connect - New Request Submitted",
+            subject="TA Connect - Request Assigned to You",
             plain_text_message=plain_text_message,
             html_message=html_message,
             recipient_list=[recipient["email"]],
+        )
+
+
+@receiver(post_save, sender="core.Request")
+def notify_customer_on_status_change(sender, instance, created, **kwargs):
+    if created:
+        return
+    
+    status_changed = getattr(instance, "_pre_save_status", _UNSET) != instance.status
+
+    if not status_changed:
+        return
+    
+    for customer in instance.customers.all():
+        plain_text_message, html_message = customer_status_email(
+            receipient_name=customer.name,
+            request=instance,
+        )
+        send_email_notification(
+            subject=f"TA Connect - Status Updated for Request #{instance.pk}",
+            plain_text_message=plain_text_message,
+            html_message=html_message,
+            recipient_list=[customer.email],
         )
