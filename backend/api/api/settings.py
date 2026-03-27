@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 
 from pathlib import Path
 from dotenv import load_dotenv
+from core.util.utils import parse_bool
 import os
 
 # use python-dotenv for .env
@@ -28,7 +29,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.getenv("SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.getenv("DEBUG", False)
+DEBUG = parse_bool(os.getenv("DEBUG"))
 
 
 # Application definition
@@ -279,6 +280,5 @@ EMAIL_HOST_USER = os.getenv('TACONNECT_EMAIL_HOST_AUTH_USER')
 EMAIL_HOST_PASSWORD = os.getenv('TACONNECT_EMAIL_HOST_PASSWORD')
 EMAIL_USE_TLS = True
 
-
 # Custom setting for development
-ENABLE_EMAIL_SENDING = os.getenv('TACONNECT_ENABLE_EMAIL_SENDING') 
+ENABLE_EMAIL_SENDING = parse_bool(os.getenv('TACONNECT_ENABLE_EMAIL_SENDING')) 

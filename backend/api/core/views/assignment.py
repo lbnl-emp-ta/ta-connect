@@ -7,8 +7,6 @@ from allauth.headless.contrib.rest_framework.authentication import (
 )
 
 from core.utils import create_audit_history
-from core.util.notifications import send_email_notification
-from core.util.email_prompts import generic_template
 from core.permissions import IsAdmin, IsLabLead
 from core.views.owner import OwnerListView
 from core.models import *
@@ -81,10 +79,6 @@ class AssignmentView(views.APIView):
                         ta_request.receipt.program = None
                         ta_request.receipt.lab = None
                         ta_request.receipt.expert = None
-                        
-                        # Who do we send notfication to
-                        reception_assignments = ReceptionRoleAssignment.objects.filter(role=Role.objects.get(name=ROLE.COORDINATOR))
-                        receipients = [assignment.user.email for assignment in reception_assignments] 
 
                     case DOMAINTYPE.PROGRAM:
                         ta_request.owner = new_owner
@@ -92,19 +86,11 @@ class AssignmentView(views.APIView):
 
                         ta_request.receipt.program = new_owner.program
 
-                        # Who do we send notfication to
-                        program_assignments = ProgramRoleAssignment.objects.filter(role=Role.objects.get(name=ROLE.PROGRAM_LEAD))
-                        receipients = [assignment.user.email for assignment in program_assignments] 
-
                     case DOMAINTYPE.LAB:
                         ta_request.owner = new_owner
                         ta_request.expert = None
 
                         ta_request.receipt.lab = new_owner.lab
-
-                        # Who do we send notfication to
-                        lab_assignments = LabRoleAssignment.objects.filter(role=Role.objects.get(name=ROLE.LAB_LEAD))
-                        receipients = [assignment.user.email for assignment in lab_assignments] 
                     
                     # Should never happen!!
                     case _:
@@ -140,9 +126,6 @@ class AssignmentView(views.APIView):
             ta_request.expert = expert
             ta_request.receipt.expert = expert
             
-            # Who do we send notification to
-            receipients = [expert.email]
-            
             try:
                 with transaction.atomic():
                     ta_request.receipt.save()
@@ -150,7 +133,5 @@ class AssignmentView(views.APIView):
                     create_audit_history(request, ta_request, ActionType.Assignment, f"Assigned to {str(expert.email)} as expert")
             except:
                 return Response(data={"message": f"{e}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-        
-        send_email_notification("TACONNECT Assignment Notification", generic_template(User.objects.get(pk=self.request.user.id).name.split(" ")[0], f"You have received this email because {ta_request} has been assigned to {"you in " if expert_id else ""}{ta_request.owner.__str__().replace(" Owner", "")}."), receipients)
         
         return Response(status=status.HTTP_200_OK)
