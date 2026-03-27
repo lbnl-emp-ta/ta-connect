@@ -90,11 +90,14 @@ def notify_reception_on_new_request(sender, instance, created, **kwargs):
 
     if not recipients:
         return
+    
+    primary_customer = instance.customers.filter(customerrequestrelationship__customer_type__name="Primary Contact").first()
 
     for recipient in recipients:
         plain_text_message, html_message = new_request_email(
             receipient_name=recipient["name"],
-            request_id=instance.pk,
+            request=instance,
+            customer=primary_customer,
         )
         send_email_notification(
             subject="TA Connect - New Request Submitted",
