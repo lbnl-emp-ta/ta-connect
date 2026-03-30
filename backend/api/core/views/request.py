@@ -219,6 +219,10 @@ class RequestDetailView(BaseUserAwareRequest):
         response_data = response_data | request_serializer.data 
         response_data["customers"] = customer_serializer.data
         response_data["owner"] = OwnerSerializer().format_owner(found_request.owner)
+
+        receipt = getattr(found_request, 'receipt', None)
+        response_data["program"] = receipt.program.name if receipt and receipt.program else None
+        response_data["lab"] = receipt.lab.name if receipt and receipt.lab else None
         
         # Determine depth options based on request owner type
         depth_options = []

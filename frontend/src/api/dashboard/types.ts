@@ -65,12 +65,14 @@ export interface TADepth {
   description: string;
 }
 
+export type TADomainType = 'reception' | 'program' | 'lab';
+
 export interface TAOwner {
   id: number;
   domain_description?: string;
   domain_id?: number;
   domain_name?: string;
-  domain_type: string;
+  domain_type: TADomainType;
 }
 
 export interface TAExpertise {
@@ -127,6 +129,8 @@ export interface TARequestDetail {
     phone: string;
   } | null;
   owner?: TAOwner;
+  program?: string | null;
+  lab?: string | null;
   proj_start_date: string | null;
   proj_completion_date: string | null;
   actual_completion_date: string | null;

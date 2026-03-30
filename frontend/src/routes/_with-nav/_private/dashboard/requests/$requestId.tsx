@@ -23,6 +23,7 @@ import {
 import { RequestAttachments } from '@/features/requests/RequestAttachments';
 import { RequestNotes } from '@/features/requests/RequestNotes';
 import { RequestAuditHistory } from '@/features/requests/RequestAuditHistory';
+import { RequestStepper } from '@/features/requests/RequestStepper';
 
 export const Route = createFileRoute('/_with-nav/_private/dashboard/requests/$requestId')({
   loader: async ({ context, params }) => {
@@ -83,6 +84,7 @@ function SelectedRequest() {
 
   return (
     <Paper sx={{ padding: 2 }}>
+      <RequestStepper request={selectedRequest} />
       <Stack direction="row" sx={{ marginBottom: 2 }}>
         {previousId !== null && (
           <AppLink
