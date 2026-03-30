@@ -169,7 +169,7 @@ def notify_owners_on_assignment(sender, instance, created, **kwargs):
                 } for assignment in program_assignments
             ]
         case DOMAINTYPE.LAB:
-            lab_assignments = LabRoleAssignment.objects.filter(role=Role.objects.get(name=ROLE.LAB_LEAD), instance=instance.owner.lab, program=instance.receipt.program)
+            lab_assignments = LabRoleAssignment.objects.filter(role=Role.objects.get(name=ROLE.LAB_LEAD), instance=instance.owner.lab, program=instance.program)
             recipients = [
                 {
                     "name": assignment.user.name,

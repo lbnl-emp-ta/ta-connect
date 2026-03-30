@@ -11,10 +11,10 @@ def assignment_email(receipient_name: str, request: Request, customer: Customer)
     expert_str = ""
     location_str = ""
 
-    if request.receipt and request.receipt.program:
-        program_name = request.receipt.program.name
-    if request.receipt and request.receipt.lab:
-        lab_name = request.receipt.lab.name
+    if request.program:
+        program_name = request.program.name
+    if request.lab:
+        lab_name = request.lab.name
 
     match domain_type:
         case DOMAINTYPE.RECEPTION:
@@ -64,10 +64,10 @@ def assignment_email(receipient_name: str, request: Request, customer: Customer)
 def new_request_email(receipient_name: str, request: Request, customer: Customer) -> tuple[str, str]:
     program_name = "Not assigned"
     lab_name = "Not assigned"
-    if request.receipt and request.receipt.program:
-        program_name = request.receipt.program.name
-    if request.receipt and request.receipt.lab:
-        lab_name = request.receipt.lab.name
+    if request.program:
+        program_name = request.program.name
+    if request.lab:
+        lab_name = request.lab.name
 
     plain_text_message = f"""
     Hello {receipient_name},
@@ -106,10 +106,10 @@ def new_request_email(receipient_name: str, request: Request, customer: Customer
 def customer_status_email(receipient_name: str, request: Request) -> tuple[str, str]:
     program_name = "Not assigned"
     lab_name = "Not assigned"
-    if request.receipt and request.receipt.program:
-        program_name = request.receipt.program.name
-    if request.receipt and request.receipt.lab:
-        lab_name = request.receipt.lab.name
+    if request.program:
+        program_name = request.program.name
+    if request.lab:
+        lab_name = request.lab.name
 
     plain_text_message = f"""
     Hello {receipient_name},

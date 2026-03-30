@@ -64,41 +64,39 @@ class BaseUserAwareRequest(views.APIView):
             except Program.DoesNotExist:
                 return queryset.none()
             
-            program_downstream = queryset.none()
-            for lab in program.labs.all():
-                # Take all requests owned by Labs associated with this 
-                # Program, and filter all requests that are also
-                # associated with this Program.
-                program_downstream |= lab.owner.request_set.filter(receipt__program=program)
-            
-            return program_downstream.exclude(pk__in=actionable_pks)
+            return queryset.filter(program=program).exclude(pk__in=actionable_pks)
 
         
         elif IsLabLead().has_permission(self.request):
-            # For a Request to be "downstream" to a Lab means that the 
-            # Request is associated with an expert in # the same Lab.
-            #
-            # NOTE: Need to reset Expert field after "reassignment" back up to
-            # Lab. Otherwise this query is too simple and would catch an old 
-            # leftover Expert assignment.
-
+            # Downstream for a LabLead means requests in this lab+program that
+            # have an expert assigned (i.e. currently being worked on by an expert).
             lab = None
             try:
                 lab = Lab.objects.get(pk=context.get("instance"))
             except Lab.DoesNotExist:
                 return queryset.none()
 
-            return lab.owner.request_set.exclude(expert=None)
+            try:
+                assignment = LabRoleAssignment.objects.get(
+                    user=User.objects.get(pk=context.get("user")),
+                    role=Role.objects.get(pk=context.get("role")),
+                    instance=lab
+                )
+            except LabRoleAssignment.DoesNotExist:
+                return queryset.none()
+
+            return queryset.filter(lab=lab, program=assignment.program).exclude(expert=None).exclude(pk__in=actionable_pks)
         
         # Here just to be explicit.
         elif IsExpert().has_permission(self.request):
+            user = User.objects.get(pk=context.get("user"))
             lab = None
             try:
                 lab = Lab.objects.get(pk=context.get("instance"))
             except Lab.DoesNotExist:
                 return queryset.none()
 
-            return lab.owner.request_set.filter(receipt__expert=User.objects.get(pk=context.get("user"))).filter(expert=None)
+            return queryset.filter(expert=user, lab=lab).exclude(pk__in=actionable_pks)
         else:
             return queryset.none()
 
@@ -219,12 +217,9 @@ class RequestDetailView(BaseUserAwareRequest):
         response_data = response_data | request_serializer.data 
         response_data["customers"] = customer_serializer.data
         response_data["owner"] = OwnerSerializer().format_owner(found_request.owner)
-
-        receipt = getattr(found_request, 'receipt', None)
-        response_data["program"] = receipt.program.name if receipt and receipt.program else None
-        response_data["lab"] = receipt.lab.name if receipt and receipt.lab else None
         
         # Determine depth options based on request owner type
+        # When owner is reception (or system admin), depth_options remains empty
         depth_options = []
         if found_request.owner:
             if found_request.owner.domain_type == Owner.DomainType.Program:
@@ -233,11 +228,10 @@ class RequestDetailView(BaseUserAwareRequest):
                 if program:
                     depth_options = list(program.depths.values_list('name', flat=True))
             elif found_request.owner.domain_type == Owner.DomainType.Lab:
-                # When owner is a lab, show depths associated with the program that the request receipt is associated with
-                if found_request.receipt and found_request.receipt.program:
-                    program = found_request.receipt.program
+                # When owner is a lab, show depths associated with the program that the request is associated with
+                if found_request.program:
+                    program = found_request.program
                     depth_options = list(program.depths.values_list('name', flat=True))
-            # When owner is reception (or system admin), depth_options remains empty
         
         response_data["depth_options"] = depth_options
 
@@ -466,11 +460,10 @@ class RequestMarkCompleteView(BaseUserAwareRequest):
         except:
             return Response(data={"message": "Request with given ID does not exist"}, status=status.HTTP_404_NOT_FOUND)
 
-        # Maybe consider checking receipt to see if its even been serviced?
+        # Maybe consider checking program/lab/expert to see if its even been serviced?
         try:
             found_request.status = RequestStatus.objects.get(name=REQUEST_STATUS.COMPLETED)
             found_request.owner = None
-            found_request.expert = None
             found_request.save()
             create_audit_history(request, found_request, ActionType.StatusChange, f"Status changed to Completed")
             create_audit_history(request, found_request, ActionType.Assignment, f"Removed all assignments")
@@ -501,11 +494,10 @@ class RequestCancelView(BaseUserAwareRequest):
                 found_request.owner = None
                 found_request.expert = None
 
-                found_request.receipt.program = None
-                found_request.receipt.lab = None
-                found_request.receipt.expert = None
+                found_request.program = None
+                found_request.lab = None
+                found_request.expert = None
 
-                found_request.receipt.save()
                 found_request.save()
                 create_audit_history(request, found_request, ActionType.StatusChange, f"Status changed to Unable to Address")
                 create_audit_history(request, found_request, ActionType.Assignment, f"Removed all assignments")

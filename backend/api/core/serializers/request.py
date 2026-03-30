@@ -67,6 +67,8 @@ class RequestExpertListSerializer(serializers.ModelSerializer):
 class RequestSerializer(serializers.Serializer):
     id = serializers.IntegerField()
     # owner field added later
+    program = serializers.SlugRelatedField(slug_field="name", read_only=True)
+    lab = serializers.SlugRelatedField(slug_field="name", read_only=True)
     expert = serializers.SlugRelatedField(
         slug_field="email",
         required=False,

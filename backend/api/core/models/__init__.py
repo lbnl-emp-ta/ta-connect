@@ -8,7 +8,6 @@ from .organization import Organization
 from .topic import Topic
 from .program import Program
 from .owner import Owner
-from .receipt import Receipt
 from .request import Request
 from .state import State
 from .transmission_planning_region import TransmissionPlanningRegion
@@ -36,7 +35,6 @@ from .note import Note
 # you try to run migrations.
 __all__ = [
     "RequestStatus",
-    "Receipt",
     "Request",
     "Depth",
     "State",

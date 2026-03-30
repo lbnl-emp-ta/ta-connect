@@ -72,25 +72,19 @@ class AssignmentView(views.APIView):
             try:
                 match new_owner.domain_type:
                     case DOMAINTYPE.RECEPTION:
-                        ta_request.owner = new_owner
+                        ta_request.owner = new_owner                    
+                        # Resetting prior assignments if request kicked back to Reception
+                        ta_request.program = None
+                        ta_request.lab = None
                         ta_request.expert = None
-                        
-                        # Resetting receipt if request kicked back
-                        ta_request.receipt.program = None
-                        ta_request.receipt.lab = None
-                        ta_request.receipt.expert = None
 
                     case DOMAINTYPE.PROGRAM:
                         ta_request.owner = new_owner
-                        ta_request.expert = None
-
-                        ta_request.receipt.program = new_owner.program
+                        ta_request.program = new_owner.program
 
                     case DOMAINTYPE.LAB:
                         ta_request.owner = new_owner
-                        ta_request.expert = None
-
-                        ta_request.receipt.lab = new_owner.lab
+                        ta_request.lab = new_owner.lab
                     
                     # Should never happen!!
                     case _:
@@ -98,7 +92,6 @@ class AssignmentView(views.APIView):
                 
                 with transaction.atomic():
                     ta_request.save()
-                    ta_request.receipt.save()
                     create_audit_history(request, ta_request, ActionType.Assignment, f"Assigned to {str(new_owner)}")
 
             except Exception as e:
@@ -119,16 +112,16 @@ class AssignmentView(views.APIView):
             
             # Make sure that expert is part of current lab for the program associated with given request
             try: 
-                LabRoleAssignment.objects.get(user=expert, role=Role.objects.get(name=ROLE.EXPERT), instance=ta_request.owner.lab, program=ta_request.receipt.program)
+                LabRoleAssignment.objects.get(user=expert, role=Role.objects.get(name=ROLE.EXPERT), instance=ta_request.owner.lab, program=ta_request.program)
             except LabRoleAssignment.DoesNotExist:
                 return Response(data={"message": "Given expert is not valid in the context of the given request's assigned lab."}, status=status.HTTP_400_BAD_REQUEST)
             
             ta_request.expert = expert
-            ta_request.receipt.expert = expert
+            ta_request.expert = expert
             
             try:
                 with transaction.atomic():
-                    ta_request.receipt.save()
+                    ta_request.save()
                     ta_request.save()
                     create_audit_history(request, ta_request, ActionType.Assignment, f"Assigned to {str(expert.email)} as expert")
             except:
