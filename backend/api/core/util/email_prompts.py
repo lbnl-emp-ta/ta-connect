@@ -21,7 +21,7 @@ def assignment_email(receipient_name: str, request: Request, customer: Customer)
             location_str = "Reception"
         case DOMAINTYPE.PROGRAM:
             location_str = f"Program | {program_name}"
-        case DOMAINTYPE.LAB:
+        case DOMAINTYPE.LAB | DOMAINTYPE.EXPERT:
             location_str = f"Lab | {lab_name} under Program | {program_name}"
     
     if request.expert:
