@@ -58,6 +58,11 @@ class OwnerListView(views.APIView):
                 program=assignment.program,
             ).values_list('user', flat=True)
 
+            print(queryset.filter(
+                Q(domain_type=DOMAINTYPE.PROGRAM, program=assignment.program) |
+                Q(domain_type=DOMAINTYPE.EXPERT, expert__in=expert_users)
+            ))
+
             return queryset.filter(
                 Q(domain_type=DOMAINTYPE.PROGRAM, program=assignment.program) |
                 Q(domain_type=DOMAINTYPE.EXPERT, expert__in=expert_users)

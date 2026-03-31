@@ -95,6 +95,7 @@ export interface TAProgram {
   filtered_orgs: number[];
   labs: number[];
   name: string;
+  owner_id: number;
   topics: TATopic[];
 }
 
@@ -102,6 +103,7 @@ export interface TALab {
   id: number;
   description: string;
   name: string;
+  owner_id: number;
 }
 
 export interface TAAttachment {

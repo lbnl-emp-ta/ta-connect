@@ -23,6 +23,7 @@ import {
   ownersQueryOptions,
   useAssignmentMutation,
   useFinishCloseoutMutation,
+  useMarkCompleteMutation,
 } from '@/utils/queryOptions';
 import { useIdentityContext } from '@/features/identity/IdentityContext';
 import { useToastContext } from '@/features/toasts/ToastContext';
@@ -83,14 +84,19 @@ export const RequestAssignForwardButton: React.FC<RequestAssignForwardButtonProp
     setShowToast(true);
     setToastMessage(<ToastMessage icon={<ErrorIcon />}>{error.message}</ToastMessage>);
   };
+  const assignRequestMutation = useAssignmentMutation(request.id.toString(), identity, {
+    onMutate: onMutate('Assigning request'),
+    onSuccess: onSuccess('Request assigned'),
+    onError: onError,
+  });
   const finishCloseoutMutation = useFinishCloseoutMutation(request.id.toString(), identity, {
     onMutate: onMutate('Finishing request closeout'),
     onSuccess: onSuccess('Request closeout finished'),
     onError: onError,
   });
-  const assignRequestMutation = useAssignmentMutation(request.id.toString(), identity, {
-    onMutate: onMutate('Assigning request'),
-    onSuccess: onSuccess('Request assigned'),
+  const completeRequestMutation = useMarkCompleteMutation(request.id.toString(), identity, {
+    onMutate: onMutate('Marking request as complete'),
+    onSuccess: onSuccess('Request marked as complete'),
     onError: onError,
   });
   const [assignAnchorEl, setAssignAnchorEl] = useState<null | HTMLElement>(null);
@@ -129,9 +135,9 @@ export const RequestAssignForwardButton: React.FC<RequestAssignForwardButtonProp
         break;
       case Steps.Approval:
         if (request.owner?.domain_type === 'lab' && request.program) {
-          assignRequestMutation.mutate({ request: request.id, owner: request.program.id });
+          assignRequestMutation.mutate({ request: request.id, owner: request.program.owner_id });
         } else if (request.owner?.domain_type === 'program') {
-          assignRequestMutation.mutate({ request: request.id, owner: null });
+          completeRequestMutation.mutate();
         }
         break;
       default:

@@ -61,7 +61,9 @@ class AssignmentView(views.APIView):
             except Owner.DoesNotExist:
                 return Response(data={"message": "Owner with given ID does not exist."}, status=status.HTTP_400_BAD_REQUEST)
 
-            if (not possible_owners) or (not possible_owners.filter(id=owner_id)):  
+            if (not possible_owners) or (not possible_owners.filter(id=owner_id)):
+                print(owner_id)
+                print(possible_owners)
                 return Response(data={"message": "Current user identity cannot assign to that owner."}, status=status.HTTP_400_BAD_REQUEST)
         
             try:

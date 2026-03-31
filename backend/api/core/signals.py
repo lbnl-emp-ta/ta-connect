@@ -152,6 +152,9 @@ def notify_owners_on_assignment(sender, instance, created, **kwargs):
     if not (owner_changed or expert_changed):
         return
 
+    if instance.owner is None:
+        return
+
     match instance.owner.domain_type:
         case DOMAINTYPE.RECEPTION:
             reception_assignments = ReceptionRoleAssignment.objects.filter(role=Role.objects.get(name=ROLE.COORDINATOR))
