@@ -65,7 +65,7 @@ export interface TADepth {
   description: string;
 }
 
-export type TADomainType = 'reception' | 'program' | 'lab';
+export type TADomainType = 'reception' | 'program' | 'lab' | 'expert';
 
 export interface TAOwner {
   id: number;
@@ -82,6 +82,7 @@ export interface TAExpertise {
 
 export interface TAExpert {
   id: number;
+  owner_id: number;
   email: string;
   name: string;
   expertise: TAExpertise[];
@@ -217,8 +218,7 @@ export interface CustomerRequestRelationship {
 
 export interface TAAssignment {
   request: number;
-  owner?: number;
-  expert?: number;
+  owner: number;
 }
 
 export interface TAError {

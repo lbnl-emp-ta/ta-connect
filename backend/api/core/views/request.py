@@ -8,7 +8,7 @@ from core.serializers import *
 from core.models import * 
 from core.models.audit_history import ActionType
 from core.permissions import *
-from core.constants import ROLE, REQUEST_STATUS
+from core.constants import DOMAINTYPE, ROLE, REQUEST_STATUS
 
 from core.views import assignment
 
@@ -68,35 +68,22 @@ class BaseUserAwareRequest(views.APIView):
 
         
         elif IsLabLead().has_permission(self.request):
-            # Downstream for a LabLead means requests in this lab+program that
-            # have an expert assigned (i.e. currently being worked on by an expert).
+            # Downstream for a LabLead means requests associated with this lab
+            # but not currently in the lab's queue — either owned by an expert
+            # (being actively worked) or back up at the program (awaiting final approval) or completed.
             lab = None
             try:
                 lab = Lab.objects.get(pk=context.get("instance"))
             except Lab.DoesNotExist:
                 return queryset.none()
 
-            try:
-                assignment = LabRoleAssignment.objects.get(
-                    user=User.objects.get(pk=context.get("user")),
-                    role=Role.objects.get(pk=context.get("role")),
-                    instance=lab
-                )
-            except LabRoleAssignment.DoesNotExist:
-                return queryset.none()
-
-            return queryset.filter(lab=lab, program=assignment.program).exclude(expert=None).exclude(pk__in=actionable_pks)
+            return queryset.filter(lab=lab).exclude(owner=lab.owner).exclude(pk__in=actionable_pks)
         
-        # Here just to be explicit.
         elif IsExpert().has_permission(self.request):
+            # Downstream for an Expert means requests assigned to them but not currently in their queue.
+            # Either owned by the lab (awaiting approval) or back up at the program (awaiting final approval) or completed.
             user = User.objects.get(pk=context.get("user"))
-            lab = None
-            try:
-                lab = Lab.objects.get(pk=context.get("instance"))
-            except Lab.DoesNotExist:
-                return queryset.none()
-
-            return queryset.filter(expert=user, lab=lab).exclude(pk__in=actionable_pks)
+            return queryset.filter(expert=user).exclude(owner=user.owner)
         else:
             return queryset.none()
 
@@ -160,23 +147,12 @@ class BaseUserAwareRequest(views.APIView):
 
             lab_lead_assignments = lab_assignments.filter(role=LAB_LEAD_ROLE, instance=lab)
             for assignment in lab_lead_assignments:
-                    # Requests owned by the Lab that have an "assigned" Expert are not 
-                    # considered are considered "downstream", not "actionable".
-                    requests = requests.union(assignment.instance.owner.request_set.all().filter(expert=None))
+                # NOTE: Should lab leads be able to see all requests for their lab, or just ones for their lab+program?
+                requests = requests.union(queryset.filter(owner=lab.owner))
 
         elif IsExpert().has_permission(self.request, self):
-            EXPERT_ROLE = Role.objects.get(name=ROLE.EXPERT)
-            user = User.objects.get(pk=context.get("user"))
-
-            lab = None
-            try:
-                lab = Lab.objects.get(pk=context.get("instance"))
-            except Lab.DoesNotExist:
-                return queryset.none()
-      
-            expert_assignments = lab_assignments.filter(role=EXPERT_ROLE, instance=lab)
-            for assignment in expert_assignments:
-                    requests = requests.union(assignment.instance.owner.request_set.all().filter(expert=user))
+            # NOTE: Should experts be able to see all requests for their lab, or just ones for their lab+program?
+            requests = requests.union(queryset.filter(owner=user.owner))
 
         requests = Request.objects.filter(id__in=[req.id for req in list(requests)])
         return requests 
@@ -222,12 +198,12 @@ class RequestDetailView(BaseUserAwareRequest):
         # When owner is reception (or system admin), depth_options remains empty
         depth_options = []
         if found_request.owner:
-            if found_request.owner.domain_type == Owner.DomainType.Program:
+            if found_request.owner.domain_type == DOMAINTYPE.PROGRAM:
                 # When owner is a program, show depths associated with that program
                 program = found_request.owner.program
                 if program:
                     depth_options = list(program.depths.values_list('name', flat=True))
-            elif found_request.owner.domain_type == Owner.DomainType.Lab:
+            elif found_request.owner.domain_type == DOMAINTYPE.LAB:
                 # When owner is a lab, show depths associated with the program that the request is associated with
                 if found_request.program:
                     program = found_request.program
@@ -528,8 +504,7 @@ class RequestCloseoutCompleteView(BaseUserAwareRequest):
 
         try:
             found_request.status = RequestStatus.objects.get(name=REQUEST_STATUS.CLOSE_OUT_COMPLETED)
-            # Effectively this "assigns" back up to Lab
-            found_request.expert = None 
+            found_request.owner = found_request.lab.owner if found_request.lab else None
             found_request.save()
             create_audit_history(request, found_request, ActionType.StatusChange, f"Status changed to Closeout Completed")
 

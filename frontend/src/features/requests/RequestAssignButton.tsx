@@ -16,7 +16,7 @@ import {
 } from '@mui/material';
 import { useNavigate } from '@tanstack/react-router';
 import { useState } from 'react';
-import { TAAssignment, TAExpert, TAOwner, TARequestDetail } from '../../api/dashboard/types';
+import { TAOwner, TARequestDetail } from '../../api/dashboard/types';
 import { queryClient } from '../../App';
 import { useAssignmentMutation } from '../../utils/queryOptions';
 import { useIdentityContext } from '../identity/IdentityContext';
@@ -28,20 +28,14 @@ import { AppLink } from '../../components/AppLink';
 interface RequestAssignButtonProps {
   requestId: TARequestDetail['id'];
   owners?: TAOwner[] | null;
-  experts?: TAExpert[] | null;
 }
 
-export const RequestAssignButton: React.FC<RequestAssignButtonProps> = ({
-  requestId,
-  owners,
-  experts,
-}) => {
+export const RequestAssignButton: React.FC<RequestAssignButtonProps> = ({ requestId, owners }) => {
   const navigate = useNavigate();
   const { identity } = useIdentityContext();
   const { nextId, previousId } = useRequestsContext();
   const { setShowToast, setToastMessage } = useToastContext();
   const [filteredOwners, setFilteredOwners] = useState(owners);
-  const [filteredExperts, setFilteredExperts] = useState(experts);
   const [searchTerm, setSearchTerm] = useState('');
   const assignRequestMutation = useAssignmentMutation(requestId.toString(), identity, {
     onMutate: () => {
@@ -89,14 +83,8 @@ export const RequestAssignButton: React.FC<RequestAssignButtonProps> = ({
     setSearchTerm('');
   };
 
-  const handleAssignment = (entity: TAOwner | TAExpert) => {
-    const mutationData: TAAssignment = { request: requestId };
-    if (Object.prototype.hasOwnProperty.call(entity, 'domain_id')) {
-      mutationData.owner = entity.id;
-    } else if (Object.prototype.hasOwnProperty.call(entity, 'expertises')) {
-      mutationData.expert = entity.id;
-    }
-    assignRequestMutation.mutate(mutationData);
+  const handleAssignment = (owner: TAOwner) => {
+    assignRequestMutation.mutate({ request: requestId, owner: owner.id });
     handleAssignMenuClose();
   };
 
@@ -107,14 +95,8 @@ export const RequestAssignButton: React.FC<RequestAssignButtonProps> = ({
       const includesDescription = owner?.domain_description?.toLowerCase().includes(newSearchTerm);
       return includesName || includesDescription;
     });
-    const newFilteredExperts = experts?.filter((expert) => {
-      const includesEmail = expert.email.toLowerCase().includes(newSearchTerm);
-      const includesName = expert.name.toLowerCase().includes(newSearchTerm);
-      return includesEmail || includesName;
-    });
     setSearchTerm(event.target.value);
     setFilteredOwners(newFilteredOwners);
-    setFilteredExperts(newFilteredExperts);
   };
 
   return (
@@ -174,14 +156,6 @@ export const RequestAssignButton: React.FC<RequestAssignButtonProps> = ({
             <Stack direction="row" spacing={1}>
               <ListItemText>{owner.domain_name}</ListItemText>
               <Chip label={capitalize(owner.domain_type)} size="small" />
-            </Stack>
-          </MenuItem>
-        ))}
-        {filteredExperts?.map((expert) => (
-          <MenuItem key={expert.id} onClick={() => handleAssignment(expert)}>
-            <Stack direction="row" spacing={1}>
-              <ListItemText>{expert.email}</ListItemText>
-              <Chip label="Expert" size="small" />
             </Stack>
           </MenuItem>
         ))}

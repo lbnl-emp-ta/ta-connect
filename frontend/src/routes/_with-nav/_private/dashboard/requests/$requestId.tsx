@@ -1,7 +1,7 @@
 import EastIcon from '@mui/icons-material/East';
 import WestIcon from '@mui/icons-material/West';
 import { Badge, Button, Grid, Paper, Stack, Tab, Tabs, Typography } from '@mui/material';
-import { useQuery, useSuspenseQuery } from '@tanstack/react-query';
+import { useSuspenseQuery } from '@tanstack/react-query';
 import { createFileRoute } from '@tanstack/react-router';
 import { useEffect, useState } from 'react';
 import { AppLink } from '@/components/AppLink';
@@ -47,7 +47,7 @@ export const Route = createFileRoute('/_with-nav/_private/dashboard/requests/$re
 
 function SelectedRequest() {
   const params = Route.useParams();
-  const { identity, detailedIdentity } = useIdentityContext();
+  const { identity } = useIdentityContext();
   const { data: selectedRequest } = useSuspenseQuery(
     requestDetailQueryOptions(params.requestId, identity)
   );
@@ -56,12 +56,8 @@ function SelectedRequest() {
     notesQueryOptions(params.requestId, identity)
   );
   const { data: owners } = useSuspenseQuery(ownersQueryOptions(identity));
-  const canAssignExperts =
-    detailedIdentity?.role.name === 'Lab Lead' || detailedIdentity?.role.name === 'Admin';
-  const { data: experts = [] } = useQuery({
-    ...expertsQueryOptions(identity),
-    enabled: canAssignExperts,
-  });
+  // const canAssignExperts =
+  //   detailedIdentity?.role.name === 'Lab Lead' || detailedIdentity?.role.name === 'Admin';
   const { sortedRequests, setCurrentIndex, nextId, previousId } = useRequestsContext();
   const currentIndex = sortedRequests.findIndex((request) => {
     if (params?.requestId) {
@@ -134,7 +130,7 @@ function SelectedRequest() {
         {selectedRequest && (
           <>
             <RequestActionsButton requestId={selectedRequest.id} />
-            <RequestAssignButton requestId={selectedRequest.id} owners={owners} experts={experts} />
+            <RequestAssignButton requestId={selectedRequest.id} owners={owners} />
           </>
         )}
       </Stack>

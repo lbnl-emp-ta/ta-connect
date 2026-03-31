@@ -33,6 +33,10 @@ class OwnerSerializer(serializers.ModelSerializer):
                 domain_id = owner.lab.pk
                 domain_name = owner.lab.name
                 domain_description = owner.lab.description
+            case DOMAINTYPE.EXPERT:
+                domain_id = owner.expert.pk
+                domain_name = owner.expert.name
+                domain_description = owner.expert.email
         
         data["domain_name"] = domain_name
         data["domain_description"] = domain_description 

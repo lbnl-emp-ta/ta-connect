@@ -1,8 +1,9 @@
+import os
 from django.db import transaction
-from django.db.models.signals import pre_save, post_save
+from django.db.models.signals import pre_save, post_save, post_delete
 from django.dispatch import receiver
 
-from core.models import User, ReceptionRoleAssignment, Role, Request, Owner, ReceptionRoleAssignment, ProgramRoleAssignment, LabRoleAssignment
+from core.models import Attachment, User, ReceptionRoleAssignment, Role, Request, Owner, ReceptionRoleAssignment, ProgramRoleAssignment, LabRoleAssignment, Lab, Program
 
 _UNSET = object()
 from core.constants import DOMAINTYPE, ROLE
@@ -176,6 +177,15 @@ def notify_owners_on_assignment(sender, instance, created, **kwargs):
                     "email": assignment.user.email
                 } for assignment in lab_assignments
             ]
+        case DOMAINTYPE.EXPERT:
+            recipients = [
+                {
+                    "name": instance.owner.expert.name,
+                    "email": instance.owner.expert.email
+                }
+            ]
+        case _:
+            recipients = []
 
     primary_customer = instance.customers.filter(
         customerrequestrelationship__customer_type__name="Primary Contact"
@@ -206,3 +216,48 @@ def notify_customer_on_status_change(sender, instance, created, **kwargs):
         return
     
     _send_customer_status_emails(instance, instance.customers.all())
+
+
+# These 
+@receiver(post_save, sender=Lab)
+def create_owner_on_lab_save(sender, instance, created, **kwargs):
+    """
+    Ensure each Lab automatically gets an associated Owner on creation.
+    """
+    if created:
+        Owner.objects.create(domain_type=DOMAINTYPE.LAB, lab=instance)
+
+
+@receiver(post_save, sender=Program)
+def create_owner_on_program_save(sender, instance, created, **kwargs):
+    """
+    Ensure each Program automatically gets an associated Owner on creation.
+    """
+    if created:
+        Owner.objects.create(domain_type=DOMAINTYPE.PROGRAM, program=instance)
+
+
+@receiver(post_save, sender=LabRoleAssignment)
+def create_owner_on_lab_role_assignment(sender, instance, created, **kwargs):
+    """
+    When a LabRoleAssignment is created that assigns a user to the Expert role for a given Lab and Program,
+    create an associated Owner if one doesn't already exist so that the user can be assigned requests.
+    """
+    if created and instance.role.name == ROLE.EXPERT:
+        user = instance.user
+
+        Owner.objects.get_or_create(
+            domain_type=DOMAINTYPE.EXPERT,
+            expert=user,
+        )
+
+
+@receiver(post_delete, sender=Attachment)
+def clean_up_after_attachment_deletion(sender, instance, **kwargs):
+    """
+    After an attachment model is deleted in the database, the underlying file
+    needs to be cleaned up as well.
+    """
+    if hasattr(instance, "file"):
+        if os.path.isfile(instance.file.path):
+            os.remove(instance.file.path)

@@ -34,17 +34,12 @@ class AssignmentView(views.APIView):
         
         request_id = body.get("request")
         owner_id = body.get("owner")
-        expert_id = body.get("expert")
 
         if not request_id:
             return Response(data={"message": "Please provide a request ID for assignment."}, status=status.HTTP_400_BAD_REQUEST)
-        
-        # Can have only owner, or expert given. Not both. 
-        if not (bool(owner_id) ^ bool(expert_id)):
-            return Response(data={"message": "Please provide only owner ID or an expert ID for assignment, not both."}, status=status.HTTP_400_BAD_REQUEST)
 
-        if not owner_id and not expert_id:
-            return Response(data={"message": "Please provide at least an owner ID or an expert ID for assignment."}, status=status.HTTP_400_BAD_REQUEST)
+        if not owner_id:
+            return Response(data={"message": "Please provide an owner ID for assignment."}, status=status.HTTP_400_BAD_REQUEST)
         
         actionable_requests = BaseUserAwareRequest(request=self.request).get_queryset()
 
@@ -85,46 +80,21 @@ class AssignmentView(views.APIView):
                     case DOMAINTYPE.LAB:
                         ta_request.owner = new_owner
                         ta_request.lab = new_owner.lab
+
+                    case DOMAINTYPE.EXPERT:
+                        if not (IsAdmin().has_permission(request) or IsLabLead().has_permission(request)):
+                            return Response(data={"message": "Insufficient privilege to assign an expert."}, status=status.HTTP_401_UNAUTHORIZED)
+                        ta_request.owner = new_owner
+                        ta_request.expert = new_owner.expert
                     
-                    # Should never happen!!
                     case _:
                         return Response(data={"message": "Given request's domaintype is invalid"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
                 
                 with transaction.atomic():
                     ta_request.save()
-                    create_audit_history(request, ta_request, ActionType.Assignment, f"Assigned to {str(new_owner)}")
+                    create_audit_history(request, ta_request, ActionType.Assignment, f"Assigned to {str(new_owner)} as {new_owner.domain_type}")
 
             except Exception as e:
                 return Response(data={"message": f"{e}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-        if (expert_id):
-            if not(IsAdmin().has_permission(request) or IsLabLead().has_permission(request)):
-                return Response(data={"message": "Insufficient privillege to assign expert for given request"}, status=status.HTTP_401_UNAUTHORIZED)
-
-            expert = None
-            try:
-                expert = User.objects.get(pk=expert_id)
-            except User.DoesNotExist:
-                return Response(data={"message": "Expert with given ID does not exist."}, status=status.HTTP_400_BAD_REQUEST)
-
-            if not ta_request.owner.domain_type == DOMAINTYPE.LAB:
-                return Response(data={"message": "Can only assign expert when given request is owned by a lab."}, status=status.HTTP_400_BAD_REQUEST)
-            
-            # Make sure that expert is part of current lab for the program associated with given request
-            try: 
-                LabRoleAssignment.objects.get(user=expert, role=Role.objects.get(name=ROLE.EXPERT), instance=ta_request.owner.lab, program=ta_request.program)
-            except LabRoleAssignment.DoesNotExist:
-                return Response(data={"message": "Given expert is not valid in the context of the given request's assigned lab."}, status=status.HTTP_400_BAD_REQUEST)
-            
-            ta_request.expert = expert
-            ta_request.expert = expert
-            
-            try:
-                with transaction.atomic():
-                    ta_request.save()
-                    ta_request.save()
-                    create_audit_history(request, ta_request, ActionType.Assignment, f"Assigned to {str(expert.email)} as expert")
-            except:
-                return Response(data={"message": f"{e}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-        
         return Response(status=status.HTTP_200_OK)
