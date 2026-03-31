@@ -36,11 +36,15 @@ interface RequestAssignForwardButtonProps {
   request: TARequestDetail;
 }
 
+/**
+ * Dynamic button that either shows a menu of owners to assign the request to,
+ * or performs a forward action such as marking the request complete or finishing closeout,
+ * depending on the current step of the request.
+ */
 export const RequestAssignForwardButton: React.FC<RequestAssignForwardButtonProps> = ({
   request,
 }) => {
   const navigate = useNavigate();
-  console.log(request);
   const { identity } = useIdentityContext();
   const { data: owners } = useSuspenseQuery(ownersQueryOptions(identity));
   const { nextId, previousId } = useRequestsContext();

@@ -58,15 +58,15 @@ class OwnerListView(views.APIView):
                 program=assignment.program,
             ).values_list('user', flat=True)
 
-            print(queryset.filter(
-                Q(domain_type=DOMAINTYPE.PROGRAM, program=assignment.program) |
-                Q(domain_type=DOMAINTYPE.EXPERT, expert__in=expert_users)
-            ))
-
             return queryset.filter(
                 Q(domain_type=DOMAINTYPE.PROGRAM, program=assignment.program) |
                 Q(domain_type=DOMAINTYPE.EXPERT, expert__in=expert_users)
             )
+        
+        if IsExpert().has_permission(self.request, self):
+            # See the lab owner for the lab this expert is associated with
+            lab = Lab.objects.get(pk=context.get("instance"))
+            return queryset.filter(domain_type=DOMAINTYPE.LAB, lab=lab)
         
         return queryset.none()
     

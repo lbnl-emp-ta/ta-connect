@@ -9,11 +9,7 @@ class RequestDetailSerializer(serializers.Serializer):
     owner = OwnerSerializer()
     program = ProgramSerializer(read_only=True)
     lab = LabSerializer(read_only=True)
-    expert = serializers.SlugRelatedField(
-        slug_field="email",
-        required=False,
-        queryset=User.objects.all()
-    ) 
+    expert = ExpertSerializer(read_only=True)
     status = serializers.SlugRelatedField(
         slug_field="name", 
         required=False, 

@@ -5,6 +5,7 @@ import { AppLink } from '@/components/AppLink';
 import { Stack, Button, Typography, IconButton } from '@mui/material';
 import { useRequestsContext } from './RequestsContext';
 import { RequestAssignForwardButton } from '@/features/requests/RequestAssignForwardButton';
+import { RequestAssignBackwardButton } from '@/features/requests/RequestAssignBackwardButton';
 
 interface RequestHeaderProps {
   request: TARequestDetail;
@@ -64,9 +65,7 @@ export const RequestHeader: React.FC<RequestHeaderProps> = ({ request }) => {
         )}
       </Stack>
       <Stack direction="row">
-        <Button variant="outlined" color="primary">
-          View on GitHub
-        </Button>
+        <RequestAssignBackwardButton request={request} />
         <RequestAssignForwardButton request={request} />
       </Stack>
     </Stack>

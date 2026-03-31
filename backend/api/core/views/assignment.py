@@ -62,8 +62,6 @@ class AssignmentView(views.APIView):
                 return Response(data={"message": "Owner with given ID does not exist."}, status=status.HTTP_400_BAD_REQUEST)
 
             if (not possible_owners) or (not possible_owners.filter(id=owner_id)):
-                print(owner_id)
-                print(possible_owners)
                 return Response(data={"message": "Current user identity cannot assign to that owner."}, status=status.HTTP_400_BAD_REQUEST)
         
             try:
@@ -74,21 +72,27 @@ class AssignmentView(views.APIView):
                         ta_request.program = None
                         ta_request.lab = None
                         ta_request.expert = None
-
                     case DOMAINTYPE.PROGRAM:
                         ta_request.owner = new_owner
                         ta_request.program = new_owner.program
-
+                        # No expert here indicates that this request is being kicked back to the
+                        # program from the lab, so remove the lab's assignment.
+                        if not ta_request.expert:
+                            ta_request.lab = None
                     case DOMAINTYPE.LAB:
                         ta_request.owner = new_owner
                         ta_request.lab = new_owner.lab
-
+                        # Assignment to a lab here should always have a null expert
+                        # because either the program is assigning to the lab for the first time (no expert yet),
+                        # or the expert is kicking the request back to the lab (remove expert).
+                        # This is possible because we use a different endpoint (`/closeout-complete`) when experts move their
+                        # request forward (to the lab).
+                        ta_request.expert = None
                     case DOMAINTYPE.EXPERT:
                         if not (IsAdmin().has_permission(request) or IsLabLead().has_permission(request)):
                             return Response(data={"message": "Insufficient privilege to assign an expert."}, status=status.HTTP_401_UNAUTHORIZED)
                         ta_request.owner = new_owner
                         ta_request.expert = new_owner.expert
-                    
                     case _:
                         return Response(data={"message": "Given request's domaintype is invalid"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
                 
