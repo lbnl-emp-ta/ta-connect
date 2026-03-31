@@ -158,7 +158,7 @@ class BaseUserAwareRequest(views.APIView):
         return requests 
 
 class RequestDetailView(BaseUserAwareRequest):
-    serializer = RequestDetailSerializer() 
+    serializer_class = RequestDetailSerializer
 
     """
     Used to populate Request and Customer panels.
@@ -187,13 +187,12 @@ class RequestDetailView(BaseUserAwareRequest):
             except CustomerRequestRelationship.DoesNotExist:
                 return Response(data={"message": "Customer relationship data is missing!"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-        request_serializer = RequestSerializer(found_request)
+        request_serializer = self.serializer_class(found_request)
 
-        response_data = dict()
-        response_data = response_data | request_serializer.data 
+        response_data = dict(request_serializer.data)
         response_data["customers"] = customer_serializer.data
         response_data["owner"] = OwnerSerializer().format_owner(found_request.owner)
-        
+
         # Determine depth options based on request owner type
         # When owner is reception (or system admin), depth_options remains empty
         depth_options = []

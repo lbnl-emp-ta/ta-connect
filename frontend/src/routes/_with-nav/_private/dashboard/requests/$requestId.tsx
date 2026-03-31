@@ -9,7 +9,7 @@ import { InfoPanel } from '@/components/InfoPanel';
 import { TabPanel } from '@/components/TabPanel';
 import { useIdentityContext } from '@/features/identity/IdentityContext';
 import { RequestActionsButton } from '@/features/requests/RequestActionsButton';
-import { RequestAssignButton } from '@/features/requests/RequestAssignButton';
+import { RequestAssignForwardButton } from '@/features/requests/RequestAssignForwardButton';
 import { RequestCustomerPanel } from '@/features/requests/RequestCustomerPanel';
 import { RequestInfoPanel } from '@/features/requests/RequestInfoPanel';
 import { useRequestsContext } from '@/features/requests/RequestsContext';
@@ -24,6 +24,7 @@ import { RequestAttachments } from '@/features/requests/RequestAttachments';
 import { RequestNotes } from '@/features/requests/RequestNotes';
 import { RequestAuditHistory } from '@/features/requests/RequestAuditHistory';
 import { RequestStepper } from '@/features/requests/RequestStepper';
+import { RequestHeader } from '@/features/requests/RequestHeader';
 
 export const Route = createFileRoute('/_with-nav/_private/dashboard/requests/$requestId')({
   loader: async ({ context, params }) => {
@@ -51,13 +52,9 @@ function SelectedRequest() {
   const { data: selectedRequest } = useSuspenseQuery(
     requestDetailQueryOptions(params.requestId, identity)
   );
-  console.log(selectedRequest);
   const { data: selectedRequestNotes } = useSuspenseQuery(
     notesQueryOptions(params.requestId, identity)
   );
-  const { data: owners } = useSuspenseQuery(ownersQueryOptions(identity));
-  // const canAssignExperts =
-  //   detailedIdentity?.role.name === 'Lab Lead' || detailedIdentity?.role.name === 'Admin';
   const { sortedRequests, setCurrentIndex, nextId, previousId } = useRequestsContext();
   const currentIndex = sortedRequests.findIndex((request) => {
     if (params?.requestId) {
@@ -79,8 +76,13 @@ function SelectedRequest() {
   }
 
   return (
-    <Paper sx={{ padding: 2 }}>
-      <RequestStepper request={selectedRequest} />
+    <Stack>
+      <Paper sx={{ padding: 2 }}>
+        <RequestHeader request={selectedRequest} />
+      </Paper>
+      <Paper sx={{ padding: 2 }}>
+        <RequestStepper request={selectedRequest} />
+      </Paper>
       <Stack direction="row" sx={{ marginBottom: 2 }}>
         {previousId !== null && (
           <AppLink
@@ -130,7 +132,7 @@ function SelectedRequest() {
         {selectedRequest && (
           <>
             <RequestActionsButton requestId={selectedRequest.id} />
-            <RequestAssignButton requestId={selectedRequest.id} owners={owners} />
+            <RequestAssignForwardButton request={selectedRequest} />
           </>
         )}
       </Stack>
@@ -200,6 +202,6 @@ function SelectedRequest() {
           </Stack>
         </Grid>
       </Grid>
-    </Paper>
+    </Stack>
   );
 }

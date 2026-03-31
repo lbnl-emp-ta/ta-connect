@@ -88,6 +88,22 @@ export interface TAExpert {
   expertise: TAExpertise[];
 }
 
+export interface TAProgram {
+  id: number;
+  depths: number[];
+  description: string;
+  filtered_orgs: number[];
+  labs: number[];
+  name: string;
+  topics: TATopic[];
+}
+
+export interface TALab {
+  id: number;
+  description: string;
+  name: string;
+}
+
 export interface TAAttachment {
   id: number;
   title: string;
@@ -130,8 +146,8 @@ export interface TARequestDetail {
     phone: string;
   } | null;
   owner?: TAOwner;
-  program?: string | null;
-  lab?: string | null;
+  program?: TAProgram | null;
+  lab?: TALab | null;
   proj_start_date: string | null;
   proj_completion_date: string | null;
   actual_completion_date: string | null;
@@ -218,7 +234,7 @@ export interface CustomerRequestRelationship {
 
 export interface TAAssignment {
   request: number;
-  owner: number;
+  owner: number | null;
 }
 
 export interface TAError {

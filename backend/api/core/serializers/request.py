@@ -7,6 +7,8 @@ from core.models import *
 class RequestDetailSerializer(serializers.Serializer):
     id = serializers.IntegerField()
     owner = OwnerSerializer()
+    program = ProgramSerializer(read_only=True)
+    lab = LabSerializer(read_only=True)
     expert = serializers.SlugRelatedField(
         slug_field="email",
         required=False,
