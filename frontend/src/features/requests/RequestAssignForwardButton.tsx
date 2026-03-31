@@ -16,7 +16,7 @@ import {
 } from '@mui/material';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { useNavigate } from '@tanstack/react-router';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { TAOwner, TARequestDetail } from '@/api/dashboard/types';
 import { queryClient } from '@/App';
 import {
@@ -49,10 +49,22 @@ export const RequestAssignForwardButton: React.FC<RequestAssignForwardButtonProp
   const { data: owners } = useSuspenseQuery(ownersQueryOptions(identity));
   const { nextId, previousId } = useRequestsContext();
   const { setShowToast, setToastMessage } = useToastContext();
-  const [filteredOwners, setFilteredOwners] = useState<TAOwner[]>(owners ?? []);
   const [searchTerm, setSearchTerm] = useState('');
   const ownersContainsExperts = owners?.some((owner) => owner.domain_type === 'expert');
   const currentStep = getStep(request);
+  const forwardOwners = useMemo(() => {
+    switch (currentStep.stepIndex) {
+      case Steps.Reception:
+        return owners?.filter((owner) => owner.domain_type === 'program');
+      case Steps.Program:
+        return owners?.filter((owner) => owner.domain_type === 'lab');
+      case Steps.Lab:
+        return owners?.filter((owner) => owner.domain_type === 'expert');
+      default:
+        return [];
+    }
+  }, [owners]);
+  const [filteredOwners, setFilteredOwners] = useState<TAOwner[]>(forwardOwners ?? []);
   const onMutate = (message: string) => {
     return () => {
       setShowToast(true);
@@ -121,7 +133,7 @@ export const RequestAssignForwardButton: React.FC<RequestAssignForwardButtonProp
 
   const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
     const newSearchTerm = event.target.value.toLowerCase();
-    const newFilteredOwners = (owners ?? []).filter((owner) => {
+    const newFilteredOwners = (forwardOwners ?? []).filter((owner) => {
       const includesName = owner?.domain_name?.toLowerCase().includes(newSearchTerm);
       const includesDescription = owner?.domain_description?.toLowerCase().includes(newSearchTerm);
       return includesName || includesDescription;
@@ -131,8 +143,6 @@ export const RequestAssignForwardButton: React.FC<RequestAssignForwardButtonProp
   };
 
   const handleForward = (owner?: TAOwner) => {
-    console.log('handling forward action');
-    console.log('current step:', currentStep);
     switch (currentStep.stepIndex) {
       case Steps.Expert:
         finishCloseoutMutation.mutate();
