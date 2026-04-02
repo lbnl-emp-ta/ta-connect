@@ -51,7 +51,9 @@ export const RequestAssignForwardButton: React.FC<RequestAssignForwardButtonProp
   const { setShowToast, setToastMessage } = useToastContext();
   const [searchTerm, setSearchTerm] = useState('');
   const ownersContainsExperts = owners?.some((owner) => owner.domain_type === 'expert');
-  const currentStep = getStep(request);
+  const currentStep = useMemo(() => {
+    return getStep(request);
+  }, [request]);
   const forwardOwners = useMemo(() => {
     switch (currentStep.stepIndex) {
       case Steps.Reception:
@@ -63,8 +65,16 @@ export const RequestAssignForwardButton: React.FC<RequestAssignForwardButtonProp
       default:
         return [];
     }
-  }, [owners]);
-  const [filteredOwners, setFilteredOwners] = useState<TAOwner[]>(forwardOwners ?? []);
+  }, [owners, currentStep]);
+  const filteredOwners = useMemo(() => {
+    if (!searchTerm) return forwardOwners ?? [];
+    const lowerSearch = searchTerm.toLowerCase();
+    return (forwardOwners ?? []).filter((owner) => {
+      const includesName = owner?.domain_name?.toLowerCase().includes(lowerSearch);
+      const includesDescription = owner?.domain_description?.toLowerCase().includes(lowerSearch);
+      return includesName || includesDescription;
+    });
+  }, [forwardOwners, searchTerm]);
   const onMutate = (message: string) => {
     return () => {
       setShowToast(true);
@@ -132,14 +142,7 @@ export const RequestAssignForwardButton: React.FC<RequestAssignForwardButtonProp
   };
 
   const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const newSearchTerm = event.target.value.toLowerCase();
-    const newFilteredOwners = (forwardOwners ?? []).filter((owner) => {
-      const includesName = owner?.domain_name?.toLowerCase().includes(newSearchTerm);
-      const includesDescription = owner?.domain_description?.toLowerCase().includes(newSearchTerm);
-      return includesName || includesDescription;
-    });
     setSearchTerm(event.target.value);
-    setFilteredOwners(newFilteredOwners);
   };
 
   const handleForward = (owner?: TAOwner) => {
