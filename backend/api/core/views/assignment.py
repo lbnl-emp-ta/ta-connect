@@ -11,7 +11,7 @@ from core.permissions import IsAdmin, IsLabLead
 from core.views.owner import OwnerListView
 from core.models import *
 from core.models.audit_history import ActionType
-from core.constants import DOMAINTYPE, ROLE
+from core.constants import DOMAINTYPE, REQUEST_STATUS
 
 class AssignmentView(views.APIView):
     authentication_classes = [
@@ -82,12 +82,19 @@ class AssignmentView(views.APIView):
                     case DOMAINTYPE.LAB:
                         ta_request.owner = new_owner
                         ta_request.lab = new_owner.lab
-                        # Assignment to a lab here should always have a null expert
-                        # because either the program is assigning to the lab for the first time (no expert yet),
-                        # or the expert is kicking the request back to the lab (remove expert).
-                        # This is possible because we use a different endpoint (`/closeout-complete`) when experts move their
-                        # request forward (to the lab).
-                        ta_request.expert = None
+                        
+                        # NOTE: statuses are not finalized so this logic isn't fully fleshed out
+
+                        # Request is being assigned to lab for the first time
+                        # Set status to "Assigned to Lab" and make sure expert is None
+                        if ta_request.status == REQUEST_STATUS.ASSIGNED_TO_PROGRAM:
+                            ta_request.status = REQUEST_STATUS.ASSIGNED_TO_LAB
+                            ta_request.expert = None
+                        # Request is being kicked back to lab from expert
+                        # Remove expert assignment and set status to "Reassignment Requested"
+                        elif ta_request.status == REQUEST_STATUS.ASSIGNED_TO_EXPERT:
+                            ta_request.status = REQUEST_STATUS.REASSIGNMENT_REQUESTED
+                            ta_request.expert = None
                     case DOMAINTYPE.EXPERT:
                         if not (IsAdmin().has_permission(request) or IsLabLead().has_permission(request)):
                             return Response(data={"message": "Insufficient privilege to assign an expert."}, status=status.HTTP_401_UNAUTHORIZED)
