@@ -9,6 +9,7 @@ from .depth import DepthSerializer
 from .lab import LabSerializer
 from .program import ProgramSerializer
 from .reception import ReceptionSerializer
+from .expert import ExpertSerializer
 from .role import RoleSerializer
 from .request_status import RequestStatusSerializer
 from .owner import OwnerSerializer
@@ -27,6 +28,7 @@ __all__ = [
     "LabSerializer",
     "ProgramSerializer",
     "ReceptionSerializer",
+    "ExpertSerializer",
     "OwnerSerializer",
     "RequestSerializer",
     "CustomerSerializer",

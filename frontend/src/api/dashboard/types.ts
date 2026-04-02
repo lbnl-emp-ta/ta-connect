@@ -65,12 +65,14 @@ export interface TADepth {
   description: string;
 }
 
+export type TADomainType = 'reception' | 'program' | 'lab' | 'expert';
+
 export interface TAOwner {
   id: number;
   domain_description?: string;
   domain_id?: number;
   domain_name?: string;
-  domain_type: string;
+  domain_type: TADomainType;
 }
 
 export interface TAExpertise {
@@ -80,9 +82,28 @@ export interface TAExpertise {
 
 export interface TAExpert {
   id: number;
+  owner_id: number;
   email: string;
   name: string;
   expertise: TAExpertise[];
+}
+
+export interface TAProgram {
+  id: number;
+  depths: number[];
+  description: string;
+  filtered_orgs: number[];
+  labs: number[];
+  name: string;
+  owner_id: number;
+  topics: TATopic[];
+}
+
+export interface TALab {
+  id: number;
+  description: string;
+  name: string;
+  owner_id: number;
 }
 
 export interface TAAttachment {
@@ -121,12 +142,10 @@ export interface TARequestDetail {
   description: string;
   date_created: string;
   customers: TACustomer[];
-  expert: {
-    id: number;
-    email: string;
-    phone: string;
-  } | null;
+  expert: TAExpert | null;
   owner?: TAOwner;
+  program?: TAProgram | null;
+  lab?: TALab | null;
   proj_start_date: string | null;
   proj_completion_date: string | null;
   actual_completion_date: string | null;
@@ -213,8 +232,7 @@ export interface CustomerRequestRelationship {
 
 export interface TAAssignment {
   request: number;
-  owner?: number;
-  expert?: number;
+  owner: number | null;
 }
 
 export interface TAError {

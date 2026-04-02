@@ -61,8 +61,12 @@ function DashboardComponent() {
     setTabValue(newValue);
   };
 
-  const handleIdentityChange = (event: SelectChangeEvent<TAIdentity | null>) => {
-    setDetailedIdentity(event.target.value as TAIdentity);
+  const getIdentityKey = (id: TAIdentity) =>
+    `${id.role.id}-${id.location}-${id.instance?.id ?? 'none'}`;
+
+  const handleIdentityChange = (event: SelectChangeEvent<string>) => {
+    const selected = identities?.find((id) => getIdentityKey(id) === event.target.value);
+    if (selected) setDetailedIdentity(selected);
   };
 
   useEffect(() => {
@@ -171,7 +175,7 @@ function DashboardComponent() {
         </Tabs>
         <Box sx={{ flexGrow: 1 }} />
         <Select
-          value={detailedIdentity || ''}
+          value={detailedIdentity ? getIdentityKey(detailedIdentity) : ''}
           size="small"
           open={identitiesMenuOpen}
           onOpen={() => setIdentitiesMenuOpen(true)}
@@ -192,8 +196,7 @@ function DashboardComponent() {
           }}
         >
           {identities?.map((identity) => (
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-explicit-any
-            <MenuItem key={identity.role.id} value={identity as any}>
+            <MenuItem key={getIdentityKey(identity)} value={getIdentityKey(identity)}>
               <Stack direction="row" spacing={1}>
                 {identity.location === 'Reception' && <span>{identity.location}</span>}
                 <span>{identity.role.name}</span>

@@ -1,18 +1,14 @@
-import EastIcon from '@mui/icons-material/East';
-import WestIcon from '@mui/icons-material/West';
-import { Badge, Button, Grid, Paper, Stack, Tab, Tabs, Typography } from '@mui/material';
-import { useQuery, useSuspenseQuery } from '@tanstack/react-query';
-import { createFileRoute } from '@tanstack/react-router';
-import { useEffect, useState } from 'react';
-import { AppLink } from '@/components/AppLink';
 import { InfoPanel } from '@/components/InfoPanel';
 import { TabPanel } from '@/components/TabPanel';
 import { useIdentityContext } from '@/features/identity/IdentityContext';
-import { RequestActionsButton } from '@/features/requests/RequestActionsButton';
-import { RequestAssignButton } from '@/features/requests/RequestAssignButton';
+import { RequestAttachments } from '@/features/requests/RequestAttachments';
+import { RequestAuditHistory } from '@/features/requests/RequestAuditHistory';
 import { RequestCustomerPanel } from '@/features/requests/RequestCustomerPanel';
+import { RequestHeader } from '@/features/requests/RequestHeader';
 import { RequestInfoPanel } from '@/features/requests/RequestInfoPanel';
+import { RequestNotes } from '@/features/requests/RequestNotes';
 import { useRequestsContext } from '@/features/requests/RequestsContext';
+import { RequestStepper } from '@/features/requests/RequestStepper';
 import {
   expertsQueryOptions,
   notesQueryOptions,
@@ -20,9 +16,10 @@ import {
   requestDetailQueryOptions,
   topicsQueryOptions,
 } from '@/utils/queryOptions';
-import { RequestAttachments } from '@/features/requests/RequestAttachments';
-import { RequestNotes } from '@/features/requests/RequestNotes';
-import { RequestAuditHistory } from '@/features/requests/RequestAuditHistory';
+import { Badge, Grid, Paper, Stack, Tab, Tabs, Typography } from '@mui/material';
+import { useSuspenseQuery } from '@tanstack/react-query';
+import { createFileRoute } from '@tanstack/react-router';
+import { useEffect, useState } from 'react';
 
 export const Route = createFileRoute('/_with-nav/_private/dashboard/requests/$requestId')({
   loader: async ({ context, params }) => {
@@ -46,22 +43,14 @@ export const Route = createFileRoute('/_with-nav/_private/dashboard/requests/$re
 
 function SelectedRequest() {
   const params = Route.useParams();
-  const { identity, detailedIdentity } = useIdentityContext();
+  const { identity } = useIdentityContext();
   const { data: selectedRequest } = useSuspenseQuery(
     requestDetailQueryOptions(params.requestId, identity)
   );
-  console.log(selectedRequest);
   const { data: selectedRequestNotes } = useSuspenseQuery(
     notesQueryOptions(params.requestId, identity)
   );
-  const { data: owners } = useSuspenseQuery(ownersQueryOptions(identity));
-  const canAssignExperts =
-    detailedIdentity?.role.name === 'Lab Lead' || detailedIdentity?.role.name === 'Admin';
-  const { data: experts = [] } = useQuery({
-    ...expertsQueryOptions(identity),
-    enabled: canAssignExperts,
-  });
-  const { sortedRequests, setCurrentIndex, nextId, previousId } = useRequestsContext();
+  const { sortedRequests, setCurrentIndex } = useRequestsContext();
   const currentIndex = sortedRequests.findIndex((request) => {
     if (params?.requestId) {
       return request.id === parseInt(params.requestId);
@@ -82,60 +71,13 @@ function SelectedRequest() {
   }
 
   return (
-    <Paper sx={{ padding: 2 }}>
-      <Stack direction="row" sx={{ marginBottom: 2 }}>
-        {previousId !== null && (
-          <AppLink
-            to={'/dashboard/requests/$requestId'}
-            params={{
-              requestId: previousId.toString(),
-            }}
-          >
-            <Button variant="outlined" color="primary">
-              <WestIcon />
-            </Button>
-          </AppLink>
-        )}
-        {previousId === null && (
-          <span>
-            <Button variant="outlined" color="primary" disabled>
-              <WestIcon />
-            </Button>
-          </span>
-        )}
-        {nextId !== null && (
-          <AppLink to={'/dashboard/requests/$requestId'} params={{ requestId: nextId.toString() }}>
-            <Button variant="outlined" color="primary">
-              <EastIcon />
-            </Button>
-          </AppLink>
-        )}
-        {nextId === null && (
-          <span>
-            <Button variant="outlined" color="primary" disabled>
-              <EastIcon />
-            </Button>
-          </span>
-        )}
-        <Typography
-          variant="h6"
-          component="h1"
-          color="primary"
-          sx={{
-            flex: 1,
-            fontWeight: 'bold',
-            textAlign: 'center',
-          }}
-        >
-          Request #{selectedRequest?.id}
-        </Typography>
-        {selectedRequest && (
-          <>
-            <RequestActionsButton requestId={selectedRequest.id} />
-            <RequestAssignButton requestId={selectedRequest.id} owners={owners} experts={experts} />
-          </>
-        )}
-      </Stack>
+    <Stack>
+      <Paper sx={{ padding: 2 }}>
+        <RequestHeader request={selectedRequest} />
+      </Paper>
+      <Paper sx={{ padding: 2 }}>
+        <RequestStepper request={selectedRequest} />
+      </Paper>
       <Grid container spacing={1}>
         <Grid size={{ lg: 6, md: 12 }}>
           <RequestInfoPanel request={selectedRequest!} />
@@ -202,6 +144,6 @@ function SelectedRequest() {
           </Stack>
         </Grid>
       </Grid>
-    </Paper>
+    </Stack>
   );
 }

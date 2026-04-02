@@ -7,11 +7,9 @@ from core.models import *
 class RequestDetailSerializer(serializers.Serializer):
     id = serializers.IntegerField()
     owner = OwnerSerializer()
-    expert = serializers.SlugRelatedField(
-        slug_field="email",
-        required=False,
-        queryset=User.objects.all()
-    ) 
+    program = ProgramSerializer(read_only=True)
+    lab = LabSerializer(read_only=True)
+    expert = ExpertSerializer(read_only=True)
     status = serializers.SlugRelatedField(
         slug_field="name", 
         required=False, 
@@ -67,6 +65,8 @@ class RequestExpertListSerializer(serializers.ModelSerializer):
 class RequestSerializer(serializers.Serializer):
     id = serializers.IntegerField()
     # owner field added later
+    program = serializers.SlugRelatedField(slug_field="name", read_only=True)
+    lab = serializers.SlugRelatedField(slug_field="name", read_only=True)
     expert = serializers.SlugRelatedField(
         slug_field="email",
         required=False,

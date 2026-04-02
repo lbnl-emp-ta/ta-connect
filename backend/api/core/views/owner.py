@@ -1,3 +1,4 @@
+from django.db.models import Q
 from rest_framework import views, status, permissions, authentication
 from rest_framework.response import Response
 
@@ -8,7 +9,7 @@ from allauth.headless.contrib.rest_framework.authentication import (
 from core.serializers import *
 from core.permissions import *
 from core.models import *
-from core.constants import DOMAINTYPE
+from core.constants import DOMAINTYPE, ROLE
 
 class OwnerListView(views.APIView):
     authentication_classes = [
@@ -51,8 +52,21 @@ class OwnerListView(views.APIView):
         if IsLabLead().has_permission(self.request, self):
             assignment = LabRoleAssignment.objects.get(user=User.objects.get(pk=context.get("user")), role=Role.objects.get(pk=context.get("role")), instance=Lab.objects.get(pk=context.get("instance")))
 
-            # Only one layer up, Experts are a role within Labs - not another layer
-            return Owner.objects.filter(domain_type=DOMAINTYPE.PROGRAM, program=assignment.program)
+            expert_users = LabRoleAssignment.objects.filter(
+                role=Role.objects.get(name=ROLE.EXPERT),
+                instance=assignment.instance,
+                program=assignment.program,
+            ).values_list('user', flat=True)
+
+            return queryset.filter(
+                Q(domain_type=DOMAINTYPE.PROGRAM, program=assignment.program) |
+                Q(domain_type=DOMAINTYPE.EXPERT, expert__in=expert_users)
+            )
+        
+        if IsExpert().has_permission(self.request, self):
+            # See the lab owner for the lab this expert is associated with
+            lab = Lab.objects.get(pk=context.get("instance"))
+            return queryset.filter(domain_type=DOMAINTYPE.LAB, lab=lab)
         
         return queryset.none()
     

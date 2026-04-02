@@ -11,7 +11,7 @@ from core.permissions import IsAdmin, IsLabLead
 from core.views.owner import OwnerListView
 from core.models import *
 from core.models.audit_history import ActionType
-from core.constants import DOMAINTYPE, ROLE
+from core.constants import DOMAINTYPE, REQUEST_STATUS
 
 class AssignmentView(views.APIView):
     authentication_classes = [
@@ -34,17 +34,12 @@ class AssignmentView(views.APIView):
         
         request_id = body.get("request")
         owner_id = body.get("owner")
-        expert_id = body.get("expert")
 
         if not request_id:
             return Response(data={"message": "Please provide a request ID for assignment."}, status=status.HTTP_400_BAD_REQUEST)
-        
-        # Can have only owner, or expert given. Not both. 
-        if not (bool(owner_id) ^ bool(expert_id)):
-            return Response(data={"message": "Please provide only owner ID or an expert ID for assignment, not both."}, status=status.HTTP_400_BAD_REQUEST)
 
-        if not owner_id and not expert_id:
-            return Response(data={"message": "Please provide at least an owner ID or an expert ID for assignment."}, status=status.HTTP_400_BAD_REQUEST)
+        if not owner_id:
+            return Response(data={"message": "Please provide an owner ID for assignment."}, status=status.HTTP_400_BAD_REQUEST)
         
         actionable_requests = BaseUserAwareRequest(request=self.request).get_queryset()
 
@@ -66,72 +61,53 @@ class AssignmentView(views.APIView):
             except Owner.DoesNotExist:
                 return Response(data={"message": "Owner with given ID does not exist."}, status=status.HTTP_400_BAD_REQUEST)
 
-            if (not possible_owners) or (not possible_owners.filter(id=owner_id)):  
+            if (not possible_owners) or (not possible_owners.filter(id=owner_id)):
                 return Response(data={"message": "Current user identity cannot assign to that owner."}, status=status.HTTP_400_BAD_REQUEST)
         
             try:
                 match new_owner.domain_type:
                     case DOMAINTYPE.RECEPTION:
-                        ta_request.owner = new_owner
+                        ta_request.owner = new_owner                    
+                        # Resetting prior assignments if request kicked back to Reception
+                        ta_request.program = None
+                        ta_request.lab = None
                         ta_request.expert = None
-                        
-                        # Resetting receipt if request kicked back
-                        ta_request.receipt.program = None
-                        ta_request.receipt.lab = None
-                        ta_request.receipt.expert = None
-
                     case DOMAINTYPE.PROGRAM:
                         ta_request.owner = new_owner
-                        ta_request.expert = None
-
-                        ta_request.receipt.program = new_owner.program
-
+                        ta_request.program = new_owner.program
+                        # No expert here indicates that this request is being kicked back to the
+                        # program from the lab, so remove the lab's assignment.
+                        if not ta_request.expert:
+                            ta_request.lab = None
                     case DOMAINTYPE.LAB:
                         ta_request.owner = new_owner
-                        ta_request.expert = None
+                        ta_request.lab = new_owner.lab
+                        
+                        # NOTE: statuses are not finalized so this logic isn't fully fleshed out
 
-                        ta_request.receipt.lab = new_owner.lab
-                    
-                    # Should never happen!!
+                        # Request is being assigned to lab for the first time
+                        # Set status to "Assigned to Lab" and make sure expert is None
+                        if ta_request.status == REQUEST_STATUS.ASSIGNED_TO_PROGRAM:
+                            ta_request.status = REQUEST_STATUS.ASSIGNED_TO_LAB
+                            ta_request.expert = None
+                        # Request is being kicked back to lab from expert
+                        # Remove expert assignment and set status to "Reassignment Requested"
+                        elif ta_request.status == REQUEST_STATUS.ASSIGNED_TO_EXPERT:
+                            ta_request.status = REQUEST_STATUS.REASSIGNMENT_REQUESTED
+                            ta_request.expert = None
+                    case DOMAINTYPE.EXPERT:
+                        if not (IsAdmin().has_permission(request) or IsLabLead().has_permission(request)):
+                            return Response(data={"message": "Insufficient privilege to assign an expert."}, status=status.HTTP_401_UNAUTHORIZED)
+                        ta_request.owner = new_owner
+                        ta_request.expert = new_owner.expert
                     case _:
                         return Response(data={"message": "Given request's domaintype is invalid"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
                 
                 with transaction.atomic():
                     ta_request.save()
-                    ta_request.receipt.save()
-                    create_audit_history(request, ta_request, ActionType.Assignment, f"Assigned to {str(new_owner)}")
+                    create_audit_history(request, ta_request, ActionType.Assignment, f"Assigned to {str(new_owner)} as {new_owner.domain_type}")
 
             except Exception as e:
                 return Response(data={"message": f"{e}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-        if (expert_id):
-            if not(IsAdmin().has_permission(request) or IsLabLead().has_permission(request)):
-                return Response(data={"message": "Insufficient privillege to assign expert for given request"}, status=status.HTTP_401_UNAUTHORIZED)
-
-            expert = None
-            try:
-                expert = User.objects.get(pk=expert_id)
-            except User.DoesNotExist:
-                return Response(data={"message": "Expert with given ID does not exist."}, status=status.HTTP_400_BAD_REQUEST)
-
-            if not ta_request.owner.domain_type == DOMAINTYPE.LAB:
-                return Response(data={"message": "Can only assign expert when given request is owned by a lab."}, status=status.HTTP_400_BAD_REQUEST)
-            
-            # Make sure that expert is part of current lab for the program associated with given request
-            try: 
-                LabRoleAssignment.objects.get(user=expert, role=Role.objects.get(name=ROLE.EXPERT), instance=ta_request.owner.lab, program=ta_request.receipt.program)
-            except LabRoleAssignment.DoesNotExist:
-                return Response(data={"message": "Given expert is not valid in the context of the given request's assigned lab."}, status=status.HTTP_400_BAD_REQUEST)
-            
-            ta_request.expert = expert
-            ta_request.receipt.expert = expert
-            
-            try:
-                with transaction.atomic():
-                    ta_request.receipt.save()
-                    ta_request.save()
-                    create_audit_history(request, ta_request, ActionType.Assignment, f"Assigned to {str(expert.email)} as expert")
-            except:
-                return Response(data={"message": f"{e}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-        
         return Response(status=status.HTTP_200_OK)

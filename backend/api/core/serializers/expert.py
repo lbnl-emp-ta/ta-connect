@@ -2,7 +2,7 @@ from rest_framework import serializers
 
 from core.models import *
 
-class LabSerializer(serializers.ModelSerializer):
+class ExpertSerializer(serializers.ModelSerializer):
     owner_id = serializers.SerializerMethodField()
 
     def get_owner_id(self, obj):
@@ -12,5 +12,5 @@ class LabSerializer(serializers.ModelSerializer):
             return None
 
     class Meta:
-        model = Lab
+        model = User
         fields = "__all__"

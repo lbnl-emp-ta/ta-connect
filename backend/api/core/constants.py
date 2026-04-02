@@ -4,6 +4,7 @@ class DOMAINTYPE(str, Enum):
     RECEPTION = "reception"
     PROGRAM = "program" 
     LAB = "lab"
+    EXPERT = "expert"
 
 class ROLE(str, Enum):
     ADMIN = "Admin"
@@ -20,7 +21,7 @@ class REQUEST_STATUS(str, Enum):
     REASSIGNMENT_REQUESTED = "Reassignment Requested"
     ASSIGNED_TO_EXPERT = "Assigned to Expert"
     PROVIDING_TA = "Providing TA"
-    CLOSE_OUT = "Close out"
+    CLOSE_OUT = "Closeout"
     CLOSE_OUT_COMPLETED = "Closeout Completed"
     COMPLETED = "Completed"
     UNABLE_TO_ADDRESS = "Unable to address"
