@@ -25,6 +25,7 @@ export const Route = createFileRoute('/_with-nav/_private/profile')({
 
 function ProfilePage() {
   const user = useUser();
+  console.log('User in ProfilePage:', user);
   const { data: identities } = useSuspenseQuery(identitiesQueryOptions());
   const hasPlaceholderEmail = !!user?.email?.endsWith('@orcid.placeholder');
   const [isUserInfoDialogOpen, setIsUserInfoDialogOpen] = useState(false);

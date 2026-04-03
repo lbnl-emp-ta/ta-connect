@@ -1,10 +1,11 @@
 import { Stack, AppBar, Toolbar, Box, Typography, Button, Menu, MenuItem } from '@mui/material';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
-import { createFileRoute, Link, Outlet, useNavigate } from '@tanstack/react-router';
+import { createFileRoute, Link, Outlet, useLocation, useNavigate } from '@tanstack/react-router';
 import { useState } from 'react';
 import { useUser } from '../../hooks/useUser';
 import { useLogoutMutation } from '../../utils/queryOptions';
+import { IdentityDropdown } from '@/features/identity/IdentityDropdown';
 
 export const Route = createFileRoute('/_with-nav')({
   component: NavbarLayout,
@@ -13,6 +14,7 @@ export const Route = createFileRoute('/_with-nav')({
 function NavbarLayout() {
   const user = useUser();
   const navigate = useNavigate();
+  const location = useLocation();
   const logoutMutation = useLogoutMutation();
   const [userMenuAnchorEl, setUserMenuAnchorEl] = useState<null | HTMLElement>(null);
   const userMenuOpen = Boolean(userMenuAnchorEl);
@@ -47,52 +49,55 @@ function NavbarLayout() {
           variant="dense"
           sx={{
             display: 'flex',
-            gap: 5,
-            color: 'primary.main',
-            bgcolor: 'white',
+            alignItems: 'center',
+            height: 64,
+            gap: 2,
+            color: 'common.white',
+            bgcolor: 'primary.dark',
           }}
         >
-          <Box sx={{ flexGrow: 1 }}>
+          <Stack direction="row" spacing={4} alignItems="center" sx={{ flexGrow: 1 }}>
             <Link to="/dashboard">
-              <Typography variant="h6" sx={{ color: 'primary.main' }}>
+              <Typography variant="h6" fontWeight="bold">
                 TA Connect
               </Typography>
             </Link>
-          </Box>
-          <Link to="/dashboard">
-            <Typography sx={{ color: 'primary.main' }}>Dashboard</Typography>
-          </Link>
-          <Link to="/intake">
-            <Typography sx={{ color: 'primary.main' }}>Intake</Typography>
-          </Link>
+            <Stack direction="row" spacing={2} alignItems="center">
+              <Link to="/dashboard">Dashboard</Link>
+              <Link to="/intake">Intake</Link>
+            </Stack>
+          </Stack>
           {user ? (
-            <div>
-              <Button
-                variant="text"
-                onClick={handleUserMenuClick}
-                startIcon={<AccountCircleIcon />}
-                endIcon={<KeyboardArrowDownIcon />}
-                sx={{
-                  color: 'primary.main',
-                }}
-              >
-                {user.name || user.email}
-              </Button>
-              <Menu
-                anchorEl={userMenuAnchorEl}
-                open={userMenuOpen}
-                onClose={handleUserMenuClose}
-                anchorOrigin={{
-                  vertical: 'bottom',
-                  horizontal: 'right',
-                }}
-              >
-                <MenuItem onClick={handleProfileClick} sx={{ width: 200 }}>
-                  Profile
-                </MenuItem>
-                <MenuItem onClick={handleLogout}>Logout</MenuItem>
-              </Menu>
-            </div>
+            <>
+              {location.pathname.startsWith('/dashboard') && <IdentityDropdown />}
+              <div>
+                <Button
+                  variant="text"
+                  onClick={handleUserMenuClick}
+                  startIcon={<AccountCircleIcon />}
+                  endIcon={<KeyboardArrowDownIcon />}
+                  sx={{
+                    color: 'common.white',
+                  }}
+                >
+                  {user.name || user.email}
+                </Button>
+                <Menu
+                  anchorEl={userMenuAnchorEl}
+                  open={userMenuOpen}
+                  onClose={handleUserMenuClose}
+                  anchorOrigin={{
+                    vertical: 'bottom',
+                    horizontal: 'right',
+                  }}
+                >
+                  <MenuItem onClick={handleProfileClick} sx={{ width: 200 }}>
+                    Profile
+                  </MenuItem>
+                  <MenuItem onClick={handleLogout}>Logout</MenuItem>
+                </Menu>
+              </div>
+            </>
           ) : (
             <Link to="/login" search={{ redirect: '/' }}>
               <Typography color="primary">Login</Typography>
