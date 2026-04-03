@@ -57,13 +57,14 @@ function NavbarLayout() {
           }}
         >
           <Stack direction="row" spacing={4} alignItems="center" sx={{ flexGrow: 1 }}>
-            <Link to="/dashboard">
+            <Link to="/requests/active">
               <Typography variant="h6" fontWeight="bold">
                 TA Connect
               </Typography>
             </Link>
             <Stack direction="row" spacing={2} alignItems="center">
-              <Link to="/dashboard">Dashboard</Link>
+              <Link to="/requests/active">Requests</Link>
+              <Link to="/experts">Experts</Link>
               <Link to="/intake">Intake</Link>
             </Stack>
           </Stack>

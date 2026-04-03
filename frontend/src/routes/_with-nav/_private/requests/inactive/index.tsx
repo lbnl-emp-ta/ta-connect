@@ -4,7 +4,7 @@ import { useRequestsContext } from '@/features/requests/RequestsContext';
 import { Stack, Typography } from '@mui/material';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 
-export const Route = createFileRoute('/_with-nav/_private/dashboard/requests/')({
+export const Route = createFileRoute('/_with-nav/_private/requests/inactive/')({
   component: NoSelectedRequest,
 });
 
@@ -19,7 +19,7 @@ function NoSelectedRequest() {
   useEffect(() => {
     if (sortedRequests && sortedRequests.length > 0) {
       void navigate({
-        to: '/dashboard/requests/$requestId',
+        to: '/requests/inactive/$requestId',
         params: { requestId: sortedRequests[0].id.toString() },
       });
     }

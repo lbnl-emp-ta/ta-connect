@@ -21,7 +21,7 @@ import { useSuspenseQuery } from '@tanstack/react-query';
 import { createFileRoute } from '@tanstack/react-router';
 import { useEffect, useState } from 'react';
 
-export const Route = createFileRoute('/_with-nav/_private/dashboard/requests/$requestId')({
+export const Route = createFileRoute('/_with-nav/_private/requests/active/$requestId')({
   loader: async ({ context, params }) => {
     await context.queryClient.ensureQueryData(
       requestDetailQueryOptions(params.requestId, context.identity)

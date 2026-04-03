@@ -5,7 +5,7 @@ import { ExpertsDataTable } from '@/features/experts/ExpertsDataTable';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { useIdentityContext } from '@/features/identity/IdentityContext';
 
-export const Route = createFileRoute('/_with-nav/_private/dashboard/experts')({
+export const Route = createFileRoute('/_with-nav/_private/experts')({
   loader: async ({ context }) => {
     await context.queryClient.ensureQueryData(expertsQueryOptions(context.identity));
   },

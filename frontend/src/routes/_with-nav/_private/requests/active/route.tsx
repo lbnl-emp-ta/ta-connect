@@ -21,7 +21,7 @@ import { a11yProps } from '@/utils/utils';
 import { useEffect, useState } from 'react';
 import { RequestsList } from '@/features/requests/RequestsList';
 
-export const Route = createFileRoute('/_with-nav/_private/dashboard/requests')({
+export const Route = createFileRoute('/_with-nav/_private/requests/active')({
   loader: async ({ context }) => {
     await context.queryClient.ensureQueryData(requestsQueryOptions(context.identity));
   },

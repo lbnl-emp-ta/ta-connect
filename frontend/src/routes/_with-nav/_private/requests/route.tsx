@@ -8,10 +8,10 @@ import { useSuspenseQuery } from '@tanstack/react-query';
 import { createFileRoute, Navigate, Outlet, redirect, useLocation } from '@tanstack/react-router';
 import { useEffect, useState } from 'react';
 
-export const Route = createFileRoute('/_with-nav/_private/dashboard')({
+export const Route = createFileRoute('/_with-nav/_private/requests')({
   beforeLoad({ location }) {
-    if (location.pathname === '/dashboard' || location.pathname === '/dashboard/') {
-      throw redirect({ to: '/dashboard/requests' });
+    if (location.pathname === '/requests' || location.pathname === '/requests/') {
+      throw redirect({ to: '/requests/active' });
     }
   },
   loader: async ({ context }) => {
@@ -81,7 +81,7 @@ function DashboardComponent() {
             disableRipple
             label={
               <AppLink
-                to="/dashboard/requests"
+                to="/requests/active"
                 sx={{
                   color: 'inherit',
                   transition: '0.25s',
@@ -90,7 +90,7 @@ function DashboardComponent() {
               >
                 <Stack direction="row" spacing={1} alignItems="center">
                   <AssignmentIcon />
-                  <Typography>Requests</Typography>
+                  <Typography>Active</Typography>
                 </Stack>
               </AppLink>
             }
@@ -105,7 +105,7 @@ function DashboardComponent() {
             disableRipple
             label={
               <AppLink
-                to="/dashboard/experts"
+                to="/requests/inactive"
                 sx={{
                   color: 'inherit',
                   transition: '0.25s',
@@ -114,7 +114,7 @@ function DashboardComponent() {
               >
                 <Stack direction="row" spacing={1} alignItems="center">
                   <PeopleIcon />
-                  <Typography>Experts</Typography>
+                  <Typography>Inactive</Typography>
                 </Stack>
               </AppLink>
             }
