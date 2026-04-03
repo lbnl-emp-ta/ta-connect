@@ -3,10 +3,10 @@ import { authSessionQueryOptions } from '@/utils/queryOptions';
 import { useSuspenseQuery } from '@tanstack/react-query';
 
 export const Route = createFileRoute('/_with-nav/_private')({
-  component: PrivateRoute,
+  component: PrivateWrapper,
 });
 
-function PrivateRoute() {
+function PrivateWrapper() {
   const {
     data: { meta },
   } = useSuspenseQuery(authSessionQueryOptions());

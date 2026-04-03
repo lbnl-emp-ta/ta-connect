@@ -11,7 +11,7 @@ interface RequestsListProps {
 
 export const RequestsList: React.FC<RequestsListProps> = ({ requests }) => {
   const navigate = useNavigate();
-  const { sortedRequests, sortField, setSortedRequests } = useRequestsContext();
+  const { tab, sortedRequests, sortField, setSortedRequests } = useRequestsContext();
   const params = useParams({ strict: false });
   const isSelected = (request: TARequest) => params.requestId === request.id.toString();
   const [page, setPage] = useState(1);
@@ -42,7 +42,7 @@ export const RequestsList: React.FC<RequestsListProps> = ({ requests }) => {
 
   const handleItemClick = (request: TARequest) => {
     navigate({
-      to: `/dashboard/requests/${request.id}`,
+      to: `/requests/${tab}/${request.id}`,
     });
   };
 
@@ -70,7 +70,7 @@ export const RequestsList: React.FC<RequestsListProps> = ({ requests }) => {
   useEffect(() => {
     if (requests.length === 0) {
       navigate({
-        to: `/dashboard/requests`,
+        to: `/requests/${tab}`,
       });
     }
   }, [requests]);

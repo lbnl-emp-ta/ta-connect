@@ -5,14 +5,12 @@ import { useEffect, useState } from 'react';
 import { TAIdentity } from '../../api/dashboard/types';
 import { identitiesQueryOptions } from '../../utils/queryOptions';
 import { useIdentityContext } from '../identity/IdentityContext';
-import { useRequestsContext } from '@/features/requests/RequestsContext';
 
 export const IdentityDropdown: React.FC = () => {
   const navigate = useNavigate();
   const { identity, detailedIdentity, setIdentity, setDetailedIdentity } = useIdentityContext();
   const { data: identities } = useSuspenseQuery(identitiesQueryOptions());
   const [identitiesMenuOpen, setIdentitiesMenuOpen] = useState(false);
-  const { setSortedRequests } = useRequestsContext();
 
   const getIdentityKey = (id: TAIdentity) =>
     `${id.role.id}-${id.location}-${id.instance?.id ?? 'none'}`;
@@ -31,8 +29,7 @@ export const IdentityDropdown: React.FC = () => {
         instance: detailedIdentity.instance?.id,
       });
       if (identity && detailedIdentity.role.id !== identity?.role) {
-        setSortedRequests([]);
-        navigate({ to: '/dashboard/requests', params: {} });
+        navigate({ to: '/requests', params: {} });
       }
     } else {
       setDetailedIdentity(identities ? identities[0] : undefined);

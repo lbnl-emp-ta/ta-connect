@@ -9,10 +9,10 @@ export const Route = createFileRoute('/_with-nav/_private/experts')({
   loader: async ({ context }) => {
     await context.queryClient.ensureQueryData(expertsQueryOptions(context.identity));
   },
-  component: RouteComponent,
+  component: ExpertsPage,
 });
 
-function RouteComponent() {
+function ExpertsPage() {
   const { identity } = useIdentityContext();
   const { data: experts } = useSuspenseQuery(expertsQueryOptions(identity));
 

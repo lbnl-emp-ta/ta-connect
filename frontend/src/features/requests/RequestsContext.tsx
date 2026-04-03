@@ -10,11 +10,16 @@ interface RequestsContextType {
   setCurrentIndex: React.Dispatch<React.SetStateAction<number>>;
   nextId: number | null;
   previousId: number | null;
+  tab: 'active' | 'inactive';
 }
 
 const RequestsContext = createContext<RequestsContextType | undefined>(undefined);
 
-export const RequestsProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+interface RequestsProviderProps extends React.PropsWithChildren {
+  tab: RequestsContextType['tab'];
+}
+
+export const RequestsProvider: React.FC<RequestsProviderProps> = ({ tab, children }) => {
   const [sortedRequests, setSortedRequests] = useState<TARequest[]>([]);
   const [sortField, setSortField] = useState('-date_created');
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -29,6 +34,7 @@ export const RequestsProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       previousId = previousIndex !== null ? sortedRequests[previousIndex]?.id : null;
     }
     return {
+      tab,
       currentIndex,
       setCurrentIndex,
       nextId,

@@ -8,16 +8,18 @@ import { useLogoutMutation } from '../../utils/queryOptions';
 import { IdentityDropdown } from '@/features/identity/IdentityDropdown';
 
 export const Route = createFileRoute('/_with-nav')({
-  component: NavbarLayout,
+  component: NavbarLayoutWrapper,
 });
 
-function NavbarLayout() {
+function NavbarLayoutWrapper() {
   const user = useUser();
   const navigate = useNavigate();
   const location = useLocation();
   const logoutMutation = useLogoutMutation();
   const [userMenuAnchorEl, setUserMenuAnchorEl] = useState<null | HTMLElement>(null);
   const userMenuOpen = Boolean(userMenuAnchorEl);
+  const showIdentityDropdown =
+    location.pathname.startsWith('/requests') || location.pathname.startsWith('/experts');
 
   const handleUserMenuClick = (event: React.MouseEvent<HTMLButtonElement>) => {
     setUserMenuAnchorEl(event.currentTarget);
@@ -70,7 +72,7 @@ function NavbarLayout() {
           </Stack>
           {user ? (
             <>
-              {location.pathname.startsWith('/dashboard') && <IdentityDropdown />}
+              {showIdentityDropdown && <IdentityDropdown />}
               <div>
                 <Button
                   variant="text"

@@ -1,11 +1,11 @@
-import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
-import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import { TARequestDetail } from '@/api/dashboard/types';
 import { AppLink } from '@/components/AppLink';
-import { Stack, Typography, IconButton } from '@mui/material';
-import { useRequestsContext } from './RequestsContext';
-import { RequestAssignForwardButton } from '@/features/requests/RequestAssignForwardButton';
 import { RequestAssignBackwardButton } from '@/features/requests/RequestAssignBackwardButton';
+import { RequestAssignForwardButton } from '@/features/requests/RequestAssignForwardButton';
+import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
+import ChevronRightIcon from '@mui/icons-material/ChevronRight';
+import { IconButton, Stack, Typography } from '@mui/material';
+import { useRequestsContext } from './RequestsContext';
 
 interface RequestHeaderProps {
   request: TARequestDetail;
@@ -15,7 +15,7 @@ interface RequestHeaderProps {
  *
  */
 export const RequestHeader: React.FC<RequestHeaderProps> = ({ request }) => {
-  const { nextId, previousId } = useRequestsContext();
+  const { tab, nextId, previousId } = useRequestsContext();
 
   return (
     <Stack direction="row" justifyContent="space-between">
@@ -32,7 +32,7 @@ export const RequestHeader: React.FC<RequestHeaderProps> = ({ request }) => {
         </Typography>
         {previousId !== null && (
           <AppLink
-            to={'/dashboard/requests/$requestId'}
+            to={`/requests/${tab}/$requestId`}
             params={{
               requestId: previousId.toString(),
             }}
@@ -50,7 +50,7 @@ export const RequestHeader: React.FC<RequestHeaderProps> = ({ request }) => {
           </span>
         )}
         {nextId !== null && (
-          <AppLink to={'/dashboard/requests/$requestId'} params={{ requestId: nextId.toString() }}>
+          <AppLink to={`/requests/${tab}/$requestId`} params={{ requestId: nextId.toString() }}>
             <IconButton size="small">
               <ChevronRightIcon />
             </IconButton>

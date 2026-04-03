@@ -208,7 +208,7 @@ class RequestDetailView(BaseUserAwareRequest):
     Used to populate Request and Customer panels.
     """
     def get(self, request, format=None, id=None):
-        queryset = self.get_actionable() | self.get_downstream()
+        queryset = self.get_actionable() | self.get_downstream() | self.get_inactive()
 
         if id is None:
             return Response(data={"message": "Please provide a Request ID"}, status=status.HTTP_400_BAD_REQUEST)
