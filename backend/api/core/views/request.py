@@ -32,7 +32,9 @@ class BaseUserAwareRequest(views.APIView):
     ]
 
     def get_actionable(self):
-        return self.get_queryset()
+        if not hasattr(self, '_actionable_cache'):
+            self._actionable_cache = self.get_queryset()
+        return self._actionable_cache
     
     def get_downstream(self):
         queryset = Request.objects.all()
@@ -43,7 +45,7 @@ class BaseUserAwareRequest(views.APIView):
 
         context = json.loads(maybe_context) 
 
-        actionable_pks = [request.pk for request in self.get_actionable()]
+        actionable_pks = self.get_actionable().values('pk')
 
         # This is a convention, we assume all requests for admin are 
         # "actionable" and none are "downstream". In reality, this 
@@ -154,8 +156,8 @@ class BaseUserAwareRequest(views.APIView):
             # NOTE: Should experts be able to see all requests for their lab, or just ones for their lab+program?
             requests = requests.union(queryset.filter(owner=user.owner))
 
-        requests = Request.objects.filter(id__in=[req.id for req in list(requests)])
-        return requests 
+        requests = Request.objects.filter(id__in=requests.values('id'))
+        return requests
 
 class RequestDetailView(BaseUserAwareRequest):
     serializer_class = RequestDetailSerializer
