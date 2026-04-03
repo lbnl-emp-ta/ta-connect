@@ -19,6 +19,7 @@ import { Route as WithNavPrivateRouteImport } from './routes/_with-nav/_private/
 import { Route as WithNavPublicOnlyLoginImport } from './routes/_with-nav/_public-only/login'
 import { Route as WithNavPrivateProfileImport } from './routes/_with-nav/_private/profile'
 import { Route as WithNavPrivateExpertsImport } from './routes/_with-nav/_private/experts'
+import { Route as WithNavPrivateRequestsRouteImport } from './routes/_with-nav/_private/requests/route'
 import { Route as WithNavPrivateRequestsIndexImport } from './routes/_with-nav/_private/requests/index'
 import { Route as publicAccountProviderCallbackImport } from './routes/(public)/account.provider.callback'
 import { Route as WithNavPrivateRequestsInactiveRouteImport } from './routes/_with-nav/_private/requests/inactive/route'
@@ -75,11 +76,18 @@ const WithNavPrivateExpertsRoute = WithNavPrivateExpertsImport.update({
   getParentRoute: () => WithNavPrivateRouteRoute,
 } as any)
 
+const WithNavPrivateRequestsRouteRoute =
+  WithNavPrivateRequestsRouteImport.update({
+    id: '/requests',
+    path: '/requests',
+    getParentRoute: () => WithNavPrivateRouteRoute,
+  } as any)
+
 const WithNavPrivateRequestsIndexRoute =
   WithNavPrivateRequestsIndexImport.update({
-    id: '/requests/',
-    path: '/requests/',
-    getParentRoute: () => WithNavPrivateRouteRoute,
+    id: '/',
+    path: '/',
+    getParentRoute: () => WithNavPrivateRequestsRouteRoute,
   } as any)
 
 const publicAccountProviderCallbackRoute =
@@ -91,16 +99,16 @@ const publicAccountProviderCallbackRoute =
 
 const WithNavPrivateRequestsInactiveRouteRoute =
   WithNavPrivateRequestsInactiveRouteImport.update({
-    id: '/requests/inactive',
-    path: '/requests/inactive',
-    getParentRoute: () => WithNavPrivateRouteRoute,
+    id: '/inactive',
+    path: '/inactive',
+    getParentRoute: () => WithNavPrivateRequestsRouteRoute,
   } as any)
 
 const WithNavPrivateRequestsActiveRouteRoute =
   WithNavPrivateRequestsActiveRouteImport.update({
-    id: '/requests/active',
-    path: '/requests/active',
-    getParentRoute: () => WithNavPrivateRouteRoute,
+    id: '/active',
+    path: '/active',
+    getParentRoute: () => WithNavPrivateRequestsRouteRoute,
   } as any)
 
 const WithNavPrivateRequestsInactiveIndexRoute =
@@ -170,6 +178,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof publicIntakeImport
       parentRoute: typeof rootRoute
     }
+    '/_with-nav/_private/requests': {
+      id: '/_with-nav/_private/requests'
+      path: '/requests'
+      fullPath: '/requests'
+      preLoaderRoute: typeof WithNavPrivateRequestsRouteImport
+      parentRoute: typeof WithNavPrivateRouteImport
+    }
     '/_with-nav/_private/experts': {
       id: '/_with-nav/_private/experts'
       path: '/experts'
@@ -193,17 +208,17 @@ declare module '@tanstack/react-router' {
     }
     '/_with-nav/_private/requests/active': {
       id: '/_with-nav/_private/requests/active'
-      path: '/requests/active'
+      path: '/active'
       fullPath: '/requests/active'
       preLoaderRoute: typeof WithNavPrivateRequestsActiveRouteImport
-      parentRoute: typeof WithNavPrivateRouteImport
+      parentRoute: typeof WithNavPrivateRequestsRouteImport
     }
     '/_with-nav/_private/requests/inactive': {
       id: '/_with-nav/_private/requests/inactive'
-      path: '/requests/inactive'
+      path: '/inactive'
       fullPath: '/requests/inactive'
       preLoaderRoute: typeof WithNavPrivateRequestsInactiveRouteImport
-      parentRoute: typeof WithNavPrivateRouteImport
+      parentRoute: typeof WithNavPrivateRequestsRouteImport
     }
     '/(public)/account/provider/callback': {
       id: '/(public)/account/provider/callback'
@@ -214,10 +229,10 @@ declare module '@tanstack/react-router' {
     }
     '/_with-nav/_private/requests/': {
       id: '/_with-nav/_private/requests/'
-      path: '/requests'
-      fullPath: '/requests'
+      path: '/'
+      fullPath: '/requests/'
       preLoaderRoute: typeof WithNavPrivateRequestsIndexImport
-      parentRoute: typeof WithNavPrivateRouteImport
+      parentRoute: typeof WithNavPrivateRequestsRouteImport
     }
     '/_with-nav/_private/requests/active/$requestId': {
       id: '/_with-nav/_private/requests/active/$requestId'
@@ -288,22 +303,37 @@ const WithNavPrivateRequestsInactiveRouteRouteWithChildren =
     WithNavPrivateRequestsInactiveRouteRouteChildren,
   )
 
-interface WithNavPrivateRouteRouteChildren {
-  WithNavPrivateExpertsRoute: typeof WithNavPrivateExpertsRoute
-  WithNavPrivateProfileRoute: typeof WithNavPrivateProfileRoute
+interface WithNavPrivateRequestsRouteRouteChildren {
   WithNavPrivateRequestsActiveRouteRoute: typeof WithNavPrivateRequestsActiveRouteRouteWithChildren
   WithNavPrivateRequestsInactiveRouteRoute: typeof WithNavPrivateRequestsInactiveRouteRouteWithChildren
   WithNavPrivateRequestsIndexRoute: typeof WithNavPrivateRequestsIndexRoute
 }
 
+const WithNavPrivateRequestsRouteRouteChildren: WithNavPrivateRequestsRouteRouteChildren =
+  {
+    WithNavPrivateRequestsActiveRouteRoute:
+      WithNavPrivateRequestsActiveRouteRouteWithChildren,
+    WithNavPrivateRequestsInactiveRouteRoute:
+      WithNavPrivateRequestsInactiveRouteRouteWithChildren,
+    WithNavPrivateRequestsIndexRoute: WithNavPrivateRequestsIndexRoute,
+  }
+
+const WithNavPrivateRequestsRouteRouteWithChildren =
+  WithNavPrivateRequestsRouteRoute._addFileChildren(
+    WithNavPrivateRequestsRouteRouteChildren,
+  )
+
+interface WithNavPrivateRouteRouteChildren {
+  WithNavPrivateRequestsRouteRoute: typeof WithNavPrivateRequestsRouteRouteWithChildren
+  WithNavPrivateExpertsRoute: typeof WithNavPrivateExpertsRoute
+  WithNavPrivateProfileRoute: typeof WithNavPrivateProfileRoute
+}
+
 const WithNavPrivateRouteRouteChildren: WithNavPrivateRouteRouteChildren = {
+  WithNavPrivateRequestsRouteRoute:
+    WithNavPrivateRequestsRouteRouteWithChildren,
   WithNavPrivateExpertsRoute: WithNavPrivateExpertsRoute,
   WithNavPrivateProfileRoute: WithNavPrivateProfileRoute,
-  WithNavPrivateRequestsActiveRouteRoute:
-    WithNavPrivateRequestsActiveRouteRouteWithChildren,
-  WithNavPrivateRequestsInactiveRouteRoute:
-    WithNavPrivateRequestsInactiveRouteRouteWithChildren,
-  WithNavPrivateRequestsIndexRoute: WithNavPrivateRequestsIndexRoute,
 }
 
 const WithNavPrivateRouteRouteWithChildren =
@@ -341,13 +371,14 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '': typeof WithNavPublicOnlyRouteRouteWithChildren
   '/intake': typeof publicIntakeRoute
+  '/requests': typeof WithNavPrivateRequestsRouteRouteWithChildren
   '/experts': typeof WithNavPrivateExpertsRoute
   '/profile': typeof WithNavPrivateProfileRoute
   '/login': typeof WithNavPublicOnlyLoginRoute
   '/requests/active': typeof WithNavPrivateRequestsActiveRouteRouteWithChildren
   '/requests/inactive': typeof WithNavPrivateRequestsInactiveRouteRouteWithChildren
   '/account/provider/callback': typeof publicAccountProviderCallbackRoute
-  '/requests': typeof WithNavPrivateRequestsIndexRoute
+  '/requests/': typeof WithNavPrivateRequestsIndexRoute
   '/requests/active/$requestId': typeof WithNavPrivateRequestsActiveRequestIdRoute
   '/requests/inactive/$requestId': typeof WithNavPrivateRequestsInactiveRequestIdRoute
   '/requests/active/': typeof WithNavPrivateRequestsActiveIndexRoute
@@ -376,6 +407,7 @@ export interface FileRoutesById {
   '/_with-nav/_private': typeof WithNavPrivateRouteRouteWithChildren
   '/_with-nav/_public-only': typeof WithNavPublicOnlyRouteRouteWithChildren
   '/(public)/intake': typeof publicIntakeRoute
+  '/_with-nav/_private/requests': typeof WithNavPrivateRequestsRouteRouteWithChildren
   '/_with-nav/_private/experts': typeof WithNavPrivateExpertsRoute
   '/_with-nav/_private/profile': typeof WithNavPrivateProfileRoute
   '/_with-nav/_public-only/login': typeof WithNavPublicOnlyLoginRoute
@@ -395,13 +427,14 @@ export interface FileRouteTypes {
     | '/'
     | ''
     | '/intake'
+    | '/requests'
     | '/experts'
     | '/profile'
     | '/login'
     | '/requests/active'
     | '/requests/inactive'
     | '/account/provider/callback'
-    | '/requests'
+    | '/requests/'
     | '/requests/active/$requestId'
     | '/requests/inactive/$requestId'
     | '/requests/active/'
@@ -427,6 +460,7 @@ export interface FileRouteTypes {
     | '/_with-nav/_private'
     | '/_with-nav/_public-only'
     | '/(public)/intake'
+    | '/_with-nav/_private/requests'
     | '/_with-nav/_private/experts'
     | '/_with-nav/_private/profile'
     | '/_with-nav/_public-only/login'
@@ -485,11 +519,9 @@ export const routeTree = rootRoute
       "filePath": "_with-nav/_private/route.tsx",
       "parent": "/_with-nav",
       "children": [
+        "/_with-nav/_private/requests",
         "/_with-nav/_private/experts",
-        "/_with-nav/_private/profile",
-        "/_with-nav/_private/requests/active",
-        "/_with-nav/_private/requests/inactive",
-        "/_with-nav/_private/requests/"
+        "/_with-nav/_private/profile"
       ]
     },
     "/_with-nav/_public-only": {
@@ -501,6 +533,15 @@ export const routeTree = rootRoute
     },
     "/(public)/intake": {
       "filePath": "(public)/intake.tsx"
+    },
+    "/_with-nav/_private/requests": {
+      "filePath": "_with-nav/_private/requests/route.tsx",
+      "parent": "/_with-nav/_private",
+      "children": [
+        "/_with-nav/_private/requests/active",
+        "/_with-nav/_private/requests/inactive",
+        "/_with-nav/_private/requests/"
+      ]
     },
     "/_with-nav/_private/experts": {
       "filePath": "_with-nav/_private/experts.tsx",
@@ -516,7 +557,7 @@ export const routeTree = rootRoute
     },
     "/_with-nav/_private/requests/active": {
       "filePath": "_with-nav/_private/requests/active/route.tsx",
-      "parent": "/_with-nav/_private",
+      "parent": "/_with-nav/_private/requests",
       "children": [
         "/_with-nav/_private/requests/active/$requestId",
         "/_with-nav/_private/requests/active/"
@@ -524,7 +565,7 @@ export const routeTree = rootRoute
     },
     "/_with-nav/_private/requests/inactive": {
       "filePath": "_with-nav/_private/requests/inactive/route.tsx",
-      "parent": "/_with-nav/_private",
+      "parent": "/_with-nav/_private/requests",
       "children": [
         "/_with-nav/_private/requests/inactive/$requestId",
         "/_with-nav/_private/requests/inactive/"
@@ -535,7 +576,7 @@ export const routeTree = rootRoute
     },
     "/_with-nav/_private/requests/": {
       "filePath": "_with-nav/_private/requests/index.tsx",
-      "parent": "/_with-nav/_private"
+      "parent": "/_with-nav/_private/requests"
     },
     "/_with-nav/_private/requests/active/$requestId": {
       "filePath": "_with-nav/_private/requests/active/$requestId.tsx",
