@@ -41,7 +41,7 @@ class AssignmentView(views.APIView):
         if not owner_id:
             return Response(data={"message": "Please provide an owner ID for assignment."}, status=status.HTTP_400_BAD_REQUEST)
         
-        actionable_requests = BaseUserAwareRequest(request=self.request).get_queryset()
+        actionable_requests = BaseUserAwareRequest(request=self.request).get_actionable()
 
         ta_request = None
         try:
