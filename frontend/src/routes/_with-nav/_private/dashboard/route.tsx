@@ -1,32 +1,12 @@
-import AssignmentIcon from '@mui/icons-material/Assignment';
-import PeopleIcon from '@mui/icons-material/People';
-import {
-  Box,
-  InputAdornment,
-  MenuItem,
-  Select,
-  SelectChangeEvent,
-  Stack,
-  Tab,
-  Tabs,
-  Typography,
-} from '@mui/material';
-import { useSuspenseQuery } from '@tanstack/react-query';
-import {
-  createFileRoute,
-  Navigate,
-  Outlet,
-  redirect,
-  useLocation,
-  useNavigate,
-} from '@tanstack/react-router';
-import { useEffect, useState } from 'react';
-import { TAIdentity } from '@/api/dashboard/types';
 import { AppLink } from '@/components/AppLink';
-import { useIdentityContext } from '@/features/identity/IdentityContext';
-import { useRequestsContext } from '@/features/requests/RequestsContext';
 import { identitiesQueryOptions } from '@/utils/queryOptions';
 import { a11yProps } from '@/utils/utils';
+import AssignmentIcon from '@mui/icons-material/Assignment';
+import PeopleIcon from '@mui/icons-material/People';
+import { Box, Stack, Tab, Tabs, Typography } from '@mui/material';
+import { useSuspenseQuery } from '@tanstack/react-query';
+import { createFileRoute, Navigate, Outlet, redirect, useLocation } from '@tanstack/react-router';
+import { useEffect, useState } from 'react';
 
 export const Route = createFileRoute('/_with-nav/_private/dashboard')({
   beforeLoad({ location }) {
@@ -41,10 +21,7 @@ export const Route = createFileRoute('/_with-nav/_private/dashboard')({
 });
 
 function DashboardComponent() {
-  const navigate = useNavigate();
   const location = useLocation();
-  const { identity, detailedIdentity, setIdentity, setDetailedIdentity } = useIdentityContext();
-  const { setSortedRequests } = useRequestsContext();
   const { data: identities } = useSuspenseQuery(identitiesQueryOptions());
   const [tabValue, setTabValue] = useState<string | number>(() => {
     if (location.pathname.startsWith('/dashboard/requests')) {
@@ -55,36 +32,10 @@ function DashboardComponent() {
     }
     return 'requests';
   });
-  const [identitiesMenuOpen, setIdentitiesMenuOpen] = useState(false);
 
   const handleTabChange = (_event: React.SyntheticEvent, newValue: string | number) => {
     setTabValue(newValue);
   };
-
-  const getIdentityKey = (id: TAIdentity) =>
-    `${id.role.id}-${id.location}-${id.instance?.id ?? 'none'}`;
-
-  const handleIdentityChange = (event: SelectChangeEvent<string>) => {
-    const selected = identities?.find((id) => getIdentityKey(id) === event.target.value);
-    if (selected) setDetailedIdentity(selected);
-  };
-
-  useEffect(() => {
-    if (detailedIdentity) {
-      setIdentity({
-        user: detailedIdentity.user.id,
-        role: detailedIdentity.role.id,
-        location: detailedIdentity.location,
-        instance: detailedIdentity.instance?.id,
-      });
-      if (identity && detailedIdentity.role.id !== identity?.role) {
-        setSortedRequests([]);
-        navigate({ to: '/dashboard/requests', params: {} });
-      }
-    } else {
-      setDetailedIdentity(identities ? identities[0] : undefined);
-    }
-  }, [detailedIdentity, identities, setDetailedIdentity, setIdentity]);
 
   useEffect(() => {
     if (location.pathname.startsWith('/dashboard/requests')) {
@@ -173,43 +124,6 @@ function DashboardComponent() {
             {...a11yProps('experts')}
           />
         </Tabs>
-        <Box sx={{ flexGrow: 1 }} />
-        <Select
-          value={detailedIdentity ? getIdentityKey(detailedIdentity) : ''}
-          size="small"
-          open={identitiesMenuOpen}
-          onOpen={() => setIdentitiesMenuOpen(true)}
-          onClose={() => setIdentitiesMenuOpen(false)}
-          onChange={handleIdentityChange}
-          startAdornment={
-            <InputAdornment
-              position="start"
-              onClick={() => setIdentitiesMenuOpen(true)}
-              sx={{ cursor: 'pointer' }}
-            >
-              Viewing as:
-            </InputAdornment>
-          }
-          sx={{
-            backgroundColor: 'white',
-            marginBottom: '0.5rem !important',
-          }}
-        >
-          {identities?.map((identity) => (
-            <MenuItem key={getIdentityKey(identity)} value={getIdentityKey(identity)}>
-              <Stack direction="row" spacing={1}>
-                {identity.location === 'Reception' && <span>{identity.location}</span>}
-                <span>{identity.role.name}</span>
-                {identity.instance && (
-                  <>
-                    <span>|</span>
-                    <span>{identity.instance.name}</span>
-                  </>
-                )}
-              </Stack>
-            </MenuItem>
-          ))}
-        </Select>
       </Stack>
       <Box component="main" sx={{ flex: 1, overflow: 'hidden', padding: 3 }}>
         <Outlet />

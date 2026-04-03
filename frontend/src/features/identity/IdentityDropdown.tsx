@@ -1,14 +1,18 @@
 import { InputAdornment, MenuItem, Select, SelectChangeEvent, Stack } from '@mui/material';
 import { useSuspenseQuery } from '@tanstack/react-query';
-import { useState } from 'react';
+import { useNavigate } from '@tanstack/react-router';
+import { useEffect, useState } from 'react';
 import { TAIdentity } from '../../api/dashboard/types';
 import { identitiesQueryOptions } from '../../utils/queryOptions';
 import { useIdentityContext } from '../identity/IdentityContext';
+import { useRequestsContext } from '@/features/requests/RequestsContext';
 
 export const IdentityDropdown: React.FC = () => {
-  const { detailedIdentity, setDetailedIdentity } = useIdentityContext();
+  const navigate = useNavigate();
+  const { identity, detailedIdentity, setIdentity, setDetailedIdentity } = useIdentityContext();
   const { data: identities } = useSuspenseQuery(identitiesQueryOptions());
   const [identitiesMenuOpen, setIdentitiesMenuOpen] = useState(false);
+  const { setSortedRequests } = useRequestsContext();
 
   const getIdentityKey = (id: TAIdentity) =>
     `${id.role.id}-${id.location}-${id.instance?.id ?? 'none'}`;
@@ -17,6 +21,23 @@ export const IdentityDropdown: React.FC = () => {
     const selected = identities?.find((id) => getIdentityKey(id) === event.target.value);
     if (selected) setDetailedIdentity(selected);
   };
+
+  useEffect(() => {
+    if (detailedIdentity) {
+      setIdentity({
+        user: detailedIdentity.user.id,
+        role: detailedIdentity.role.id,
+        location: detailedIdentity.location,
+        instance: detailedIdentity.instance?.id,
+      });
+      if (identity && detailedIdentity.role.id !== identity?.role) {
+        setSortedRequests([]);
+        navigate({ to: '/dashboard/requests', params: {} });
+      }
+    } else {
+      setDetailedIdentity(identities ? identities[0] : undefined);
+    }
+  }, [detailedIdentity, identities, setDetailedIdentity, setIdentity]);
 
   if (!identities || identities.length === 0) {
     return null;
