@@ -1,9 +1,11 @@
-import { Chip, Pagination, Paper, Stack, Typography } from '@mui/material';
+import { Chip, TablePagination, Paper, Stack, Typography } from '@mui/material';
 import { useNavigate, useParams } from '@tanstack/react-router';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { TARequest } from '../../api/dashboard/types';
 import { formatDatetime } from '../../utils/utils';
 import { useRequestsContext } from './RequestsContext';
+import HourglassBottomIcon from '@mui/icons-material/HourglassBottom';
+import TaskAltIcon from '@mui/icons-material/TaskAlt';
 
 interface RequestsListProps {
   listId: string;
@@ -30,13 +32,16 @@ export const RequestsList: React.FC<RequestsListProps> = ({
   const params = useParams({ strict: false });
   const sortedRequests = sortedRequestsMap[listId] ?? [];
   const isSelected = (request: TARequest) => params.requestId === request.id.toString();
-  const [page, setPage] = useState(1);
-  const pageCount = Math.ceil(sortedRequests.length / itemsPerPage);
+  const [page, setPage] = useState(0);
+  // const pageCount = Math.ceil(sortedRequests.length / itemsPerPage);
   const paginatedRequests = useMemo(() => {
-    return sortedRequests.slice((page - 1) * itemsPerPage, page * itemsPerPage);
+    return sortedRequests.slice(page * itemsPerPage, (page + 1) * itemsPerPage);
   }, [page, sortedRequests]);
 
-  const handlePageChange = (_event: React.ChangeEvent<unknown>, value: number) => {
+  const handlePageChange = (
+    _event: React.MouseEvent<HTMLButtonElement, MouseEvent> | null,
+    value: number
+  ) => {
     setPage(value);
   };
 
@@ -62,12 +67,12 @@ export const RequestsList: React.FC<RequestsListProps> = ({
   useEffect(() => {
     const requestIndex = sortedRequests.findIndex((r) => r.id.toString() === params.requestId);
     if (requestIndex !== -1) {
-      const newPage = Math.floor(requestIndex / itemsPerPage) + 1;
+      const newPage = Math.floor(requestIndex / itemsPerPage);
       setPage(newPage);
       setSelectedListId(listId);
       setCurrentIndex(requestIndex);
     } else {
-      setPage(1);
+      setPage(0);
     }
   }, [params.requestId, sortedRequests]);
 
@@ -91,9 +96,13 @@ export const RequestsList: React.FC<RequestsListProps> = ({
   return (
     <Stack spacing={1}>
       {heading && (
-        <Typography component="h3" variant="h6" fontWeight="bold">
-          {heading}
-        </Typography>
+        <Stack direction="row" spacing={1} alignItems="center">
+          {listId === 'actionable' && <TaskAltIcon color="primary" />}
+          {listId === 'downstream' && <HourglassBottomIcon color="primary" />}
+          <Typography component="h3" variant="h6" fontWeight="bold">
+            {heading}
+          </Typography>
+        </Stack>
       )}
       {paginatedRequests.map((request) => (
         <Paper
@@ -133,12 +142,15 @@ export const RequestsList: React.FC<RequestsListProps> = ({
       {sortedRequests.length === 0 && (
         <Typography variant="body1">No requests found in this category.</Typography>
       )}
-      <Pagination
-        count={pageCount}
+      <TablePagination
+        component="div"
+        rowsPerPage={itemsPerPage}
+        rowsPerPageOptions={[]}
+        count={sortedRequests.length}
         page={page}
-        onChange={handlePageChange}
-        variant="outlined"
-        color="primary"
+        onPageChange={handlePageChange}
+        showFirstButton
+        showLastButton
       />
     </Stack>
   );
