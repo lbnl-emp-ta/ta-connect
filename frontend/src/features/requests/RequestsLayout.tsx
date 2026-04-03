@@ -12,6 +12,7 @@ import {
   Stack,
   Tab,
   Tabs,
+  TextField,
   Typography,
 } from '@mui/material';
 import { Outlet, useNavigate } from '@tanstack/react-router';
@@ -29,7 +30,11 @@ interface RequestsLayoutProps {
 export const RequestsLayout: React.FC<RequestsLayoutProps> = ({ requestLists }) => {
   const navigate = useNavigate();
   // const { identity, detailedIdentity, setIdentity, setDetailedIdentity } = useIdentityContext();
-  const { tab, sortField, setSortField } = useRequestsContext();
+  const { tab, sortField, setSortField, searchTerm, setSearchTerm } = useRequestsContext();
+
+  const handleChangeSearchTerm = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchTerm(event.target.value);
+  };
 
   // useEffect(() => {
   //   if (detailedIdentity && identity && detailedIdentity.role.id !== identity?.role) {
@@ -90,22 +95,34 @@ export const RequestsLayout: React.FC<RequestsLayoutProps> = ({ requestLists }) 
             </Tabs>
           </Box>
           <Stack sx={{ padding: 2 }}>
-            <Select
-              value={sortField}
-              startAdornment={
-                <InputAdornment position="start">
-                  <SortIcon />
-                </InputAdornment>
-              }
-              onChange={(e) => setSortField(e.target.value)}
-            >
-              <MenuItem value="-date_created">Newest first</MenuItem>
-              <MenuItem value="date_created">Oldest first</MenuItem>
-              <MenuItem value="status">Status</MenuItem>
-            </Select>
+            <Stack direction="row" spacing={2} alignItems="center">
+              <TextField
+                value={searchTerm}
+                label="Search"
+                type="search"
+                variant="outlined"
+                size="small"
+                fullWidth
+                onChange={handleChangeSearchTerm}
+              />
+              <Select
+                value={sortField}
+                size="small"
+                startAdornment={
+                  <InputAdornment position="start">
+                    <SortIcon />
+                  </InputAdornment>
+                }
+                onChange={(e) => setSortField(e.target.value)}
+                sx={{ width: 163, flexShrink: 0, flexGrow: 0 }}
+              >
+                <MenuItem value="-date_created">Newest first</MenuItem>
+                <MenuItem value="date_created">Oldest first</MenuItem>
+                <MenuItem value="status">Status</MenuItem>
+              </Select>
+            </Stack>
             {requestLists.map((list) => {
               if (list.requests) {
-                console.log(list.heading, list.requests);
                 return (
                   <RequestsList
                     key={list.id}

@@ -13,6 +13,8 @@ interface RequestsContextType {
   tab: 'active' | 'inactive';
   selectedListId: string | null;
   setSelectedListId: React.Dispatch<React.SetStateAction<string | null>>;
+  searchTerm: string;
+  setSearchTerm: (value: string) => void;
 }
 
 const RequestsContext = createContext<RequestsContextType | undefined>(undefined);
@@ -25,8 +27,13 @@ export const RequestsProvider: React.FC<RequestsProviderProps> = ({ tab, childre
   const [sortedRequestsMap, setSortedRequestsMap] = useState<Record<string, TARequest[]>>({});
   const localStorageSortKey =
     tab === 'active' ? 'activeRequestsSortField' : 'inactiveRequestsSortField';
+  const localStorageSearchKey =
+    tab === 'active' ? 'activeRequestsSearchTerm' : 'inactiveRequestsSearchTerm';
   const [sortField, setSortField] = useState(() => {
     return localStorage.getItem(localStorageSortKey) ?? '-date_created';
+  });
+  const [searchTerm, setSearchTerm] = useState(() => {
+    return localStorage.getItem(localStorageSearchKey) ?? '';
   });
   const [currentIndex, setCurrentIndex] = useState(0);
   const [selectedListId, setSelectedListId] = useState<string | null>(null);
@@ -34,6 +41,11 @@ export const RequestsProvider: React.FC<RequestsProviderProps> = ({ tab, childre
   const handleSetSortField = useCallback((value: string) => {
     localStorage.setItem(localStorageSortKey, value);
     setSortField(value);
+  }, []);
+
+  const handleSetSearchTerm = useCallback((value: string) => {
+    localStorage.setItem(localStorageSearchKey, value);
+    setSearchTerm(value);
   }, []);
 
   /**
@@ -71,8 +83,20 @@ export const RequestsProvider: React.FC<RequestsProviderProps> = ({ tab, childre
       setSortField: handleSetSortField,
       selectedListId,
       setSelectedListId,
+      searchTerm,
+      setSearchTerm: handleSetSearchTerm,
     };
-  }, [currentIndex, sortedRequestsMap, sortField, selectedListId, setSortedRequestsForList]);
+  }, [
+    currentIndex,
+    sortedRequestsMap,
+    sortField,
+    selectedListId,
+    setSortedRequestsForList,
+    handleSetSortField,
+    searchTerm,
+    handleSetSearchTerm,
+    tab,
+  ]);
 
   return <RequestsContext value={value}>{children}</RequestsContext>;
 };

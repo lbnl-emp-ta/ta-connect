@@ -28,12 +28,12 @@ export const RequestsList: React.FC<RequestsListProps> = ({
     setSortedRequestsForList,
     setCurrentIndex,
     setSelectedListId,
+    searchTerm,
   } = useRequestsContext();
   const params = useParams({ strict: false });
   const sortedRequests = sortedRequestsMap[listId] ?? [];
   const isSelected = (request: TARequest) => params.requestId === request.id.toString();
   const [page, setPage] = useState(0);
-  // const pageCount = Math.ceil(sortedRequests.length / itemsPerPage);
   const paginatedRequests = useMemo(() => {
     return sortedRequests.slice(page * itemsPerPage, (page + 1) * itemsPerPage);
   }, [page, sortedRequests]);
@@ -48,13 +48,18 @@ export const RequestsList: React.FC<RequestsListProps> = ({
   const sortRequests = useCallback(() => {
     const sortDirection = sortField.startsWith('-') ? 'desc' : 'asc';
     const sortFieldName = sortField.replace('-', '') as keyof TARequest;
-    const sorted = [...requests].sort((a, b) => {
+    const filtered = searchTerm
+      ? requests.filter((r) =>
+          `${JSON.stringify(r)}`.toLowerCase().includes(searchTerm.toLowerCase())
+        )
+      : requests;
+    const sorted = [...filtered].sort((a, b) => {
       if (a[sortFieldName]! < b[sortFieldName]!) return sortDirection === 'asc' ? -1 : 1;
       if (a[sortFieldName]! > b[sortFieldName]!) return sortDirection === 'asc' ? 1 : -1;
       return 0;
     });
     setSortedRequestsForList(listId, sorted);
-  }, [sortField, requests, listId, setSortedRequestsForList]);
+  }, [sortField, searchTerm, requests, listId, setSortedRequestsForList]);
 
   const handleItemClick = (request: TARequest) => {
     navigate({
@@ -77,10 +82,8 @@ export const RequestsList: React.FC<RequestsListProps> = ({
   }, [params.requestId, sortedRequests]);
 
   useEffect(() => {
-    if (sortField) {
-      sortRequests();
-    }
-  }, [sortField, requests]);
+    sortRequests();
+  }, [sortField, requests, searchTerm, sortRequests]);
 
   // If there are no requests, redirect to the requests page
   // This occurs if a request is assigned or removed and
