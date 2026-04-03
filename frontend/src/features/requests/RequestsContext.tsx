@@ -5,7 +5,7 @@ interface RequestsContextType {
   sortedRequestsMap: Record<string, TARequest[]>;
   setSortedRequestsForList: (listId: string, requests: TARequest[]) => void;
   sortField: string;
-  setSortField: React.Dispatch<React.SetStateAction<string>>;
+  setSortField: (value: string) => void;
   currentIndex: number;
   setCurrentIndex: React.Dispatch<React.SetStateAction<number>>;
   nextId: number | null;
@@ -23,10 +23,25 @@ interface RequestsProviderProps extends React.PropsWithChildren {
 
 export const RequestsProvider: React.FC<RequestsProviderProps> = ({ tab, children }) => {
   const [sortedRequestsMap, setSortedRequestsMap] = useState<Record<string, TARequest[]>>({});
-  const [sortField, setSortField] = useState('-date_created');
+  const localStorageSortKey =
+    tab === 'active' ? 'activeRequestsSortField' : 'inactiveRequestsSortField';
+  const [sortField, setSortField] = useState(() => {
+    return localStorage.getItem(localStorageSortKey) ?? '-date_created';
+  });
   const [currentIndex, setCurrentIndex] = useState(0);
   const [selectedListId, setSelectedListId] = useState<string | null>(null);
 
+  const handleSetSortField = useCallback((value: string) => {
+    localStorage.setItem(localStorageSortKey, value);
+    setSortField(value);
+  }, []);
+
+  /**
+   * Sets the sorted requests for a specific list in the context.
+   * This allows different lists (e.g., actionable, downstream, inactive)
+   * to maintain their own sorted state without interfering with each other.
+   * The sorted requests are stored in a map where the key is the list ID and the value is the array of sorted requests for that list.
+   */
   const setSortedRequestsForList = useCallback((listId: string, requests: TARequest[]) => {
     setSortedRequestsMap((prev) => ({
       ...prev,
@@ -53,7 +68,7 @@ export const RequestsProvider: React.FC<RequestsProviderProps> = ({ tab, childre
       sortedRequestsMap,
       setSortedRequestsForList,
       sortField,
-      setSortField,
+      setSortField: handleSetSortField,
       selectedListId,
       setSelectedListId,
     };
