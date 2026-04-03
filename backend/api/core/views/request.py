@@ -36,9 +36,9 @@ class BaseUserAwareRequest(views.APIView):
         if hasattr(self, '_actionable_cache'):
             return self._actionable_cache
     
-        queryset = Request.objects.all()
+        queryset = Request.objects.exclude(owner=None)
 
-        # admins can see all requests
+        # admins can act on all requests that are active (have an owner).
         if IsAdmin().has_permission(self.request):
             return queryset
 
@@ -106,7 +106,7 @@ class BaseUserAwareRequest(views.APIView):
         return requests
     
     def get_downstream(self):
-        queryset = Request.objects.all()
+        queryset = Request.objects.exclude(owner=None)
 
         maybe_context = self.request.headers.get("Context")
         if not maybe_context:
@@ -126,7 +126,7 @@ class BaseUserAwareRequest(views.APIView):
         # archived (i.e. no owner) or are owned by Reception currently 
         # (i.e. are actionable).
         elif IsCoordinator().has_permission(self.request):
-            return queryset.exclude(owner=None).exclude(pk__in=actionable_pks)
+            return queryset.exclude(pk__in=actionable_pks)
 
         elif IsProgramLead().has_permission(self.request):
             program = None
