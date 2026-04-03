@@ -113,7 +113,8 @@ export const RequestsList: React.FC<RequestsListProps> = ({
           onClick={() => handleItemClick(request)}
           sx={{
             backgroundColor: isSelected(request) ? 'primary.light' : 'white',
-            border: isSelected(request) ? '2px solid' : 'none',
+            border: isSelected(request) ? '2px solid' : '1px solid',
+            borderColor: isSelected(request) ? 'primary.main' : 'grey.200',
             cursor: 'pointer',
             paddingBottom: 1,
             paddingLeft: 2,
@@ -127,9 +128,14 @@ export const RequestsList: React.FC<RequestsListProps> = ({
         >
           <Stack spacing={1}>
             <Stack direction="row">
-              <Typography component="h4" fontWeight="bold" sx={{ flexGrow: 1 }}>
-                {request.customer_state_abbreviation} - {request.customer_name}
-              </Typography>
+              <Stack direction="row" spacing={1} alignItems="center" sx={{ flexGrow: 1 }}>
+                <Typography component="h4" fontWeight="bold">
+                  {request.customer_name}
+                </Typography>
+                <Typography component="h4" fontWeight="bold">
+                  ({request.customer_state_abbreviation})
+                </Typography>
+              </Stack>
               <Typography>#{request.id}</Typography>
             </Stack>
             <Stack direction="row" alignItems="center">
