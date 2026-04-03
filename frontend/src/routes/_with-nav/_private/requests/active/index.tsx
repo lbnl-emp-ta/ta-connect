@@ -10,7 +10,8 @@ export const Route = createFileRoute('/_with-nav/_private/requests/active/')({
 
 function NoSelectedRequest() {
   const navigate = useNavigate();
-  const { sortedRequests } = useRequestsContext();
+  const { sortedRequestsMap } = useRequestsContext();
+  const sortedRequests = sortedRequestsMap['actionable'] ?? [];
 
   /**
    * If the /dashboard/requests page is navigated to and there are actionable requests,

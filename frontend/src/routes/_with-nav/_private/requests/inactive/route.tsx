@@ -16,11 +16,16 @@ export const Route = createFileRoute('/_with-nav/_private/requests/inactive')({
 function InactiveRequestsWrapper() {
   const { identity } = useIdentityContext();
   const { data: requests } = useSuspenseQuery(requestsQueryOptions(identity));
-  const inactiveRequests = requests ? requests.inactive : null;
+  const inactiveRequests = [
+    {
+      id: 'inactive',
+      requests: requests ? requests.inactive : null,
+    },
+  ];
 
   return (
     <RequestsProvider tab="inactive">
-      <RequestsLayout requestsList={inactiveRequests} />
+      <RequestsLayout requestLists={inactiveRequests} />
     </RequestsProvider>
   );
 }

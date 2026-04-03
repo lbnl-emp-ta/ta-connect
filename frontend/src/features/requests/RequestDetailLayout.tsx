@@ -24,7 +24,8 @@ export const RequestDetailLayout: React.FC<RequestDetailLayoutProps> = ({ reques
     requestDetailQueryOptions(requestId, identity)
   );
   const { data: selectedRequestNotes } = useSuspenseQuery(notesQueryOptions(requestId, identity));
-  const { sortedRequests, setCurrentIndex } = useRequestsContext();
+  const { sortedRequestsMap, selectedListId, setCurrentIndex } = useRequestsContext();
+  const sortedRequests = selectedListId ? (sortedRequestsMap[selectedListId] ?? []) : [];
   const currentIndex = sortedRequests.findIndex((request) => {
     if (requestId) {
       return request.id === parseInt(requestId);

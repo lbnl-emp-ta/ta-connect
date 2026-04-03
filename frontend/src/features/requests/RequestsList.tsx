@@ -6,16 +6,31 @@ import { formatDatetime } from '../../utils/utils';
 import { useRequestsContext } from './RequestsContext';
 
 interface RequestsListProps {
+  listId: string;
+  heading?: string;
   requests: TARequest[];
+  itemsPerPage?: number;
 }
 
-export const RequestsList: React.FC<RequestsListProps> = ({ requests }) => {
+export const RequestsList: React.FC<RequestsListProps> = ({
+  listId,
+  heading,
+  requests,
+  itemsPerPage = 10,
+}) => {
   const navigate = useNavigate();
-  const { tab, sortedRequests, sortField, setSortedRequests } = useRequestsContext();
+  const {
+    tab,
+    sortedRequestsMap,
+    sortField,
+    setSortedRequestsForList,
+    setCurrentIndex,
+    setSelectedListId,
+  } = useRequestsContext();
   const params = useParams({ strict: false });
+  const sortedRequests = sortedRequestsMap[listId] ?? [];
   const isSelected = (request: TARequest) => params.requestId === request.id.toString();
   const [page, setPage] = useState(1);
-  const itemsPerPage = 10;
   const pageCount = Math.ceil(sortedRequests.length / itemsPerPage);
   const paginatedRequests = useMemo(() => {
     return sortedRequests.slice((page - 1) * itemsPerPage, page * itemsPerPage);
@@ -28,17 +43,13 @@ export const RequestsList: React.FC<RequestsListProps> = ({ requests }) => {
   const sortRequests = useCallback(() => {
     const sortDirection = sortField.startsWith('-') ? 'desc' : 'asc';
     const sortFieldName = sortField.replace('-', '') as keyof TARequest;
-    requests.sort((a, b) => {
-      if (a[sortFieldName]! < b[sortFieldName]!) {
-        return sortDirection === 'asc' ? -1 : 1;
-      }
-      if (a[sortFieldName]! > b[sortFieldName]!) {
-        return sortDirection === 'asc' ? 1 : -1;
-      }
+    const sorted = [...requests].sort((a, b) => {
+      if (a[sortFieldName]! < b[sortFieldName]!) return sortDirection === 'asc' ? -1 : 1;
+      if (a[sortFieldName]! > b[sortFieldName]!) return sortDirection === 'asc' ? 1 : -1;
       return 0;
     });
-    setSortedRequests([...requests]);
-  }, [sortField, requests, setSortedRequests]);
+    setSortedRequestsForList(listId, sorted);
+  }, [sortField, requests, listId, setSortedRequestsForList]);
 
   const handleItemClick = (request: TARequest) => {
     navigate({
@@ -53,6 +64,8 @@ export const RequestsList: React.FC<RequestsListProps> = ({ requests }) => {
     if (requestIndex !== -1) {
       const newPage = Math.floor(requestIndex / itemsPerPage) + 1;
       setPage(newPage);
+      setSelectedListId(listId);
+      setCurrentIndex(requestIndex);
     } else {
       setPage(1);
     }
@@ -77,6 +90,11 @@ export const RequestsList: React.FC<RequestsListProps> = ({ requests }) => {
 
   return (
     <Stack spacing={1}>
+      {heading && (
+        <Typography component="h3" variant="h6" fontWeight="bold">
+          {heading}
+        </Typography>
+      )}
       {paginatedRequests.map((request) => (
         <Paper
           key={request.id}

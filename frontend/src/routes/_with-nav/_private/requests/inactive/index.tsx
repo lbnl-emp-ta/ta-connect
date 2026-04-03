@@ -10,11 +10,12 @@ export const Route = createFileRoute('/_with-nav/_private/requests/inactive/')({
 
 function NoSelectedRequest() {
   const navigate = useNavigate();
-  const { sortedRequests } = useRequestsContext();
+  const { sortedRequestsMap } = useRequestsContext();
+  const sortedRequests = sortedRequestsMap['inactive'] ?? [];
 
   /**
-   * If the /dashboard/requests page is navigated to and there are actionable requests,
-   * it should redirect to the first item in the requests table.
+   * If the /requests/inactive page is navigated to and there are requests,
+   * it should redirect to the first item in the requests list.
    */
   useEffect(() => {
     if (sortedRequests && sortedRequests.length > 0) {
