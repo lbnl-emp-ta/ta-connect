@@ -70,6 +70,7 @@ export const RequestsLayout: React.FC<RequestsLayoutProps> = ({ requestLists }) 
                 value="active"
                 sx={{
                   '&.MuiButtonBase-root': {
+                    fontSize: '1rem',
                     paddingLeft: 0,
                     paddingRight: 0,
                     textTransform: 'none',
@@ -85,6 +86,7 @@ export const RequestsLayout: React.FC<RequestsLayoutProps> = ({ requestLists }) 
                 value="inactive"
                 sx={{
                   '&.MuiButtonBase-root': {
+                    fontSize: '1rem',
                     paddingLeft: 0,
                     paddingRight: 0,
                     textTransform: 'none',
