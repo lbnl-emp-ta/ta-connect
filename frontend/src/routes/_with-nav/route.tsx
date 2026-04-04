@@ -60,7 +60,7 @@ function NavbarLayoutWrapper() {
         >
           <Stack direction="row" spacing={4} alignItems="center" sx={{ flexGrow: 1 }}>
             <Link to="/requests/active">
-              <Typography variant="h6" fontWeight="bold">
+              <Typography variant="h5" fontWeight="bold">
                 TA Connect
               </Typography>
             </Link>

@@ -164,12 +164,12 @@ export const UserInfoDialog: React.FC<UserInfoDialogProps> = ({
       </DialogContent>
       <DialogActions sx={{ justifyContent: 'space-between' }}>
         <Box>{hasMissingInfo && <Button onClick={handleLogout}>Logout</Button>}</Box>
-        <Box>
+        <Stack direction="row">
           {!hasMissingInfo && <Button onClick={handleCancel}>Cancel</Button>}
           <Button variant="contained" type="submit" form="profile-form">
             Save
           </Button>
-        </Box>
+        </Stack>
       </DialogActions>
     </Dialog>
   );

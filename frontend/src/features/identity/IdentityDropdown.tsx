@@ -1,6 +1,6 @@
 import { InputAdornment, MenuItem, Select, SelectChangeEvent, Stack } from '@mui/material';
 import { useSuspenseQuery } from '@tanstack/react-query';
-import { useNavigate } from '@tanstack/react-router';
+import { useMatchRoute, useNavigate } from '@tanstack/react-router';
 import { useEffect, useState } from 'react';
 import { TAIdentity } from '../../api/dashboard/types';
 import { identitiesQueryOptions } from '../../utils/queryOptions';
@@ -8,6 +8,7 @@ import { useIdentityContext } from '../identity/IdentityContext';
 
 export const IdentityDropdown: React.FC = () => {
   const navigate = useNavigate();
+  const matchRoute = useMatchRoute();
   const { identity, detailedIdentity, setIdentity, setDetailedIdentity } = useIdentityContext();
   const { data: identities } = useSuspenseQuery(identitiesQueryOptions());
   const [identitiesMenuOpen, setIdentitiesMenuOpen] = useState(false);
@@ -20,6 +21,35 @@ export const IdentityDropdown: React.FC = () => {
     if (selected) setDetailedIdentity(selected);
   };
 
+  /**
+   * Detect where to navigate when identity changes.
+   * This uses the current route to determine whether the user is on the active requests list,
+   * inactive requests list, or experts page.
+   */
+  const getNavigationTarget = () => {
+    const activeMatch = matchRoute({
+      to: '/requests/active',
+      fuzzy: true,
+    });
+
+    if (activeMatch) return '/requests/active';
+
+    const inactiveMatch = matchRoute({
+      to: '/requests/inactive',
+      fuzzy: true,
+    });
+
+    if (inactiveMatch) return '/requests/inactive';
+
+    const expertsMatch = matchRoute({
+      to: '/experts',
+    });
+
+    if (expertsMatch) return '/experts';
+
+    return '/requests';
+  };
+
   useEffect(() => {
     if (detailedIdentity) {
       setIdentity({
@@ -29,7 +59,7 @@ export const IdentityDropdown: React.FC = () => {
         instance: detailedIdentity.instance?.id,
       });
       if (identity && detailedIdentity.role.id !== identity?.role) {
-        navigate({ to: '/requests', params: {} });
+        navigate({ to: getNavigationTarget() });
       }
     } else {
       setDetailedIdentity(identities ? identities[0] : undefined);
