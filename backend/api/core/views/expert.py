@@ -38,8 +38,6 @@ class ExpertsListView(views.APIView):
                 expert_assignments = LabRoleAssignment.objects.filter(role=Role.objects.get(name=ROLE.EXPERT), instance=Lab.objects.get(pk=context.get("instance")))
             except Exception as e:
                 return Response(data={"message": f"{e}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-        else:
-            return Response(data={"message": "Insufficient credentials to access experts"}, status=status.HTTP_400_BAD_REQUEST)
 
         experts_data = list()
 
