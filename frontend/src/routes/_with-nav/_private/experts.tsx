@@ -17,7 +17,7 @@ function ExpertsPage() {
   const { data: experts } = useSuspenseQuery(expertsQueryOptions(identity));
 
   return (
-    <Container maxWidth="xl">
+    <Container maxWidth="xl" sx={{ paddingTop: 3, paddingBottom: 3 }}>
       <Stack>
         <ExpertsDataTable experts={experts || []} />
       </Stack>
