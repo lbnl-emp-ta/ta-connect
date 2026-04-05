@@ -31,8 +31,9 @@ class CustomerEditView(views.APIView):
             return Response(data={"message":"Customer with given ID does not exist"})
 
         # Making sure the customer that is being edited is associated with a request that is actionable for the user
-        # i.e. preventing user from editing arbitrary customers in system 
-        if not CustomerRequestRelationship.objects.filter(customer=customer_obj).filter(request__in=BaseUserAwareRequest(request=request).get_actionable()):
+        # i.e. preventing user from editing arbitrary customers in system.
+        # Admins can edit any customer
+        if not IsAdmin().has_permission(request) and not CustomerRequestRelationship.objects.filter(customer=customer_obj).filter(request__in=BaseUserAwareRequest(request=request).get_actionable()):
             return Response(data={"message": "Insufficient authorization to edit given customer's information"}, status=status.HTTP_400_BAD_REQUEST)
 
         customer_patch_data = dict() 
