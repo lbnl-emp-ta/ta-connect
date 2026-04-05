@@ -29,18 +29,11 @@ interface RequestsLayoutProps {
 
 export const RequestsLayout: React.FC<RequestsLayoutProps> = ({ requestLists }) => {
   const navigate = useNavigate();
-  // const { identity, detailedIdentity, setIdentity, setDetailedIdentity } = useIdentityContext();
   const { tab, sortField, setSortField, searchTerm, setSearchTerm } = useRequestsContext();
 
   const handleChangeSearchTerm = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(event.target.value);
   };
-
-  // useEffect(() => {
-  //   if (detailedIdentity && identity && detailedIdentity.role.id !== identity?.role) {
-  //     setSortedRequests([]);
-  //   }
-  // }, [detailedIdentity, setDetailedIdentity, setIdentity]);
 
   return (
     <Stack direction="row" spacing={0} sx={{ height: '100%' }}>
