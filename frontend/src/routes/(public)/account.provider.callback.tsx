@@ -41,5 +41,5 @@ function CallbackComponent() {
     return <Navigate to="/login" />;
   }
 
-  return <Navigate to={'/dashboard'} />;
+  return <Navigate to={'/requests/active'} />;
 }
