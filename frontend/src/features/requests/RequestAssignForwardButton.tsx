@@ -24,6 +24,7 @@ import {
   useAssignmentMutation,
   useFinishCloseoutMutation,
   useMarkCompleteMutation,
+  useReopenMutation,
 } from '@/utils/queryOptions';
 import { useIdentityContext } from '@/features/identity/IdentityContext';
 import { useToastContext } from '@/features/toasts/ToastContext';
@@ -125,6 +126,11 @@ export const RequestAssignForwardButton: React.FC<RequestAssignForwardButtonProp
     onSuccess: onSuccess('Request marked as complete'),
     onError: onError,
   });
+  const reopenRequestMutation = useReopenMutation(request.id.toString(), identity, {
+    onMutate: onMutate('Reopening request'),
+    onSuccess: onSuccess('Request reopened and assigned to Reception'),
+    onError: onError,
+  });
   const [assignAnchorEl, setAssignAnchorEl] = useState<null | HTMLElement>(null);
   const assignMenuOpen = Boolean(assignAnchorEl);
   const handleAssignMenuClick = (event: React.MouseEvent<HTMLButtonElement>) => {
@@ -156,6 +162,9 @@ export const RequestAssignForwardButton: React.FC<RequestAssignForwardButtonProp
         } else if (request.owner?.domain_type === 'program') {
           completeRequestMutation.mutate();
         }
+        break;
+      case Steps.Completed:
+        reopenRequestMutation.mutate();
         break;
       default:
         if (owner) handleAssignment(owner);

@@ -1,5 +1,6 @@
 from django.db import models
 from django.utils.functional import classproperty
+from core.constants import REQUEST_STATUS
 
 class RequestStatus(models.Model):
     name = models.CharField(max_length=255, unique=True)
@@ -7,7 +8,7 @@ class RequestStatus(models.Model):
     
     @classproperty
     def default_name(cls):
-        return "New"
+        return REQUEST_STATUS.SCOPING.value
     
     @classproperty
     def default_description(cls):
