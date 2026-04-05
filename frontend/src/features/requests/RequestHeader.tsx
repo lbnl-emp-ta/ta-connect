@@ -12,7 +12,7 @@ interface RequestHeaderProps {
 }
 
 /**
- *
+ * Top header section to show in the request detail view
  */
 export const RequestHeader: React.FC<RequestHeaderProps> = ({ request }) => {
   const { tab, nextId, previousId } = useRequestsContext();
