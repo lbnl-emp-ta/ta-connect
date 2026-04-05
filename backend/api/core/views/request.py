@@ -558,3 +558,32 @@ class RequestCloseoutCompleteView(BaseUserAwareRequest):
             return Response(data={"message": f"{e}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
         return Response(status=status.HTTP_200_OK)
+
+
+class RequestReopenView(BaseUserAwareRequest):
+    def post(self, request, id=None):
+        if id is None:
+            return Response(data={"message": "Please provide a Request ID"}, status=status.HTTP_400_BAD_REQUEST)
+
+        if not (IsAdmin().has_permission(request)):
+            return Response(data={"message": "Insufficient privillege to reopen request"}, status=status.HTTP_401_UNAUTHORIZED)
+
+        queryset = Request.objects.filter(owner=None)
+
+        found_request = None
+        try:
+            found_request = queryset.get(pk=id)        
+        except:
+            return Response(data={"message": "Request with given ID does not exist"}, status=status.HTTP_404_NOT_FOUND)
+
+        try:
+            found_request.status = RequestStatus.objects.get(name=REQUEST_STATUS.SCOPING)
+            found_request.owner = Owner.objects.get(pk=Owner.get_default_pk())
+            found_request.save()
+            create_audit_history(request, found_request, ActionType.StatusChange, f"Request reopened, status changed to Scoping")
+            create_audit_history(request, found_request, ActionType.Assignment, f"Assigned to Reception")
+
+        except Exception as e:
+            return Response(data={"message": f"{e}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+        return Response(status=status.HTTP_200_OK)

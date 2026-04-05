@@ -282,6 +282,18 @@ export const useFinishCloseoutMutation = (
   });
 };
 
+export const useReopenMutation = (
+  requestId: string,
+  identity?: Identity,
+  options?: UseMutationOptions<unknown, Error, void, unknown>
+) => {
+  return useMutation({
+    mutationKey: ['requests', 'reopen', requestId, identity],
+    mutationFn: () => postData(`${apiUrl}/requests/${requestId}/reopen/`, null, identity),
+    ...options,
+  });
+};
+
 export const useAttachmentMutation = (
   requestId: string,
   identity?: Identity,
