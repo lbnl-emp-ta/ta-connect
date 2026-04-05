@@ -46,7 +46,6 @@ class TestRequestDetailViewEndpoint():
         api_client.force_login(User.objects.get(pk=1)) 
         response = api_client.patch("/api/requests/1", data=data, headers={"Context": '{"user":1,"role":1,"location":"System"}'})
         
-        print(response.data)
         assert response.status_code == status.HTTP_200_OK
         
         new_request = Request.objects.get(pk=1)
