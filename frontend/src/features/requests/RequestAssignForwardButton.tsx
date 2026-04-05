@@ -45,7 +45,7 @@ export const RequestAssignForwardButton: React.FC<RequestAssignForwardButtonProp
   request,
 }) => {
   const navigate = useNavigate();
-  const { identity } = useIdentityContext();
+  const { identity, detailedIdentity } = useIdentityContext();
   const { data: owners } = useSuspenseQuery(ownersQueryOptions(identity));
   const { tab, nextId, previousId } = useRequestsContext();
   const { setShowToast, setToastMessage } = useToastContext();
@@ -161,6 +161,10 @@ export const RequestAssignForwardButton: React.FC<RequestAssignForwardButtonProp
         if (owner) handleAssignment(owner);
     }
   };
+
+  if (!detailedIdentity || !currentStep.allowedRoles.includes(detailedIdentity.role.name)) {
+    return null;
+  }
 
   if (!currentStep.forwardIsMenu) {
     return (

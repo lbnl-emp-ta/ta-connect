@@ -26,7 +26,7 @@ export const RequestAssignBackwardButton: React.FC<RequestAssignBackwardButtonPr
   request,
 }) => {
   const navigate = useNavigate();
-  const { identity } = useIdentityContext();
+  const { identity, detailedIdentity } = useIdentityContext();
   const { data: owners } = useSuspenseQuery(ownersQueryOptions(identity));
   const receptionOwnerId = owners?.find((owner) => owner.domain_type === 'reception')?.id;
   const { tab, nextId, previousId } = useRequestsContext();
@@ -116,6 +116,14 @@ export const RequestAssignBackwardButton: React.FC<RequestAssignBackwardButtonPr
         if (owner) handleAssignment(owner);
     }
   };
+
+  if (
+    !currentStep.backwardText ||
+    !detailedIdentity ||
+    !currentStep.allowedRoles.includes(detailedIdentity.role.name)
+  ) {
+    return null;
+  }
 
   return (
     <Button
