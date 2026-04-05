@@ -36,17 +36,18 @@ def sync_allauth_email_on_change(sender, instance, **kwargs):
     if not instance.pk:
         # New user — allauth will create the EmailAddress row itself
         return
+    
+    # Import here to avoid circular imports at module load time
+    from allauth.account.models import EmailAddress
 
     try:
-        old_email = User.objects.values_list("email", flat=True).get(pk=instance.pk)
+        old_email_user = User.objects.values_list("email", flat=True).get(pk=instance.pk)
+        old_email_social = EmailAddress.objects.values_list("email", flat=True).filter(user_id=instance.pk).first()
     except User.DoesNotExist:
         return
 
-    if old_email == instance.email:
+    if old_email_user == instance.email and old_email_social == instance.email:
         return
-
-    # Import here to avoid circular imports at module load time
-    from allauth.account.models import EmailAddress
 
     updated = EmailAddress.objects.filter(user_id=instance.pk).update(
         email=instance.email,

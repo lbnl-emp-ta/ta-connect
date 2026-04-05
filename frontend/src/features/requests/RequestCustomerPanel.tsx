@@ -112,7 +112,6 @@ export const RequestCustomerPanel: React.FC<RequestCustomerPanelProps> = ({ cust
       setEditing(false);
       return;
     }
-    console.log('Submitting request update:', mutationData);
     updateCustomerMutation.mutate(mutationData);
   };
 

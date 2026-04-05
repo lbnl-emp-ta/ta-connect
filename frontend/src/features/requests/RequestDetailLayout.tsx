@@ -9,51 +9,26 @@ import { RequestInfoPanel } from '@/features/requests/RequestInfoPanel';
 import { RequestNotes } from '@/features/requests/RequestNotes';
 import { useRequestsContext } from '@/features/requests/RequestsContext';
 import { RequestStepper } from '@/features/requests/RequestStepper';
-import {
-  expertsQueryOptions,
-  notesQueryOptions,
-  ownersQueryOptions,
-  requestDetailQueryOptions,
-  topicsQueryOptions,
-} from '@/utils/queryOptions';
+import { notesQueryOptions, requestDetailQueryOptions } from '@/utils/queryOptions';
 import { Badge, Grid, Paper, Stack, Tab, Tabs, Typography } from '@mui/material';
 import { useSuspenseQuery } from '@tanstack/react-query';
-import { createFileRoute } from '@tanstack/react-router';
 import { useEffect, useState } from 'react';
 
-export const Route = createFileRoute('/_with-nav/_private/dashboard/requests/$requestId')({
-  loader: async ({ context, params }) => {
-    await context.queryClient.ensureQueryData(
-      requestDetailQueryOptions(params.requestId, context.identity)
-    );
-    await context.queryClient.ensureQueryData(ownersQueryOptions(context.identity));
-    await context.queryClient.ensureQueryData(topicsQueryOptions());
-    await context.queryClient.ensureQueryData(
-      notesQueryOptions(params.requestId, context.identity)
-    );
-    if (
-      context.detailedIdentity?.role.name === 'Lab Lead' ||
-      context.detailedIdentity?.role.name === 'Admin'
-    ) {
-      await context.queryClient.ensureQueryData(expertsQueryOptions(context.identity));
-    }
-  },
-  component: SelectedRequest,
-});
+interface RequestDetailLayoutProps {
+  requestId: string;
+}
 
-function SelectedRequest() {
-  const params = Route.useParams();
+export const RequestDetailLayout: React.FC<RequestDetailLayoutProps> = ({ requestId }) => {
   const { identity } = useIdentityContext();
   const { data: selectedRequest } = useSuspenseQuery(
-    requestDetailQueryOptions(params.requestId, identity)
+    requestDetailQueryOptions(requestId, identity)
   );
-  const { data: selectedRequestNotes } = useSuspenseQuery(
-    notesQueryOptions(params.requestId, identity)
-  );
-  const { sortedRequests, setCurrentIndex } = useRequestsContext();
+  const { data: selectedRequestNotes } = useSuspenseQuery(notesQueryOptions(requestId, identity));
+  const { sortedRequestsMap, selectedListId, setCurrentIndex } = useRequestsContext();
+  const sortedRequests = selectedListId ? (sortedRequestsMap[selectedListId] ?? []) : [];
   const currentIndex = sortedRequests.findIndex((request) => {
-    if (params?.requestId) {
-      return request.id === parseInt(params.requestId);
+    if (requestId) {
+      return request.id === parseInt(requestId);
     }
   });
   const [tabValue, setTabValue] = useState<string | number>('notes');
@@ -146,4 +121,4 @@ function SelectedRequest() {
       </Grid>
     </Stack>
   );
-}
+};

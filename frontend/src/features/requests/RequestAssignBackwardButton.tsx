@@ -26,10 +26,10 @@ export const RequestAssignBackwardButton: React.FC<RequestAssignBackwardButtonPr
   request,
 }) => {
   const navigate = useNavigate();
-  const { identity } = useIdentityContext();
+  const { identity, detailedIdentity } = useIdentityContext();
   const { data: owners } = useSuspenseQuery(ownersQueryOptions(identity));
   const receptionOwnerId = owners?.find((owner) => owner.domain_type === 'reception')?.id;
-  const { nextId, previousId } = useRequestsContext();
+  const { tab, nextId, previousId } = useRequestsContext();
   const { setShowToast, setToastMessage } = useToastContext();
   const currentStep = getStep(request);
   const onMutate = (message: string) => {
@@ -52,12 +52,12 @@ export const RequestAssignBackwardButton: React.FC<RequestAssignBackwardButtonPr
       setToastMessage(<ToastMessage icon={<CheckCircleIcon />}>{message}</ToastMessage>);
       if (nextId) {
         navigate({
-          to: `/dashboard/requests/$requestId`,
+          to: `/requests/${tab}/${nextId}`,
           params: { requestId: nextId.toString() },
         });
       } else if (previousId) {
         navigate({
-          to: `/dashboard/requests/$requestId`,
+          to: `/requests/${tab}/${previousId}`,
           params: { requestId: previousId.toString() },
         });
       }
@@ -116,6 +116,14 @@ export const RequestAssignBackwardButton: React.FC<RequestAssignBackwardButtonPr
         if (owner) handleAssignment(owner);
     }
   };
+
+  if (
+    !currentStep.backwardText ||
+    !detailedIdentity ||
+    !currentStep.allowedRoles.includes(detailedIdentity.role.name)
+  ) {
+    return null;
+  }
 
   return (
     <Button

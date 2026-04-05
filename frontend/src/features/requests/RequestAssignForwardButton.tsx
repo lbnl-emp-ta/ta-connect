@@ -45,9 +45,9 @@ export const RequestAssignForwardButton: React.FC<RequestAssignForwardButtonProp
   request,
 }) => {
   const navigate = useNavigate();
-  const { identity } = useIdentityContext();
+  const { identity, detailedIdentity } = useIdentityContext();
   const { data: owners } = useSuspenseQuery(ownersQueryOptions(identity));
-  const { nextId, previousId } = useRequestsContext();
+  const { tab, nextId, previousId } = useRequestsContext();
   const { setShowToast, setToastMessage } = useToastContext();
   const [searchTerm, setSearchTerm] = useState('');
   const ownersContainsExperts = owners?.some((owner) => owner.domain_type === 'expert');
@@ -95,12 +95,12 @@ export const RequestAssignForwardButton: React.FC<RequestAssignForwardButtonProp
       setToastMessage(<ToastMessage icon={<CheckCircleIcon />}>{message}</ToastMessage>);
       if (nextId) {
         navigate({
-          to: `/dashboard/requests/$requestId`,
+          to: `/requests/${tab}/${nextId}`,
           params: { requestId: nextId.toString() },
         });
       } else if (previousId) {
         navigate({
-          to: `/dashboard/requests/$requestId`,
+          to: `/requests/${tab}/${previousId}`,
           params: { requestId: previousId.toString() },
         });
       }
@@ -162,6 +162,10 @@ export const RequestAssignForwardButton: React.FC<RequestAssignForwardButtonProp
     }
   };
 
+  if (!detailedIdentity || !currentStep.allowedRoles.includes(detailedIdentity.role.name)) {
+    return null;
+  }
+
   if (!currentStep.forwardIsMenu) {
     return (
       <Button
@@ -216,7 +220,7 @@ export const RequestAssignForwardButton: React.FC<RequestAssignForwardButtonProp
           />
         </Box>
         {ownersContainsExperts && (
-          <AppLink to="/dashboard/experts">
+          <AppLink to="/experts">
             <MenuItem>
               <ListItemText sx={{ color: 'secondary.main' }}>
                 <Typography variant="body2" component="div">

@@ -207,6 +207,7 @@ export interface TAUserMutation {
 export interface TARequestsResponse {
   actionable: TARequest[];
   downstream: TARequest[];
+  inactive: TARequest[];
 }
 
 export interface Customer {

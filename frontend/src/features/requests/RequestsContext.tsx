@@ -1,44 +1,102 @@
-import React, { createContext, use, useMemo, useState } from 'react';
+import React, { createContext, use, useCallback, useMemo, useState } from 'react';
 import { TARequest } from '../../api/dashboard/types';
 
 interface RequestsContextType {
-  sortedRequests: TARequest[];
-  setSortedRequests: React.Dispatch<React.SetStateAction<TARequest[]>>;
+  sortedRequestsMap: Record<string, TARequest[]>;
+  setSortedRequestsForList: (listId: string, requests: TARequest[]) => void;
   sortField: string;
-  setSortField: React.Dispatch<React.SetStateAction<string>>;
+  setSortField: (value: string) => void;
   currentIndex: number;
   setCurrentIndex: React.Dispatch<React.SetStateAction<number>>;
   nextId: number | null;
   previousId: number | null;
+  tab: 'active' | 'inactive';
+  selectedListId: string | null;
+  setSelectedListId: React.Dispatch<React.SetStateAction<string | null>>;
+  searchTerm: string;
+  setSearchTerm: (value: string) => void;
 }
 
 const RequestsContext = createContext<RequestsContextType | undefined>(undefined);
 
-export const RequestsProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [sortedRequests, setSortedRequests] = useState<TARequest[]>([]);
-  const [sortField, setSortField] = useState('-date_created');
+interface RequestsProviderProps extends React.PropsWithChildren {
+  tab: RequestsContextType['tab'];
+}
+
+export const RequestsProvider: React.FC<RequestsProviderProps> = ({ tab, children }) => {
+  const [sortedRequestsMap, setSortedRequestsMap] = useState<Record<string, TARequest[]>>({});
+  const localStorageSortKey =
+    tab === 'active' ? 'activeRequestsSortField' : 'inactiveRequestsSortField';
+  const localStorageSearchKey =
+    tab === 'active' ? 'activeRequestsSearchTerm' : 'inactiveRequestsSearchTerm';
+  const [sortField, setSortField] = useState(() => {
+    return localStorage.getItem(localStorageSortKey) ?? '-date_created';
+  });
+  const [searchTerm, setSearchTerm] = useState(() => {
+    return localStorage.getItem(localStorageSearchKey) ?? '';
+  });
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [selectedListId, setSelectedListId] = useState<string | null>(null);
+
+  const handleSetSortField = useCallback((value: string) => {
+    localStorage.setItem(localStorageSortKey, value);
+    setSortField(value);
+  }, []);
+
+  const handleSetSearchTerm = useCallback((value: string) => {
+    localStorage.setItem(localStorageSearchKey, value);
+    setSearchTerm(value);
+  }, []);
+
+  /**
+   * Sets the sorted requests for a specific list in the context.
+   * This allows different lists (e.g., actionable, downstream, inactive)
+   * to maintain their own sorted state without interfering with each other.
+   * The sorted requests are stored in a map where the key is the list ID and the value is the array of sorted requests for that list.
+   */
+  const setSortedRequestsForList = useCallback((listId: string, requests: TARequest[]) => {
+    setSortedRequestsMap((prev) => ({
+      ...prev,
+      [listId]: requests,
+    }));
+  }, []);
 
   const value = useMemo(() => {
     let nextId: number | null = null;
     let previousId: number | null = null;
-    if (sortedRequests) {
-      const nextIndex = currentIndex < sortedRequests.length - 1 ? currentIndex + 1 : null;
+    const activeList = selectedListId ? (sortedRequestsMap[selectedListId] ?? []) : [];
+    if (activeList.length > 0) {
+      const nextIndex = currentIndex < activeList.length - 1 ? currentIndex + 1 : null;
       const previousIndex = currentIndex > 0 ? currentIndex - 1 : null;
-      nextId = nextIndex !== null ? sortedRequests[nextIndex]?.id : null;
-      previousId = previousIndex !== null ? sortedRequests[previousIndex]?.id : null;
+      nextId = nextIndex !== null ? (activeList[nextIndex]?.id ?? null) : null;
+      previousId = previousIndex !== null ? (activeList[previousIndex]?.id ?? null) : null;
     }
     return {
+      tab,
       currentIndex,
       setCurrentIndex,
       nextId,
       previousId,
-      sortedRequests,
-      setSortedRequests,
+      sortedRequestsMap,
+      setSortedRequestsForList,
       sortField,
-      setSortField,
+      setSortField: handleSetSortField,
+      selectedListId,
+      setSelectedListId,
+      searchTerm,
+      setSearchTerm: handleSetSearchTerm,
     };
-  }, [currentIndex, sortedRequests, sortField]);
+  }, [
+    currentIndex,
+    sortedRequestsMap,
+    sortField,
+    selectedListId,
+    setSortedRequestsForList,
+    handleSetSortField,
+    searchTerm,
+    handleSetSearchTerm,
+    tab,
+  ]);
 
   return <RequestsContext value={value}>{children}</RequestsContext>;
 };

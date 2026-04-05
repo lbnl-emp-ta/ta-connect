@@ -145,6 +145,10 @@ interface StepInfo {
    * The index of the step in the system flow. Based on the `Steps` object above and the `steps` array defined in `RequestStepper.tsx`.
    */
   stepIndex: StepIndex;
+  /**
+   * Array of roles that are allowed to perform the forward action.
+   */
+  allowedRoles: TARole[];
 }
 
 /**
@@ -160,6 +164,7 @@ export const getStep = (request: TARequestDetail): StepInfo => {
       forwardIsMenu: true,
       backwardText: 'Cancel request',
       stepIndex: Steps.Opened,
+      allowedRoles: [TARole.Coordinator, TARole.Admin],
     };
   } else if (request.owner?.domain_type === 'reception') {
     return {
@@ -167,6 +172,7 @@ export const getStep = (request: TARequestDetail): StepInfo => {
       forwardIsMenu: true,
       backwardText: 'Cancel request',
       stepIndex: Steps.Reception,
+      allowedRoles: [TARole.Coordinator, TARole.Admin],
     };
   } else if (request.owner?.domain_type === 'program' && request.lab === null) {
     return {
@@ -174,6 +180,7 @@ export const getStep = (request: TARequestDetail): StepInfo => {
       forwardIsMenu: true,
       backwardText: 'Assign back to reception',
       stepIndex: Steps.Program,
+      allowedRoles: [TARole.ProgramLead, TARole.Admin],
     };
   } else if (request.owner?.domain_type === 'lab' && request.expert === null) {
     return {
@@ -181,6 +188,7 @@ export const getStep = (request: TARequestDetail): StepInfo => {
       forwardIsMenu: true,
       backwardText: 'Assign back to program',
       stepIndex: Steps.Lab,
+      allowedRoles: [TARole.LabLead, TARole.Admin],
     };
   } else if (request.owner?.domain_type === 'expert') {
     return {
@@ -188,6 +196,7 @@ export const getStep = (request: TARequestDetail): StepInfo => {
       forwardIsMenu: false,
       backwardText: 'Assign back to lab',
       stepIndex: Steps.Expert,
+      allowedRoles: [TARole.Expert, TARole.Admin],
     };
   } else if (request.owner?.domain_type === 'lab' && request.expert !== null) {
     return {
@@ -195,6 +204,7 @@ export const getStep = (request: TARequestDetail): StepInfo => {
       forwardIsMenu: false,
       backwardText: 'Assign back to expert',
       stepIndex: Steps.Approval,
+      allowedRoles: [TARole.LabLead, TARole.Admin],
     };
   } else if (request.owner?.domain_type === 'program' && request.expert !== null) {
     return {
@@ -202,6 +212,7 @@ export const getStep = (request: TARequestDetail): StepInfo => {
       forwardIsMenu: false,
       backwardText: 'Assign back to lab',
       stepIndex: Steps.Approval,
+      allowedRoles: [TARole.ProgramLead, TARole.Admin],
     };
   } else if (
     !request.owner &&
@@ -211,12 +222,16 @@ export const getStep = (request: TARequestDetail): StepInfo => {
       forwardText: 'Reopen request',
       backwardText: null,
       stepIndex: Steps.Completed,
+      allowedRoles: [TARole.Admin],
     };
   } else {
+    // This case should never happen if the backend is correctly enforcing the flow,
+    // but we return a default value just in case
     return {
       forwardText: '',
       backwardText: '',
       stepIndex: Steps.Opened,
+      allowedRoles: [TARole.Admin],
     };
   }
 };

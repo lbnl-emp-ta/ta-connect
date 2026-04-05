@@ -5,11 +5,10 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { createRouter, ErrorComponent, RouterProvider } from '@tanstack/react-router';
 import React from 'react';
-import { routeTree } from './routeTree.gen';
-import { theme } from './theme';
 import { useIdentityContext } from './features/identity/IdentityContext';
 import { ToastProvider } from './features/toasts/ToastContext';
-import { RequestsProvider } from './features/requests/RequestsContext';
+import { routeTree } from './routeTree.gen';
+import { theme } from './theme';
 
 export const queryClient = new QueryClient();
 
@@ -45,13 +44,8 @@ const App: React.FC = () => {
       <LocalizationProvider dateAdapter={AdapterDayjs}>
         <ThemeProvider theme={theme}>
           <ToastProvider>
-            <RequestsProvider>
-              <CssBaseline />
-              <RouterProvider
-                router={router}
-                context={{ queryClient, identity, detailedIdentity }}
-              />
-            </RequestsProvider>
+            <CssBaseline />
+            <RouterProvider router={router} context={{ queryClient, identity, detailedIdentity }} />
           </ToastProvider>
         </ThemeProvider>
       </LocalizationProvider>

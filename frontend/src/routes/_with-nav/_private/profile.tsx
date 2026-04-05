@@ -43,7 +43,7 @@ function ProfilePage() {
   }, []);
 
   return (
-    <Container sx={{ marginTop: 2 }}>
+    <Container sx={{ paddingTop: 3, paddingBottom: 3 }}>
       <Stack direction="row" spacing={2} alignItems="center" sx={{ marginBottom: 2 }}>
         <AccountCircleIcon color="primary" sx={{ fontSize: '6rem' }} />
         <Box>

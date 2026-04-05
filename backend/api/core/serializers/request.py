@@ -22,9 +22,9 @@ class RequestDetailSerializer(serializers.Serializer):
     )
     description = serializers.CharField(max_length=None)
     date_created = serializers.DateTimeField()
-    proj_start_date = serializers.DateTimeField()
-    proj_completion_date = serializers.DateTimeField()
-    actual_completion_date = serializers.DateTimeField()
+    proj_start_date = serializers.DateField()
+    proj_completion_date = serializers.DateField()
+    actual_completion_date = serializers.DateField()
     customers = CustomerSerializer(many=True)
 
 class RequestListSerializer(serializers.Serializer):

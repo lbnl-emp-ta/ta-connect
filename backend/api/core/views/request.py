@@ -1,4 +1,5 @@
 from django.db import transaction, IntegrityError
+from django.db.models import Q
 
 from rest_framework import views, status, permissions, authentication
 from rest_framework.response import Response
@@ -32,66 +33,12 @@ class BaseUserAwareRequest(views.APIView):
     ]
 
     def get_actionable(self):
-        return self.get_queryset()
+        if hasattr(self, '_actionable_cache'):
+            return self._actionable_cache
     
-    def get_downstream(self):
-        queryset = Request.objects.all()
+        queryset = Request.objects.exclude(owner=None)
 
-        maybe_context = self.request.headers.get("Context")
-        if not maybe_context:
-            return queryset.none()
-
-        context = json.loads(maybe_context) 
-
-        actionable_pks = [request.pk for request in self.get_actionable()]
-
-        # This is a convention, we assume all requests for admin are 
-        # "actionable" and none are "downstream". In reality, this 
-        # concept doesn't really apply to Admins.
-        if IsAdmin().has_permission(self.request):
-            return queryset.none()
-
-        # All requests that are in the system, excluding ones that have been 
-        # archived (i.e. no owner) or are owned by Reception currently 
-        # (i.e. are actionable).
-        elif IsCoordinator().has_permission(self.request):
-            return queryset.exclude(owner=None).exclude(pk__in=actionable_pks)
-
-        elif IsProgramLead().has_permission(self.request):
-            program = None
-            try:
-                program = Program.objects.get(pk=context.get("instance"))
-            except Program.DoesNotExist:
-                return queryset.none()
-            
-            return queryset.filter(program=program).exclude(pk__in=actionable_pks)
-
-        
-        elif IsLabLead().has_permission(self.request):
-            # Downstream for a LabLead means requests associated with this lab
-            # but not currently in the lab's queue — either owned by an expert
-            # (being actively worked) or back up at the program (awaiting final approval) or completed.
-            lab = None
-            try:
-                lab = Lab.objects.get(pk=context.get("instance"))
-            except Lab.DoesNotExist:
-                return queryset.none()
-
-            return queryset.filter(lab=lab).exclude(owner=lab.owner).exclude(pk__in=actionable_pks)
-        
-        elif IsExpert().has_permission(self.request):
-            # Downstream for an Expert means requests assigned to them but not currently in their queue.
-            # Either owned by the lab (awaiting approval) or back up at the program (awaiting final approval) or completed.
-            user = User.objects.get(pk=context.get("user"))
-            return queryset.filter(expert=user).exclude(owner=user.owner)
-        else:
-            return queryset.none()
-
-
-    def get_queryset(self):
-        queryset = Request.objects.all()
-
-        # admins can see all requests
+        # admins can act on all requests that are active (have an owner).
         if IsAdmin().has_permission(self.request):
             return queryset
 
@@ -154,8 +101,105 @@ class BaseUserAwareRequest(views.APIView):
             # NOTE: Should experts be able to see all requests for their lab, or just ones for their lab+program?
             requests = requests.union(queryset.filter(owner=user.owner))
 
-        requests = Request.objects.filter(id__in=[req.id for req in list(requests)])
-        return requests 
+        requests = Request.objects.filter(id__in=requests.values('id'))
+        self._actionable_cache = requests
+        return requests
+    
+    def get_downstream(self):
+        queryset = Request.objects.exclude(owner=None)
+
+        maybe_context = self.request.headers.get("Context")
+        if not maybe_context:
+            return queryset.none()
+
+        context = json.loads(maybe_context) 
+
+        actionable_pks = self.get_actionable().values('pk')
+
+        # This is a convention, we assume all requests for admin are 
+        # "actionable" and none are "downstream". In reality, this 
+        # concept doesn't really apply to Admins.
+        if IsAdmin().has_permission(self.request):
+            return queryset.none()
+
+        # All requests that are in the system, excluding ones that have been 
+        # archived (i.e. no owner) or are owned by Reception currently 
+        # (i.e. are actionable).
+        elif IsCoordinator().has_permission(self.request):
+            return queryset.exclude(pk__in=actionable_pks)
+
+        elif IsProgramLead().has_permission(self.request):
+            program = None
+            try:
+                program = Program.objects.get(pk=context.get("instance"))
+            except Program.DoesNotExist:
+                return queryset.none()
+            
+            return queryset.filter(program=program).exclude(pk__in=actionable_pks)
+
+        
+        elif IsLabLead().has_permission(self.request):
+            # Downstream for a LabLead means requests associated with this lab
+            # but not currently in the lab's queue — either owned by an expert
+            # (being actively worked) or back up at the program (awaiting final approval) or completed.
+            lab = None
+            try:
+                lab = Lab.objects.get(pk=context.get("instance"))
+            except Lab.DoesNotExist:
+                return queryset.none()
+
+            return queryset.filter(lab=lab).exclude(owner=lab.owner).exclude(pk__in=actionable_pks)
+        
+        elif IsExpert().has_permission(self.request):
+            # Downstream for an Expert means requests assigned to them but not currently in their queue.
+            # Either owned by the lab (awaiting approval) or back up at the program (awaiting final approval) or completed.
+            user = User.objects.get(pk=context.get("user"))
+            return queryset.filter(expert=user).exclude(owner=user.owner)
+        else:
+            return queryset.none()
+        
+    def get_inactive(self):
+        maybe_context = self.request.headers.get("Context")
+        if maybe_context is None:
+            return Request.objects.none()
+            
+        context = json.loads(maybe_context)
+
+        if not context:
+            return Request.objects.none()
+
+        # user is trying to impersonate another user
+        if not (context.get("user") == self.request.user.id): 
+            return Request.objects.none()
+
+        queryset = Request.objects.filter(owner=None)
+
+        if IsAdmin().has_permission(self.request):
+            return queryset
+        elif IsCoordinator().has_permission(self.request, self):
+            return queryset
+        elif IsProgramLead().has_permission(self.request, self):
+            program = None
+            try:
+                program = Program.objects.get(pk=context.get("instance"))
+            except Program.DoesNotExist:
+                return queryset.none()
+            
+            return queryset.filter(program=program)
+        elif IsLabLead().has_permission(self.request, self):
+            lab = None
+            try:
+                lab = Lab.objects.get(pk=context.get("instance"))
+            except Lab.DoesNotExist:
+                return queryset.none()
+
+            return queryset.filter(lab=lab)
+        elif IsExpert().has_permission(self.request, self):
+            user = User.objects.get(pk=context.get("user"))
+            return queryset.filter(expert=user)
+
+        return queryset.none()
+
 
 class RequestDetailView(BaseUserAwareRequest):
     serializer_class = RequestDetailSerializer
@@ -164,7 +208,7 @@ class RequestDetailView(BaseUserAwareRequest):
     Used to populate Request and Customer panels.
     """
     def get(self, request, format=None, id=None):
-        queryset = self.get_actionable() | self.get_downstream()
+        queryset = self.get_actionable() | self.get_downstream() | self.get_inactive()
 
         if id is None:
             return Response(data={"message": "Please provide a Request ID"}, status=status.HTTP_400_BAD_REQUEST)
@@ -392,17 +436,20 @@ class RequestListView(BaseUserAwareRequest):
     def get(self, request, format=None):
         actionable = self.get_actionable()
         downstream = self.get_downstream()
+        inactive = self.get_inactive()
         
-        response_data = {"actionable": list(), "downstream": list()}
+        response_data = {"actionable": list(), "downstream": list(), "inactive": list()}
 
-        for tag in response_data:
+        for key in response_data:
             queryset = None 
-            if tag == "actionable":
+            if key == "actionable":
                 queryset = actionable
-            else:
+            elif key == "downstream":
                 queryset = downstream
+            elif key == "inactive":
+                queryset = inactive
             
-            if not queryset.exists():
+            if not queryset or not queryset.exists():
                 continue 
                 
             serializer = RequestListSerializer(queryset, many=True)
@@ -415,7 +462,7 @@ class RequestListView(BaseUserAwareRequest):
                 data["customer_state_abbreviation"] = poc_customer.state.abbreviation 
                 requests_data.append(data)
             
-            response_data[tag] = requests_data
+            response_data[key] = requests_data
 
         return Response(data=response_data, status=status.HTTP_200_OK)
 

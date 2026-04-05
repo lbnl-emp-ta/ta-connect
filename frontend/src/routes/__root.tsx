@@ -18,10 +18,10 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
   loader: async ({ context }) => {
     await context.queryClient.ensureQueryData(authSessionQueryOptions());
   },
-  component: TopLevelLayout,
+  component: TopLevelLayoutWrapper,
 });
 
-function TopLevelLayout() {
+function TopLevelLayoutWrapper() {
   const { showToast, toastMessage, toastAutoHideDuration, setShowToast } = useToastContext();
 
   const handleToastClose = (_event: React.SyntheticEvent | Event, reason?: SnackbarCloseReason) => {

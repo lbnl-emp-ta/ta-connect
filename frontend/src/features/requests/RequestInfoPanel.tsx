@@ -120,7 +120,6 @@ export const RequestInfoPanel: React.FC<RequestInfoPanelProps> = ({ request }) =
       setEditing(false);
       return;
     }
-    console.log('Submitting request update:', mutationData);
     updateRequestMutation.mutate(mutationData);
   };
 

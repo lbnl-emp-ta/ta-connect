@@ -29,7 +29,7 @@ class NoteListView(views.APIView):
             return Response(data={"message": "Request with given ID does not exist"}, status=status.HTTP_400_BAD_REQUEST)
             
         base_user_request_obj = BaseUserAwareRequest(request=request)
-        visible_request = base_user_request_obj.get_actionable() | base_user_request_obj.get_downstream()
+        visible_request = base_user_request_obj.get_actionable() | base_user_request_obj.get_downstream() | base_user_request_obj.get_inactive()
         
         if not visible_request.contains(request_obj):
             return Response(data={"message": "Insufficient authorization to view notes for given request"}, status=status.HTTP_400_BAD_REQUEST)
