@@ -219,12 +219,12 @@ export const RequestCustomerPanel: React.FC<RequestCustomerPanelProps> = ({ cust
       header={
         <Stack direction="row" alignItems="center" justifyContent="space-between">
           <span>Customer Information</span>
-          {!editing && (
+          {hasPermission('edit-customer', detailedIdentity) && !editing && (
             <IconButton onClick={handleEditClick}>
               <EditIcon />
             </IconButton>
           )}
-          {editing && (
+          {hasPermission('edit-customer', detailedIdentity) && editing && (
             <Stack direction="row">
               {!updateCustomerMutation.isPending && (
                 <IconButton onClick={handleEditSubmit}>

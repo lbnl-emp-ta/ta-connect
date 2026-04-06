@@ -85,6 +85,7 @@ type PermissionAction =
   | 'edit-projected-start-date'
   | 'edit-projected-completion-date'
   | 'edit-actual-completion-date'
+  | 'edit-customer'
   | 'edit-organization-type';
 
 /**
@@ -105,6 +106,7 @@ export const hasPermission = (action: PermissionAction, detailedIdentity?: TAIde
         case 'edit-projected-start-date':
         case 'edit-projected-completion-date':
         case 'edit-actual-completion-date':
+        case 'edit-customer':
           return true;
       }
       return false;
@@ -116,6 +118,7 @@ export const hasPermission = (action: PermissionAction, detailedIdentity?: TAIde
         case 'edit-projected-start-date':
         case 'edit-projected-completion-date':
         case 'edit-actual-completion-date':
+        case 'edit-customer':
           return true;
       }
       return false;
@@ -127,6 +130,7 @@ export const hasPermission = (action: PermissionAction, detailedIdentity?: TAIde
         case 'edit-projected-start-date':
         case 'edit-projected-completion-date':
         case 'edit-actual-completion-date':
+        case 'edit-customer':
           return true;
       }
       return false;
