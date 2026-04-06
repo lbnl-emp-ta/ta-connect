@@ -4,6 +4,7 @@ import ClearIcon from '@mui/icons-material/Clear';
 import EditIcon from '@mui/icons-material/Edit';
 import ErrorIcon from '@mui/icons-material/Error';
 import {
+  Alert,
   Box,
   CircularProgress,
   IconButton,
@@ -249,11 +250,17 @@ export const RequestCustomerPanel: React.FC<RequestCustomerPanelProps> = ({ cust
         <TableContainer>
           <Table size="small" sx={{ '& .MuiTableCell-root:first-of-type': { width: '205px' } }}>
             <TableBody>
-              {/* TODO: Implement relationship in the API */}
-              {/* <TableRow>
-                <TableCell>Relationship</TableCell>
-                <TableCell>Unknown</TableCell>
-              </TableRow> */}
+              {editing && (
+                <TableRow>
+                  <TableCell colSpan={2}>
+                    <Alert severity="info">
+                      Changes to customer information will apply to all requests associated with
+                      this customer. If you need to change the associated customer, please contact
+                      an administrator or taconnect@lbl.gov.
+                    </Alert>
+                  </TableCell>
+                </TableRow>
+              )}
               <TableRow>
                 <TableCell>Name</TableCell>
                 <TableCell>
