@@ -213,7 +213,7 @@ export const RequestInfoPanel: React.FC<RequestInfoPanelProps> = ({ request }) =
                   <TableCell>{request.id}</TableCell>
                 </TableRow>
                 <TableRow>
-                  <TableCell>Assignment Location</TableCell>
+                  <TableCell>Current Owner</TableCell>
                   <TableCell>
                     <Stack direction="row" spacing={1}>
                       {request.owner && <span>{capitalize(request.owner.domain_type)}</span>}
@@ -228,8 +228,16 @@ export const RequestInfoPanel: React.FC<RequestInfoPanelProps> = ({ request }) =
                   </TableCell>
                 </TableRow>
                 <TableRow>
+                  <TableCell>Program</TableCell>
+                  <TableCell>{request.program ? request.program.name : 'Not assigned'}</TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell>Lab</TableCell>
+                  <TableCell>{request.lab ? request.lab.name : 'Not assigned'}</TableCell>
+                </TableRow>
+                <TableRow>
                   <TableCell>Assigned Expert</TableCell>
-                  <TableCell>{request.expert ? request.expert.email : 'None'}</TableCell>
+                  <TableCell>{request.expert ? request.expert.email : 'Not assigned'}</TableCell>
                 </TableRow>
                 <TableRow>
                   <TableCell>Status</TableCell>
