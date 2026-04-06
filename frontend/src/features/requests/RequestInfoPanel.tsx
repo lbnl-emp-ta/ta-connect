@@ -263,14 +263,15 @@ export const RequestInfoPanel: React.FC<RequestInfoPanelProps> = ({ request }) =
                 <TableRow>
                   <TableCell>Projected Start Date</TableCell>
                   <TableCell>
-                    {!editing && (
+                    {(!editing ||
+                      !hasPermission('edit-projected-start-date', detailedIdentity)) && (
                       <>
                         {request.proj_start_date
                           ? dayjs(request.proj_start_date).format('MM/DD/YYYY')
                           : 'Unknown'}
                       </>
                     )}
-                    {editing && (
+                    {editing && hasPermission('edit-projected-start-date', detailedIdentity) && (
                       <DatePicker
                         value={projectedStartDate || null}
                         onChange={handleProjectedStartDateChange}
@@ -286,37 +287,40 @@ export const RequestInfoPanel: React.FC<RequestInfoPanelProps> = ({ request }) =
                 <TableRow>
                   <TableCell>Projected Completion Date</TableCell>
                   <TableCell>
-                    {!editing && (
+                    {(!editing ||
+                      !hasPermission('edit-projected-completion-date', detailedIdentity)) && (
                       <>
                         {request.proj_completion_date
                           ? dayjs(request.proj_completion_date).format('MM/DD/YYYY')
                           : 'Unknown'}
                       </>
                     )}
-                    {editing && (
-                      <DatePicker
-                        value={projectedCompletionDate || null}
-                        onChange={handleProjectedCompletionDateChange}
-                        slotProps={{
-                          field: {
-                            clearable: true,
-                          },
-                        }}
-                      />
-                    )}
+                    {editing &&
+                      hasPermission('edit-projected-completion-date', detailedIdentity) && (
+                        <DatePicker
+                          value={projectedCompletionDate || null}
+                          onChange={handleProjectedCompletionDateChange}
+                          slotProps={{
+                            field: {
+                              clearable: true,
+                            },
+                          }}
+                        />
+                      )}
                   </TableCell>
                 </TableRow>
                 <TableRow>
                   <TableCell>Actual Completion Date</TableCell>
                   <TableCell>
-                    {!editing && (
+                    {(!editing ||
+                      !hasPermission('edit-actual-completion-date', detailedIdentity)) && (
                       <>
                         {request.actual_completion_date
                           ? dayjs(request.actual_completion_date).format('MM/DD/YYYY')
                           : 'Unknown'}
                       </>
                     )}
-                    {editing && (
+                    {editing && hasPermission('edit-actual-completion-date', detailedIdentity) && (
                       <DatePicker
                         value={actualCompletionDate || null}
                         onChange={handleActualCompletionDateChange}

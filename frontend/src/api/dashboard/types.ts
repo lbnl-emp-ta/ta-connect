@@ -1,3 +1,9 @@
+export interface TAOrganizationType {
+  id: number;
+  name: string;
+  description: string;
+}
+
 export interface TACustomer {
   id: number;
   email: string;
@@ -8,11 +14,7 @@ export interface TACustomer {
     id: number;
     address: string;
     name: string;
-    type: {
-      id: number;
-      name: string;
-      description: string;
-    };
+    type: TAOrganizationType;
   };
   state: {
     id: number;
@@ -28,6 +30,7 @@ export interface TACustomer {
 
 export interface TACustomerMutation {
   org?: number;
+  orgType?: number;
   tpr?: number;
   email?: string;
   name?: string;
