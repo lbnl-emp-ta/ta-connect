@@ -32,9 +32,10 @@ class CustomSocialAccountAdapter(DefaultSocialAccountAdapter):
         """
         if sociallogin.account.provider == 'orcid':
             # ORCID only returns an email if the user has made it public.
-            # If no email is provided, generate a placeholder from the ORCID iD
+            # If no email is provided by ORCID and the user has not already
+            # provided their email during a previous login, generate a placeholder from the ORCID
             # so that allauth's EMAIL_REQUIRED check doesn't block signup.
-            if not sociallogin.email_addresses:
+            if not sociallogin.user.email and not sociallogin.email_addresses:
                 orcid_id = sociallogin.account.uid  # e.g. '0000-0002-1825-0097'
                 placeholder_email = f"{orcid_id}@orcid.placeholder"
                 sociallogin.user.email = placeholder_email
