@@ -4,6 +4,7 @@ import ClearIcon from '@mui/icons-material/Clear';
 import EditIcon from '@mui/icons-material/Edit';
 import ErrorIcon from '@mui/icons-material/Error';
 import {
+  Alert,
   Box,
   CircularProgress,
   IconButton,
@@ -16,36 +17,40 @@ import {
   TableContainer,
   TableRow,
   TextField,
+  Tooltip,
   Typography,
 } from '@mui/material';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { ChangeEvent, useCallback, useEffect, useState } from 'react';
-import { TACustomer, TACustomerMutation } from '../../api/dashboard/types';
-import { InfoPanel } from '../../components/InfoPanel';
+import { TACustomer, TACustomerMutation, TAOrganizationType } from '@/api/dashboard/types';
+import { InfoPanel } from '@/components/InfoPanel';
 import {
   organizationQueryOptions,
+  organizationTypesQueryOptions,
   statesQueryOptions,
   transmissionPlanningRegionsQueryOptions,
   useCustomerMutation,
-} from '../../utils/queryOptions';
-import { isValidEmail, isValidUSTelephone } from '../../utils/utils';
-import { useIdentityContext } from '../identity/IdentityContext';
-import { useToastContext } from '../toasts/ToastContext';
-import { ToastMessage } from '../toasts/ToastMessage';
+} from '@/utils/queryOptions';
+import { hasPermission, isValidEmail, isValidUSTelephone } from '@/utils/utils';
+import { useIdentityContext } from '@/features/identity/IdentityContext';
+import { useToastContext } from '@/features/toasts/ToastContext';
+import { ToastMessage } from '@/features/toasts/ToastMessage';
 
 interface RequestCustomerPanelProps {
   customer?: TACustomer;
 }
 
 export const RequestCustomerPanel: React.FC<RequestCustomerPanelProps> = ({ customer }) => {
-  const { identity } = useIdentityContext();
+  const { identity, detailedIdentity } = useIdentityContext();
   const { data: allOrganizations } = useSuspenseQuery(organizationQueryOptions());
+  const { data: allOrganizationTypes } = useSuspenseQuery(organizationTypesQueryOptions());
   const { data: allTpr } = useSuspenseQuery(transmissionPlanningRegionsQueryOptions());
   const { data: allStates } = useSuspenseQuery(statesQueryOptions());
   const updateCustomerMutation = useCustomerMutation(customer?.id.toString() || '', identity);
   const [editing, setEditing] = useState(false);
   const { setShowToast, setToastMessage } = useToastContext();
   const [org, setOrg] = useState<TACustomer['org']['id']>();
+  const [orgType, setOrgType] = useState<TAOrganizationType['id']>();
   const [tpr, setTpr] = useState<TACustomer['tpr']['id']>();
   const [email, setEmail] = useState<TACustomer['email']>();
   const [emailError, setEmailError] = useState(false);
@@ -63,6 +68,7 @@ export const RequestCustomerPanel: React.FC<RequestCustomerPanelProps> = ({ cust
   const resetFormValues = useCallback(() => {
     if (customer) {
       setOrg(customer.org.id);
+      setOrgType(customer.org.type.id);
       setTpr(customer.tpr.id);
       setEmail(customer.email || '');
       setEmailError(false);
@@ -101,6 +107,9 @@ export const RequestCustomerPanel: React.FC<RequestCustomerPanelProps> = ({ cust
     }
     if (org !== customer?.org.id) {
       mutationData.org = org;
+    }
+    if (orgType !== customer?.org.type.id) {
+      mutationData.orgType = orgType;
     }
     if (tpr !== customer?.tpr.id) {
       mutationData.tpr = tpr;
@@ -159,6 +168,14 @@ export const RequestCustomerPanel: React.FC<RequestCustomerPanelProps> = ({ cust
     setOrg(event.target.value);
   };
 
+  const handleOrgTypeChange = (
+    event:
+      | ChangeEvent<Omit<HTMLInputElement, 'value'> & { value: number }>
+      | (Event & { target: { value: number; name: string } })
+  ) => {
+    setOrgType(event.target.value);
+  };
+
   const handleTprChange = (
     event:
       | ChangeEvent<Omit<HTMLInputElement, 'value'> & { value: number }>
@@ -203,12 +220,12 @@ export const RequestCustomerPanel: React.FC<RequestCustomerPanelProps> = ({ cust
       header={
         <Stack direction="row" alignItems="center" justifyContent="space-between">
           <span>Customer Information</span>
-          {!editing && (
+          {hasPermission('edit-customer', detailedIdentity) && !editing && (
             <IconButton onClick={handleEditClick}>
               <EditIcon />
             </IconButton>
           )}
-          {editing && (
+          {hasPermission('edit-customer', detailedIdentity) && editing && (
             <Stack direction="row">
               {!updateCustomerMutation.isPending && (
                 <IconButton onClick={handleEditSubmit}>
@@ -233,11 +250,17 @@ export const RequestCustomerPanel: React.FC<RequestCustomerPanelProps> = ({ cust
         <TableContainer>
           <Table size="small" sx={{ '& .MuiTableCell-root:first-of-type': { width: '205px' } }}>
             <TableBody>
-              {/* TODO: Implement relationship in the API */}
-              {/* <TableRow>
-                <TableCell>Relationship</TableCell>
-                <TableCell>Unknown</TableCell>
-              </TableRow> */}
+              {editing && (
+                <TableRow>
+                  <TableCell colSpan={2}>
+                    <Alert severity="info">
+                      Changes to customer information will apply to all requests associated with
+                      this customer. If you need to change the associated customer, please contact
+                      an administrator or taconnect@lbl.gov.
+                    </Alert>
+                  </TableCell>
+                </TableRow>
+              )}
               <TableRow>
                 <TableCell>Name</TableCell>
                 <TableCell>
@@ -327,6 +350,38 @@ export const RequestCustomerPanel: React.FC<RequestCustomerPanelProps> = ({ cust
                       ))}
                     </Select>
                   )}
+                </TableCell>
+              </TableRow>
+              <TableRow>
+                <TableCell>Organization Type</TableCell>
+                <TableCell>
+                  <Stack direction="row" alignItems="center" spacing={1}>
+                    {(!editing || !hasPermission('edit-organization-type', detailedIdentity)) && (
+                      <span>{customer.org.type.name}</span>
+                    )}
+                    {editing && !hasPermission('edit-organization-type', detailedIdentity) && (
+                      <Tooltip title="Only admins can edit the organization type." placement="top">
+                        <ErrorIcon sx={{ color: 'grey.500' }} />
+                      </Tooltip>
+                    )}
+                    {editing && hasPermission('edit-organization-type', detailedIdentity) && (
+                      <>
+                        <Select value={orgType} onChange={handleOrgTypeChange}>
+                          {allOrganizationTypes?.map((orgTypeItem) => (
+                            <MenuItem key={orgTypeItem.id} value={orgTypeItem.id}>
+                              {orgTypeItem.name}
+                            </MenuItem>
+                          ))}
+                        </Select>
+                        <Tooltip
+                          title="Changing the organization type will apply to all customers that use this organization."
+                          placement="top"
+                        >
+                          <ErrorIcon sx={{ color: 'grey.500' }} />
+                        </Tooltip>
+                      </>
+                    )}
+                  </Stack>
                 </TableCell>
               </TableRow>
               <TableRow>
