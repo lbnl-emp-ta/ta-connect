@@ -12,6 +12,7 @@ import {
   MenuItem,
   Stack,
   TextField,
+  Tooltip,
   Typography,
 } from '@mui/material';
 import { useSuspenseQuery } from '@tanstack/react-query';
@@ -51,6 +52,7 @@ export const RequestAssignForwardButton: React.FC<RequestAssignForwardButtonProp
   const { tab, nextId, previousId } = useRequestsContext();
   const { setShowToast, setToastMessage } = useToastContext();
   const [searchTerm, setSearchTerm] = useState('');
+  const requestOrganizationType = request.customers[0].org.type;
   const ownersContainsExperts = owners?.some((owner) => owner.domain_type === 'expert');
   const currentStep = useMemo(() => {
     return getStep(request);
@@ -171,6 +173,14 @@ export const RequestAssignForwardButton: React.FC<RequestAssignForwardButtonProp
     }
   };
 
+  const checkOrganizationTypes = (owner: TAOwner) => {
+    if (!owner.domain_organization_types || owner.domain_organization_types.length === 0) {
+      return false;
+    }
+    const ownerOrganizationTypeIds = owner.domain_organization_types.map((orgType) => orgType.id);
+    return ownerOrganizationTypeIds.includes(requestOrganizationType.id);
+  };
+
   if (!detailedIdentity || !currentStep.allowedRoles.includes(detailedIdentity.role.name)) {
     return null;
   }
@@ -247,6 +257,23 @@ export const RequestAssignForwardButton: React.FC<RequestAssignForwardButtonProp
             <Stack direction="row" spacing={1}>
               <ListItemText>{owner.domain_name}</ListItemText>
               <Chip label={capitalize(owner.domain_type)} size="small" />
+              {owner.domain_type === 'program' && (
+                <>
+                  {checkOrganizationTypes(owner) ? (
+                    <Tooltip
+                      title={`This program supports ${requestOrganizationType.name} customers.`}
+                    >
+                      <CheckCircleIcon color="success" />
+                    </Tooltip>
+                  ) : (
+                    <Tooltip
+                      title={`This program does not support ${requestOrganizationType.name} customers.`}
+                    >
+                      <ErrorIcon color="error" />
+                    </Tooltip>
+                  )}
+                </>
+              )}
             </Stack>
           </MenuItem>
         ))}

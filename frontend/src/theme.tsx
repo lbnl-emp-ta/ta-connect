@@ -30,22 +30,13 @@ export const theme = createTheme({
       main: '#38AECC',
     },
     success: {
-      main: '#2e7d32',
-      light: '#4caf50',
-      dark: '#1b5e20',
-      contrastText: '#fff',
+      main: '#74AA50',
     },
     warning: {
-      main: '#ed6c02',
-      light: '#ff9800',
-      dark: '#e65100',
-      contrastText: '#fff',
+      main: '#FAD038',
     },
     error: {
-      main: '#d32f2f',
-      light: '#ef5350',
-      dark: '#c62828',
-      contrastText: '#fff',
+      main: '#FF8370',
     },
     common: {
       black: '#000',

@@ -76,6 +76,7 @@ export interface TAOwner {
   domain_id?: number;
   domain_name?: string;
   domain_type: TADomainType;
+  domain_organization_types?: TAOrganizationType[];
 }
 
 export interface TAExpertise {
