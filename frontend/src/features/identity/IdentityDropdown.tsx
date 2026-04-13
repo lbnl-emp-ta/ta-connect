@@ -52,14 +52,19 @@ export const IdentityDropdown: React.FC = () => {
 
   useEffect(() => {
     if (detailedIdentity) {
-      setIdentity({
+      const newIdentity = {
         user: detailedIdentity.user.id,
         role: detailedIdentity.role.id,
         location: detailedIdentity.location,
         instance: detailedIdentity.instance?.id,
-      });
+      };
       if (identity && detailedIdentity.role.id !== identity?.role) {
-        navigate({ to: getNavigationTarget() });
+        // Attempt to fix error thrown when changing identity
+        void navigate({ to: getNavigationTarget() }).then(() => {
+          setIdentity(newIdentity);
+        });
+      } else {
+        setIdentity(newIdentity);
       }
     } else {
       setDetailedIdentity(identities ? identities[0] : undefined);

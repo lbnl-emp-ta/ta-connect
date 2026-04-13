@@ -14,7 +14,7 @@ function NoSelectedRequest() {
   const sortedRequests = sortedRequestsMap['actionable'] ?? [];
 
   /**
-   * If the /dashboard/requests page is navigated to and there are actionable requests,
+   * If the /requests/active page is navigated to and there are actionable requests,
    * it should redirect to the first item in the requests table.
    */
   useEffect(() => {

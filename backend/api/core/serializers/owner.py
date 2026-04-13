@@ -20,6 +20,7 @@ class OwnerSerializer(serializers.ModelSerializer):
         domain_name = None
         domain_description = None
         domain_id = None
+        domain_organization_types = None
         match owner.domain_type:
             case DOMAINTYPE.RECEPTION:
                 domain_id = owner.reception.pk
@@ -29,6 +30,7 @@ class OwnerSerializer(serializers.ModelSerializer):
                 domain_id = owner.program.pk
                 domain_name = owner.program.name
                 domain_description = owner.program.description
+                domain_organization_types = OrganizationTypeSerializer(owner.program.organization_types.all(), many=True).data
             case DOMAINTYPE.LAB:
                 domain_id = owner.lab.pk
                 domain_name = owner.lab.name
@@ -41,5 +43,6 @@ class OwnerSerializer(serializers.ModelSerializer):
         data["domain_name"] = domain_name
         data["domain_description"] = domain_description 
         data["domain_id"] = domain_id 
+        data["domain_organization_types"] = domain_organization_types 
 
         return data

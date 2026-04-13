@@ -75,6 +75,13 @@ class CustomerEditView(views.APIView):
             except Organization.DoesNotExist:
                 return Response(data={"message":"Organization with given ID does not exist"})
             customer_patch_data["org"] = request.data.get("org")
+
+        if "orgType" in request.data and (request.data.get("orgType") is not None):
+            try:
+                OrganizationType.objects.get(pk=request.data.get("orgType"))
+            except OrganizationType.DoesNotExist:
+                return Response(data={"message":"Organization type with given ID does not exist"})
+            customer_patch_data["orgType"] = request.data.get("orgType")
         
         serializer = CustomerEditSerializer(customer_obj, data=customer_patch_data, partial=True)
         if serializer.is_valid():

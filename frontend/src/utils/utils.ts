@@ -78,7 +78,15 @@ export const downloadBlob = (blob: Blob, filename: string): void => {
   a.remove();
 };
 
-type PermissionAction = 'edit-depth' | 'edit-topics' | 'edit-description';
+type PermissionAction =
+  | 'edit-depth'
+  | 'edit-topics'
+  | 'edit-description'
+  | 'edit-projected-start-date'
+  | 'edit-projected-completion-date'
+  | 'edit-actual-completion-date'
+  | 'edit-customer'
+  | 'edit-organization-type';
 
 /**
  * Frontend function for checking if a user has permission to perform a certain action based on their role.
@@ -91,18 +99,49 @@ export const hasPermission = (action: PermissionAction, detailedIdentity?: TAIde
     case TARole.Admin:
       return true;
     case TARole.Coordinator:
-      return true;
-    case TARole.Expert:
       switch (action) {
         case 'edit-depth':
         case 'edit-topics':
         case 'edit-description':
-          return false;
+        case 'edit-projected-start-date':
+        case 'edit-projected-completion-date':
+        case 'edit-actual-completion-date':
+        case 'edit-customer':
+          return true;
       }
-    case TARole.LabLead:
-      return true;
+      return false;
     case TARole.ProgramLead:
-      return true;
+      switch (action) {
+        case 'edit-depth':
+        case 'edit-topics':
+        case 'edit-description':
+        case 'edit-projected-start-date':
+        case 'edit-projected-completion-date':
+        case 'edit-actual-completion-date':
+        case 'edit-customer':
+          return true;
+      }
+      return false;
+    case TARole.LabLead:
+      switch (action) {
+        case 'edit-depth':
+        case 'edit-topics':
+        case 'edit-description':
+        case 'edit-projected-start-date':
+        case 'edit-projected-completion-date':
+        case 'edit-actual-completion-date':
+        case 'edit-customer':
+          return true;
+      }
+      return false;
+    case TARole.Expert:
+      switch (action) {
+        case 'edit-projected-start-date':
+        case 'edit-projected-completion-date':
+        case 'edit-actual-completion-date':
+          return true;
+      }
+      return false;
     default:
       return false;
   }

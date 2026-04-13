@@ -1,3 +1,9 @@
+export interface TAOrganizationType {
+  id: number;
+  name: string;
+  description: string;
+}
+
 export interface TACustomer {
   id: number;
   email: string;
@@ -8,11 +14,7 @@ export interface TACustomer {
     id: number;
     address: string;
     name: string;
-    type: {
-      id: number;
-      name: string;
-      description: string;
-    };
+    type: TAOrganizationType;
   };
   state: {
     id: number;
@@ -28,6 +30,7 @@ export interface TACustomer {
 
 export interface TACustomerMutation {
   org?: number;
+  orgType?: number;
   tpr?: number;
   email?: string;
   name?: string;
@@ -73,6 +76,7 @@ export interface TAOwner {
   domain_id?: number;
   domain_name?: string;
   domain_type: TADomainType;
+  domain_organization_types?: TAOrganizationType[];
 }
 
 export interface TAExpertise {

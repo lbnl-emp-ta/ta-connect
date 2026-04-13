@@ -18,6 +18,7 @@ import { useUser } from '@/hooks/useUser';
 import { identitiesQueryOptions } from '@/utils/queryOptions';
 import { useEffect, useState } from 'react';
 import { UserInfoDialog } from '@/features/profile/UserInfoDialog';
+import { TAIdentity } from '@/api/dashboard/types';
 
 export const Route = createFileRoute('/_with-nav/_private/profile')({
   component: ProfilePage,
@@ -36,6 +37,10 @@ function ProfilePage() {
 
   const handleCloseUserInfoDialog = () => {
     setIsUserInfoDialogOpen(false);
+  };
+
+  const getIdentityKey = (identity: TAIdentity) => {
+    return `${identity.role.id}-${identity.location}-${identity.instance?.id ?? 'none'}`;
   };
 
   useEffect(() => {
@@ -99,7 +104,7 @@ function ProfilePage() {
         {identities && identities.length > 0 && (
           <Stack spacing={2}>
             {identities.map((identity) => (
-              <RolePanel identity={identity} key={identity.role.id} />
+              <RolePanel identity={identity} key={getIdentityKey(identity)} />
             ))}
           </Stack>
         )}
