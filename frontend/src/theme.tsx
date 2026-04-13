@@ -30,7 +30,8 @@ export const theme = createTheme({
       main: '#38AECC',
     },
     success: {
-      main: '#74AA50',
+      main: '#13b8a6',
+      light: '#f0fdfa',
     },
     warning: {
       main: '#FAD038',
