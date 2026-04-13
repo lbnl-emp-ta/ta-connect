@@ -90,6 +90,9 @@ export interface TAExpert {
   email: string;
   name: string;
   expertise: TAExpertise[];
+  lab?: TALab;
+  active_requests_count?: number;
+  total_requests_count?: number;
 }
 
 export interface TAProgram {

@@ -42,13 +42,16 @@ const columns: GridColDef[] = [
     },
   },
   {
-    field: 'requests',
-    headerName: 'Assigned Requests',
+    field: 'active_requests_count',
+    headerName: 'Active Requests',
     width: 200,
     type: 'number',
-    valueGetter: (value: any) => {
-      return value?.length || 0;
-    },
+  },
+  {
+    field: 'total_requests_count',
+    headerName: 'Total Requests',
+    width: 200,
+    type: 'number',
   },
 ];
 

@@ -7,7 +7,7 @@ from core.views.request import BaseUserAwareRequest
 from core.models import *
 from core.serializers import *
 from core.permissions import *
-from core.constants import ROLE
+from core.constants import ROLE, REQUEST_STATUS
 
 from allauth.headless.contrib.rest_framework.authentication import (
     XSessionTokenAuthentication,
@@ -70,8 +70,11 @@ class ExpertsListView(views.APIView):
 
             data["expertises"] = expertise_list
 
-            request_data = RequestExpertListSerializer(Request.objects.filter(expert=User.objects.get(pk=self.request.user.id)), many=True).data
-            data["requests"] = request_data
+            expert_user = assignment.user
+            expert_requests = Request.objects.filter(expert=expert_user)
+            active_requests = expert_requests.exclude(owner=None)
+            data["active_requests_count"] = active_requests.count()
+            data["total_requests_count"] = expert_requests.count()
 
             experts_data.append(data)
         
