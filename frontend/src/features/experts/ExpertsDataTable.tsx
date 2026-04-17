@@ -1,26 +1,15 @@
 import { CellWithPopover } from '@/components/CellWithPopover';
-import { Button, Chip, Paper, Stack, Tooltip } from '@mui/material';
+import { Chip, Paper, Stack, Tooltip } from '@mui/material';
 import { DataGrid, GridColDef, GridRenderCellParams } from '@mui/x-data-grid';
-import CheckCircleIcon from '@mui/icons-material/CheckCircle';
-import CircularProgress from '@mui/material/CircularProgress';
-import ErrorIcon from '@mui/icons-material/Error';
-import { useNavigate } from '@tanstack/react-router';
-import { TAExpert, TAExpertise, TAOwner } from '../../api/dashboard/types';
+import { TAExpert, TAExpertise } from '../../api/dashboard/types';
 import { ExpertsToolbar } from './ExpertsToolbar';
-import { queryClient } from '@/App';
-import { useIdentityContext } from '@/features/identity/IdentityContext';
-import { useRequestsContext } from '@/features/requests/RequestsContext';
-import { useToastContext } from '@/features/toasts/ToastContext';
-import { ToastMessage } from '@/features/toasts/ToastMessage';
-import { useAssignmentMutation } from '@/utils/queryOptions';
 
 interface ExpertsDataTableProps {
   experts: TAExpert[] | null;
-  showAssignColumn?: boolean;
-  currentRequestId?: number;
+  columns?: GridColDef[];
 }
 
-const columns: GridColDef[] = [
+export const expertColumns: GridColDef[] = [
   { field: 'name', headerName: 'Name', width: 150 },
   { field: 'email', headerName: 'Email', width: 150 },
   {
@@ -70,89 +59,20 @@ const columns: GridColDef[] = [
   },
 ];
 
+/**
+ * Data table component for displaying experts.
+ * Used in the Experts page and also in the request details page (as ExpertsPanelDataTable).
+ */
 export const ExpertsDataTable: React.FC<ExpertsDataTableProps> = ({
   experts,
-  showAssignColumn,
-  currentRequestId,
+  columns = expertColumns,
 }) => {
-  const navigate = useNavigate();
-  const { identity } = useIdentityContext();
-  const { tab, nextId, previousId, setExpertsPanelOpen } = useRequestsContext();
-  const { setShowToast, setToastMessage } = useToastContext();
-  const onMutate = (message: string) => {
-    return () => {
-      setShowToast(true);
-      setToastMessage(
-        <ToastMessage>
-          <Stack direction="row" alignItems="center">
-            <CircularProgress size="1.25rem" color="info" />
-            <span>{message}</span>
-          </Stack>
-        </ToastMessage>
-      );
-    };
-  };
-  const onSuccess = (message: string) => {
-    return () => {
-      queryClient.invalidateQueries();
-      setShowToast(true);
-      setToastMessage(<ToastMessage icon={<CheckCircleIcon />}>{message}</ToastMessage>);
-      if (nextId) {
-        navigate({
-          to: `/requests/${tab}/${nextId}`,
-          params: { requestId: nextId.toString() },
-        });
-      } else if (previousId) {
-        navigate({
-          to: `/requests/${tab}/${previousId}`,
-          params: { requestId: previousId.toString() },
-        });
-      }
-    };
-  };
-  const onError = (error: Error) => {
-    setShowToast(true);
-    setToastMessage(<ToastMessage icon={<ErrorIcon />}>{error.message}</ToastMessage>);
-  };
-  const assignRequestMutation = currentRequestId
-    ? useAssignmentMutation(currentRequestId.toString(), identity, {
-        onMutate: onMutate('Assigning request'),
-        onSuccess: onSuccess('Request assigned'),
-        onError: onError,
-      })
-    : null;
-
-  const handleAssignment = (expert: TAExpert) => {
-    if (!assignRequestMutation || !currentRequestId) return;
-    assignRequestMutation.mutate({ request: currentRequestId, owner: expert.owner_id });
-    setExpertsPanelOpen(false);
-  };
-
-  const assignColumn: GridColDef = {
-    field: 'assign',
-    headerName: 'Assign',
-    width: 150,
-    type: 'custom',
-    align: 'center',
-    headerAlign: 'center',
-    renderCell: (params) => (
-      <Button
-        variant="contained"
-        color="primary"
-        size="small"
-        onClick={() => handleAssignment(params.row)}
-      >
-        Assign
-      </Button>
-    ),
-  };
-
   return (
     <Paper>
       <DataGrid
         loading={experts === null}
         rows={experts || []}
-        columns={showAssignColumn ? [...columns, assignColumn] : columns}
+        columns={columns}
         disableRowSelectionOnClick
         showToolbar
         slots={{ toolbar: ExpertsToolbar }}

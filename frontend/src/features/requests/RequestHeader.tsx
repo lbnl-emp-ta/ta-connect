@@ -1,15 +1,15 @@
 import { TARequestDetail } from '@/api/dashboard/types';
 import { AppLink } from '@/components/AppLink';
+import { ExpertsPanelDataTable } from '@/features/experts/ExpertsPanelDataTable';
+import { useIdentityContext } from '@/features/identity/IdentityContext';
 import { RequestAssignBackwardButton } from '@/features/requests/RequestAssignBackwardButton';
 import { RequestAssignForwardButton } from '@/features/requests/RequestAssignForwardButton';
+import { expertsQueryOptions } from '@/utils/queryOptions';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
-import { IconButton, Stack, Typography, Drawer, Box } from '@mui/material';
-import { useRequestsContext } from './RequestsContext';
-import { ExpertsDataTable } from '@/features/experts/ExpertsDataTable';
+import { Box, Drawer, IconButton, Stack, Typography } from '@mui/material';
 import { useSuspenseQuery } from '@tanstack/react-query';
-import { expertsQueryOptions } from '@/utils/queryOptions';
-import { useIdentityContext } from '@/features/identity/IdentityContext';
+import { useRequestsContext } from './RequestsContext';
 
 interface RequestHeaderProps {
   request: TARequestDetail;
@@ -89,11 +89,7 @@ export const RequestHeader: React.FC<RequestHeaderProps> = ({ request }) => {
         sx={{ zIndex: 1202 }}
       >
         <Box sx={{ width: 1000 }}>
-          <ExpertsDataTable
-            experts={experts || []}
-            showAssignColumn
-            currentRequestId={request.id}
-          />
+          <ExpertsPanelDataTable experts={experts || []} currentRequestId={request.id} />
         </Box>
       </Drawer>
     </Stack>
