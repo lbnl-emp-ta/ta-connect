@@ -1,3 +1,17 @@
+import { TAOwner, TARequestDetail } from '@/api/dashboard/types';
+import { queryClient } from '@/App';
+import { useIdentityContext } from '@/features/identity/IdentityContext';
+import { useRequestsContext } from '@/features/requests/RequestsContext';
+import { useToastContext } from '@/features/toasts/ToastContext';
+import { ToastMessage } from '@/features/toasts/ToastMessage';
+import {
+  ownersQueryOptions,
+  useAssignmentMutation,
+  useFinishCloseoutMutation,
+  useMarkCompleteMutation,
+  useReopenMutation,
+} from '@/utils/queryOptions';
+import { getStep, Steps } from '@/utils/utils';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import EastIcon from '@mui/icons-material/East';
 import ErrorIcon from '@mui/icons-material/Error';
@@ -18,21 +32,6 @@ import {
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { useNavigate } from '@tanstack/react-router';
 import { useMemo, useState } from 'react';
-import { TAOwner, TARequestDetail } from '@/api/dashboard/types';
-import { queryClient } from '@/App';
-import {
-  ownersQueryOptions,
-  useAssignmentMutation,
-  useFinishCloseoutMutation,
-  useMarkCompleteMutation,
-  useReopenMutation,
-} from '@/utils/queryOptions';
-import { useIdentityContext } from '@/features/identity/IdentityContext';
-import { useToastContext } from '@/features/toasts/ToastContext';
-import { ToastMessage } from '@/features/toasts/ToastMessage';
-import { useRequestsContext } from '@/features/requests/RequestsContext';
-import { AppLink } from '@/components/AppLink';
-import { getStep, Steps } from '@/utils/utils';
 
 interface RequestAssignForwardButtonProps {
   request: TARequestDetail;
@@ -49,7 +48,7 @@ export const RequestAssignForwardButton: React.FC<RequestAssignForwardButtonProp
   const navigate = useNavigate();
   const { identity, detailedIdentity } = useIdentityContext();
   const { data: owners } = useSuspenseQuery(ownersQueryOptions(identity));
-  const { tab, nextId, previousId } = useRequestsContext();
+  const { tab, nextId, previousId, setExpertsPanelOpen } = useRequestsContext();
   const { setShowToast, setToastMessage } = useToastContext();
   const [searchTerm, setSearchTerm] = useState('');
   const requestOrganizationType = request.customers[0].org.type;
@@ -153,6 +152,11 @@ export const RequestAssignForwardButton: React.FC<RequestAssignForwardButtonProp
     setSearchTerm(event.target.value);
   };
 
+  const handleOpenExpertsPanel = () => {
+    setExpertsPanelOpen(true);
+    handleAssignMenuClose();
+  };
+
   const handleForward = (owner?: TAOwner) => {
     switch (currentStep.stepIndex) {
       case Steps.Expert:
@@ -239,18 +243,16 @@ export const RequestAssignForwardButton: React.FC<RequestAssignForwardButtonProp
           />
         </Box>
         {ownersContainsExperts && (
-          <AppLink to="/experts">
-            <MenuItem>
-              <ListItemText sx={{ color: 'secondary.main' }}>
-                <Typography variant="body2" component="div">
-                  <Stack direction="row" alignItems="center">
-                    <span>Explore experts</span>
-                    <EastIcon />
-                  </Stack>
-                </Typography>
-              </ListItemText>
-            </MenuItem>
-          </AppLink>
+          <MenuItem onClick={handleOpenExpertsPanel}>
+            <ListItemText sx={{ color: 'secondary.main' }}>
+              <Typography variant="body2" component="div">
+                <Stack direction="row" alignItems="center">
+                  <span>Explore experts</span>
+                  <EastIcon />
+                </Stack>
+              </Typography>
+            </ListItemText>
+          </MenuItem>
         )}
         {filteredOwners?.map((owner) => (
           <MenuItem key={owner.id} onClick={() => handleForward(owner)}>

@@ -59,7 +59,7 @@ const StyledTextField = styled(TextField)<{
 }));
 
 interface ExpertsToolbarProps {
-  experts: TAExpert[];
+  experts: TAExpert[] | null;
 }
 
 export const ExpertsToolbar: React.FC<ExpertsToolbarProps> = ({ experts }) => {

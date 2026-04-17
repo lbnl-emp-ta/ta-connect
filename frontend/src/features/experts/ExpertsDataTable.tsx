@@ -2,14 +2,15 @@ import { Chip, Paper, Stack, Tooltip } from '@mui/material';
 import { DataGrid, GridColDef, GridRenderCellParams } from '@mui/x-data-grid';
 import { TAExpert, TAExpertise } from '../../api/dashboard/types';
 import { ExpertsToolbar } from './ExpertsToolbar';
+import { CellWithPopover } from '@/components/CellWithPopover';
 
 interface ExpertsDataTableProps {
-  experts: TAExpert[];
+  experts: TAExpert[] | null;
 }
 
 const columns: GridColDef[] = [
-  { field: 'name', headerName: 'Name', width: 200 },
-  { field: 'email', headerName: 'Email', width: 200 },
+  { field: 'name', headerName: 'Name', width: 150 },
+  { field: 'email', headerName: 'Email', width: 150 },
   {
     field: 'lab',
     headerName: 'Lab',
@@ -31,26 +32,28 @@ const columns: GridColDef[] = [
     renderCell: (params: GridRenderCellParams<any, string>) => {
       const values = params.value?.split('__') || [];
       return (
-        <Stack direction="row" spacing={1} alignItems="center" sx={{ height: '100%' }}>
-          {values.map((expertiseStr: string) => (
-            <Tooltip key={expertiseStr} title={expertiseStr.split('++')[1] || ''} placement="top">
-              <Chip label={`${expertiseStr.split('++')[0]}`} variant="outlined" />
-            </Tooltip>
-          ))}
-        </Stack>
+        <CellWithPopover>
+          <Stack direction="row" spacing={1} alignItems="center" sx={{ height: '100%' }}>
+            {values.map((expertiseStr: string) => (
+              <Tooltip key={expertiseStr} title={expertiseStr.split('++')[1] || ''} placement="top">
+                <Chip label={`${expertiseStr.split('++')[0]}`} variant="outlined" />
+              </Tooltip>
+            ))}
+          </Stack>
+        </CellWithPopover>
       );
     },
   },
   {
     field: 'active_requests_count',
     headerName: 'Active Requests',
-    width: 200,
+    width: 150,
     type: 'number',
   },
   {
     field: 'total_requests_count',
     headerName: 'Total Requests',
-    width: 200,
+    width: 150,
     type: 'number',
   },
 ];
@@ -59,6 +62,7 @@ export const ExpertsDataTable: React.FC<ExpertsDataTableProps> = ({ experts }) =
   return (
     <Paper>
       <DataGrid
+        loading={experts === null}
         rows={experts || []}
         columns={columns}
         showToolbar

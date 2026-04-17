@@ -4,8 +4,12 @@ import { RequestAssignBackwardButton } from '@/features/requests/RequestAssignBa
 import { RequestAssignForwardButton } from '@/features/requests/RequestAssignForwardButton';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
-import { IconButton, Stack, Typography } from '@mui/material';
+import { IconButton, Stack, Typography, Drawer, Box } from '@mui/material';
 import { useRequestsContext } from './RequestsContext';
+import { ExpertsDataTable } from '@/features/experts/ExpertsDataTable';
+import { useSuspenseQuery } from '@tanstack/react-query';
+import { expertsQueryOptions } from '@/utils/queryOptions';
+import { useIdentityContext } from '@/features/identity/IdentityContext';
 
 interface RequestHeaderProps {
   request: TARequestDetail;
@@ -15,7 +19,13 @@ interface RequestHeaderProps {
  * Top header section to show in the request detail view
  */
 export const RequestHeader: React.FC<RequestHeaderProps> = ({ request }) => {
-  const { tab, nextId, previousId } = useRequestsContext();
+  const { identity } = useIdentityContext();
+  const { tab, nextId, previousId, expertsPanelOpen, setExpertsPanelOpen } = useRequestsContext();
+  const { data: experts } = useSuspenseQuery(expertsQueryOptions(identity));
+
+  const handleCloseExpertsPanel = () => {
+    setExpertsPanelOpen(false);
+  };
 
   return (
     <Stack direction="row" alignItems="center" justifyContent="space-between">
@@ -72,6 +82,16 @@ export const RequestHeader: React.FC<RequestHeaderProps> = ({ request }) => {
         <RequestAssignBackwardButton request={request} />
         <RequestAssignForwardButton request={request} />
       </Stack>
+      <Drawer
+        anchor="right"
+        open={expertsPanelOpen}
+        onClose={handleCloseExpertsPanel}
+        sx={{ zIndex: 1202 }}
+      >
+        <Box sx={{ width: 1000 }}>
+          <ExpertsDataTable experts={experts || []} />
+        </Box>
+      </Drawer>
     </Stack>
   );
 };
