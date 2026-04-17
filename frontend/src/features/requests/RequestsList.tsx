@@ -112,9 +112,11 @@ export const RequestsList: React.FC<RequestsListProps> = ({
           key={request.id}
           onClick={() => handleItemClick(request)}
           sx={{
-            backgroundColor: isSelected(request) ? 'primary.light' : 'white',
-            border: isSelected(request) ? '2px solid' : '1px solid',
-            borderColor: isSelected(request) ? 'primary.main' : 'grey.200',
+            backgroundColor: isSelected(request) ? 'success.light' : 'white',
+            border: isSelected(request) ? '1px solid' : '1px solid',
+            borderColor: isSelected(request) ? 'success.main' : 'grey.200',
+            borderLeft: isSelected(request) ? '6px solid' : '6px solid',
+            borderLeftColor: isSelected(request) ? 'success.main' : 'transparent',
             cursor: 'pointer',
             paddingBottom: 1,
             paddingLeft: 2,

@@ -1,10 +1,14 @@
 import { TARequestDetail } from '@/api/dashboard/types';
 import { AppLink } from '@/components/AppLink';
+import { ExpertsPanelDataTable } from '@/features/experts/ExpertsPanelDataTable';
+import { useIdentityContext } from '@/features/identity/IdentityContext';
 import { RequestAssignBackwardButton } from '@/features/requests/RequestAssignBackwardButton';
 import { RequestAssignForwardButton } from '@/features/requests/RequestAssignForwardButton';
+import { expertsQueryOptions } from '@/utils/queryOptions';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
-import { IconButton, Stack, Typography } from '@mui/material';
+import { Box, Drawer, IconButton, Stack, Typography } from '@mui/material';
+import { useSuspenseQuery } from '@tanstack/react-query';
 import { useRequestsContext } from './RequestsContext';
 
 interface RequestHeaderProps {
@@ -15,7 +19,13 @@ interface RequestHeaderProps {
  * Top header section to show in the request detail view
  */
 export const RequestHeader: React.FC<RequestHeaderProps> = ({ request }) => {
-  const { tab, nextId, previousId } = useRequestsContext();
+  const { identity } = useIdentityContext();
+  const { tab, nextId, previousId, expertsPanelOpen, setExpertsPanelOpen } = useRequestsContext();
+  const { data: experts } = useSuspenseQuery(expertsQueryOptions(identity));
+
+  const handleCloseExpertsPanel = () => {
+    setExpertsPanelOpen(false);
+  };
 
   return (
     <Stack direction="row" alignItems="center" justifyContent="space-between">
@@ -72,6 +82,16 @@ export const RequestHeader: React.FC<RequestHeaderProps> = ({ request }) => {
         <RequestAssignBackwardButton request={request} />
         <RequestAssignForwardButton request={request} />
       </Stack>
+      <Drawer
+        anchor="right"
+        open={expertsPanelOpen}
+        onClose={handleCloseExpertsPanel}
+        sx={{ zIndex: 1202 }}
+      >
+        <Box sx={{ width: 1000 }}>
+          <ExpertsPanelDataTable experts={experts || []} currentRequestId={request.id} />
+        </Box>
+      </Drawer>
     </Stack>
   );
 };

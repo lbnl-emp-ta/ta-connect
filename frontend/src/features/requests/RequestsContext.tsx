@@ -15,6 +15,8 @@ interface RequestsContextType {
   setSelectedListId: React.Dispatch<React.SetStateAction<string | null>>;
   searchTerm: string;
   setSearchTerm: (value: string) => void;
+  expertsPanelOpen: boolean;
+  setExpertsPanelOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 const RequestsContext = createContext<RequestsContextType | undefined>(undefined);
@@ -37,6 +39,7 @@ export const RequestsProvider: React.FC<RequestsProviderProps> = ({ tab, childre
   });
   const [currentIndex, setCurrentIndex] = useState(0);
   const [selectedListId, setSelectedListId] = useState<string | null>(null);
+  const [expertsPanelOpen, setExpertsPanelOpen] = useState(false);
 
   const handleSetSortField = useCallback((value: string) => {
     localStorage.setItem(localStorageSortKey, value);
@@ -85,6 +88,8 @@ export const RequestsProvider: React.FC<RequestsProviderProps> = ({ tab, childre
       setSelectedListId,
       searchTerm,
       setSearchTerm: handleSetSearchTerm,
+      expertsPanelOpen,
+      setExpertsPanelOpen,
     };
   }, [
     currentIndex,
@@ -96,6 +101,8 @@ export const RequestsProvider: React.FC<RequestsProviderProps> = ({ tab, childre
     searchTerm,
     handleSetSearchTerm,
     tab,
+    expertsPanelOpen,
+    setExpertsPanelOpen,
   ]);
 
   return <RequestsContext value={value}>{children}</RequestsContext>;

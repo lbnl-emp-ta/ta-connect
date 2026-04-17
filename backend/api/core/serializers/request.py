@@ -26,6 +26,7 @@ class RequestDetailSerializer(serializers.Serializer):
     proj_completion_date = serializers.DateField()
     actual_completion_date = serializers.DateField()
     customers = CustomerSerializer(many=True)
+    topics = TopicSerializer(many=True)
 
 class RequestListSerializer(serializers.Serializer):
     id = serializers.IntegerField()

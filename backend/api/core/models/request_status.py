@@ -24,7 +24,7 @@ class RequestStatus(models.Model):
         """
         status, _ = cls.objects.get_or_create(
             name=cls.default_name,
-            description=cls.default_description
+            defaults={"description": cls.default_description}
         )
 
         return status.pk
