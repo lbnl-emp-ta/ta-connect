@@ -87,6 +87,9 @@ export const ExpertsPanelDataTable: React.FC<ExpertsPanelDataTableProps> = ({
     type: 'custom',
     align: 'center',
     headerAlign: 'center',
+    sortable: false,
+    filterable: false,
+    disableColumnMenu: true,
     renderCell: (params) => (
       <Button
         variant="contained"
