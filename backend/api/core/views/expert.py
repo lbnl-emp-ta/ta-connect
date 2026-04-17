@@ -28,6 +28,16 @@ class ExpertsListView(views.APIView):
         expert_assignments = list()
         if IsAdmin().has_permission(request):
             expert_assignments = LabRoleAssignment.objects.filter(role=Role.objects.get(name=ROLE.EXPERT))
+        elif IsProgramLead().has_permission(request):
+            maybe_context = self.request.headers.get("Context")
+            if not maybe_context:
+                return Response(data={"message": "Please include identity context with request"}, status=status.HTTP_400_BAD_REQUEST)
+
+            context = json.loads(maybe_context) 
+            try:
+                expert_assignments = LabRoleAssignment.objects.filter(role=Role.objects.get(name=ROLE.EXPERT), program=Program.objects.get(pk=context.get("instance")))
+            except Exception as e:
+                return Response(data={"message": f"{e}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         elif IsLabLead().has_permission(request):
             maybe_context = self.request.headers.get("Context")
             if not maybe_context:
