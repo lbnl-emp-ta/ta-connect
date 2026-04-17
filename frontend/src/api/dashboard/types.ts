@@ -89,7 +89,7 @@ export interface TAExpert {
   owner_id: number;
   email: string;
   name: string;
-  expertise: TAExpertise[];
+  expertises: TAExpertise[];
   lab?: TALab;
   active_requests_count?: number;
   total_requests_count?: number;

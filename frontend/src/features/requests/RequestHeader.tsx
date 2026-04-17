@@ -89,7 +89,11 @@ export const RequestHeader: React.FC<RequestHeaderProps> = ({ request }) => {
         sx={{ zIndex: 1202 }}
       >
         <Box sx={{ width: 1000 }}>
-          <ExpertsDataTable experts={experts || []} />
+          <ExpertsDataTable
+            experts={experts || []}
+            showAssignColumn
+            currentRequestId={request.id}
+          />
         </Box>
       </Drawer>
     </Stack>

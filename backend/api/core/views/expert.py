@@ -43,14 +43,17 @@ class ExpertsListView(views.APIView):
 
         # A(2/2): ...this loop can fail gracefully
         for assignment in expert_assignments:
+            expert_user = assignment.user
+            expert_serializer = ExpertSerializer(expert_user)
             data = dict()
-            data["id"] = assignment.user.pk
-            data["name"] = assignment.user.name
-            data["email"] = assignment.user.email
+            data["id"] = expert_user.pk
+            data["owner_id"] = expert_serializer.data.get("owner_id")
+            data["name"] = expert_user.name
+            data["email"] = expert_user.email
             data["lab"] = LabSerializer(assignment.instance).data
 
             expertise_list = list()
-            expertise_entries = Expertise.objects.filter(user=assignment.user.pk)
+            expertise_entries = Expertise.objects.filter(user=expert_user.pk)
             for expertise_entry in expertise_entries:
                 expertise = dict()
                 maybe_topic = None
@@ -70,7 +73,7 @@ class ExpertsListView(views.APIView):
 
             data["expertises"] = expertise_list
 
-            expert_user = assignment.user
+            # expert_user = assignment.user
             expert_requests = Request.objects.filter(expert=expert_user)
             active_requests = expert_requests.exclude(owner=None)
             data["active_requests_count"] = active_requests.count()
