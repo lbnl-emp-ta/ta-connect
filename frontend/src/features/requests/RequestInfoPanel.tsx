@@ -1,10 +1,13 @@
+import AssignmentIcon from '@mui/icons-material/Assignment';
 import CheckIcon from '@mui/icons-material/Check';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import CircleIcon from '@mui/icons-material/Circle';
 import ClearIcon from '@mui/icons-material/Clear';
 import EditIcon from '@mui/icons-material/Edit';
 import ErrorIcon from '@mui/icons-material/Error';
 import {
   Autocomplete,
+  Box,
   Chip,
   CircularProgress,
   Grid,
@@ -180,7 +183,12 @@ export const RequestInfoPanel: React.FC<RequestInfoPanelProps> = ({ request }) =
     <InfoPanel
       header={
         <Stack direction="row" alignItems="center" justifyContent="space-between">
-          <span>Request Details</span>
+          <Stack direction="row" spacing={2} alignItems="center">
+            <AssignmentIcon color="primary" />
+            <Typography variant="h5" component="h3" fontWeight="bold">
+              Request Details
+            </Typography>
+          </Stack>
           {!editing && (
             <IconButton onClick={handleEditClick}>
               <EditIcon />
@@ -206,7 +214,16 @@ export const RequestInfoPanel: React.FC<RequestInfoPanelProps> = ({ request }) =
       {request && (
         <>
           <TableContainer>
-            <Table size="small" sx={{ '& .MuiTableCell-root:first-of-type': { width: '205px' } }}>
+            <Table
+              size="small"
+              sx={{
+                '& .MuiTableCell-root:first-of-type': {
+                  color: 'grey.900',
+                  fontWeight: 'bold',
+                  width: '205px',
+                },
+              }}
+            >
               <TableBody>
                 <TableRow>
                   <TableCell>ID</TableCell>
@@ -242,7 +259,8 @@ export const RequestInfoPanel: React.FC<RequestInfoPanelProps> = ({ request }) =
                 <TableRow>
                   <TableCell>Status</TableCell>
                   <TableCell>
-                    <Stack direction="row">
+                    <Stack direction="row" alignItems="center" spacing={1}>
+                      <CircleIcon fontSize="small" />
                       <span>{request.status ? request.status : 'Unknown'}</span>
                     </Stack>
                   </TableCell>
@@ -384,12 +402,24 @@ export const RequestInfoPanel: React.FC<RequestInfoPanelProps> = ({ request }) =
           </TableContainer>
           <Stack sx={{ padding: 2 }}>
             <Stack direction="row" alignItems="center" justifyContent="space-between">
-              <Typography fontSize="0.875rem">Description</Typography>
+              <Typography fontSize="0.875rem" fontWeight="bold" color="grey.900">
+                Description
+              </Typography>
             </Stack>
             {(!editing || !hasPermission('edit-description', detailedIdentity)) && (
-              <Typography fontSize="0.875rem">
-                {request.description || 'No description for this request.'}
-              </Typography>
+              <Box
+                sx={{
+                  backgroundColor: 'grey.50',
+                  padding: 2,
+                  borderRadius: 1,
+                  borderLeft: '4px solid',
+                  borderColor: 'grey.500',
+                }}
+              >
+                <Typography fontSize="0.875rem">
+                  {request.description || 'No description for this request.'}
+                </Typography>
+              </Box>
             )}
             {editing && hasPermission('edit-topics', detailedIdentity) && (
               <TextField

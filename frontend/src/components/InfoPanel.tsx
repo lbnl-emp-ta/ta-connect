@@ -1,4 +1,4 @@
-import { Box, Paper, Typography } from '@mui/material';
+import { Box, Paper } from '@mui/material';
 
 interface InfoPanelProps {
   header?: React.ReactNode;
@@ -25,22 +25,20 @@ export const InfoPanel: React.FC<InfoPanelProps> = ({ header, tabs, children }) 
       {tabs && (
         <Box
           sx={{
-            backgroundColor: 'grey.50',
+            // backgroundColor: 'grey.100',
             borderBottom: '1px solid',
-            borderBottomColor: 'grey.50',
+            borderBottomColor: 'grey.100',
           }}
         >
           {tabs}
         </Box>
       )}
       {!tabs && header && (
-        <Typography
-          component="h3"
+        <Box
           sx={{
-            backgroundColor: 'grey.50',
+            // backgroundColor: 'grey.100',
             borderBottom: '1px solid',
-            borderBottomColor: 'grey.50',
-            fontWeight: 'bold',
+            borderBottomColor: 'grey.100',
             paddingTop: 1,
             paddingBottom: 1,
             paddingLeft: 2,
@@ -48,7 +46,7 @@ export const InfoPanel: React.FC<InfoPanelProps> = ({ header, tabs, children }) 
           }}
         >
           {header}
-        </Typography>
+        </Box>
       )}
       {children}
     </Paper>

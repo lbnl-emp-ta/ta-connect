@@ -3,6 +3,7 @@ import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import ClearIcon from '@mui/icons-material/Clear';
 import EditIcon from '@mui/icons-material/Edit';
 import ErrorIcon from '@mui/icons-material/Error';
+import PeopleAltIcon from '@mui/icons-material/PeopleAlt';
 import {
   Alert,
   Box,
@@ -219,7 +220,12 @@ export const RequestCustomerPanel: React.FC<RequestCustomerPanelProps> = ({ cust
     <InfoPanel
       header={
         <Stack direction="row" alignItems="center" justifyContent="space-between">
-          <span>Customer Information</span>
+          <Stack direction="row" spacing={2} alignItems="center">
+            <PeopleAltIcon color="primary" />
+            <Typography variant="h5" component="h3" fontWeight="bold">
+              Customer Information
+            </Typography>
+          </Stack>
           {hasPermission('edit-customer', detailedIdentity) && !editing && (
             <IconButton onClick={handleEditClick}>
               <EditIcon />
@@ -248,7 +254,16 @@ export const RequestCustomerPanel: React.FC<RequestCustomerPanelProps> = ({ cust
       )}
       {customer && (
         <TableContainer>
-          <Table size="small" sx={{ '& .MuiTableCell-root:first-of-type': { width: '205px' } }}>
+          <Table
+            size="small"
+            sx={{
+              '& .MuiTableCell-root:first-of-type': {
+                color: 'grey.900',
+                fontWeight: 'bold',
+                width: '205px',
+              },
+            }}
+          >
             <TableBody>
               {editing && (
                 <TableRow>
