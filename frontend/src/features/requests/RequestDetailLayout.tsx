@@ -65,6 +65,7 @@ export const RequestDetailLayout: React.FC<RequestDetailLayoutProps> = ({ reques
                   value={tabValue}
                   textColor="inherit"
                   indicatorColor="primary"
+                  sx={{ '& .MuiTab-root': { fontWeight: 'bold' } }}
                 >
                   <Tab
                     label={
