@@ -11,15 +11,13 @@ export const RolePanel: React.FC<RolePanelProps> = ({ identity }) => {
       <Typography variant="h5" fontWeight="bold">
         {identity.role.name}
       </Typography>
-      <Stack direction="row" spacing={1} alignItems="center">
+      <Stack spacing={1}>
         {identity.instance && (
           <>
-            <Typography
-              sx={{ borderRight: '1px solid', borderRightColor: 'grey.400', paddingRight: 1 }}
-            >
-              {identity.instance.name}
+            <Typography>{identity.instance.name}</Typography>
+            <Typography variant="body2" color="text.secondary">
+              {identity.instance.description}
             </Typography>
-            <Typography>{identity.instance.description}</Typography>
           </>
         )}
         {/* {identity.role.name !== 'Expert' && (
