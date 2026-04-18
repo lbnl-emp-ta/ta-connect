@@ -17,14 +17,9 @@ interface InfoPanelProps {
 export const InfoPanel: React.FC<InfoPanelProps> = ({ header, tabs, children }) => {
   return (
     <Paper
-      elevation={0}
       sx={{
         height: 'stretch',
         width: 'stretch',
-        borderStyle: 'solid',
-        borderColor: 'grey.50',
-        borderRadius: 1,
-        borderWidth: 1,
       }}
     >
       {tabs && (

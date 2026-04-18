@@ -47,9 +47,7 @@ export const RequestDetailLayout: React.FC<RequestDetailLayoutProps> = ({ reques
 
   return (
     <Stack>
-      <Paper sx={{ padding: 2 }}>
-        <RequestHeader request={selectedRequest} />
-      </Paper>
+      <RequestHeader request={selectedRequest} />
       <Paper sx={{ padding: 2 }}>
         <RequestStepper request={selectedRequest} />
       </Paper>
