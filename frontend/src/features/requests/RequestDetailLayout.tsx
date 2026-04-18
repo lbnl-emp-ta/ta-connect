@@ -51,7 +51,7 @@ export const RequestDetailLayout: React.FC<RequestDetailLayoutProps> = ({ reques
       <Paper sx={{ padding: 2 }}>
         <RequestStepper request={selectedRequest} />
       </Paper>
-      <Grid container spacing={1}>
+      <Grid container spacing={2}>
         <Grid size={{ lg: 6, md: 12 }}>
           <RequestInfoPanel request={selectedRequest!} />
         </Grid>
