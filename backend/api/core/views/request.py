@@ -4,7 +4,7 @@ from django.db.models import Q
 from rest_framework import views, status, permissions, authentication
 from rest_framework.response import Response
 
-from core.utils import create_audit_history
+from core.utils import create_audit_history, get_status
 from core.serializers import * 
 from core.models import * 
 from core.models.audit_history import ActionType
@@ -379,8 +379,8 @@ class RequestDetailView(BaseUserAwareRequest):
             patch_data["proj_completion_date"] = body.get("proj_completion_date")
 
             # If projected completion date is being set by the expert for the first time, set status to PROVIDING_TA
-            if maybe_request.status == REQUEST_STATUS.ASSIGNED_TO_EXPERT:
-                patch_data["status"] = REQUEST_STATUS.PROVIDING_TA
+            if maybe_request.status.name == REQUEST_STATUS.ASSIGNED_TO_EXPERT:
+                patch_data["status"] = get_status(REQUEST_STATUS.PROVIDING_TA)
             
         if "status" in body:
             if body.get("status") is None:
