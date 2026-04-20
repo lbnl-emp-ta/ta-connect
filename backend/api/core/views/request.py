@@ -377,6 +377,10 @@ class RequestDetailView(BaseUserAwareRequest):
                 return Response(data={"message": "Insufficient privillege to update 'projected completion date' field"}, status=status.HTTP_401_UNAUTHORIZED)
 
             patch_data["proj_completion_date"] = body.get("proj_completion_date")
+
+            # If projected completion date is being set by the expert for the first time, set status to PROVIDING_TA
+            if maybe_request.status == REQUEST_STATUS.ASSIGNED_TO_EXPERT:
+                patch_data["status"] = REQUEST_STATUS.PROVIDING_TA
             
         if "status" in body:
             if body.get("status") is None:
