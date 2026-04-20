@@ -553,7 +553,7 @@ class RequestCloseoutCompleteView(BaseUserAwareRequest):
             return Response(data={"message": "Request must have an assigned expert in order to complete closeout"}, status=status.HTTP_404_NOT_FOUND)
 
         try:
-            found_request.status = RequestStatus.objects.get(name=REQUEST_STATUS.CLOSE_OUT_COMPLETED)
+            found_request.status = RequestStatus.objects.get(name=REQUEST_STATUS.CLOSEOUT_REVIEW_BY_LAB)
             found_request.owner = found_request.lab.owner if found_request.lab else None
             found_request.save()
             create_audit_history(request, found_request, ActionType.StatusChange, f"Status changed to Closeout Completed")

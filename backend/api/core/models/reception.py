@@ -9,7 +9,7 @@ class Reception(models.Model):
 
     @classproperty
     def default_name(cls):
-        return "The Reception"
+        return "Reception"
     
     @classmethod
     def get_default_pk(cls):
