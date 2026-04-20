@@ -1,0 +1,90 @@
+[
+  {
+    "model": "core.Owner",
+    "pk": 1,
+    "fields": {
+      "domain_type": "reception",
+      "reception": 1,
+      "program": null,
+      "lab": null,
+      "expert": null
+    }
+  },
+  {
+    "model": "core.Owner",
+    "pk": 2,
+    "fields": {
+      "domain_type": "program",
+      "reception": null,
+      "program": 1,
+      "lab": null,
+      "expert": null
+    }
+  },
+  {
+    "model": "core.Owner",
+    "pk": 3,
+    "fields": {
+      "domain_type": "program",
+      "reception": null,
+      "program": 2,
+      "lab": null,
+      "expert": null
+    }
+  },
+  {
+    "model": "core.Owner",
+    "pk": 4,
+    "fields": {
+      "domain_type": "lab",
+      "reception": null,
+      "program": null,
+      "lab": 1,
+      "expert": null
+    }
+  },
+  {
+    "model": "core.Owner",
+    "pk": 5,
+    "fields": {
+      "domain_type": "lab",
+      "reception": null,
+      "program": null,
+      "lab": 2,
+      "expert": null
+    }
+  },
+  {
+    "model": "core.Owner",
+    "pk": 6,
+    "fields": {
+      "domain_type": "lab",
+      "reception": null,
+      "program": null,
+      "lab": 3,
+      "expert": null
+    }
+  },
+  {
+    "model": "core.Owner",
+    "pk": 7,
+    "fields": {
+      "domain_type": "expert",
+      "reception": null,
+      "program": null,
+      "lab": null,
+      "expert": 6
+    }
+  },
+  {
+    "model": "core.Owner",
+    "pk": 8,
+    "fields": {
+      "domain_type": "expert",
+      "reception": null,
+      "program": null,
+      "lab": null,
+      "expert": 7
+    }
+  }
+]

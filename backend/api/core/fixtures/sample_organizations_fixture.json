@@ -1,0 +1,29 @@
+[
+  {
+    "model": "core.Organization",
+    "pk": 1,
+    "fields": {
+      "name": "New York Energy Office",
+      "address": "123 Main Street, Albany, NY 12207",
+      "type": 2
+    }
+  },
+  {
+    "model": "core.Organization",
+    "pk": 2,
+    "fields": {
+      "name": "California Energy Commission",
+      "address": "1516 Ninth Street, Sacramento, CA 95814",
+      "type": 2
+    }
+  },
+  {
+    "model": "core.Organization",
+    "pk": 3,
+    "fields": {
+      "name": "Texas Public Utility Commission",
+      "address": "1701 N. Congress Ave, Austin, TX 78701",
+      "type": 1
+    }
+  }
+]

@@ -1,0 +1,86 @@
+[
+  {
+    "model": "core.User",
+    "pk": 2,
+    "fields": {
+      "email": "admin@taconnect.gov",
+      "password": "Password123?",
+      "is_superuser": true,
+      "name": "Alice Admin",
+      "is_staff": true,
+      "is_active": true,
+      "date_joined": "2025-09-01T08:00:00Z",
+      "last_login": "2025-09-01T08:00:00Z"
+    }
+  },
+  {
+    "model": "core.User",
+    "pk": 3,
+    "fields": {
+      "email": "coordinator@taconnect.gov",
+      "password": "Password123?",
+      "is_superuser": false,
+      "name": "Carlos Coordinator",
+      "is_staff": false,
+      "is_active": true,
+      "date_joined": "2025-09-01T08:00:00Z",
+      "last_login": "2025-09-01T08:00:00Z"
+    }
+  },
+  {
+    "model": "core.User",
+    "pk": 4,
+    "fields": {
+      "email": "programlead@taconnect.gov",
+      "password": "Password123?",
+      "is_superuser": false,
+      "name": "Patricia Program",
+      "is_staff": false,
+      "is_active": true,
+      "date_joined": "2025-09-01T08:00:00Z",
+      "last_login": "2025-09-01T08:00:00Z"
+    }
+  },
+  {
+    "model": "core.User",
+    "pk": 5,
+    "fields": {
+      "email": "lablead@taconnect.gov",
+      "password": "Password123?",
+      "is_superuser": false,
+      "name": "Larry Lab",
+      "is_staff": false,
+      "is_active": true,
+      "date_joined": "2025-09-01T08:00:00Z",
+      "last_login": "2025-09-01T08:00:00Z"
+    }
+  },
+  {
+    "model": "core.User",
+    "pk": 6,
+    "fields": {
+      "email": "expert1@taconnect.gov",
+      "password": "Password123?",
+      "is_superuser": false,
+      "name": "Emma Expert",
+      "is_staff": false,
+      "is_active": true,
+      "date_joined": "2025-09-01T08:00:00Z",
+      "last_login": "2025-09-01T08:00:00Z"
+    }
+  },
+  {
+    "model": "core.User",
+    "pk": 7,
+    "fields": {
+      "email": "expert2@taconnect.gov",
+      "password": "Password123?",
+      "is_superuser": false,
+      "name": "Edward Expert",
+      "is_staff": false,
+      "is_active": true,
+      "date_joined": "2025-09-01T08:00:00Z",
+      "last_login": "2025-09-01T08:00:00Z"
+    }
+  }
+]

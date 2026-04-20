@@ -1,0 +1,92 @@
+[
+  {
+    "model": "core.Request",
+    "pk": 1,
+    "fields": {
+      "owner": 1,
+      "program": null,
+      "lab": null,
+      "expert": null,
+      "status": 1,
+      "depth": 1,
+      "description": "Our utility is looking for help understanding interconnection queue reform proposals and how they may affect our regional planning process.",
+      "date_created": "2026-01-10T09:00:00Z",
+      "proj_start_date": null,
+      "proj_completion_date": null,
+      "actual_completion_date": null,
+      "topics": [1]
+    }
+  },
+  {
+    "model": "core.Request",
+    "pk": 2,
+    "fields": {
+      "owner": 5,
+      "program": 1,
+      "lab": null,
+      "expert": null,
+      "status": 2,
+      "depth": 2,
+      "description": "We need assistance evaluating grid architecture options for integrating large-scale renewable generation into our transmission system.",
+      "date_created": "2026-01-12T10:30:00Z",
+      "proj_start_date": "2026-02-01",
+      "proj_completion_date": "2026-05-01",
+      "actual_completion_date": null,
+      "topics": [2]
+    }
+  },
+  {
+    "model": "core.Request",
+    "pk": 3,
+    "fields": {
+      "owner": 2,
+      "program": 1,
+      "lab": 1,
+      "expert": null,
+      "status": 4,
+      "depth": 3,
+      "description": "Request for technical review of our grid visibility and SCADA modernization plan including data communication protocols and vendor interoperability.",
+      "date_created": "2026-01-15T14:00:00Z",
+      "proj_start_date": "2026-02-15",
+      "proj_completion_date": "2026-06-30",
+      "actual_completion_date": null,
+      "topics": [3]
+    }
+  },
+  {
+    "model": "core.Request",
+    "pk": 4,
+    "fields": {
+      "owner": 7,
+      "program": 1,
+      "lab": 1,
+      "expert": 6,
+      "status": 8,
+      "depth": 3,
+      "description": "Deep-dive analysis requested for transmission planning study methodology, specifically around modeling assumptions for high-renewable scenarios.",
+      "date_created": "2026-01-20T11:00:00Z",
+      "proj_start_date": "2026-02-10",
+      "proj_completion_date": "2026-07-15",
+      "actual_completion_date": null,
+      "topics": [4]
+    }
+  },
+  {
+    "model": "core.Request",
+    "pk": 5,
+    "fields": {
+      "owner": 8,
+      "program": 2,
+      "lab": 2,
+      "expert": 7,
+      "status": 13,
+      "depth": 4,
+      "description": "Completed deep-dive assistance on interconnection study reforms and bulk power system planning best practices.",
+      "date_created": "2025-10-05T09:00:00Z",
+      "proj_start_date": "2025-11-01",
+      "proj_completion_date": "2026-01-31",
+      "actual_completion_date": "2026-01-28",
+      "topics": [1, 4]
+    }
+  }
+]

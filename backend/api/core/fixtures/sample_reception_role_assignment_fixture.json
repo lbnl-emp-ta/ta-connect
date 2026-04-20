@@ -1,0 +1,12 @@
+[
+  {
+    "model": "core.ReceptionRoleAssignment",
+    "pk": 1,
+    "fields": {
+      "user": 3,
+      "role": 2,
+      "instance": 1,
+      "date_assigned": "2025-09-01T08:00:00Z"
+    }
+  }
+]

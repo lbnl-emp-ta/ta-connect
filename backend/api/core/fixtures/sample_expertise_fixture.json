@@ -1,0 +1,56 @@
+[
+  {
+    "model": "core.Expertise",
+    "pk": 1,
+    "fields": {
+      "user": 6,
+      "topic": 1,
+      "depth": 3
+    }
+  },
+  {
+    "model": "core.Expertise",
+    "pk": 2,
+    "fields": {
+      "user": 6,
+      "topic": 2,
+      "depth": 4
+    }
+  },
+  {
+    "model": "core.Expertise",
+    "pk": 3,
+    "fields": {
+      "user": 6,
+      "topic": 4,
+      "depth": 3
+    }
+  },
+  {
+    "model": "core.Expertise",
+    "pk": 4,
+    "fields": {
+      "user": 7,
+      "topic": 1,
+      "depth": 4
+    }
+  },
+  {
+    "model": "core.Expertise",
+    "pk": 5,
+    "fields": {
+      "user": 7,
+      "topic": 3,
+      "depth": 3
+    }
+  },
+  {
+    "model": "core.Expertise",
+    "pk": 6,
+    "fields": {
+      "user": 7,
+      "topic": 4,
+      "depth": 4
+    }
+  }
+]

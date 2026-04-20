@@ -1,0 +1,26 @@
+[
+  {
+    "model": "core.Program",
+    "pk": 1,
+    "fields": {
+      "name": "RASOR",
+      "description": "Rapid Analysis and Support for Operational Resilience TA Program",
+      "labs": [1, 2],
+      "depths": [2, 3, 4],
+      "topics": [1, 2, 3, 4],
+      "organization_types": [1, 2]
+    }
+  },
+  {
+    "model": "core.Program",
+    "pk": 2,
+    "fields": {
+      "name": "Grid Modernization",
+      "description": "Technical assistance program focused on grid modernization initiatives",
+      "labs": [2, 3],
+      "depths": [1, 2, 3],
+      "topics": [2, 3],
+      "organization_types": [1, 2, 3]
+    }
+  }
+]
