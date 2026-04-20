@@ -1,17 +1,25 @@
 [
   {
     "model": "core.RequestStatus",
-    "pk": 3,
+    "pk": 1,
     "fields": {
-      "name": "Assigned to Program",
-      "description": "Request had been assigned to a program by reception"
+      "name": "scoping",
+      "description": "The default status of a new Request"
     }
   },
   {
     "model": "core.RequestStatus",
-    "pk": 10,
+    "pk": 2,
     "fields": {
-      "name": "Rejected by Program",
+      "name": "assigned-to-program",
+      "description": "Request has been assigned to a program by reception"
+    }
+  },
+  {
+    "model": "core.RequestStatus",
+    "pk": 3,
+    "fields": {
+      "name": "rejected-by-program",
       "description": "The request was rejected by the assigned program"
     }
   },
@@ -19,64 +27,88 @@
     "model": "core.RequestStatus",
     "pk": 4,
     "fields": {
-      "name": "Assigned to Lab",
-      "description": "Request had been assigned to a lab by a program"
-    }
-  },
-  {
-    "model": "core.RequestStatus",
-    "pk": 11,
-    "fields": {
-      "name": "Reassignment Requested",
-      "description": "The assigned lab would like the request to be reassigned"
+      "name": "assigned-to-lab",
+      "description": "Request has been assigned to a lab by a program"
     }
   },
   {
     "model": "core.RequestStatus",
     "pk": 5,
     "fields": {
-      "name": "Assigned to Expert",
-      "description": "Request had been assigned to an expert by a lab"
+      "name": "rejected-by-lab",
+      "description": "The request was rejected by the assigned lab"
     }
   },
   {
     "model": "core.RequestStatus",
     "pk": 6,
     "fields": {
-      "name": "Providing TA",
-      "description": "Expert is currently providing technical assistance to the customer"
+      "name": "assigned-to-expert",
+      "description": "Request has been assigned to an expert by a lab"
     }
   },
   {
     "model": "core.RequestStatus",
     "pk": 7,
     "fields": {
-      "name": "Close out",
-      "description": "Expert is providing close out information"
+      "name": "rejected-by-expert",
+      "description": "The request was rejected by the assigned expert"
     }
   },
   {
     "model": "core.RequestStatus",
     "pk": 8,
     "fields": {
-      "name": "Completed",
-      "description": "Technical assistance assiciated with the request has been fulfilled"
+      "name": "providing-ta",
+      "description": "Expert is currently providing technical assistance to the customer"
     }
   },
   {
     "model": "core.RequestStatus",
     "pk": 9,
     "fields": {
-      "name": "Unable to address",
-      "description": "Request was not able to be serviced by any available program."
+      "name": "closeout-started",
+      "description": "Expert has started the closeout process"
     }
   },
   {
     "model": "core.RequestStatus",
     "pk": 10,
     "fields": {
-      "name": "Closeout Completed",
-      "description": "Closeout forms have been completed by an expert and are ready for review"
+      "name": "closeout-more-info",
+      "description": "Closeout was returned to the expert for more information"
+    }
+  },
+  {
+    "model": "core.RequestStatus",
+    "pk": 11,
+    "fields": {
+      "name": "closeout-review-by-lab",
+      "description": "Closeout forms are being reviewed by the lab"
+    }
+  },
+  {
+    "model": "core.RequestStatus",
+    "pk": 12,
+    "fields": {
+      "name": "closeout-review-by-program",
+      "description": "Closeout forms are being reviewed by the program"
+    }
+  },
+  {
+    "model": "core.RequestStatus",
+    "pk": 13,
+    "fields": {
+      "name": "completed",
+      "description": "Technical assistance associated with the request has been fulfilled"
+    }
+  },
+  {
+    "model": "core.RequestStatus",
+    "pk": 14,
+    "fields": {
+      "name": "unable-to-address",
+      "description": "Request was not able to be serviced by any available program"
     }
   }
 ]

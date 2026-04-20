@@ -75,7 +75,6 @@ export const RequestAssignForwardButton: React.FC<RequestAssignForwardButtonProp
       case Steps.Lab:
         return forwardOwners?.filter((owner) => {
           const expert = experts?.find((expert) => expert.owner_id === owner.id);
-          console.log('Checking expert:', expert);
           const hasExpertiseInRequestTopic = expert?.expertises.some((expertise) =>
             request.topics.some((requestTopic) => requestTopic.id === expertise.topic.id)
           );
@@ -184,7 +183,7 @@ export const RequestAssignForwardButton: React.FC<RequestAssignForwardButtonProp
       case Steps.Expert:
         finishCloseoutMutation.mutate();
         break;
-      case Steps.Approval:
+      case Steps.Review:
         if (request.owner?.domain_type === 'lab' && request.program) {
           assignRequestMutation.mutate({ request: request.id, owner: request.program.owner_id });
         } else if (request.owner?.domain_type === 'program') {
@@ -253,93 +252,95 @@ export const RequestAssignForwardButton: React.FC<RequestAssignForwardButtonProp
         onClose={handleAssignMenuClose}
         aria-labelledby="assign-menu-button"
       >
-        <Box sx={{ padding: 1, width: 300 }}>
-          <TextField
-            variant="outlined"
-            size="small"
-            placeholder="Search assignees"
-            fullWidth
-            value={searchTerm}
-            onChange={handleSearch}
-            onKeyDown={(e) => e.stopPropagation()}
-          />
-        </Box>
-        {ownersContainsExperts && (
-          <MenuItem onClick={handleOpenExpertsPanel}>
-            <ListItemText sx={{ color: 'secondary.main' }}>
-              <Typography variant="body2" component="div">
-                <Stack direction="row" alignItems="center">
-                  <span>Explore experts</span>
-                  <EastIcon />
-                </Stack>
-              </Typography>
-            </ListItemText>
-          </MenuItem>
-        )}
-        {!searchTerm && suggestedExperts && (
-          <>
-            <Box sx={{ paddingX: 2, paddingY: 1 }}>
-              <Typography variant="subtitle2" color="text.secondary">
-                Suggested experts
-              </Typography>
-            </Box>
-            {suggestedExperts.length === 0 && (
+        <Box>
+          <Box sx={{ padding: 1, width: 300 }}>
+            <TextField
+              variant="outlined"
+              size="small"
+              placeholder="Search assignees"
+              fullWidth
+              value={searchTerm}
+              onChange={handleSearch}
+              onKeyDown={(e) => e.stopPropagation()}
+            />
+          </Box>
+          {ownersContainsExperts && (
+            <MenuItem onClick={handleOpenExpertsPanel}>
+              <ListItemText sx={{ color: 'secondary.main' }}>
+                <Typography variant="body2" component="div">
+                  <Stack direction="row" alignItems="center">
+                    <span>Explore experts</span>
+                    <EastIcon />
+                  </Stack>
+                </Typography>
+              </ListItemText>
+            </MenuItem>
+          )}
+          {!searchTerm && suggestedExperts && (
+            <>
               <Box sx={{ paddingX: 2, paddingY: 1 }}>
-                <Typography variant="body2" color="text.secondary">
-                  No experts found with relevant expertise.
+                <Typography variant="subtitle2" color="text.secondary">
+                  Suggested experts
                 </Typography>
               </Box>
-            )}
-            {suggestedExperts.length > 0 &&
-              suggestedExperts.map((owner) => (
-                <MenuItem key={owner.id} onClick={() => handleForward(owner)}>
-                  <Stack direction="row" spacing={1}>
-                    <ListItemText>{owner.domain_name}</ListItemText>
-                    <Chip label={capitalize(owner.domain_type)} size="small" />
-                  </Stack>
-                </MenuItem>
-              ))}
+              {suggestedExperts.length === 0 && (
+                <Box sx={{ paddingX: 2, paddingY: 1 }}>
+                  <Typography variant="body2" color="text.secondary">
+                    No experts found with relevant expertise.
+                  </Typography>
+                </Box>
+              )}
+              {suggestedExperts.length > 0 &&
+                suggestedExperts.map((owner) => (
+                  <MenuItem key={owner.id} onClick={() => handleForward(owner)}>
+                    <Stack direction="row" spacing={1}>
+                      <ListItemText>{owner.domain_name}</ListItemText>
+                      <Chip label={capitalize(owner.domain_type)} size="small" />
+                    </Stack>
+                  </MenuItem>
+                ))}
+              <Box sx={{ paddingX: 2, paddingY: 1 }}>
+                <Typography variant="subtitle2" color="text.secondary">
+                  Other experts
+                </Typography>
+              </Box>
+            </>
+          )}
+          {filteredOwners &&
+            filteredOwners.length > 0 &&
+            filteredOwners.map((owner) => (
+              <MenuItem key={owner.id} onClick={() => handleForward(owner)}>
+                <Stack direction="row" spacing={1}>
+                  <ListItemText>{owner.domain_name}</ListItemText>
+                  <Chip label={capitalize(owner.domain_type)} size="small" />
+                  {owner.domain_type === 'program' && (
+                    <>
+                      {checkOrganizationTypes(owner) ? (
+                        <Tooltip
+                          title={`This program supports ${requestOrganizationType.name} customers.`}
+                        >
+                          <CheckCircleIcon color="success" />
+                        </Tooltip>
+                      ) : (
+                        <Tooltip
+                          title={`This program does not support ${requestOrganizationType.name} customers.`}
+                        >
+                          <ErrorIcon color="error" />
+                        </Tooltip>
+                      )}
+                    </>
+                  )}
+                </Stack>
+              </MenuItem>
+            ))}
+          {(!filteredOwners || filteredOwners.length === 0) && (
             <Box sx={{ paddingX: 2, paddingY: 1 }}>
-              <Typography variant="subtitle2" color="text.secondary">
-                Other experts
+              <Typography variant="body2" color="text.secondary">
+                No other experts found.
               </Typography>
             </Box>
-          </>
-        )}
-        {filteredOwners &&
-          filteredOwners.length > 0 &&
-          filteredOwners.map((owner) => (
-            <MenuItem key={owner.id} onClick={() => handleForward(owner)}>
-              <Stack direction="row" spacing={1}>
-                <ListItemText>{owner.domain_name}</ListItemText>
-                <Chip label={capitalize(owner.domain_type)} size="small" />
-                {owner.domain_type === 'program' && (
-                  <>
-                    {checkOrganizationTypes(owner) ? (
-                      <Tooltip
-                        title={`This program supports ${requestOrganizationType.name} customers.`}
-                      >
-                        <CheckCircleIcon color="success" />
-                      </Tooltip>
-                    ) : (
-                      <Tooltip
-                        title={`This program does not support ${requestOrganizationType.name} customers.`}
-                      >
-                        <ErrorIcon color="error" />
-                      </Tooltip>
-                    )}
-                  </>
-                )}
-              </Stack>
-            </MenuItem>
-          ))}
-        {(!filteredOwners || filteredOwners.length === 0) && (
-          <Box sx={{ paddingX: 2, paddingY: 1 }}>
-            <Typography variant="body2" color="text.secondary">
-              No other experts found.
-            </Typography>
-          </Box>
-        )}
+          )}
+        </Box>
       </Menu>
     </>
   );

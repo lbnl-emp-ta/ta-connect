@@ -12,8 +12,13 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 
 from pathlib import Path
 from dotenv import load_dotenv
-from core.util.utils import parse_bool
 import os
+
+
+def parse_bool(value: str | None, default: bool = False) -> bool:
+    if value is None:
+        return default
+    return value.lower() in ('true', '1', 'yes')
 
 # use python-dotenv for .env
 load_dotenv()

@@ -158,7 +158,7 @@ export const Steps = {
   Program: 2,
   Lab: 3,
   Expert: 4,
-  Approval: 5,
+  Review: 5,
   Completed: 6,
 } as const;
 
@@ -242,7 +242,7 @@ export const getStep = (request: TARequestDetail): StepInfo => {
       forwardText: 'Approve and send to program',
       forwardIsMenu: false,
       backwardText: 'Assign back to expert',
-      stepIndex: Steps.Approval,
+      stepIndex: Steps.Review,
       allowedRoles: [TARole.LabLead, TARole.Admin],
     };
   } else if (request.owner?.domain_type === 'program' && request.expert !== null) {
@@ -250,7 +250,7 @@ export const getStep = (request: TARequestDetail): StepInfo => {
       forwardText: 'Approve and mark complete',
       forwardIsMenu: false,
       backwardText: 'Assign back to lab',
-      stepIndex: Steps.Approval,
+      stepIndex: Steps.Review,
       allowedRoles: [TARole.ProgramLead, TARole.Admin],
     };
   } else if (
