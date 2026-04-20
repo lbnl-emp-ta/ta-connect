@@ -72,34 +72,57 @@ class AssignmentView(views.APIView):
                         ta_request.program = None
                         ta_request.lab = None
                         ta_request.expert = None
+
+                        # Request is being kicked back to reception from program
+                        if ta_request.status == REQUEST_STATUS.ASSIGNED_TO_PROGRAM:
+                            ta_request.status = REQUEST_STATUS.REJECTED_BY_PROGRAM
+                        # Request is being assigned to reception for the first time or being reopened
+                        else:
+                            ta_request.status = REQUEST_STATUS.SCOPING
                     case DOMAINTYPE.PROGRAM:
                         ta_request.owner = new_owner
                         ta_request.program = new_owner.program
-                        # No expert here indicates that this request is being kicked back to the
-                        # program from the lab, so remove the lab's assignment.
-                        if not ta_request.expert:
+                        
+                        # Request is being kicked back to the program from the lab
+                        if ta_request.status in [REQUEST_STATUS.ASSIGNED_TO_LAB, REQUEST_STATUS.REJECTED_BY_EXPERT]:
+                            ta_request.status = REQUEST_STATUS.REJECTED_BY_LAB
                             ta_request.lab = None
+                        # Request is being forwarded to the program from the lab after reviewing closeout
+                        elif ta_request.status == REQUEST_STATUS.CLOSEOUT_REVIEW_BY_LAB:
+                            ta_request.status = REQUEST_STATUS.CLOSEOUT_REVIEW_BY_PROGRAM
+                        # Request is being assigned to program for the first time
+                        else:
+                            ta_request.status = REQUEST_STATUS.ASSIGNED_TO_PROGRAM
+
                     case DOMAINTYPE.LAB:
                         ta_request.owner = new_owner
                         ta_request.lab = new_owner.lab
                         
-                        # NOTE: statuses are not finalized so this logic isn't fully fleshed out
-
                         # Request is being assigned to lab for the first time
-                        # Set status to "Assigned to Lab" and make sure expert is None
-                        if ta_request.status == REQUEST_STATUS.ASSIGNED_TO_PROGRAM:
+                        if ta_request.status in [REQUEST_STATUS.ASSIGNED_TO_PROGRAM, REQUEST_STATUS.REJECTED_BY_LAB]:
                             ta_request.status = REQUEST_STATUS.ASSIGNED_TO_LAB
                             ta_request.expert = None
                         # Request is being kicked back to lab from expert
-                        # Remove expert assignment and set status to "Reassignment Requested"
-                        elif ta_request.status == REQUEST_STATUS.ASSIGNED_TO_EXPERT:
-                            ta_request.status = REQUEST_STATUS.REASSIGNMENT_REQUESTED
+                        elif ta_request.status in [REQUEST_STATUS.ASSIGNED_TO_EXPERT, REQUEST_STATUS.PROVIDING_TA]:
+                            ta_request.status = REQUEST_STATUS.REJECTED_BY_EXPERT
                             ta_request.expert = None
+                        # Request is being forwarded to the lab from the expert after finishing closeout
+                        elif ta_request.status in [REQUEST_STATUS.CLOSEOUT_STARTED, REQUEST_STATUS.CLOSEOUT_MORE_INFO]:
+                            ta_request.status = REQUEST_STATUS.CLOSEOUT_REVIEW_BY_LAB
+                        
                     case DOMAINTYPE.EXPERT:
                         if not (IsAdmin().has_permission(request) or IsLabLead().has_permission(request)):
                             return Response(data={"message": "Insufficient privilege to assign an expert."}, status=status.HTTP_401_UNAUTHORIZED)
                         ta_request.owner = new_owner
                         ta_request.expert = new_owner.expert
+
+                        # Request is being assigned to expert for the first time
+                        if ta_request.status in [REQUEST_STATUS.ASSIGNED_TO_LAB, REQUEST_STATUS.REJECTED_BY_EXPERT]:
+                            ta_request.status = REQUEST_STATUS.ASSIGNED_TO_EXPERT
+                        # Request is being kicked back to expert by lab or program during closeout review
+                        elif ta_request.status in [REQUEST_STATUS.CLOSEOUT_REVIEW_BY_LAB, REQUEST_STATUS.CLOSEOUT_REVIEW_BY_PROGRAM]:
+                            ta_request.status = REQUEST_STATUS.CLOSEOUT_MORE_INFO
+                            
                     case _:
                         return Response(data={"message": "Given request's domaintype is invalid"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
                 
