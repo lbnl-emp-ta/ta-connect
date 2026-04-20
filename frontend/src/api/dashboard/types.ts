@@ -120,9 +120,25 @@ export interface TAAttachment {
   uploaded_at: string;
 }
 
+export type TAStatusName =
+  | 'scoping'
+  | 'assigned-to-program'
+  | 'rejected-by-program'
+  | 'assigned-to-lab'
+  | 'rejected-by-lab'
+  | 'assigned-to-expert'
+  | 'rejected-by-expert'
+  | 'providing-ta'
+  | 'closeout-started'
+  | 'closeout-more-info'
+  | 'closeout-review-by-lab'
+  | 'closeout-review-by-program'
+  | 'completed'
+  | 'unable-to-address';
+
 export interface TARequest {
   id: number;
-  status: string;
+  status: TAStatusName;
   depth: string;
   description: string;
   date_created: string;
@@ -143,7 +159,7 @@ export interface TAStatus {
 
 export interface TARequestDetail {
   id: number;
-  status: string;
+  status: TAStatusName;
   depth: string;
   depth_options: string[];
   description: string;

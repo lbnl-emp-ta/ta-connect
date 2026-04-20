@@ -2,7 +2,12 @@ import { Chip, TablePagination, Paper, Stack, Typography } from '@mui/material';
 import { useNavigate, useParams } from '@tanstack/react-router';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { TARequest } from '../../api/dashboard/types';
-import { formatDatetime } from '../../utils/utils';
+import {
+  formatDatetime,
+  readableStatusNames,
+  statusColors,
+  statusContrastColors,
+} from '../../utils/utils';
 import { useRequestsContext } from './RequestsContext';
 import HourglassBottomIcon from '@mui/icons-material/HourglassBottom';
 import TaskAltIcon from '@mui/icons-material/TaskAlt';
@@ -141,7 +146,14 @@ export const RequestsList: React.FC<RequestsListProps> = ({
               <Typography>#{request.id}</Typography>
             </Stack>
             <Stack direction="row" alignItems="center">
-              <Chip label={request.status} />
+              <Chip
+                label={readableStatusNames[request.status]}
+                size="small"
+                sx={{
+                  backgroundColor: statusColors[request.status],
+                  color: statusContrastColors[request.status],
+                }}
+              />
               <Typography variant="body2">{request.depth}</Typography>
               <Typography variant="body2" sx={{ flexGrow: 1, textAlign: 'right' }}>
                 {formatDatetime(request.date_created)}

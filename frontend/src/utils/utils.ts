@@ -1,4 +1,4 @@
-import { TAIdentity, TARequestDetail, TARole } from '../api/dashboard/types';
+import { TAIdentity, TARequestDetail, TARole, TAStatusName } from '../api/dashboard/types';
 
 /**
  * Validates a US telephone number (10 digits, allows common formatting)
@@ -196,7 +196,7 @@ interface StepInfo {
  * and stepper index. The stepIndex is based on the `steps` var in `RequestStepper.tsx`.
  */
 export const getStep = (request: TARequestDetail): StepInfo => {
-  if (request.status === 'New' && !request.owner) {
+  if (!request.status && !request.owner) {
     // This should technically never happen since we auto-assign to reception
     return {
       forwardText: 'Assign to reception',
@@ -255,7 +255,7 @@ export const getStep = (request: TARequestDetail): StepInfo => {
     };
   } else if (
     !request.owner &&
-    (request.status === 'Completed' || request.status === 'Unable to address')
+    (request.status === 'completed' || request.status === 'unable-to-address')
   ) {
     return {
       forwardText: 'Reopen request',
@@ -273,4 +273,55 @@ export const getStep = (request: TARequestDetail): StepInfo => {
       allowedRoles: [TARole.Admin],
     };
   }
+};
+
+export const readableStatusNames: Record<TAStatusName, string> = {
+  scoping: 'Scoping',
+  'assigned-to-program': 'Assigned to Program',
+  'rejected-by-program': 'Rejected by Program',
+  'assigned-to-lab': 'Assigned to lab',
+  'rejected-by-lab': 'Rejected by lab',
+  'assigned-to-expert': 'Assigned to expert',
+  'rejected-by-expert': 'Rejected by expert',
+  'providing-ta': 'TA in progress',
+  'closeout-started': 'Closeout started',
+  'closeout-more-info': 'Closeout needs more info',
+  'closeout-review-by-lab': 'Closeout being reviewed by lab',
+  'closeout-review-by-program': 'Closeout being reviewed by program',
+  completed: 'Completed',
+  'unable-to-address': 'Unable to address',
+};
+
+export const statusColors: Record<TAStatusName, string> = {
+  scoping: '#444441',
+  'assigned-to-program': '#3d6e96',
+  'rejected-by-program': '#444441',
+  'assigned-to-lab': '#5a52a8',
+  'rejected-by-lab': '#3d6e96',
+  'assigned-to-expert': '#2e7d68',
+  'rejected-by-expert': '#5a52a8',
+  'providing-ta': '#2e7d68',
+  'closeout-started': '#2e7d68',
+  'closeout-more-info': '#2e7d68',
+  'closeout-review-by-lab': '#8a6d1a',
+  'closeout-review-by-program': '#8a6d1a',
+  completed: '#e4f2dc',
+  'unable-to-address': '#E8F0F2',
+};
+
+export const statusContrastColors: Record<TAStatusName, string> = {
+  scoping: 'white',
+  'assigned-to-program': 'white',
+  'rejected-by-program': 'white',
+  'assigned-to-lab': 'white',
+  'rejected-by-lab': 'white',
+  'assigned-to-expert': 'white',
+  'rejected-by-expert': 'white',
+  'providing-ta': 'white',
+  'closeout-started': 'white',
+  'closeout-more-info': 'white',
+  'closeout-review-by-lab': 'white',
+  'closeout-review-by-program': 'white',
+  completed: 'grey.900',
+  'unable-to-address': 'grey.900',
 };
