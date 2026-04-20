@@ -25,7 +25,6 @@ export const InfoPanel: React.FC<InfoPanelProps> = ({ header, tabs, children }) 
       {tabs && (
         <Box
           sx={{
-            // backgroundColor: 'grey.100',
             borderBottom: '1px solid',
             borderBottomColor: 'grey.100',
           }}
