@@ -1,6 +1,6 @@
 import { TARequestDetail } from '@/api/dashboard/types';
 import { getStep, Steps } from '@/utils/utils';
-import { Chip, Stack, Step, StepLabel, Stepper, Typography } from '@mui/material';
+import { Box, Chip, Stack, Step, StepLabel, Stepper, Typography } from '@mui/material';
 
 interface RequestStepperProps {
   request: TARequestDetail;
@@ -24,7 +24,11 @@ export const RequestStepper: React.FC<RequestStepperProps> = ({ request }) => {
               <Typography variant="overline" fontWeight="bold">
                 {label}
               </Typography>
-              {getStep(request).stepIndex === i && <Chip label={request.status} size="small" />}
+              {getStep(request).stepIndex === i && (
+                <Box>
+                  <Chip label={request.status} size="small" />
+                </Box>
+              )}
             </Stack>
           </StepLabel>
         </Step>

@@ -102,5 +102,7 @@ export const ExpertsPanelDataTable: React.FC<ExpertsPanelDataTableProps> = ({
     ),
   };
 
-  return <ExpertsDataTable experts={experts} columns={[...expertColumns, assignColumn]} />;
+  return (
+    <ExpertsDataTable elevation={0} experts={experts} columns={[...expertColumns, assignColumn]} />
+  );
 };

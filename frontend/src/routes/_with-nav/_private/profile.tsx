@@ -6,6 +6,7 @@ import {
   Box,
   Button,
   Container,
+  Grid,
   IconButton,
   Link,
   Stack,
@@ -49,7 +50,17 @@ function ProfilePage() {
 
   return (
     <Container sx={{ paddingTop: 3, paddingBottom: 3 }}>
-      <Stack direction="row" spacing={2} alignItems="center" sx={{ marginBottom: 2 }}>
+      <Stack
+        direction="row"
+        spacing={2}
+        alignItems="center"
+        sx={{
+          marginBottom: 2,
+          paddingBottom: 2,
+          borderBottom: '1px solid',
+          borderBottomColor: 'grey.100',
+        }}
+      >
         <AccountCircleIcon color="primary" sx={{ fontSize: '6rem' }} />
         <Box>
           <Typography variant="h2" component="h1">
@@ -72,13 +83,8 @@ function ProfilePage() {
         </Box>
       </Stack>
       <Stack spacing={2}>
-        <Stack
-          direction="row"
-          spacing={2}
-          alignItems="center"
-          sx={{ borderBottom: '1px solid', borderBottomColor: 'grey.300', paddingBottom: 2 }}
-        >
-          <Typography variant="h4" component="h2" sx={{ flexGrow: 1 }}>
+        <Stack direction="row" spacing={2} alignItems="center">
+          <Typography variant="h4" component="h2" fontWeight="bold" sx={{ flexGrow: 1 }}>
             Roles
           </Typography>
           <Box>
@@ -102,11 +108,13 @@ function ProfilePage() {
           </Alert>
         )}
         {identities && identities.length > 0 && (
-          <Stack spacing={2}>
+          <Grid container spacing={2}>
             {identities.map((identity) => (
-              <RolePanel identity={identity} key={getIdentityKey(identity)} />
+              <Grid size={{ lg: 3, md: 6, xs: 12 }} key={getIdentityKey(identity)}>
+                <RolePanel identity={identity} />
+              </Grid>
             ))}
-          </Stack>
+          </Grid>
         )}
       </Stack>
     </Container>

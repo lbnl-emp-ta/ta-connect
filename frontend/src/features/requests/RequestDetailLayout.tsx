@@ -47,13 +47,11 @@ export const RequestDetailLayout: React.FC<RequestDetailLayoutProps> = ({ reques
 
   return (
     <Stack>
-      <Paper sx={{ padding: 2 }}>
-        <RequestHeader request={selectedRequest} />
-      </Paper>
+      <RequestHeader request={selectedRequest} />
       <Paper sx={{ padding: 2 }}>
         <RequestStepper request={selectedRequest} />
       </Paper>
-      <Grid container spacing={1}>
+      <Grid container spacing={2}>
         <Grid size={{ lg: 6, md: 12 }}>
           <RequestInfoPanel request={selectedRequest!} />
         </Grid>
@@ -67,6 +65,7 @@ export const RequestDetailLayout: React.FC<RequestDetailLayoutProps> = ({ reques
                   value={tabValue}
                   textColor="inherit"
                   indicatorColor="primary"
+                  sx={{ '& .MuiTab-root': { fontWeight: 'bold' } }}
                 >
                   <Tab
                     label={

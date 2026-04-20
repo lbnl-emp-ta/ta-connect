@@ -116,9 +116,9 @@ export const RequestNotes: React.FC<RequestNotesProps> = ({ requestId, notes }) 
       <Dialog fullWidth maxWidth="sm" open={showAddDialog} onClose={handleUploadDialogClose}>
         {!createNoteMutation.isPending && (
           <form onSubmit={handleSubmit}>
-            <DialogTitle>Add Note</DialogTitle>
+            <DialogTitle sx={{ paddingBottom: 0 }}>Add Note</DialogTitle>
             <DialogContent>
-              <Stack sx={{ marginTop: 2 }}>
+              <Stack sx={{ paddingTop: 2 }}>
                 <TextField
                   value={noteDescription}
                   label="Description"

@@ -7,6 +7,7 @@ import { ExpertsToolbar } from './ExpertsToolbar';
 interface ExpertsDataTableProps {
   experts: TAExpert[] | null;
   columns?: GridColDef[];
+  elevation?: number;
 }
 
 export const expertColumns: GridColDef[] = [
@@ -66,9 +67,10 @@ export const expertColumns: GridColDef[] = [
 export const ExpertsDataTable: React.FC<ExpertsDataTableProps> = ({
   experts,
   columns = expertColumns,
+  elevation = 1,
 }) => {
   return (
-    <Paper>
+    <Paper elevation={elevation}>
       <DataGrid
         loading={experts === null}
         rows={experts || []}

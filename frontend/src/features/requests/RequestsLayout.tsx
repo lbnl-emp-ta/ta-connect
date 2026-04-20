@@ -41,6 +41,8 @@ export const RequestsLayout: React.FC<RequestsLayoutProps> = ({ requestLists }) 
         component="aside"
         sx={{
           backgroundColor: 'background.paper',
+          borderRight: 1,
+          borderColor: 'grey.100',
           height: '100%',
           flexBasis: 500,
           minWidth: 500,
