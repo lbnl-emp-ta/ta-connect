@@ -32,17 +32,16 @@ export const expertColumns: GridColDef[] = [
       );
     },
     renderCell: (params: GridRenderCellParams<any, string>) => {
-      const values = params.value?.split('__') || [];
+      const values = params.value ? params.value.split('__') : [];
+      if (values.length === 0) {
+        return '-';
+      }
       return (
         <CellWithPopover>
           <Grid container spacing={1} sx={{ height: '100%' }}>
             {values.map((expertiseStr: string) => (
-              <Grid>
-                <Tooltip
-                  key={expertiseStr}
-                  title={expertiseStr.split('++')[1] || ''}
-                  placement="top"
-                >
+              <Grid key={expertiseStr}>
+                <Tooltip title={expertiseStr.split('++')[1] || ''} placement="top">
                   <Chip label={`${expertiseStr.split('++')[0]}`} variant="outlined" />
                 </Tooltip>
               </Grid>
