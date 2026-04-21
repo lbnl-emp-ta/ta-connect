@@ -237,20 +237,13 @@ class RequestDetailView(BaseUserAwareRequest):
         response_data["customers"] = customer_serializer.data
         response_data["owner"] = OwnerSerializer().format_owner(found_request.owner)
 
-        # Determine depth options based on request owner type
-        # When owner is reception (or system admin), depth_options remains empty
+        # Determine depth options based on request's current program.
+        # Only Program Leads, Lab Leads, Coordinators, and Admins should be able to see depth options,
+        # and only if a program is currently assigned to the request.
         depth_options = []
-        if found_request.owner:
-            if found_request.owner.domain_type == DOMAINTYPE.PROGRAM:
-                # When owner is a program, show depths associated with that program
-                program = found_request.owner.program
-                if program:
-                    depth_options = list(program.depths.values_list('name', flat=True))
-            elif found_request.owner.domain_type == DOMAINTYPE.LAB:
-                # When owner is a lab, show depths associated with the program that the request is associated with
-                if found_request.program:
-                    program = found_request.program
-                    depth_options = list(program.depths.values_list('name', flat=True))
+        if found_request.program and IsAdmin().has_permission(request, None) or IsProgramLead().has_permission(request, None) or IsLabLead().has_permission(request, None) or IsCoordinator().has_permission(request, None):
+            program = found_request.program
+            depth_options = list(program.depths.values_list('name', flat=True))
         
         response_data["depth_options"] = depth_options
 
@@ -315,7 +308,7 @@ class RequestDetailView(BaseUserAwareRequest):
             patch_data["description"] = new_description_data 
 
         if "depth" in body:
-            if not (IsAdmin().has_permission(request, None) or IsProgramLead().has_permission(request, None) or IsCoordinator().has_permission(request, None)):
+            if not (IsAdmin().has_permission(request, None) or IsProgramLead().has_permission(request, None) or IsLabLead().has_permission(request, None) or IsCoordinator().has_permission(request, None)):
                 return Response(data={"message": "Insufficient privillege to update 'depth' field"}, status=status.HTTP_401_UNAUTHORIZED)
             
             if body.get("depth") is None:

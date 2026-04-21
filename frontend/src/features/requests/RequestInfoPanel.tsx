@@ -378,7 +378,7 @@ export const RequestInfoPanel: React.FC<RequestInfoPanelProps> = ({ request }) =
                 <TableRow>
                   <TableCell>Topics</TableCell>
                   <TableCell>
-                    {(!editing || !hasPermission('edit-depth', detailedIdentity)) && (
+                    {(!editing || !hasPermission('edit-topics', detailedIdentity)) && (
                       <Grid container spacing={1}>
                         {request.topics && request.topics.length > 0 ? (
                           request.topics.map((topic) => (

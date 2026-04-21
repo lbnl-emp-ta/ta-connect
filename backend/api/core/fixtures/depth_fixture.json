@@ -1,30 +1,23 @@
 [
-    {
-        "model": "core.Depth",
-        "pk": 1,
-        "fields": {
-            "name": "Unsure"
-        }
-    },
-    {
-        "model": "core.Depth",
-        "pk": 2,
-        "fields": {
-            "name": "Help Desk"
-        }
-    },
-    {
-        "model": "core.Depth",
-        "pk": 3,
-        "fields": {
-            "name": "Expert Match"
-        }
-    },
-    {
-        "model": "core.Depth",
-        "pk": 4,
-        "fields": {
-            "name": "Deep Dive"
-        }
+  {
+    "model": "core.Depth",
+    "pk": 1,
+    "fields": {
+      "name": "Help Desk"
     }
+  },
+  {
+    "model": "core.Depth",
+    "pk": 2,
+    "fields": {
+      "name": "Expert Match"
+    }
+  },
+  {
+    "model": "core.Depth",
+    "pk": 3,
+    "fields": {
+      "name": "Deep Dive"
+    }
+  }
 ]
