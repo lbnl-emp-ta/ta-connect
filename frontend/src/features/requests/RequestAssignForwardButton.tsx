@@ -59,20 +59,23 @@ export const RequestAssignForwardButton: React.FC<RequestAssignForwardButtonProp
     return getStep(request);
   }, [request]);
   const forwardOwners = useMemo(() => {
-    switch (currentStep.stepIndex) {
-      case Steps.Reception:
+    switch (request.status) {
+      case 'scoping':
         return owners?.filter((owner) => owner.domain_type === 'program');
-      case Steps.Program:
+      case 'assigned-to-program':
+      case 'rejected-by-lab':
         return owners?.filter((owner) => owner.domain_type === 'lab');
-      case Steps.Lab:
+      case 'assigned-to-lab':
+      case 'rejected-by-expert':
         return owners?.filter((owner) => owner.domain_type === 'expert');
       default:
         return [];
     }
-  }, [owners, currentStep]);
+  }, [owners, request.status]);
   const suggestedExperts = useMemo(() => {
-    switch (currentStep.stepIndex) {
-      case Steps.Lab:
+    switch (request.status) {
+      case 'assigned-to-lab':
+      case 'rejected-by-expert':
         return forwardOwners?.filter((owner) => {
           const expert = experts?.find((expert) => expert.owner_id === owner.id);
           const hasExpertiseInRequestTopic = expert?.expertises.some((expertise) =>
@@ -83,7 +86,7 @@ export const RequestAssignForwardButton: React.FC<RequestAssignForwardButtonProp
       default:
         return null;
     }
-  }, [owners, currentStep]);
+  }, [owners, request.status]);
   const filteredOwners = useMemo(() => {
     if (!searchTerm && suggestedExperts && suggestedExperts.length > 0) {
       return forwardOwners?.filter(
@@ -180,9 +183,8 @@ export const RequestAssignForwardButton: React.FC<RequestAssignForwardButtonProp
 
   const handleForward = (owner?: TAOwner) => {
     switch (currentStep.stepIndex) {
-      case Steps.Expert:
+      case Steps.Delivery:
         if (request.status === 'assigned-to-expert') {
-          console.log('Opening dates dialog for request', request.id);
           setDatesDialogOpen(true);
         } else if (request.status === 'providing-ta') {
           finishCloseoutMutation.mutate();

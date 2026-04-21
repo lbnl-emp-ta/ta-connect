@@ -168,13 +168,11 @@ export const hasPermission = (
  * They should be in ascending order based on the number in the value.
  */
 export const Steps = {
-  Opened: 0,
-  Reception: 1,
-  Program: 2,
-  Lab: 3,
-  Expert: 4,
-  Review: 5,
-  Completed: 6,
+  Intake: 0,
+  Assignment: 1,
+  Delivery: 2,
+  Review: 3,
+  Completed: 4,
 } as const;
 
 /**
@@ -217,7 +215,7 @@ export const getStep = (request: TARequestDetail): StepInfo => {
       forwardText: 'Assign to reception',
       forwardIsMenu: true,
       backwardText: 'Cancel request',
-      stepIndex: Steps.Opened,
+      stepIndex: Steps.Intake,
       allowedRoles: [TARole.Coordinator, TARole.Admin],
     };
   } else if (request.owner?.domain_type === 'reception') {
@@ -225,7 +223,7 @@ export const getStep = (request: TARequestDetail): StepInfo => {
       forwardText: 'Assign to program',
       forwardIsMenu: true,
       backwardText: 'Cancel request',
-      stepIndex: Steps.Reception,
+      stepIndex: Steps.Assignment,
       allowedRoles: [TARole.Coordinator, TARole.Admin],
     };
   } else if (request.owner?.domain_type === 'program' && request.lab === null) {
@@ -233,7 +231,7 @@ export const getStep = (request: TARequestDetail): StepInfo => {
       forwardText: 'Assign to lab',
       forwardIsMenu: true,
       backwardText: 'Assign back to reception',
-      stepIndex: Steps.Program,
+      stepIndex: Steps.Assignment,
       allowedRoles: [TARole.ProgramLead, TARole.Admin],
     };
   } else if (request.owner?.domain_type === 'lab' && request.expert === null) {
@@ -241,7 +239,7 @@ export const getStep = (request: TARequestDetail): StepInfo => {
       forwardText: 'Assign to expert',
       forwardIsMenu: true,
       backwardText: 'Assign back to program',
-      stepIndex: Steps.Lab,
+      stepIndex: Steps.Assignment,
       allowedRoles: [TARole.LabLead, TARole.Admin],
     };
   } else if (request.owner?.domain_type === 'expert' && request.status === 'assigned-to-expert') {
@@ -249,7 +247,7 @@ export const getStep = (request: TARequestDetail): StepInfo => {
       forwardText: 'Start TA and add dates',
       forwardIsMenu: false,
       backwardText: 'Assign back to lab',
-      stepIndex: Steps.Expert,
+      stepIndex: Steps.Delivery,
       allowedRoles: [TARole.Expert, TARole.Admin],
     };
   } else if (request.owner?.domain_type === 'expert' && request.status === 'providing-ta') {
@@ -257,7 +255,7 @@ export const getStep = (request: TARequestDetail): StepInfo => {
       forwardText: 'Start closeout process',
       forwardIsMenu: false,
       backwardText: 'Assign back to lab',
-      stepIndex: Steps.Expert,
+      stepIndex: Steps.Delivery,
       allowedRoles: [TARole.Expert, TARole.Admin],
     };
   } else if (request.owner?.domain_type === 'lab' && request.expert !== null) {
@@ -272,7 +270,7 @@ export const getStep = (request: TARequestDetail): StepInfo => {
     return {
       forwardText: 'Approve and mark complete',
       forwardIsMenu: false,
-      backwardText: 'Assign back to lab',
+      backwardText: 'Assign back to expert',
       stepIndex: Steps.Review,
       allowedRoles: [TARole.ProgramLead, TARole.Admin],
     };
@@ -292,7 +290,7 @@ export const getStep = (request: TARequestDetail): StepInfo => {
     return {
       forwardText: '',
       backwardText: '',
-      stepIndex: Steps.Opened,
+      stepIndex: Steps.Intake,
       allowedRoles: [TARole.Admin],
     };
   }

@@ -5,7 +5,7 @@ import { useRequestsContext } from '@/features/requests/RequestsContext';
 import { useToastContext } from '@/features/toasts/ToastContext';
 import { ToastMessage } from '@/features/toasts/ToastMessage';
 import { ownersQueryOptions, useAssignmentMutation, useCancelMutation } from '@/utils/queryOptions';
-import { getStep, Steps } from '@/utils/utils';
+import { getStep } from '@/utils/utils';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import WestIcon from '@mui/icons-material/West';
 import ErrorIcon from '@mui/icons-material/Error';
@@ -83,33 +83,36 @@ export const RequestAssignBackwardButton: React.FC<RequestAssignBackwardButtonPr
   };
 
   const handleBackward = (owner?: TAOwner) => {
-    switch (currentStep.stepIndex) {
-      case Steps.Reception:
+    switch (request.status) {
+      case 'scoping':
         cancelRequestMutation.mutate();
         break;
-      case Steps.Program:
+      case 'assigned-to-program':
+      case 'rejected-by-lab':
         if (receptionOwnerId) {
           assignRequestMutation.mutate({ request: request.id, owner: receptionOwnerId });
         }
         break;
-      case Steps.Lab:
+      case 'assigned-to-lab':
+      case 'rejected-by-expert':
         if (request.program) {
           assignRequestMutation.mutate({ request: request.id, owner: request.program.owner_id });
         }
         break;
-      case Steps.Expert:
+      case 'assigned-to-expert':
+      case 'providing-ta':
         if (request.lab) {
           assignRequestMutation.mutate({ request: request.id, owner: request.lab.owner_id });
         }
         break;
-      case Steps.Approval:
-        if (request.owner?.domain_type === 'lab' && request.expert) {
+      case 'closeout-review-by-lab':
+      case 'closeout-review-by-program':
+        if (request.expert) {
           assignRequestMutation.mutate({ request: request.id, owner: request.expert.owner_id });
-        } else if (request.owner?.domain_type === 'program' && request.lab) {
-          assignRequestMutation.mutate({ request: request.id, owner: request.lab.owner_id });
         }
         break;
-      case Steps.Completed:
+      case 'completed':
+      case 'unable-to-address':
         // reopen the request
         break;
       default:
