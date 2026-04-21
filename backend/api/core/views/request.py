@@ -381,6 +381,9 @@ class RequestDetailView(BaseUserAwareRequest):
             # If projected completion date is being set by the expert for the first time, set status to PROVIDING_TA
             if maybe_request.status.name == REQUEST_STATUS.ASSIGNED_TO_EXPERT:
                 patch_data["status"] = get_status(REQUEST_STATUS.PROVIDING_TA)
+            # If projected completion date is being removed while PROVIDING_TA, revert status back to ASSIGNED_TO_EXPERT
+            if body.get("proj_completion_date") == None and maybe_request.status.name == REQUEST_STATUS.PROVIDING_TA:
+                patch_data["status"] = get_status(REQUEST_STATUS.ASSIGNED_TO_EXPERT)
             
         if "status" in body:
             if body.get("status") is None:

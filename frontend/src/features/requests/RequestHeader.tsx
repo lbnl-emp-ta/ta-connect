@@ -10,6 +10,7 @@ import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import { Box, Drawer, IconButton, Stack, Typography } from '@mui/material';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { useRequestsContext } from './RequestsContext';
+import { RequestDatesDialog } from '@/features/requests/RequestDatesDialog';
 
 interface RequestHeaderProps {
   request: TARequestDetail;
@@ -92,6 +93,7 @@ export const RequestHeader: React.FC<RequestHeaderProps> = ({ request }) => {
           <ExpertsPanelDataTable experts={experts || []} currentRequestId={request.id} />
         </Box>
       </Drawer>
+      <RequestDatesDialog request={request} />
     </Stack>
   );
 };

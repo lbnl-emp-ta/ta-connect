@@ -229,9 +229,17 @@ export const getStep = (request: TARequestDetail): StepInfo => {
       stepIndex: Steps.Lab,
       allowedRoles: [TARole.LabLead, TARole.Admin],
     };
-  } else if (request.owner?.domain_type === 'expert') {
+  } else if (request.owner?.domain_type === 'expert' && request.status === 'assigned-to-expert') {
     return {
-      forwardText: 'Complete closeout',
+      forwardText: 'Start TA and add dates',
+      forwardIsMenu: false,
+      backwardText: 'Assign back to lab',
+      stepIndex: Steps.Expert,
+      allowedRoles: [TARole.Expert, TARole.Admin],
+    };
+  } else if (request.owner?.domain_type === 'expert' && request.status === 'providing-ta') {
+    return {
+      forwardText: 'Start closeout process',
       forwardIsMenu: false,
       backwardText: 'Assign back to lab',
       stepIndex: Steps.Expert,

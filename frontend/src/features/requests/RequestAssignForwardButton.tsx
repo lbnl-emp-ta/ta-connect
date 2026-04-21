@@ -50,7 +50,7 @@ export const RequestAssignForwardButton: React.FC<RequestAssignForwardButtonProp
   const { identity, detailedIdentity } = useIdentityContext();
   const { data: owners } = useSuspenseQuery(ownersQueryOptions(identity));
   const { data: experts } = useSuspenseQuery(expertsQueryOptions(identity));
-  const { tab, nextId, previousId, setExpertsPanelOpen } = useRequestsContext();
+  const { tab, nextId, previousId, setExpertsPanelOpen, setDatesDialogOpen } = useRequestsContext();
   const { setShowToast, setToastMessage } = useToastContext();
   const [searchTerm, setSearchTerm] = useState('');
   const requestOrganizationType = request.customers[0].org.type;
@@ -181,7 +181,12 @@ export const RequestAssignForwardButton: React.FC<RequestAssignForwardButtonProp
   const handleForward = (owner?: TAOwner) => {
     switch (currentStep.stepIndex) {
       case Steps.Expert:
-        finishCloseoutMutation.mutate();
+        if (request.status === 'assigned-to-expert') {
+          console.log('Opening dates dialog for request', request.id);
+          setDatesDialogOpen(true);
+        } else if (request.status === 'providing-ta') {
+          finishCloseoutMutation.mutate();
+        }
         break;
       case Steps.Review:
         if (request.owner?.domain_type === 'lab' && request.program) {
