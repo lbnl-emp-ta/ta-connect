@@ -116,9 +116,10 @@ export const RequestInfoPanel: React.FC<RequestInfoPanelProps> = ({ request }) =
     ) {
       mutationData.actual_completion_date = actualCompletionDate.format('YYYY-MM-DD');
     }
-    // Always send topics, even if they are unchanged.
-    // We could add a special function to check if topics have changed.
-    mutationData.topics = topics.map((topic) => topic.name);
+    if (topics !== request?.topics) {
+      mutationData.topics = topics.map((topic) => topic.name);
+    }
+
     if (Object.keys(mutationData).length === 0) {
       setEditing(false);
       return;
