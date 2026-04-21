@@ -118,7 +118,7 @@ export const RequestDatesDialog: React.FC<RequestDatesDialogProps> = ({ request 
   ]);
 
   return (
-    <Dialog open={datesDialogOpen} onClose={handleCancel}>
+    <Dialog open={datesDialogOpen} onClose={handleCancel} disableRestoreFocus>
       <DialogTitle>Enter dates to start TA</DialogTitle>
       <DialogContent>
         <DialogContentText sx={{ marginBottom: 4 }}>

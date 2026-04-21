@@ -116,7 +116,7 @@ export const UserInfoDialog: React.FC<UserInfoDialogProps> = ({
   ]);
 
   return (
-    <Dialog open={open} onClose={!hasMissingInfo ? handleCancel : undefined}>
+    <Dialog open={open} onClose={!hasMissingInfo ? handleCancel : undefined} disableRestoreFocus>
       <DialogTitle>User Information</DialogTitle>
       <DialogContent>
         <DialogContentText sx={{ marginBottom: 2 }}>

@@ -31,8 +31,7 @@ function ProfilePage() {
   const hasPlaceholderEmail = !!user?.email?.endsWith('@orcid.placeholder');
   const [isUserInfoDialogOpen, setIsUserInfoDialogOpen] = useState(false);
 
-  const handleOpenUserInfolDialog = (e: React.MouseEvent<HTMLButtonElement>) => {
-    e.currentTarget.blur();
+  const handleOpenUserInfolDialog = () => {
     setIsUserInfoDialogOpen(true);
   };
 
