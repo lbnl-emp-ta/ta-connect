@@ -14,7 +14,6 @@ fixture_list = [
     "roles_fixture.json",
 
     # Users
-    "user_fixture.json",
     "sample_users_fixture.json",
 
     # Core entities
