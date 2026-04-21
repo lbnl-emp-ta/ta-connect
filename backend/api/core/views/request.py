@@ -376,10 +376,11 @@ class RequestDetailView(BaseUserAwareRequest):
             if not(IsAnyRoleOnRequest().has_permission(request, None)):
                 return Response(data={"message": "Insufficient privillege to update 'projected completion date' field"}, status=status.HTTP_401_UNAUTHORIZED)
 
-            patch_data["proj_completion_date"] = body.get("proj_completion_date")
-
-            # If projected completion date is being set by the expert for the first time, set status to PROVIDING_TA
-            if maybe_request.status.name == REQUEST_STATUS.ASSIGNED_TO_EXPERT:
+            # Projected completion date can only be set if request is currently ASSIGNED_TO_EXPERT
+            # or is already PROVIDING_TA (in which case we're just updating the projected completion date).
+            # Setting it implies status should be updated to PROVIDING_TA.
+            if maybe_request.status.name in [REQUEST_STATUS.ASSIGNED_TO_EXPERT, REQUEST_STATUS.PROVIDING_TA]:
+                patch_data["proj_completion_date"] = body.get("proj_completion_date")
                 patch_data["status"] = get_status(REQUEST_STATUS.PROVIDING_TA)
             # If projected completion date is being removed while PROVIDING_TA, revert status back to ASSIGNED_TO_EXPERT
             if body.get("proj_completion_date") == None and maybe_request.status.name == REQUEST_STATUS.PROVIDING_TA:

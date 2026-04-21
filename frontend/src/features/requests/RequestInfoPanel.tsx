@@ -321,7 +321,11 @@ export const RequestInfoPanel: React.FC<RequestInfoPanelProps> = ({ request }) =
                   <TableCell>Projected Completion Date</TableCell>
                   <TableCell>
                     {(!editing ||
-                      !hasPermission('edit-projected-completion-date', detailedIdentity)) && (
+                      !hasPermission(
+                        'edit-projected-completion-date',
+                        detailedIdentity,
+                        request.status
+                      )) && (
                       <>
                         {request.proj_completion_date
                           ? dayjs(request.proj_completion_date).format('MM/DD/YYYY')
@@ -329,7 +333,11 @@ export const RequestInfoPanel: React.FC<RequestInfoPanelProps> = ({ request }) =
                       </>
                     )}
                     {editing &&
-                      hasPermission('edit-projected-completion-date', detailedIdentity) && (
+                      hasPermission(
+                        'edit-projected-completion-date',
+                        detailedIdentity,
+                        request.status
+                      ) && (
                         <DatePicker
                           value={projectedCompletionDate || null}
                           onChange={handleProjectedCompletionDateChange}

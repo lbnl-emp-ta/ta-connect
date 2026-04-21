@@ -93,8 +93,23 @@ type PermissionAction =
  * Note that this is used purely for changing UI elements and is not a substitute for backend permission checks.
  * The backend is the source of truth for permissions.
  */
-export const hasPermission = (action: PermissionAction, detailedIdentity?: TAIdentity): boolean => {
+export const hasPermission = (
+  action: PermissionAction,
+  detailedIdentity?: TAIdentity,
+  statusName?: TAStatusName
+): boolean => {
   if (!detailedIdentity || !detailedIdentity.role) return false;
+
+  // No one can edit the projected completion date unless
+  // the request is currently assigned-to-expert or is already providing-ta.
+  if (
+    action === 'edit-projected-completion-date' &&
+    statusName !== 'assigned-to-expert' &&
+    statusName !== 'providing-ta'
+  ) {
+    return false;
+  }
+
   switch (detailedIdentity.role.name) {
     case TARole.Admin:
       return true;
