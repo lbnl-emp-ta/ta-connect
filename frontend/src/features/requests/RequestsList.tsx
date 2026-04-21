@@ -2,12 +2,7 @@ import { Chip, TablePagination, Paper, Stack, Typography } from '@mui/material';
 import { useNavigate, useParams } from '@tanstack/react-router';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { TARequest } from '../../api/dashboard/types';
-import {
-  formatDatetime,
-  readableStatusNames,
-  statusColors,
-  statusContrastColors,
-} from '../../utils/utils';
+import { formatDatetime, statusMap } from '../../utils/utils';
 import { useRequestsContext } from './RequestsContext';
 import HourglassBottomIcon from '@mui/icons-material/HourglassBottom';
 import TaskAltIcon from '@mui/icons-material/TaskAlt';
@@ -147,11 +142,11 @@ export const RequestsList: React.FC<RequestsListProps> = ({
             </Stack>
             <Stack direction="row" alignItems="center">
               <Chip
-                label={readableStatusNames[request.status]}
+                label={statusMap[request.status].text}
                 size="small"
                 sx={{
-                  backgroundColor: statusColors[request.status],
-                  color: statusContrastColors[request.status],
+                  backgroundColor: statusMap[request.status].color,
+                  color: statusMap[request.status].contrastColor,
                 }}
               />
               <Typography variant="body2">{request.depth}</Typography>

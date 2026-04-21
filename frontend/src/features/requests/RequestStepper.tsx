@@ -1,11 +1,5 @@
 import { TARequestDetail } from '@/api/dashboard/types';
-import {
-  getStep,
-  readableStatusNames,
-  statusColors,
-  statusContrastColors,
-  Steps,
-} from '@/utils/utils';
+import { getStep, statusMap, Steps } from '@/utils/utils';
 import { Box, Chip, Stack, Step, StepLabel, Stepper, Typography } from '@mui/material';
 
 interface RequestStepperProps {
@@ -33,11 +27,11 @@ export const RequestStepper: React.FC<RequestStepperProps> = ({ request }) => {
               {getStep(request).stepIndex === i && (
                 <Box>
                   <Chip
-                    label={readableStatusNames[request.status]}
+                    label={statusMap[request.status].text}
                     size="small"
                     sx={{
-                      backgroundColor: statusColors[request.status],
-                      color: statusContrastColors[request.status],
+                      backgroundColor: statusMap[request.status].color,
+                      color: statusMap[request.status].contrastColor,
                     }}
                   />
                 </Box>

@@ -275,53 +275,81 @@ export const getStep = (request: TARequestDetail): StepInfo => {
   }
 };
 
-export const readableStatusNames: Record<TAStatusName, string> = {
-  scoping: 'Scoping',
-  'assigned-to-program': 'Assigned to Program',
-  'rejected-by-program': 'Rejected by Program',
-  'assigned-to-lab': 'Assigned to lab',
-  'rejected-by-lab': 'Rejected by lab',
-  'assigned-to-expert': 'Assigned to expert',
-  'rejected-by-expert': 'Rejected by expert',
-  'providing-ta': 'TA in progress',
-  'closeout-started': 'Closeout started',
-  'closeout-more-info': 'Closeout needs more info',
-  'closeout-review-by-lab': 'Closeout being reviewed by lab',
-  'closeout-review-by-program': 'Closeout being reviewed by program',
-  completed: 'Completed',
-  'unable-to-address': 'Unable to address',
-};
+interface StatusInfo {
+  text: string;
+  color: string;
+  contrastColor: string;
+}
 
-export const statusColors: Record<TAStatusName, string> = {
-  scoping: '#444441',
-  'assigned-to-program': '#3d6e96',
-  'rejected-by-program': '#444441',
-  'assigned-to-lab': '#5a52a8',
-  'rejected-by-lab': '#3d6e96',
-  'assigned-to-expert': '#2e7d68',
-  'rejected-by-expert': '#5a52a8',
-  'providing-ta': '#2e7d68',
-  'closeout-started': '#2e7d68',
-  'closeout-more-info': '#2e7d68',
-  'closeout-review-by-lab': '#8a6d1a',
-  'closeout-review-by-program': '#8a6d1a',
-  completed: '#e4f2dc',
-  'unable-to-address': '#E8F0F2',
-};
-
-export const statusContrastColors: Record<TAStatusName, string> = {
-  scoping: 'white',
-  'assigned-to-program': 'white',
-  'rejected-by-program': 'white',
-  'assigned-to-lab': 'white',
-  'rejected-by-lab': 'white',
-  'assigned-to-expert': 'white',
-  'rejected-by-expert': 'white',
-  'providing-ta': 'white',
-  'closeout-started': 'white',
-  'closeout-more-info': 'white',
-  'closeout-review-by-lab': 'white',
-  'closeout-review-by-program': 'white',
-  completed: 'grey.900',
-  'unable-to-address': 'grey.900',
+export const statusMap: Record<TAStatusName, StatusInfo> = {
+  scoping: {
+    text: 'Scoping',
+    color: '#444441',
+    contrastColor: 'white',
+  },
+  'assigned-to-program': {
+    text: 'Assigned to Program',
+    color: '#3d6e96',
+    contrastColor: 'white',
+  },
+  'rejected-by-program': {
+    text: 'Rejected by Program',
+    color: '#444441',
+    contrastColor: 'white',
+  },
+  'assigned-to-lab': {
+    text: 'Assigned to lab',
+    color: '#5a52a8',
+    contrastColor: 'white',
+  },
+  'rejected-by-lab': {
+    text: 'Rejected by lab',
+    color: '#3d6e96',
+    contrastColor: 'white',
+  },
+  'assigned-to-expert': {
+    text: 'Assigned to expert',
+    color: '#2e7d68',
+    contrastColor: 'white',
+  },
+  'rejected-by-expert': {
+    text: 'Rejected by expert',
+    color: '#5a52a8',
+    contrastColor: 'white',
+  },
+  'providing-ta': {
+    text: 'TA in progress',
+    color: '#2e7d68',
+    contrastColor: 'white',
+  },
+  'closeout-started': {
+    text: 'Closeout started',
+    color: '#2e7d68',
+    contrastColor: 'white',
+  },
+  'closeout-more-info': {
+    text: 'Closeout needs more info',
+    color: '#2e7d68',
+    contrastColor: 'white',
+  },
+  'closeout-review-by-lab': {
+    text: 'Closeout being reviewed by lab',
+    color: '#8a6d1a',
+    contrastColor: 'white',
+  },
+  'closeout-review-by-program': {
+    text: 'Closeout being reviewed by program',
+    color: '#8a6d1a',
+    contrastColor: 'white',
+  },
+  completed: {
+    text: 'Completed',
+    color: '#e4f2dc',
+    contrastColor: '#333333',
+  },
+  'unable-to-address': {
+    text: 'Unable to address',
+    color: '#E8F0F2',
+    contrastColor: '#333333',
+  },
 };

@@ -31,13 +31,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { TARequestDetail, TARequestDetailMutation, TATopic } from '../../api/dashboard/types';
 import { InfoPanel } from '../../components/InfoPanel';
 import { topicsQueryOptions, useRequestMutation } from '../../utils/queryOptions';
-import {
-  capitalize,
-  formatDatetime,
-  hasPermission,
-  readableStatusNames,
-  statusColors,
-} from '../../utils/utils';
+import { capitalize, formatDatetime, hasPermission, statusMap } from '../../utils/utils';
 import { useIdentityContext } from '../identity/IdentityContext';
 import { useToastContext } from '../toasts/ToastContext';
 import { ToastMessage } from '../toasts/ToastMessage';
@@ -269,12 +263,10 @@ export const RequestInfoPanel: React.FC<RequestInfoPanelProps> = ({ request }) =
                       <CircleIcon
                         fontSize="small"
                         sx={{
-                          color: statusColors[request.status],
+                          color: statusMap[request.status].color,
                         }}
                       />
-                      <span>
-                        {request.status ? readableStatusNames[request.status] : 'Unknown'}
-                      </span>
+                      <span>{request.status ? statusMap[request.status].text : 'Unknown'}</span>
                     </Stack>
                   </TableCell>
                 </TableRow>
