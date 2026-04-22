@@ -74,7 +74,7 @@ class AssignmentView(views.APIView):
                         ta_request.expert = None
 
                         # Request is being kicked back to reception from program
-                        if ta_request.status.name == REQUEST_STATUS.ASSIGNED_TO_PROGRAM:
+                        if ta_request.status.name in [REQUEST_STATUS.ASSIGNED_TO_PROGRAM, REQUEST_STATUS.REJECTED_BY_LAB]:
                             ta_request.status = get_status(REQUEST_STATUS.REJECTED_BY_PROGRAM)
                         # Request is being assigned to reception for the first time or being reopened
                         else:

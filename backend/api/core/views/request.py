@@ -241,7 +241,7 @@ class RequestDetailView(BaseUserAwareRequest):
         # Only Program Leads, Lab Leads, Coordinators, and Admins should be able to see depth options,
         # and only if a program is currently assigned to the request.
         depth_options = []
-        if found_request.program and IsAdmin().has_permission(request, None) or IsProgramLead().has_permission(request, None) or IsLabLead().has_permission(request, None) or IsCoordinator().has_permission(request, None):
+        if found_request.program and (IsAdmin().has_permission(request, None) or IsProgramLead().has_permission(request, None) or IsLabLead().has_permission(request, None) or IsCoordinator().has_permission(request, None)):
             program = found_request.program
             depth_options = list(program.depths.values_list('name', flat=True))
         

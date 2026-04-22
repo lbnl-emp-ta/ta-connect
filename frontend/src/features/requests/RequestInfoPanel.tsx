@@ -231,8 +231,27 @@ export const RequestInfoPanel: React.FC<RequestInfoPanelProps> = ({ request }) =
                   <TableCell>{request.id}</TableCell>
                 </TableRow>
                 <TableRow>
-                  <TableCell>Current Owner</TableCell>
+                  <TableCell>Status</TableCell>
                   <TableCell>
+                    <Stack direction="row" alignItems="center" spacing={1}>
+                      <CircleIcon
+                        fontSize="small"
+                        sx={{
+                          color: statusMap[request.status].color,
+                        }}
+                      />
+                      <span>{request.status ? statusMap[request.status].text : 'Unknown'}</span>
+                    </Stack>
+                  </TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell>Current Owner</TableCell>
+                  <TableCell
+                    sx={{
+                      color: statusMap[request.status].color,
+                      fontWeight: 'bold',
+                    }}
+                  >
                     <Stack direction="row" spacing={1}>
                       {request.owner && <span>{capitalize(request.owner.domain_type)}</span>}
                       {request.owner && request.owner.domain_type !== 'reception' && (
@@ -256,20 +275,6 @@ export const RequestInfoPanel: React.FC<RequestInfoPanelProps> = ({ request }) =
                 <TableRow>
                   <TableCell>Assigned Expert</TableCell>
                   <TableCell>{request.expert ? request.expert.email : 'Not assigned'}</TableCell>
-                </TableRow>
-                <TableRow>
-                  <TableCell>Status</TableCell>
-                  <TableCell>
-                    <Stack direction="row" alignItems="center" spacing={1}>
-                      <CircleIcon
-                        fontSize="small"
-                        sx={{
-                          color: statusMap[request.status].color,
-                        }}
-                      />
-                      <span>{request.status ? statusMap[request.status].text : 'Unknown'}</span>
-                    </Stack>
-                  </TableCell>
                 </TableRow>
                 <TableRow>
                   <TableCell>Depth</TableCell>
