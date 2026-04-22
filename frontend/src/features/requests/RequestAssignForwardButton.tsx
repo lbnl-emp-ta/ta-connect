@@ -12,7 +12,7 @@ import {
   useMarkCompleteMutation,
   useReopenMutation,
 } from '@/utils/queryOptions';
-import { getStep, Steps } from '@/utils/utils';
+import { getStep, statusMap, Steps } from '@/utils/utils';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import EastIcon from '@mui/icons-material/East';
 import ErrorIcon from '@mui/icons-material/Error';
@@ -54,13 +54,32 @@ export const RequestAssignForwardButton: React.FC<RequestAssignForwardButtonProp
   const { setShowToast, setToastMessage } = useToastContext();
   const [searchTerm, setSearchTerm] = useState('');
   const requestOrganizationType = request.customers[0].org.type;
-  const ownersContainsExperts = owners?.some((owner) => owner.domain_type === 'expert');
+  const ownersContainsExperts =
+    owners?.some((owner) => owner.domain_type === 'expert') ||
+    request.status === 'assigned-to-lab' ||
+    request.status === 'rejected-by-expert';
+  const ownersNoun = useMemo(() => {
+    switch (request.status) {
+      case 'scoping':
+      case 'rejected-by-program':
+        return 'programs';
+      case 'assigned-to-program':
+      case 'rejected-by-lab':
+        return 'labs';
+      case 'assigned-to-lab':
+      case 'rejected-by-expert':
+        return 'experts';
+      default:
+        return 'owners';
+    }
+  }, [request.status]);
   const currentStep = useMemo(() => {
     return getStep(request);
   }, [request]);
   const forwardOwners = useMemo(() => {
     switch (request.status) {
       case 'scoping':
+      case 'rejected-by-program':
         return owners?.filter((owner) => owner.domain_type === 'program');
       case 'assigned-to-program':
       case 'rejected-by-lab':
@@ -264,7 +283,7 @@ export const RequestAssignForwardButton: React.FC<RequestAssignForwardButtonProp
             <TextField
               variant="outlined"
               size="small"
-              placeholder="Search assignees"
+              placeholder={`Search ${ownersNoun}`}
               fullWidth
               value={searchTerm}
               onChange={handleSearch}
@@ -273,7 +292,7 @@ export const RequestAssignForwardButton: React.FC<RequestAssignForwardButtonProp
           </Box>
           {ownersContainsExperts && (
             <MenuItem onClick={handleOpenExpertsPanel}>
-              <ListItemText sx={{ color: 'secondary.main' }}>
+              <ListItemText sx={{ color: statusMap['assigned-to-expert'].color }}>
                 <Typography variant="body2" component="div">
                   <Stack direction="row" alignItems="center">
                     <span>Explore experts</span>
@@ -343,7 +362,7 @@ export const RequestAssignForwardButton: React.FC<RequestAssignForwardButtonProp
           {(!filteredOwners || filteredOwners.length === 0) && (
             <Box sx={{ paddingX: 2, paddingY: 1 }}>
               <Typography variant="body2" color="text.secondary">
-                No other experts found.
+                {`No other ${ownersNoun} found.`}
               </Typography>
             </Box>
           )}
