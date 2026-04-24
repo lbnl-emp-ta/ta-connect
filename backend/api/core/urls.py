@@ -19,6 +19,8 @@ urlpatterns = [
     path('requests/<int:request_id>/download-attachment/<int:attachment_id>/', DownloadAttachmentView.as_view(), name="download-attachment"),
     path('requests/<int:request_id>/delete-attachment/<int:attachment_id>/', DeleteAttachmentView.as_view(), name="delete-attachment"),
 
+    path('requests/<int:request_id>/closeout-form/', CloseoutFormView.as_view(), name="closeout-form"),
+
     path('requests/<int:request_id>/list-notes/', NoteListView.as_view(), name="list-notes"),
     path('requests/<int:request_id>/add-note/', NoteCreateView.as_view(), name="add-note"),
     path('requests/<int:request_id>/delete-note/<int:note_id>/', NoteDeleteView.as_view(), name="delete-note"),

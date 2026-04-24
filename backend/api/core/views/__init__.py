@@ -23,6 +23,7 @@ from .note import NoteListView, NoteCreateView, NoteDeleteView
 from .topic import TopicListView
 from .audit_history import AuditHistoryListView
 from .user import UserEditView
+from .closeout_form import CloseoutFormView
 
 __all__ = [
     "AssignmentView",
@@ -56,5 +57,6 @@ __all__ = [
     "NoteDeleteView",
     "TopicListView",
     "AuditHistoryListView",
-    "UserEditView"
+    "UserEditView",
+    "CloseoutFormView",
 ]

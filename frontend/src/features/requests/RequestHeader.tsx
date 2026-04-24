@@ -11,6 +11,7 @@ import { Box, Drawer, IconButton, Stack, Typography } from '@mui/material';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { useRequestsContext } from './RequestsContext';
 import { RequestDatesDialog } from '@/features/requests/RequestDatesDialog';
+import { RequestCloseoutForm } from '@/features/requests/RequestCloseoutForm';
 
 interface RequestHeaderProps {
   request: TARequestDetail;
@@ -94,6 +95,7 @@ export const RequestHeader: React.FC<RequestHeaderProps> = ({ request }) => {
         </Box>
       </Drawer>
       <RequestDatesDialog request={request} />
+      <RequestCloseoutForm requestId={request.id} />
     </Stack>
   );
 };

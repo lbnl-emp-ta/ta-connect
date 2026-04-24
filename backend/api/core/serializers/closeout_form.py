@@ -1,0 +1,26 @@
+from rest_framework import serializers
+
+from core.models import CloseoutForm
+
+
+class CloseoutFormSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CloseoutForm
+        fields = [
+            "id",
+            "request",
+            "submitted_date",
+            "approved_by_lab",
+            "approved_by_program",
+            "experience_description",
+            "ta_provided_description",
+            "impact_description",
+            "alignment_description",
+            "customer_feedback",
+            "follow_up_needed",
+            "follow_up_description",
+            "follow_up_duration",
+            "follow_up_comments",
+            "follow_up_has_same_expert",
+        ]
+        read_only_fields = ["id", "request", "submitted_date"]
