@@ -19,7 +19,7 @@ class CloseoutForm(models.Model):
     follow_up_description = models.TextField(blank=True, null=True, verbose_name="What is the scope of the additional TA effort? (topics, etc.)")
     follow_up_duration = models.CharField(max_length=256, blank=True, null=True, verbose_name="How much additional time is needed?")
     follow_up_comments = models.TextField(blank=True, null=True, verbose_name="Other questions/comments regarding follow-up TA")
-    follow_up_has_same_expert = models.BooleanField(default=False, verbose_name="Do you want to be an SME for any follow-up?")
+    follow_up_has_same_expert = models.BooleanField(default=False, verbose_name="Do you want to be a subject matter expert (SME) for any follow-up?")
 
     def __str__(self):
         return f"Closeout Form for Request #{self.request.pk}"

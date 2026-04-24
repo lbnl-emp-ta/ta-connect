@@ -7,6 +7,7 @@ import { deleteData, fetchData, patchData, postData, postForm } from './dashboar
 import {
   CustomerRequestRelationship,
   TAAssignment,
+  TACloseoutForm,
   TACustomerMutation,
   TAExpert,
   TAIdentity,
@@ -146,6 +147,23 @@ export const notesQueryOptions = (requestId: string, identity?: Identity) =>
     },
   });
 
+export const closeoutQueryOptions = (requestId: string, identity?: Identity) =>
+  queryOptions({
+    staleTime: 120_000, // stale after 2 minutes
+    retry: false,
+    queryKey: ['requests', requestId, 'closeout-form', identity],
+    queryFn: () => {
+      if (identity) {
+        return fetchData<TACloseoutForm>(
+          `${apiUrl}/requests/${requestId}/closeout-form/`,
+          identity
+        );
+      } else {
+        return null;
+      }
+    },
+  });
+
 export const statesQueryOptions = () =>
   queryOptions({
     staleTime: 120_000, // stale after 2 minutes
@@ -241,6 +259,36 @@ export const useAssignmentMutation = (
     mutationKey: ['requests', 'assign', requestId, identity],
     mutationFn: (data: TAAssignment) =>
       postData<TAAssignment>(`${apiUrl}/requests/assign/`, data, identity),
+    ...options,
+  });
+};
+
+export const useCloseoutMutation = (requestId: string, identity?: Identity) => {
+  return useMutation({
+    mutationKey: ['requests', 'update', 'closeout-form', requestId, identity],
+    mutationFn: (data: Partial<TACloseoutForm>) =>
+      patchData<TACloseoutForm>(
+        `${import.meta.env.VITE_API_URL}/requests/${requestId}/closeout-form/`,
+        data,
+        identity
+      ),
+    onSuccess: () => queryClient.invalidateQueries(),
+  });
+};
+
+export const useCreateCloseoutMutation = (
+  requestId: string,
+  identity?: Identity,
+  options?: UseMutationOptions<unknown, Error, void, unknown>
+) => {
+  return useMutation({
+    mutationKey: ['requests', 'create', 'closeout-form', requestId, identity],
+    mutationFn: () =>
+      postData(
+        `${import.meta.env.VITE_API_URL}/requests/${requestId}/closeout-form/`,
+        null,
+        identity
+      ),
     ...options,
   });
 };

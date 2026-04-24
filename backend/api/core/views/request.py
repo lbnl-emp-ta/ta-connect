@@ -43,7 +43,7 @@ class BaseUserAwareRequest(views.APIView):
             return queryset
 
         maybe_context = self.request.headers.get("Context")
-        if maybe_context is None:
+        if not maybe_context:
             return queryset.none()
             
         context = json.loads(maybe_context)
@@ -160,7 +160,7 @@ class BaseUserAwareRequest(views.APIView):
         
     def get_inactive(self):
         maybe_context = self.request.headers.get("Context")
-        if maybe_context is None:
+        if not maybe_context:
             return Request.objects.none()
             
         context = json.loads(maybe_context)

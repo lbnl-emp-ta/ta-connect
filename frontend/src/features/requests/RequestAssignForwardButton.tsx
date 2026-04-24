@@ -8,6 +8,7 @@ import {
   expertsQueryOptions,
   ownersQueryOptions,
   useAssignmentMutation,
+  useCreateCloseoutMutation,
   useFinishCloseoutMutation,
   useMarkCompleteMutation,
   useReopenMutation,
@@ -50,7 +51,14 @@ export const RequestAssignForwardButton: React.FC<RequestAssignForwardButtonProp
   const { identity, detailedIdentity } = useIdentityContext();
   const { data: owners } = useSuspenseQuery(ownersQueryOptions(identity));
   const { data: experts } = useSuspenseQuery(expertsQueryOptions(identity));
-  const { tab, nextId, previousId, setExpertsPanelOpen, setDatesDialogOpen } = useRequestsContext();
+  const {
+    tab,
+    nextId,
+    previousId,
+    setExpertsPanelOpen,
+    setDatesDialogOpen,
+    setCloseoutDialogOpen,
+  } = useRequestsContext();
   const { setShowToast, setToastMessage } = useToastContext();
   const [searchTerm, setSearchTerm] = useState('');
   const requestOrganizationType = request.customers[0].org.type;
@@ -160,6 +168,20 @@ export const RequestAssignForwardButton: React.FC<RequestAssignForwardButtonProp
     onSuccess: onSuccess('Request assigned'),
     onError: onError,
   });
+  const createCloseoutMutation = useCreateCloseoutMutation(request.id.toString(), identity, {
+    onMutate: onMutate('Creating closeout form'),
+    onSuccess: () => {
+      queryClient.invalidateQueries();
+      setShowToast(true);
+      setToastMessage(
+        <ToastMessage icon={<CheckCircleIcon />}>
+          Closeout form created and request marked as closeout started
+        </ToastMessage>
+      );
+      setCloseoutDialogOpen(true);
+    },
+    onError: onError,
+  });
   const finishCloseoutMutation = useFinishCloseoutMutation(request.id.toString(), identity, {
     onMutate: onMutate('Finishing request closeout'),
     onSuccess: onSuccess('Request closeout finished'),
@@ -206,7 +228,9 @@ export const RequestAssignForwardButton: React.FC<RequestAssignForwardButtonProp
         if (request.status === 'assigned-to-expert') {
           setDatesDialogOpen(true);
         } else if (request.status === 'providing-ta') {
-          finishCloseoutMutation.mutate();
+          createCloseoutMutation.mutate();
+        } else if (request.status === 'closeout-started') {
+          setCloseoutDialogOpen(true);
         }
         break;
       case Steps.Review:

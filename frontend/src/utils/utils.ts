@@ -43,6 +43,13 @@ export const capitalize = (str: string): string => {
 };
 
 /**
+ * Parse a string value to a boolean.
+ * Returns true if the string is "true" (case-sensitive), and false otherwise.
+ * Used for radio button groups.
+ */
+export const parseBoolean = (value: string): boolean => value === 'true';
+
+/**
  * Format a datetime string to a more readable format.
  */
 export const formatDatetime = (dateString: string): string => {
@@ -255,6 +262,14 @@ export const getStep = (request: TARequestDetail): StepInfo => {
       forwardText: 'Start closeout process',
       forwardIsMenu: false,
       backwardText: 'Assign back to lab',
+      stepIndex: Steps.Delivery,
+      allowedRoles: [TARole.Expert, TARole.Admin],
+    };
+  } else if (request.owner?.domain_type === 'expert' && request.status === 'closeout-started') {
+    return {
+      forwardText: 'Continue closeout form',
+      forwardIsMenu: false,
+      backwardText: 'Go back to providing TA',
       stepIndex: Steps.Delivery,
       allowedRoles: [TARole.Expert, TARole.Admin],
     };

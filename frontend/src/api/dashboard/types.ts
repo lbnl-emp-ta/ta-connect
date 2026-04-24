@@ -136,6 +136,26 @@ export type TAStatusName =
   | 'completed'
   | 'unable-to-address';
 
+export interface TACloseoutForm {
+  request: number;
+  submitted_date: string;
+  approved_by_lab: boolean;
+  approved_by_program: boolean;
+  experience_description?: string;
+  ta_provided_description?: string;
+  impact_description?: string;
+  alignment_description?: string;
+  customer_feedback?: string;
+  follow_up_needed?: boolean;
+  follow_up_description?: string;
+  follow_up_duration?: string;
+  follow_up_comments?: string;
+  follow_up_has_same_expert?: boolean;
+  questions?: {
+    [key: string]: string;
+  };
+}
+
 export interface TARequest {
   id: number;
   status: TAStatusName;
