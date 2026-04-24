@@ -1,9 +1,9 @@
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import ErrorIcon from '@mui/icons-material/Error';
 import { queryOptions, useMutation, UseMutationOptions } from '@tanstack/react-query';
-import { loginMutation } from '../api/accounts/login';
-import { logoutMutation } from '../api/accounts/logout';
-import { deleteData, fetchData, patchData, postData, postForm } from '../api/dashboard';
+import { loginMutation } from './accounts/login';
+import { logoutMutation } from './accounts/logout';
+import { deleteData, fetchData, patchData, postData, postForm } from './dashboard';
 import {
   CustomerRequestRelationship,
   TAAssignment,
@@ -18,16 +18,16 @@ import {
   TAStatus,
   TATopic,
   TAUserMutation,
-} from '../api/dashboard/types';
-import { submitIntakeMutation } from '../api/forms';
+} from './dashboard/types';
+import { submitIntakeMutation } from './forms';
 import {
   IntakeFormData,
   Organization,
   OrganizationType,
   State,
   TransmissionPlanningRegion,
-} from '../api/forms/types';
-import { sessionsApi } from '../api/sessions';
+} from './forms/types';
+import { sessionsApi } from './sessions';
 import { queryClient } from '../App';
 import { Identity } from '../features/identity/IdentityContext';
 import { useToastContext } from '../features/toasts/ToastContext';

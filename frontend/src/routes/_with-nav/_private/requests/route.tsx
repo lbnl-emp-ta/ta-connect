@@ -1,4 +1,4 @@
-import { identitiesQueryOptions } from '@/utils/queryOptions';
+import { identitiesQueryOptions } from '@/api/queryOptions';
 import { Box } from '@mui/material';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { createFileRoute, Navigate, Outlet } from '@tanstack/react-router';

@@ -4,7 +4,7 @@ import { ExpertsPanelDataTable } from '@/features/experts/ExpertsPanelDataTable'
 import { useIdentityContext } from '@/features/identity/IdentityContext';
 import { RequestAssignBackwardButton } from '@/features/requests/RequestAssignBackwardButton';
 import { RequestAssignForwardButton } from '@/features/requests/RequestAssignForwardButton';
-import { expertsQueryOptions } from '@/utils/queryOptions';
+import { expertsQueryOptions } from '@/api/queryOptions';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import { Box, Drawer, IconButton, Stack, Typography } from '@mui/material';

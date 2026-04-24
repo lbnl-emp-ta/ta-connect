@@ -4,7 +4,7 @@ import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import { createFileRoute, Link, Outlet, useLocation, useNavigate } from '@tanstack/react-router';
 import { useState } from 'react';
 import { useUser } from '../../hooks/useUser';
-import { useLogoutMutation } from '../../utils/queryOptions';
+import { useLogoutMutation } from '../../api/queryOptions';
 import { IdentityDropdown } from '@/features/identity/IdentityDropdown';
 
 export const Route = createFileRoute('/_with-nav')({

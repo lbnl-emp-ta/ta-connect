@@ -4,7 +4,7 @@ import { useIdentityContext } from '@/features/identity/IdentityContext';
 import { useRequestsContext } from '@/features/requests/RequestsContext';
 import { useToastContext } from '@/features/toasts/ToastContext';
 import { ToastMessage } from '@/features/toasts/ToastMessage';
-import { useAssignmentMutation } from '@/utils/queryOptions';
+import { useAssignmentMutation } from '@/api/queryOptions';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import ErrorIcon from '@mui/icons-material/Error';
 import { Button, Stack } from '@mui/material';

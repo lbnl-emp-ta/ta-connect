@@ -1,5 +1,5 @@
 import { useSuspenseQuery } from '@tanstack/react-query';
-import { authSessionQueryOptions } from '../utils/queryOptions';
+import { authSessionQueryOptions } from '../api/queryOptions';
 import { SessionAuthenticatedResponse } from '../api/types';
 
 /**

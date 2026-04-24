@@ -4,7 +4,7 @@ import { useIdentityContext } from '@/features/identity/IdentityContext';
 import { useRequestsContext } from '@/features/requests/RequestsContext';
 import { useToastContext } from '@/features/toasts/ToastContext';
 import { ToastMessage } from '@/features/toasts/ToastMessage';
-import { ownersQueryOptions, useAssignmentMutation, useCancelMutation } from '@/utils/queryOptions';
+import { ownersQueryOptions, useAssignmentMutation, useCancelMutation } from '@/api/queryOptions';
 import { getStep } from '@/utils/utils';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import WestIcon from '@mui/icons-material/West';

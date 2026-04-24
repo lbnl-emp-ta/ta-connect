@@ -11,7 +11,7 @@ import {
   useFinishCloseoutMutation,
   useMarkCompleteMutation,
   useReopenMutation,
-} from '@/utils/queryOptions';
+} from '@/api/queryOptions';
 import { getStep, statusMap, Steps } from '@/utils/utils';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import EastIcon from '@mui/icons-material/East';

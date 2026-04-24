@@ -16,7 +16,7 @@ import { useSuspenseQuery } from '@tanstack/react-query';
 import { createFileRoute } from '@tanstack/react-router';
 import { RolePanel } from '@/features/profile/RolePanel';
 import { useUser } from '@/hooks/useUser';
-import { identitiesQueryOptions } from '@/utils/queryOptions';
+import { identitiesQueryOptions } from '@/api/queryOptions';
 import { useEffect, useState } from 'react';
 import { UserInfoDialog } from '@/features/profile/UserInfoDialog';
 import { TAIdentity } from '@/api/dashboard/types';

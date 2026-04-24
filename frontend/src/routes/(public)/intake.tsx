@@ -36,7 +36,7 @@ import {
   statesQueryOptions,
   transmissionPlanningRegionsQueryOptions,
   useSubmitIntakeMutation,
-} from '../../utils/queryOptions';
+} from '../../api/queryOptions';
 import { isValidEmail, isValidUSTelephone } from '../../utils/utils';
 
 export const Route = createFileRoute('/(public)/intake')({

@@ -30,7 +30,7 @@ import dayjs, { Dayjs } from 'dayjs';
 import { useCallback, useEffect, useState } from 'react';
 import { TARequestDetail, TARequestDetailMutation, TATopic } from '../../api/dashboard/types';
 import { InfoPanel } from '../../components/InfoPanel';
-import { topicsQueryOptions, useRequestMutation } from '../../utils/queryOptions';
+import { topicsQueryOptions, useRequestMutation } from '../../api/queryOptions';
 import { capitalize, formatDatetime, hasPermission, statusMap } from '../../utils/utils';
 import { useIdentityContext } from '../identity/IdentityContext';
 import { useToastContext } from '../toasts/ToastContext';

@@ -9,7 +9,7 @@ import { RequestInfoPanel } from '@/features/requests/RequestInfoPanel';
 import { RequestNotes } from '@/features/requests/RequestNotes';
 import { useRequestsContext } from '@/features/requests/RequestsContext';
 import { RequestStepper } from '@/features/requests/RequestStepper';
-import { notesQueryOptions, requestDetailQueryOptions } from '@/utils/queryOptions';
+import { notesQueryOptions, requestDetailQueryOptions } from '@/api/queryOptions';
 import { Badge, Grid, Paper, Stack, Tab, Tabs, Typography } from '@mui/material';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { useEffect, useState } from 'react';

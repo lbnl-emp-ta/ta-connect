@@ -12,7 +12,7 @@ import {
   useCancelMutation,
   useFinishCloseoutMutation,
   useMarkCompleteMutation,
-} from '../../utils/queryOptions';
+} from '../../api/queryOptions';
 import { useIdentityContext } from '../identity/IdentityContext';
 import { useToastContext } from '../toasts/ToastContext';
 import { ToastMessage } from '../toasts/ToastMessage';
