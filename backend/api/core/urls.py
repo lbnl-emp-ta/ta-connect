@@ -21,6 +21,8 @@ urlpatterns = [
 
     path('requests/<int:request_id>/closeout-form/', CloseoutFormView.as_view(), name="closeout-form"),
     path('requests/<int:request_id>/submit-closeout-form/', RequestSubmitCloseoutFormView.as_view(), name="submit-closeout-form"),
+    path('requests/<int:request_id>/approve-closeout-form-by-lab/', RequestApproveCloseoutFormByLabView.as_view(), name="approve-closeout-form-by-lab"),
+    path('requests/<int:request_id>/approve-closeout-form-by-program/', RequestApproveCloseoutFormByProgramView.as_view(), name="approve-closeout-form-by-program"),
 
     path('requests/<int:request_id>/list-notes/', NoteListView.as_view(), name="list-notes"),
     path('requests/<int:request_id>/add-note/', NoteCreateView.as_view(), name="add-note"),

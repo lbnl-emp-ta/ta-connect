@@ -1,4 +1,4 @@
-from .request import RequestListView, RequestDetailView, RequestMarkCompleteView, RequestCancelView, RequestCloseoutCompleteView, RequestReopenView, RequestSubmitCloseoutFormView
+from .request import RequestListView, RequestDetailView, RequestMarkCompleteView, RequestCancelView, RequestCloseoutCompleteView, RequestReopenView, RequestSubmitCloseoutFormView, RequestApproveCloseoutFormByLabView, RequestApproveCloseoutFormByProgramView
 from .depth import DepthListView
 from .state import StateListView
 from .organization_type import OrganizationTypeListView
@@ -36,6 +36,8 @@ __all__ = [
     "RequestMarkCompleteView",
     "RequestCloseoutCompleteView",
     "RequestSubmitCloseoutFormView",
+    "RequestApproveCloseoutFormByLabView",
+    "RequestApproveCloseoutFormByProgramView",
     "RequestCancelView",
     "RequestReopenView",
     "DepthListView",

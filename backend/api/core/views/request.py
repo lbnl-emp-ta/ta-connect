@@ -573,31 +573,75 @@ class RequestSubmitCloseoutFormView(BaseUserAwareRequest):
         return Response(status=status.HTTP_200_OK)
 
 
-class RequestCloseoutCompleteView(BaseUserAwareRequest):
+class RequestApproveCloseoutFormByLabView(BaseUserAwareRequest):
     def post(self, request, request_id=None):
         if request_id is None:
             return Response(data={"message": "Please provide a Request ID"}, status=status.HTTP_400_BAD_REQUEST)
 
-        if not (IsExpert().has_permission(request) or IsAdmin().has_permission(request)):
-            return Response(data={"message": "Insufficient privillege to mark request as complete"}, status=status.HTTP_401_UNAUTHORIZED)
+        if not (IsLabLead().has_permission(request) or IsAdmin().has_permission(request)):
+            return Response(data={"message": "Insufficient privilege to approve closeout form"}, status=status.HTTP_403_FORBIDDEN)
 
         queryset = self.get_actionable()
 
         found_request = None
         try:
-            found_request = queryset.get(pk=request_id)        
-        except:
+            found_request = queryset.get(pk=request_id)
+        except Request.DoesNotExist:
             return Response(data={"message": "Request with given ID does not exist"}, status=status.HTTP_404_NOT_FOUND)
 
-        if found_request.expert is None:
-            return Response(data={"message": "Request must have an assigned expert in order to complete closeout"}, status=status.HTTP_404_NOT_FOUND)
+        if not hasattr(found_request, "closeout_form"):
+            return Response(data={"message": "Closeout form does not exist for this request"}, status=status.HTTP_400_BAD_REQUEST)
 
         try:
-            found_request.status = RequestStatus.objects.get(name=REQUEST_STATUS.CLOSEOUT_REVIEW_BY_LAB)
-            found_request.owner = found_request.lab.owner if found_request.lab else None
-            found_request.save()
-            create_audit_history(request, found_request, ActionType.StatusChange, f"Status changed to Closeout Completed")
+            with transaction.atomic():
+                closeout_form = found_request.closeout_form
+                closeout_form.approved_by_lab = True
+                closeout_form.save()
 
+                found_request.status = get_status(REQUEST_STATUS.CLOSEOUT_REVIEW_BY_PROGRAM)
+                found_request.owner = found_request.program.owner if found_request.program else None
+                found_request.save()
+
+                create_audit_history(request, found_request, ActionType.StatusChange, "Closeout form approved by lab, status changed to Closeout Review by Program")
+        except Exception as e:
+            return Response(data={"message": f"{e}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+        return Response(status=status.HTTP_200_OK)
+
+
+class RequestApproveCloseoutFormByProgramView(BaseUserAwareRequest):
+    def post(self, request, request_id=None):
+        if request_id is None:
+            return Response(data={"message": "Please provide a Request ID"}, status=status.HTTP_400_BAD_REQUEST)
+
+        if not (IsProgramLead().has_permission(request) or IsAdmin().has_permission(request)):
+            return Response(data={"message": "Insufficient privilege to approve closeout form"}, status=status.HTTP_403_FORBIDDEN)
+
+        queryset = self.get_actionable()
+
+        found_request = None
+        try:
+            found_request = queryset.get(pk=request_id)
+        except Request.DoesNotExist:
+            return Response(data={"message": "Request with given ID does not exist"}, status=status.HTTP_404_NOT_FOUND)
+
+        if not hasattr(found_request, "closeout_form"):
+            return Response(data={"message": "Closeout form does not exist for this request"}, status=status.HTTP_400_BAD_REQUEST)
+
+        if not found_request.closeout_form.approved_by_lab:
+            return Response(data={"message": "Closeout form must be approved by lab before program can approve"}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            with transaction.atomic():
+                closeout_form = found_request.closeout_form
+                closeout_form.approved_by_program = True
+                closeout_form.save()
+
+                found_request.status = get_status(REQUEST_STATUS.COMPLETED)
+                found_request.owner = None
+                found_request.save()
+
+                create_audit_history(request, found_request, ActionType.StatusChange, "Closeout form approved by program, status changed to Completed")
         except Exception as e:
             return Response(data={"message": f"{e}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
