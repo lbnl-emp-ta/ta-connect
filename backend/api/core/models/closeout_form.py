@@ -7,7 +7,7 @@ class CloseoutForm(models.Model):
     This form is meant to capture information about the resolution of the request.
     """
     request = models.OneToOneField(Request, on_delete=models.CASCADE, related_name="closeout_form")
-    submitted_date = models.DateTimeField(auto_now_add=True)
+    submitted_date = models.DateTimeField(null=True, blank=True)
     approved_by_lab = models.BooleanField(default=False)
     approved_by_program = models.BooleanField(default=False)
     experience_description = models.TextField(blank=True, null=True, verbose_name="Short description of the experience")

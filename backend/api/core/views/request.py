@@ -4,6 +4,8 @@ from django.db.models import Q
 from rest_framework import views, status, permissions, authentication
 from rest_framework.response import Response
 
+from django.utils import timezone
+
 from core.utils import create_audit_history, get_status
 from core.serializers import * 
 from core.models import * 
@@ -529,6 +531,47 @@ class RequestCancelView(BaseUserAwareRequest):
             return Response(data={"message": f"{e}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
         return Response(status=status.HTTP_200_OK)
+
+class RequestSubmitCloseoutFormView(BaseUserAwareRequest):
+    def post(self, request, id=None):
+        if id is None:
+            return Response(data={"message": "Please provide a Request ID"}, status=status.HTTP_400_BAD_REQUEST)
+
+        if not (IsExpert().has_permission(request) or IsAdmin().has_permission(request)):
+            return Response(data={"message": "Insufficient privilege to submit closeout form"}, status=status.HTTP_403_FORBIDDEN)
+
+        queryset = self.get_actionable()
+
+        found_request = None
+        try:
+            found_request = queryset.get(pk=id)
+        except Request.DoesNotExist:
+            return Response(data={"message": "Request with given ID does not exist"}, status=status.HTTP_404_NOT_FOUND)
+
+        # Experts must be the assigned expert on this specific request
+        if IsExpert().has_permission(request) and not IsAdmin().has_permission(request):
+            if found_request.expert is None or found_request.expert != request.user:
+                return Response(data={"message": "Only the assigned expert can submit the closeout form"}, status=status.HTTP_403_FORBIDDEN)
+
+        if not hasattr(found_request, "closeout_form"):
+            return Response(data={"message": "Closeout form does not exist for this request"}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            with transaction.atomic():
+                closeout_form = found_request.closeout_form
+                closeout_form.submitted_date = timezone.now()
+                closeout_form.save()
+
+                found_request.status = get_status(REQUEST_STATUS.CLOSEOUT_REVIEW_BY_LAB)
+                found_request.owner = found_request.lab.owner if found_request.lab else None
+                found_request.save()
+
+                create_audit_history(request, found_request, ActionType.StatusChange, "Closeout form submitted, status changed to Closeout Review by Lab")
+        except Exception as e:
+            return Response(data={"message": f"{e}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+        return Response(status=status.HTTP_200_OK)
+
 
 class RequestCloseoutCompleteView(BaseUserAwareRequest):
     def post(self, request, id=None):
