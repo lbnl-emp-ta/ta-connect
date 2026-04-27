@@ -6,13 +6,13 @@ urlpatterns = [
     
     path('requests/', RequestListView.as_view(), name="request-list"),
     path('requests/assign/', AssignmentView.as_view(), name="assignment"),
-    path('requests/<int:id>', RequestDetailView.as_view(), name="request-detail"),
+    path('requests/<int:request_id>', RequestDetailView.as_view(), name="request-detail"),
 
     path('requests/<int:request_id>/audit-history/', AuditHistoryListView.as_view(), name="list-audit-history"),
-    path('requests/<int:id>/mark-complete/', RequestMarkCompleteView.as_view(), name="mark-complete"),
-    path('requests/<int:id>/closeout-complete/', RequestCloseoutCompleteView.as_view(), name="closeout-complete"),
-    path('requests/<int:id>/cancel/', RequestCancelView.as_view(), name="mark-complete"),
-    path('requests/<int:id>/reopen/', RequestReopenView.as_view(), name="reopen"),
+    path('requests/<int:request_id>/mark-complete/', RequestMarkCompleteView.as_view(), name="mark-complete"),
+    path('requests/<int:request_id>/closeout-complete/', RequestCloseoutCompleteView.as_view(), name="closeout-complete"),
+    path('requests/<int:request_id>/cancel/', RequestCancelView.as_view(), name="mark-complete"),
+    path('requests/<int:request_id>/reopen/', RequestReopenView.as_view(), name="reopen"),
 
     path('requests/<int:request_id>/upload-attachment/', UploadAttachmentView.as_view(), name="upload-attachment"),
     path('requests/<int:request_id>/edit-attachment/<int:attachment_id>/', EditAttachmentView.as_view(), name="edit-attachment"),
@@ -20,7 +20,7 @@ urlpatterns = [
     path('requests/<int:request_id>/delete-attachment/<int:attachment_id>/', DeleteAttachmentView.as_view(), name="delete-attachment"),
 
     path('requests/<int:request_id>/closeout-form/', CloseoutFormView.as_view(), name="closeout-form"),
-    path('requests/<int:id>/submit-closeout-form/', RequestSubmitCloseoutFormView.as_view(), name="submit-closeout-form"),
+    path('requests/<int:request_id>/submit-closeout-form/', RequestSubmitCloseoutFormView.as_view(), name="submit-closeout-form"),
 
     path('requests/<int:request_id>/list-notes/', NoteListView.as_view(), name="list-notes"),
     path('requests/<int:request_id>/add-note/', NoteCreateView.as_view(), name="add-note"),

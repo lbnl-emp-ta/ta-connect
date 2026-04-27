@@ -209,15 +209,15 @@ class RequestDetailView(BaseUserAwareRequest):
     """
     Used to populate Request and Customer panels.
     """
-    def get(self, request, format=None, id=None):
+    def get(self, request, format=None, request_id=None):
         queryset = self.get_actionable() | self.get_downstream() | self.get_inactive()
 
-        if id is None:
+        if request_id is None:
             return Response(data={"message": "Please provide a Request ID"}, status=status.HTTP_400_BAD_REQUEST)
 
         found_request = None
         try:
-            found_request = queryset.get(pk=id)        
+            found_request = queryset.get(pk=request_id)        
         except:
             return Response(data={"message": "Request with given ID does not exist"}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -276,19 +276,19 @@ class RequestDetailView(BaseUserAwareRequest):
     """
     Used for Edit action.
     """
-    def patch(self, request, id=None):
+    def patch(self, request, request_id=None):
         context = self.request.headers.get("Context")
         if context is None:
             return Response(data={"message": "Please provide context object header with request"}, status=status.HTTP_400_BAD_REQUEST)
             
-        if id is None:
+        if request_id is None:
             return Response(data={"message": "Please provide a Request ID"}, status=status.HTTP_400_BAD_REQUEST)
         
         queryset = self.get_actionable() | self.get_downstream()
 
         maybe_request = None
         try:
-            maybe_request = queryset.get(pk=id)        
+            maybe_request = queryset.get(pk=request_id)        
         except Request.DoesNotExist:
             return Response(data={"message": "Request with given ID does not exist"}, status=status.HTTP_404_NOT_FOUND)
 
@@ -429,7 +429,7 @@ class RequestDetailView(BaseUserAwareRequest):
             return Response(data={"message": patch_serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
 
 
-        return self.get(request, None, id)
+        return self.get(request, None, request_id)
 
 
 """
@@ -470,8 +470,8 @@ class RequestListView(BaseUserAwareRequest):
         return Response(data=response_data, status=status.HTTP_200_OK)
 
 class RequestMarkCompleteView(BaseUserAwareRequest):
-    def post(self, request, id=None) :
-        if id is None:
+    def post(self, request, request_id=None):
+        if request_id is None:
             return Response(data={"message": "Please provide a Request ID"}, status=status.HTTP_400_BAD_REQUEST)
 
         if not (IsProgramLead().has_permission(request) or IsAdmin().has_permission(request)):
@@ -481,7 +481,7 @@ class RequestMarkCompleteView(BaseUserAwareRequest):
 
         found_request = None
         try:
-            found_request = queryset.get(pk=id)        
+            found_request = queryset.get(pk=request_id)        
         except:
             return Response(data={"message": "Request with given ID does not exist"}, status=status.HTTP_404_NOT_FOUND)
 
@@ -498,8 +498,8 @@ class RequestMarkCompleteView(BaseUserAwareRequest):
         return Response(status=status.HTTP_200_OK)
       
 class RequestCancelView(BaseUserAwareRequest):
-    def post(self, request, id=None):
-        if id is None:
+    def post(self, request, request_id=None):
+        if request_id is None:
             return Response(data={"message": "Please provide a Request ID"}, status=status.HTTP_400_BAD_REQUEST)
 
         if not (IsCoordinator().has_permission(request) or IsAdmin().has_permission(request)):
@@ -509,7 +509,7 @@ class RequestCancelView(BaseUserAwareRequest):
 
         found_request = None
         try:
-            found_request = queryset.get(pk=id)        
+            found_request = queryset.get(pk=request_id)        
         except:
             return Response(data={"message": "Request with given ID does not exist"}, status=status.HTTP_404_NOT_FOUND)
 
@@ -533,8 +533,8 @@ class RequestCancelView(BaseUserAwareRequest):
         return Response(status=status.HTTP_200_OK)
 
 class RequestSubmitCloseoutFormView(BaseUserAwareRequest):
-    def post(self, request, id=None):
-        if id is None:
+    def post(self, request, request_id=None):
+        if request_id is None:
             return Response(data={"message": "Please provide a Request ID"}, status=status.HTTP_400_BAD_REQUEST)
 
         if not (IsExpert().has_permission(request) or IsAdmin().has_permission(request)):
@@ -544,7 +544,7 @@ class RequestSubmitCloseoutFormView(BaseUserAwareRequest):
 
         found_request = None
         try:
-            found_request = queryset.get(pk=id)
+            found_request = queryset.get(pk=request_id)
         except Request.DoesNotExist:
             return Response(data={"message": "Request with given ID does not exist"}, status=status.HTTP_404_NOT_FOUND)
 
@@ -574,8 +574,8 @@ class RequestSubmitCloseoutFormView(BaseUserAwareRequest):
 
 
 class RequestCloseoutCompleteView(BaseUserAwareRequest):
-    def post(self, request, id=None):
-        if id is None:
+    def post(self, request, request_id=None):
+        if request_id is None:
             return Response(data={"message": "Please provide a Request ID"}, status=status.HTTP_400_BAD_REQUEST)
 
         if not (IsExpert().has_permission(request) or IsAdmin().has_permission(request)):
@@ -585,7 +585,7 @@ class RequestCloseoutCompleteView(BaseUserAwareRequest):
 
         found_request = None
         try:
-            found_request = queryset.get(pk=id)        
+            found_request = queryset.get(pk=request_id)        
         except:
             return Response(data={"message": "Request with given ID does not exist"}, status=status.HTTP_404_NOT_FOUND)
 
@@ -605,8 +605,8 @@ class RequestCloseoutCompleteView(BaseUserAwareRequest):
 
 
 class RequestReopenView(BaseUserAwareRequest):
-    def post(self, request, id=None):
-        if id is None:
+    def post(self, request, request_id=None):
+        if request_id is None:
             return Response(data={"message": "Please provide a Request ID"}, status=status.HTTP_400_BAD_REQUEST)
 
         if not (IsAdmin().has_permission(request)):
@@ -616,7 +616,7 @@ class RequestReopenView(BaseUserAwareRequest):
 
         found_request = None
         try:
-            found_request = queryset.get(pk=id)        
+            found_request = queryset.get(pk=request_id)        
         except:
             return Response(data={"message": "Request with given ID does not exist"}, status=status.HTTP_404_NOT_FOUND)
 
