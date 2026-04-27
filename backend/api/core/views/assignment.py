@@ -65,6 +65,7 @@ class AssignmentView(views.APIView):
                 return Response(data={"message": "Current user identity cannot assign to that owner."}, status=status.HTTP_400_BAD_REQUEST)
 
             try:
+                closeout_form = None
                 match new_owner.domain_type:
                     case DOMAINTYPE.RECEPTION:
                         ta_request.owner = new_owner                    
@@ -122,7 +123,7 @@ class AssignmentView(views.APIView):
                         # Request is being kicked back to expert by lab or program during closeout review
                         elif ta_request.status.name in [REQUEST_STATUS.CLOSEOUT_REVIEW_BY_LAB, REQUEST_STATUS.CLOSEOUT_REVIEW_BY_PROGRAM]:
                             ta_request.status = get_status(REQUEST_STATUS.CLOSEOUT_MORE_INFO)
-                            closeout_form = ta_request.closeout_form
+                            closeout_form = ta_request.closeout_form if hasattr(ta_request, "closeout_form") else None
                             if closeout_form:
                                 closeout_form.submitted_date = None
                                 closeout_form.approved_by_lab = False
