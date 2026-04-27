@@ -240,7 +240,7 @@ export const RequestInfoPanel: React.FC<RequestInfoPanelProps> = ({ request }) =
                           color: statusMap[request.status].color,
                         }}
                       />
-                      <span>{request.status ? statusMap[request.status].text : 'Unknown'}</span>
+                      <span>{request.status ? statusMap[request.status].text : '-'}</span>
                     </Stack>
                   </TableCell>
                 </TableRow>
@@ -248,7 +248,7 @@ export const RequestInfoPanel: React.FC<RequestInfoPanelProps> = ({ request }) =
                   <TableCell>Current Owner</TableCell>
                   <TableCell
                     sx={{
-                      color: statusMap[request.status].color,
+                      color: request.owner ? statusMap[request.status].color : 'grey.900',
                       fontWeight: 'bold',
                     }}
                   >
@@ -260,7 +260,7 @@ export const RequestInfoPanel: React.FC<RequestInfoPanelProps> = ({ request }) =
                           <span>{request.owner.domain_name}</span>
                         </>
                       )}
-                      {!request.owner && <span>None</span>}
+                      {!request.owner && <span>-</span>}
                     </Stack>
                   </TableCell>
                 </TableRow>
@@ -280,7 +280,7 @@ export const RequestInfoPanel: React.FC<RequestInfoPanelProps> = ({ request }) =
                   <TableCell>Depth</TableCell>
                   <TableCell>
                     {(!editing || !hasPermission('edit-depth', detailedIdentity)) && (
-                      <>{request.depth || 'Unknown'}</>
+                      <>{request.depth || '-'}</>
                     )}
                     {editing && hasPermission('edit-depth', detailedIdentity) && (
                       <Select value={depth} onChange={handleDepthChange}>
@@ -296,7 +296,7 @@ export const RequestInfoPanel: React.FC<RequestInfoPanelProps> = ({ request }) =
                 <TableRow>
                   <TableCell>Date Submitted</TableCell>
                   <TableCell>
-                    {request.date_created ? formatDatetime(request.date_created) : 'Unknown'}
+                    {request.date_created ? formatDatetime(request.date_created) : '-'}
                   </TableCell>
                 </TableRow>
                 <TableRow>
@@ -307,7 +307,7 @@ export const RequestInfoPanel: React.FC<RequestInfoPanelProps> = ({ request }) =
                       <>
                         {request.proj_start_date
                           ? dayjs(request.proj_start_date).format('MM/DD/YYYY')
-                          : 'Unknown'}
+                          : '-'}
                       </>
                     )}
                     {editing && hasPermission('edit-projected-start-date', detailedIdentity) && (
@@ -335,7 +335,7 @@ export const RequestInfoPanel: React.FC<RequestInfoPanelProps> = ({ request }) =
                       <>
                         {request.proj_completion_date
                           ? dayjs(request.proj_completion_date).format('MM/DD/YYYY')
-                          : 'Unknown'}
+                          : '-'}
                       </>
                     )}
                     {editing &&
@@ -364,7 +364,7 @@ export const RequestInfoPanel: React.FC<RequestInfoPanelProps> = ({ request }) =
                       <>
                         {request.actual_completion_date
                           ? dayjs(request.actual_completion_date).format('MM/DD/YYYY')
-                          : 'Unknown'}
+                          : '-'}
                       </>
                     )}
                     {editing && hasPermission('edit-actual-completion-date', detailedIdentity) && (
