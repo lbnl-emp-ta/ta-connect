@@ -298,6 +298,57 @@ export const useCreateCloseoutMutation = (
   });
 };
 
+export const useSubmitCloseoutMutation = (
+  requestId: string,
+  identity?: Identity,
+  options?: UseMutationOptions<unknown, Error, void, unknown>
+) => {
+  return useMutation({
+    mutationKey: ['requests', 'submit', 'closeout-form', requestId, identity],
+    mutationFn: () =>
+      postData(
+        `${import.meta.env.VITE_API_URL}/requests/${requestId}/submit-closeout-form/`,
+        null,
+        identity
+      ),
+    ...options,
+  });
+};
+
+export const useApproveCloseoutByLabMutation = (
+  requestId: string,
+  identity?: Identity,
+  options?: UseMutationOptions<unknown, Error, void, unknown>
+) => {
+  return useMutation({
+    mutationKey: ['requests', 'approve-by-lab', 'closeout-form', requestId, identity],
+    mutationFn: () =>
+      postData(
+        `${import.meta.env.VITE_API_URL}/requests/${requestId}/approve-closeout-form-by-lab/`,
+        null,
+        identity
+      ),
+    ...options,
+  });
+};
+
+export const useApproveCloseoutByProgramMutation = (
+  requestId: string,
+  identity?: Identity,
+  options?: UseMutationOptions<unknown, Error, void, unknown>
+) => {
+  return useMutation({
+    mutationKey: ['requests', 'approve-by-program', 'closeout-form', requestId, identity],
+    mutationFn: () =>
+      postData(
+        `${import.meta.env.VITE_API_URL}/requests/${requestId}/approve-closeout-form-by-program/`,
+        null,
+        identity
+      ),
+    ...options,
+  });
+};
+
 export const useMarkCompleteMutation = (
   requestId: string,
   identity?: Identity,

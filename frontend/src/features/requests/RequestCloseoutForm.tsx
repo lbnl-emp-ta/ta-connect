@@ -19,7 +19,11 @@ import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import ErrorIcon from '@mui/icons-material/Error';
 import { TACloseoutForm, TARequestDetail } from '../../api/dashboard/types';
 import { useSuspenseQuery } from '@tanstack/react-query';
-import { closeoutQueryOptions, useCloseoutMutation } from '@/api/queryOptions';
+import {
+  closeoutQueryOptions,
+  useCloseoutMutation,
+  useSubmitCloseoutMutation,
+} from '@/api/queryOptions';
 import { useIdentityContext } from '@/features/identity/IdentityContext';
 import { useCallback, useEffect, useState } from 'react';
 import { parseBoolean } from '@/utils/utils';
@@ -38,27 +42,39 @@ export const RequestCloseoutForm: React.FC<RequestCloseoutFormProps> = ({ reques
   const { data: closeoutForm } = useSuspenseQuery(
     closeoutQueryOptions(requestId.toString(), identity)
   );
-  const closeoutMutation = useCloseoutMutation(requestId.toString(), identity, {
-    onMutate: () => {
+  const onMutate = (message: string) => {
+    return () => {
       setShowToast(true);
       setToastMessage(
         <ToastMessage>
           <Stack direction="row" alignItems="center">
             <CircularProgress size="1.25rem" color="info" />
-            <span>Saving closeout form</span>
+            <span>{message}</span>
           </Stack>
         </ToastMessage>
       );
-    },
-    onSuccess: () => {
+    };
+  };
+  const onSuccess = (message: string) => {
+    return () => {
       queryClient.invalidateQueries();
       setShowToast(true);
-      setToastMessage(<ToastMessage icon={<CheckCircleIcon />}>Closeout form saved</ToastMessage>);
-    },
-    onError: (error: Error) => {
-      setShowToast(true);
-      setToastMessage(<ToastMessage icon={<ErrorIcon />}>{error.message}</ToastMessage>);
-    },
+      setToastMessage(<ToastMessage icon={<CheckCircleIcon />}>{message}</ToastMessage>);
+    };
+  };
+  const onError = (error: Error) => {
+    setShowToast(true);
+    setToastMessage(<ToastMessage icon={<ErrorIcon />}>{error.message}</ToastMessage>);
+  };
+  const closeoutMutation = useCloseoutMutation(requestId.toString(), identity, {
+    onMutate: onMutate('Saving closeout form'),
+    onSuccess: onSuccess('Closeout form saved successfully'),
+    onError: onError,
+  });
+  const submitCloseoutMutation = useSubmitCloseoutMutation(requestId.toString(), identity, {
+    onMutate: onMutate('Submitting closeout form'),
+    onSuccess: onSuccess('Closeout form submitted successfully'),
+    onError: onError,
   });
   const [experienceDescription, setExperienceDescription] = useState(
     closeoutForm?.experience_description ?? ''
@@ -83,7 +99,7 @@ export const RequestCloseoutForm: React.FC<RequestCloseoutFormProps> = ({ reques
     closeoutForm?.follow_up_has_same_expert ?? false
   );
 
-  const handleSave = useCallback(() => {
+  const handleSave = useCallback(async () => {
     const mutationData = {} as Partial<TACloseoutForm>;
     if (experienceDescription !== closeoutForm?.experience_description) {
       mutationData.experience_description = experienceDescription;
@@ -116,11 +132,11 @@ export const RequestCloseoutForm: React.FC<RequestCloseoutFormProps> = ({ reques
       mutationData.follow_up_has_same_expert = followUpHasSameExpert;
     }
     if (Object.keys(mutationData).length > 0) {
-      closeoutMutation.mutate(mutationData);
+      await closeoutMutation.mutateAsync(mutationData);
     }
   }, [
     closeoutForm,
-    closeoutMutation.mutate,
+    closeoutMutation.mutateAsync,
     experienceDescription,
     taProvidedDescription,
     impactDescription,
@@ -134,14 +150,15 @@ export const RequestCloseoutForm: React.FC<RequestCloseoutFormProps> = ({ reques
   ]);
 
   // TODO: handle submission of form (update submitted_date, request status, and request owner)
-  const handleSubmit: React.FormEventHandler<HTMLFormElement> = (e) => {
+  const handleSubmit: React.FormEventHandler<HTMLFormElement> = async (e) => {
     e.preventDefault();
-    handleSave();
+    await handleSave();
+    submitCloseoutMutation.mutate();
     setCloseoutDialogOpen(false);
   };
 
-  const handleDialogClose = () => {
-    handleSave();
+  const handleDialogClose = async () => {
+    await handleSave();
     setCloseoutDialogOpen(false);
   };
 
@@ -164,7 +181,7 @@ export const RequestCloseoutForm: React.FC<RequestCloseoutFormProps> = ({ reques
         Closeout Questions for Expert
       </DialogTitle>
       <DialogContent>
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit} id="closeout-form">
           <Stack spacing={3} sx={{ marginTop: 2 }}>
             <Typography>
               To close out this request, please provide the following details about your experience
@@ -280,7 +297,7 @@ export const RequestCloseoutForm: React.FC<RequestCloseoutFormProps> = ({ reques
         <Button variant="outlined" onClick={handleDialogClose}>
           Back to request
         </Button>
-        <Button variant="contained" color="primary" type="submit">
+        <Button variant="contained" color="primary" type="submit" form="closeout-form">
           Submit
         </Button>
       </DialogActions>

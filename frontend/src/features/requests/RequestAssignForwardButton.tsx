@@ -7,10 +7,10 @@ import { ToastMessage } from '@/features/toasts/ToastMessage';
 import {
   expertsQueryOptions,
   ownersQueryOptions,
+  useApproveCloseoutByLabMutation,
+  useApproveCloseoutByProgramMutation,
   useAssignmentMutation,
   useCreateCloseoutMutation,
-  useFinishCloseoutMutation,
-  useMarkCompleteMutation,
   useReopenMutation,
 } from '@/api/queryOptions';
 import { getStep, statusMap, Steps } from '@/utils/utils';
@@ -182,16 +182,26 @@ export const RequestAssignForwardButton: React.FC<RequestAssignForwardButtonProp
     },
     onError: onError,
   });
-  const finishCloseoutMutation = useFinishCloseoutMutation(request.id.toString(), identity, {
-    onMutate: onMutate('Finishing request closeout'),
-    onSuccess: onSuccess('Request closeout finished'),
-    onError: onError,
-  });
-  const completeRequestMutation = useMarkCompleteMutation(request.id.toString(), identity, {
-    onMutate: onMutate('Marking request as complete'),
-    onSuccess: onSuccess('Request marked as complete'),
-    onError: onError,
-  });
+  const approveCloseoutByLabMutation = useApproveCloseoutByLabMutation(
+    request.id.toString(),
+    identity,
+    {
+      onMutate: onMutate(`Approving request closeout by ${request.lab?.name ?? 'lab'}`),
+      onSuccess: onSuccess(`Request closeout approved by ${request.lab?.name ?? 'lab'}`),
+      onError: onError,
+    }
+  );
+  const approveCloseoutByProgramMutation = useApproveCloseoutByProgramMutation(
+    request.id.toString(),
+    identity,
+    {
+      onMutate: onMutate(`Approving request closeout by ${request.program?.name ?? 'program'}`),
+      onSuccess: onSuccess(
+        `Request closeout approved by ${request.program?.name ?? 'program'} and marked as completed`
+      ),
+      onError: onError,
+    }
+  );
   const reopenRequestMutation = useReopenMutation(request.id.toString(), identity, {
     onMutate: onMutate('Reopening request'),
     onSuccess: onSuccess('Request reopened and assigned to Reception'),
@@ -235,9 +245,11 @@ export const RequestAssignForwardButton: React.FC<RequestAssignForwardButtonProp
         break;
       case Steps.Review:
         if (request.owner?.domain_type === 'lab' && request.program) {
-          assignRequestMutation.mutate({ request: request.id, owner: request.program.owner_id });
+          // assignRequestMutation.mutate({ request: request.id, owner: request.program.owner_id });
+          approveCloseoutByLabMutation.mutate();
         } else if (request.owner?.domain_type === 'program') {
-          completeRequestMutation.mutate();
+          // completeRequestMutation.mutate();
+          approveCloseoutByProgramMutation.mutate();
         }
         break;
       case Steps.Completed:
