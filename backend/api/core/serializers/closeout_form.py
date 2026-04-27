@@ -12,6 +12,8 @@ class CloseoutFormSerializer(serializers.ModelSerializer):
             "id",
             "request",
             "submitted_date",
+            "approved_by_lab",
+            "approved_by_program",
             "experience_description",
             "ta_provided_description",
             "impact_description",

@@ -239,17 +239,16 @@ export const RequestAssignForwardButton: React.FC<RequestAssignForwardButtonProp
           setDatesDialogOpen(true);
         } else if (request.status === 'providing-ta') {
           createCloseoutMutation.mutate();
-        } else if (request.status === 'closeout-started') {
+        } else if (
+          request.status === 'closeout-started' ||
+          request.status === 'closeout-more-info'
+        ) {
           setCloseoutDialogOpen(true);
         }
         break;
       case Steps.Review:
-        if (request.owner?.domain_type === 'lab' && request.program) {
-          // assignRequestMutation.mutate({ request: request.id, owner: request.program.owner_id });
-          approveCloseoutByLabMutation.mutate();
-        } else if (request.owner?.domain_type === 'program') {
-          // completeRequestMutation.mutate();
-          approveCloseoutByProgramMutation.mutate();
+        if (request.owner?.domain_type === 'lab' || request.owner?.domain_type === 'program') {
+          setCloseoutDialogOpen(true);
         }
         break;
       case Steps.Completed:

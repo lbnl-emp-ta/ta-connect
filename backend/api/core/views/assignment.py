@@ -7,7 +7,7 @@ from allauth.headless.contrib.rest_framework.authentication import (
 )
 
 from core.utils import create_audit_history, get_status
-from core.permissions import IsAdmin, IsLabLead
+from core.permissions import IsAdmin, IsLabLead, IsProgramLead
 from core.views.owner import OwnerListView
 from core.models import *
 from core.models.audit_history import ActionType
@@ -111,7 +111,7 @@ class AssignmentView(views.APIView):
                             ta_request.status = get_status(REQUEST_STATUS.CLOSEOUT_REVIEW_BY_LAB)
                         
                     case DOMAINTYPE.EXPERT:
-                        if not (IsAdmin().has_permission(request) or IsLabLead().has_permission(request)):
+                        if not (IsAdmin().has_permission(request) or IsLabLead().has_permission(request) or IsProgramLead().has_permission(request)):
                             return Response(data={"message": "Insufficient privilege to assign an expert."}, status=status.HTTP_401_UNAUTHORIZED)
                         ta_request.owner = new_owner
                         ta_request.expert = new_owner.expert
@@ -122,11 +122,18 @@ class AssignmentView(views.APIView):
                         # Request is being kicked back to expert by lab or program during closeout review
                         elif ta_request.status.name in [REQUEST_STATUS.CLOSEOUT_REVIEW_BY_LAB, REQUEST_STATUS.CLOSEOUT_REVIEW_BY_PROGRAM]:
                             ta_request.status = get_status(REQUEST_STATUS.CLOSEOUT_MORE_INFO)
+                            closeout_form = ta_request.closeout_form
+                            if closeout_form:
+                                closeout_form.submitted_date = None
+                                closeout_form.approved_by_lab = False
+                                closeout_form.approved_by_program = False
 
                     case _:
                         return Response(data={"message": "Given request's domaintype is invalid"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
                 
                 with transaction.atomic():
+                    if closeout_form:
+                        closeout_form.save()
                     ta_request.save()
                     create_audit_history(request, ta_request, ActionType.Assignment, f"Assigned to {str(new_owner)} as {new_owner.domain_type}")
 

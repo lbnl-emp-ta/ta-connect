@@ -265,7 +265,10 @@ export const getStep = (request: TARequestDetail): StepInfo => {
       stepIndex: Steps.Delivery,
       allowedRoles: [TARole.Expert, TARole.Admin],
     };
-  } else if (request.owner?.domain_type === 'expert' && request.status === 'closeout-started') {
+  } else if (
+    request.owner?.domain_type === 'expert' &&
+    (request.status === 'closeout-started' || request.status === 'closeout-more-info')
+  ) {
     return {
       forwardText: 'Continue closeout form',
       forwardIsMenu: false,
@@ -275,7 +278,7 @@ export const getStep = (request: TARequestDetail): StepInfo => {
     };
   } else if (request.owner?.domain_type === 'lab' && request.expert !== null) {
     return {
-      forwardText: 'Approve and send to program',
+      forwardText: 'Review closeout information',
       forwardIsMenu: false,
       backwardText: 'Assign back to expert',
       stepIndex: Steps.Review,
@@ -283,7 +286,7 @@ export const getStep = (request: TARequestDetail): StepInfo => {
     };
   } else if (request.owner?.domain_type === 'program' && request.expert !== null) {
     return {
-      forwardText: 'Approve and mark complete',
+      forwardText: 'Review closeout information',
       forwardIsMenu: false,
       backwardText: 'Assign back to expert',
       stepIndex: Steps.Review,

@@ -95,7 +95,7 @@ export const RequestHeader: React.FC<RequestHeaderProps> = ({ request }) => {
         </Box>
       </Drawer>
       <RequestDatesDialog request={request} />
-      <RequestCloseoutForm requestId={request.id} />
+      <RequestCloseoutForm requestId={request.id} expertOwnerId={request.expert?.owner_id} />
     </Stack>
   );
 };

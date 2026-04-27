@@ -30,7 +30,7 @@ import {
   Typography,
 } from '@mui/material';
 import ListIcon from '@mui/icons-material/List';
-import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import CheckIcon from '@mui/icons-material/Check';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { useEffect, useState } from 'react';
 import { formatDatetime } from '@/utils/utils';
@@ -116,13 +116,13 @@ export const RequestDetailLayout: React.FC<RequestDetailLayoutProps> = ({ reques
                       <TableRow>
                         <TableCell>Approved by Lab</TableCell>
                         <TableCell>
-                          {closeoutForm?.approved_by_lab ? <CheckCircleIcon /> : '-'}
+                          {closeoutForm?.approved_by_lab ? <CheckIcon fontSize="small" /> : '-'}
                         </TableCell>
                       </TableRow>
                       <TableRow>
                         <TableCell>Approved by Program</TableCell>
                         <TableCell>
-                          {closeoutForm?.approved_by_program ? <CheckCircleIcon /> : '-'}
+                          {closeoutForm?.approved_by_program ? <CheckIcon fontSize="small" /> : '-'}
                         </TableCell>
                       </TableRow>
                     </TableBody>
