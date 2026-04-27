@@ -263,7 +263,11 @@ export const useAssignmentMutation = (
   });
 };
 
-export const useCloseoutMutation = (requestId: string, identity?: Identity) => {
+export const useCloseoutMutation = (
+  requestId: string,
+  identity?: Identity,
+  options?: UseMutationOptions<unknown, Error, Partial<TACloseoutForm>, unknown>
+) => {
   return useMutation({
     mutationKey: ['requests', 'update', 'closeout-form', requestId, identity],
     mutationFn: (data: Partial<TACloseoutForm>) =>
@@ -273,6 +277,7 @@ export const useCloseoutMutation = (requestId: string, identity?: Identity) => {
         identity
       ),
     onSuccess: () => queryClient.invalidateQueries(),
+    ...options,
   });
 };
 

@@ -1,6 +1,7 @@
 import { useRequestsContext } from '@/features/requests/RequestsContext';
 import {
   Button,
+  CircularProgress,
   Dialog,
   DialogActions,
   DialogContent,
@@ -14,12 +15,17 @@ import {
   Stack,
   Typography,
 } from '@mui/material';
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import ErrorIcon from '@mui/icons-material/Error';
 import { TACloseoutForm, TARequestDetail } from '../../api/dashboard/types';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { closeoutQueryOptions, useCloseoutMutation } from '@/api/queryOptions';
 import { useIdentityContext } from '@/features/identity/IdentityContext';
 import { useCallback, useEffect, useState } from 'react';
 import { parseBoolean } from '@/utils/utils';
+import { useToastContext } from '@/features/toasts/ToastContext';
+import { queryClient } from '@/App';
+import { ToastMessage } from '@/features/toasts/ToastMessage';
 
 interface RequestCloseoutFormProps {
   requestId: TARequestDetail['id'];
@@ -28,10 +34,32 @@ interface RequestCloseoutFormProps {
 export const RequestCloseoutForm: React.FC<RequestCloseoutFormProps> = ({ requestId }) => {
   const { identity } = useIdentityContext();
   const { closeoutDialogOpen, setCloseoutDialogOpen } = useRequestsContext();
+  const { setShowToast, setToastMessage } = useToastContext();
   const { data: closeoutForm } = useSuspenseQuery(
     closeoutQueryOptions(requestId.toString(), identity)
   );
-  const closeoutMutation = useCloseoutMutation(requestId.toString(), identity);
+  const closeoutMutation = useCloseoutMutation(requestId.toString(), identity, {
+    onMutate: () => {
+      setShowToast(true);
+      setToastMessage(
+        <ToastMessage>
+          <Stack direction="row" alignItems="center">
+            <CircularProgress size="1.25rem" color="info" />
+            <span>Saving closeout form</span>
+          </Stack>
+        </ToastMessage>
+      );
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries();
+      setShowToast(true);
+      setToastMessage(<ToastMessage icon={<CheckCircleIcon />}>Closeout form saved</ToastMessage>);
+    },
+    onError: (error: Error) => {
+      setShowToast(true);
+      setToastMessage(<ToastMessage icon={<ErrorIcon />}>{error.message}</ToastMessage>);
+    },
+  });
   const [experienceDescription, setExperienceDescription] = useState(
     closeoutForm?.experience_description ?? ''
   );
@@ -56,7 +84,6 @@ export const RequestCloseoutForm: React.FC<RequestCloseoutFormProps> = ({ reques
   );
 
   const handleSave = useCallback(() => {
-    console.log('saving...');
     const mutationData = {} as Partial<TACloseoutForm>;
     if (experienceDescription !== closeoutForm?.experience_description) {
       mutationData.experience_description = experienceDescription;
@@ -113,17 +140,17 @@ export const RequestCloseoutForm: React.FC<RequestCloseoutFormProps> = ({ reques
     setCloseoutDialogOpen(false);
   };
 
+  const handleDialogClose = () => {
+    handleSave();
+    setCloseoutDialogOpen(false);
+  };
+
   // Debounce: save 1s after the user stops making changes
   useEffect(() => {
     if (!closeoutDialogOpen) return;
     const timeout = setTimeout(handleSave, 1000);
     return () => clearTimeout(timeout);
   }, [handleSave, closeoutDialogOpen]);
-
-  const handleDialogClose = () => {
-    handleSave();
-    setCloseoutDialogOpen(false);
-  };
 
   return (
     <Dialog
