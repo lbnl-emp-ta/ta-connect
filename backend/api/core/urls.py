@@ -10,7 +10,6 @@ urlpatterns = [
 
     path('requests/<int:request_id>/audit-history/', AuditHistoryListView.as_view(), name="list-audit-history"),
     path('requests/<int:request_id>/mark-complete/', RequestMarkCompleteView.as_view(), name="mark-complete"),
-    path('requests/<int:request_id>/closeout-complete/', RequestCloseoutCompleteView.as_view(), name="closeout-complete"),
     path('requests/<int:request_id>/cancel/', RequestCancelView.as_view(), name="mark-complete"),
     path('requests/<int:request_id>/reopen/', RequestReopenView.as_view(), name="reopen"),
 
