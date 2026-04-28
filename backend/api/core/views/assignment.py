@@ -1,32 +1,18 @@
-from rest_framework import views, status, authentication, permissions
+from rest_framework import status
 from rest_framework.response import Response
 from django.db import transaction
 
-from allauth.headless.contrib.rest_framework.authentication import (
-    XSessionTokenAuthentication,
-)
-
 from core.utils import create_audit_history, get_status
-from core.permissions import IsAdmin, IsLabLead, IsProgramLead
+from core.permissions import CanAssignExpert
 from core.views.owner import OwnerListView
 from core.models import *
 from core.models.audit_history import ActionType
 from core.constants import DOMAINTYPE, REQUEST_STATUS
+from core.views.request import BaseUserAwareRequest
 
-class AssignmentView(views.APIView):
-    authentication_classes = [
-        authentication.SessionAuthentication,
-        XSessionTokenAuthentication,
-    ]
-
-    permission_classes = [
-        permissions.IsAuthenticated,
-    ]
+class AssignmentView(BaseUserAwareRequest):
 
     def post(self, request):
-        # Import BaseUserAwareRequest here to avoid circular import
-        from core.views.request import BaseUserAwareRequest
-
         body = request.data
 
         if not body:
@@ -41,13 +27,11 @@ class AssignmentView(views.APIView):
         if not owner_id:
             return Response(data={"message": "Please provide an owner ID for assignment."}, status=status.HTTP_400_BAD_REQUEST)
         
-        actionable_requests = BaseUserAwareRequest(request=self.request).get_actionable()
+        actionable_requests = self.get_actionable()
 
-        ta_request = None
-        try:
-            ta_request = Request.objects.get(pk=request_id)
-        except Request.DoesNotExist:
-            return Response(data={"message": "A request with given ID does not exist."}, status=status.HTTP_400_BAD_REQUEST)
+        ta_request, err = self.get_request_or_error(Request.objects.all(), request_id)
+        if err:
+            return err
 
         if (not actionable_requests) or (not actionable_requests.filter(id=request_id)):  
             return Response(data={"message": "Request is not actionable for the current user identity."}, status=status.HTTP_400_BAD_REQUEST)
@@ -112,7 +96,7 @@ class AssignmentView(views.APIView):
                             ta_request.status = get_status(REQUEST_STATUS.CLOSEOUT_REVIEW_BY_LAB)
                         
                     case DOMAINTYPE.EXPERT:
-                        if not (IsAdmin().has_permission(request) or IsLabLead().has_permission(request) or IsProgramLead().has_permission(request)):
+                        if not CanAssignExpert().has_permission(request):
                             return Response(data={"message": "Insufficient privilege to assign an expert."}, status=status.HTTP_401_UNAUTHORIZED)
                         ta_request.owner = new_owner
                         ta_request.expert = new_owner.expert

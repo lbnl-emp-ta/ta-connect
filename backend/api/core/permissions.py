@@ -92,5 +92,29 @@ class IsAnyRoleOnRequest(permissions.BasePermission):
         if has_role(request, "Admin") or has_role(request, "Coordinator") or has_role(request, "Program Lead") or has_role(request, "Lab Lead") or has_role(request, "Expert"):
             return True
         return False
+
+
+def compose(*classes):
+    """
+    Combines permission classes with OR logic, producing a BasePermission
+    subclass whose has_permission accepts an optional view argument.
+    Works identically to the | operator but can be called as:
+        ComposedClass().has_permission(request)
+    """
+    class Composed(permissions.BasePermission):
+        def has_permission(self, request, view=None):
+            return any(cls().has_permission(request, view) for cls in classes)
+    return Composed
+
+# Composed permission aliases for common view-level checks.
+CanAssignExpert       = compose(IsAdmin, IsLabLead, IsProgramLead)
+CanMarkComplete       = compose(IsAdmin, IsProgramLead)
+CanCancel             = compose(IsAdmin, IsCoordinator)
+CanSubmitCloseout     = compose(IsAdmin, IsExpert)
+CanApproveCloseoutByLab     = compose(IsAdmin, IsLabLead)
+CanApproveCloseoutByProgram = compose(IsAdmin, IsProgramLead)
+CanEditDescription    = compose(IsAdmin, IsProgramLead, IsCoordinator)
+CanEditDepth          = compose(IsAdmin, IsProgramLead, IsLabLead, IsCoordinator)
+CanEditTopics         = compose(IsAdmin, IsProgramLead, IsLabLead, IsCoordinator)
     
         

@@ -1,5 +1,4 @@
 from django.db import transaction, IntegrityError
-from django.db.models import Q
 
 from rest_framework import views, status, permissions, authentication
 from rest_framework.response import Response
@@ -11,13 +10,17 @@ from core.serializers import *
 from core.models import * 
 from core.models.audit_history import ActionType
 from core.permissions import *
-from core.constants import DOMAINTYPE, ROLE, REQUEST_STATUS
-
-from core.views import assignment
+from core.constants import ROLE, REQUEST_STATUS
 
 from allauth.headless.contrib.rest_framework.authentication import (
     XSessionTokenAuthentication,
 )
+
+
+class ContextError(Exception):
+    """Raised when the Context header is missing, unparseable, or contains a mismatched user."""
+    pass
+
 
 """
 Provides common functionality across all Request views. Like
@@ -34,27 +37,53 @@ class BaseUserAwareRequest(views.APIView):
         permissions.IsAuthenticated,
     ]
 
+    def get_context(self):
+        """
+        Returns the parsed & validated Context header dict.
+        Raises ContextError if the header is missing, invalid JSON, or
+        the embedded user ID doesn't match the authenticated user.
+        """
+        maybe_context = self.request.headers.get("Context")
+        if not maybe_context:
+            raise ContextError("Missing Context header")
+        context = json.loads(maybe_context)
+        if not context:
+            raise ContextError("Empty Context header")
+        if context.get("user") != self.request.user.id:
+            raise ContextError("Context user does not match authenticated user")
+        return context
+
+    def get_request_or_error(self, queryset, request_id):
+        """
+        Returns (instance, None) when found, or (None, Response) on failure.
+
+        Usage::
+
+            found, err = self.get_request_or_error(queryset, request_id)
+            if err:
+                return err
+        """
+        try:
+            return queryset.get(pk=request_id), None
+        except Request.DoesNotExist:
+            return None, Response(
+                data={"message": "Request with given ID does not exist"},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
     def get_actionable(self):
         if hasattr(self, '_actionable_cache'):
             return self._actionable_cache
     
         queryset = Request.objects.exclude(owner=None)
 
-        # admins can act on all requests that are active (have an owner).
+        # Admins can act on all active requests; bypass context validation.
         if IsAdmin().has_permission(self.request):
             return queryset
 
-        maybe_context = self.request.headers.get("Context")
-        if not maybe_context:
-            return queryset.none()
-            
-        context = json.loads(maybe_context)
-
-        if not context:
-            return queryset.none()
-
-        # user is trying to impersonate another user
-        if not (context.get("user") == self.request.user.id): 
+        try:
+            context = self.get_context()
+        except ContextError:
             return queryset.none()
 
         user = User.objects.get(pk=self.request.user.id)
@@ -110,24 +139,21 @@ class BaseUserAwareRequest(views.APIView):
     def get_downstream(self):
         queryset = Request.objects.exclude(owner=None)
 
-        maybe_context = self.request.headers.get("Context")
-        if not maybe_context:
-            return queryset.none()
-
-        context = json.loads(maybe_context) 
-
-        actionable_pks = self.get_actionable().values('pk')
-
-        # This is a convention, we assume all requests for admin are 
-        # "actionable" and none are "downstream". In reality, this 
-        # concept doesn't really apply to Admins.
+        # Admins have no downstream requests by convention.
         if IsAdmin().has_permission(self.request):
             return queryset.none()
+
+        try:
+            context = self.get_context()
+        except ContextError:
+            return queryset.none()
+
+        actionable_pks = self.get_actionable().values('pk')
 
         # All requests that are in the system, excluding ones that have been 
         # archived (i.e. no owner) or are owned by Reception currently 
         # (i.e. are actionable).
-        elif IsCoordinator().has_permission(self.request):
+        if IsCoordinator().has_permission(self.request):
             return queryset.exclude(pk__in=actionable_pks)
 
         elif IsProgramLead().has_permission(self.request):
@@ -161,17 +187,9 @@ class BaseUserAwareRequest(views.APIView):
             return queryset.none()
         
     def get_inactive(self):
-        maybe_context = self.request.headers.get("Context")
-        if not maybe_context:
-            return Request.objects.none()
-            
-        context = json.loads(maybe_context)
-
-        if not context:
-            return Request.objects.none()
-
-        # user is trying to impersonate another user
-        if not (context.get("user") == self.request.user.id): 
+        try:
+            context = self.get_context()
+        except ContextError:
             return Request.objects.none()
 
         queryset = Request.objects.filter(owner=None)
@@ -215,11 +233,9 @@ class RequestDetailView(BaseUserAwareRequest):
         if request_id is None:
             return Response(data={"message": "Please provide a Request ID"}, status=status.HTTP_400_BAD_REQUEST)
 
-        found_request = None
-        try:
-            found_request = queryset.get(pk=request_id)        
-        except:
-            return Response(data={"message": "Request with given ID does not exist"}, status=status.HTTP_400_BAD_REQUEST)
+        found_request, err = self.get_request_or_error(queryset, request_id)
+        if err:
+            return err
 
         customers = found_request.customers 
         customer_serializer = CustomerSerializer(customers, many=True)
@@ -243,7 +259,7 @@ class RequestDetailView(BaseUserAwareRequest):
         # Only Program Leads, Lab Leads, Coordinators, and Admins should be able to see depth options,
         # and only if a program is currently assigned to the request.
         depth_options = []
-        if found_request.program and (IsAdmin().has_permission(request, None) or IsProgramLead().has_permission(request, None) or IsLabLead().has_permission(request, None) or IsCoordinator().has_permission(request, None)):
+        if found_request.program and CanEditDepth().has_permission(request):
             program = found_request.program
             depth_options = list(program.depths.values_list('name', flat=True))
         
@@ -277,20 +293,19 @@ class RequestDetailView(BaseUserAwareRequest):
     Used for Edit action.
     """
     def patch(self, request, request_id=None):
-        context = self.request.headers.get("Context")
-        if context is None:
-            return Response(data={"message": "Please provide context object header with request"}, status=status.HTTP_400_BAD_REQUEST)
-            
         if request_id is None:
             return Response(data={"message": "Please provide a Request ID"}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            context = self.get_context()
+        except ContextError:
+            return Response(data={"message": "Please provide context object header with request"}, status=status.HTTP_400_BAD_REQUEST)
         
         queryset = self.get_actionable() | self.get_downstream()
 
-        maybe_request = None
-        try:
-            maybe_request = queryset.get(pk=request_id)        
-        except Request.DoesNotExist:
-            return Response(data={"message": "Request with given ID does not exist"}, status=status.HTTP_404_NOT_FOUND)
+        maybe_request, err = self.get_request_or_error(queryset, request_id)
+        if err:
+            return err
 
         body = request.data
 
@@ -300,7 +315,7 @@ class RequestDetailView(BaseUserAwareRequest):
             return Response(data={"message": "Missing request body"}, status=status.HTTP_204_NO_CONTENT)
         
         if "description" in body:
-            if not (IsAdmin().has_permission(request, None) or IsProgramLead().has_permission(request, None) or IsCoordinator().has_permission(request, None)):
+            if not CanEditDescription().has_permission(request):
                 return Response(data={"message": "Insufficient privillege to update 'description' field"}, status=status.HTTP_401_UNAUTHORIZED)
             
             new_description_data = body.get("description")
@@ -310,7 +325,7 @@ class RequestDetailView(BaseUserAwareRequest):
             patch_data["description"] = new_description_data 
 
         if "depth" in body:
-            if not (IsAdmin().has_permission(request, None) or IsProgramLead().has_permission(request, None) or IsLabLead().has_permission(request, None) or IsCoordinator().has_permission(request, None)):
+            if not CanEditDepth().has_permission(request):
                 return Response(data={"message": "Insufficient privillege to update 'depth' field"}, status=status.HTTP_401_UNAUTHORIZED)
             
             if body.get("depth") is None:
@@ -325,13 +340,13 @@ class RequestDetailView(BaseUserAwareRequest):
             patch_data["depth"] = maybe_depth.name
 
         if "actual_completion_date" in body:
-            if not (IsAnyRoleOnRequest().has_permission(request, None)):
+            if not (IsAnyRoleOnRequest().has_permission(request)):
                 return Response(data={"message": "Insufficient privillege to update 'actual completion date' field"}, status=status.HTTP_401_UNAUTHORIZED)
 
             patch_data["actual_completion_date"] = body.get("actual_completion_date") 
 
         if "expert" in body:
-            if not(IsAdmin().has_permission(request, None) or IsLabLead().has_permission(request, None)):
+            if not(IsAdmin().has_permission(request) or IsLabLead().has_permission(request)):
                 return Response(data={"message": "Insufficient privillege to update 'expert' field"}, status=status.HTTP_401_UNAUTHORIZED)
             
             new_expert_data = body.get("expert")
@@ -345,7 +360,7 @@ class RequestDetailView(BaseUserAwareRequest):
                 # Need to check provided user has expert role
                 try:
                     # if they are lab lead, check to see if expert is in their lab
-                    if IsLabLead().has_permission(request, None):
+                    if IsLabLead().has_permission(request):
                         LabRoleAssignment.objects.get(user=maybe_expert, role=Role.objects.get(name="Expert"), instance=Lab.objects.get(pk=context.get("instance")))
 
                     # if they are admin best we can do is check if they are an expert
@@ -362,13 +377,13 @@ class RequestDetailView(BaseUserAwareRequest):
             patch_data["expert"] = maybe_expert.email 
         
         if "proj_start_date" in body:
-            if not(IsAnyRoleOnRequest().has_permission(request, None)):
+            if not(IsAnyRoleOnRequest().has_permission(request)):
                 return Response(data={"message": "Insufficient privillege to update 'projected start date' field"}, status=status.HTTP_401_UNAUTHORIZED)
 
             patch_data["proj_start_date"] = body.get("proj_start_date")
 
         if "proj_completion_date" in body:
-            if not(IsAnyRoleOnRequest().has_permission(request, None)):
+            if not(IsAnyRoleOnRequest().has_permission(request)):
                 return Response(data={"message": "Insufficient privillege to update 'projected completion date' field"}, status=status.HTTP_401_UNAUTHORIZED)
 
             # Projected completion date can only be set if request is currently ASSIGNED_TO_EXPERT
@@ -396,7 +411,7 @@ class RequestDetailView(BaseUserAwareRequest):
         # Topics are done a special way (not using patch serializer) because they are 
         # stored as a Many-to-Many relationship in the database.
         if "topics" in body:
-            if not(IsAdmin().has_permission(request, None) or IsProgramLead().has_permission(request, None) or IsCoordinator().has_permission(request, None) or IsLabLead().has_permission(request, None)):
+            if not CanEditTopics().has_permission(request):
                 return Response(data={"message": "Insufficient privillege to update 'topics' field"}, status=status.HTTP_401_UNAUTHORIZED)
             current_topics = maybe_request.topics.all()
             maybe_request.topics.clear()
@@ -470,20 +485,13 @@ class RequestListView(BaseUserAwareRequest):
         return Response(data=response_data, status=status.HTTP_200_OK)
 
 class RequestMarkCompleteView(BaseUserAwareRequest):
+    permission_classes = [permissions.IsAuthenticated, CanMarkComplete]
+
     def post(self, request, request_id=None):
-        if request_id is None:
-            return Response(data={"message": "Please provide a Request ID"}, status=status.HTTP_400_BAD_REQUEST)
-
-        if not (IsProgramLead().has_permission(request) or IsAdmin().has_permission(request)):
-            return Response(data={"message": "Insufficient privillege to mark request as complete"}, status=status.HTTP_401_UNAUTHORIZED)
-
         queryset = self.get_actionable()
-
-        found_request = None
-        try:
-            found_request = queryset.get(pk=request_id)        
-        except:
-            return Response(data={"message": "Request with given ID does not exist"}, status=status.HTTP_404_NOT_FOUND)
+        found_request, err = self.get_request_or_error(queryset, request_id)
+        if err:
+            return err
 
         # Maybe consider checking program/lab/expert to see if its even been serviced?
         try:
@@ -498,20 +506,13 @@ class RequestMarkCompleteView(BaseUserAwareRequest):
         return Response(status=status.HTTP_200_OK)
       
 class RequestCancelView(BaseUserAwareRequest):
+    permission_classes = [permissions.IsAuthenticated, CanCancel]
+
     def post(self, request, request_id=None):
-        if request_id is None:
-            return Response(data={"message": "Please provide a Request ID"}, status=status.HTTP_400_BAD_REQUEST)
-
-        if not (IsCoordinator().has_permission(request) or IsAdmin().has_permission(request)):
-            return Response(data={"message": "Insufficient privillege to mark request as complete"}, status=status.HTTP_401_UNAUTHORIZED)
-
         queryset = self.get_actionable()
-
-        found_request = None
-        try:
-            found_request = queryset.get(pk=request_id)        
-        except:
-            return Response(data={"message": "Request with given ID does not exist"}, status=status.HTTP_404_NOT_FOUND)
+        found_request, err = self.get_request_or_error(queryset, request_id)
+        if err:
+            return err
 
         try:
             with transaction.atomic():
@@ -533,20 +534,13 @@ class RequestCancelView(BaseUserAwareRequest):
         return Response(status=status.HTTP_200_OK)
 
 class RequestSubmitCloseoutFormView(BaseUserAwareRequest):
+    permission_classes = [permissions.IsAuthenticated, CanSubmitCloseout]
+
     def post(self, request, request_id=None):
-        if request_id is None:
-            return Response(data={"message": "Please provide a Request ID"}, status=status.HTTP_400_BAD_REQUEST)
-
-        if not (IsExpert().has_permission(request) or IsAdmin().has_permission(request)):
-            return Response(data={"message": "Insufficient privilege to submit closeout form"}, status=status.HTTP_403_FORBIDDEN)
-
         queryset = self.get_actionable()
-
-        found_request = None
-        try:
-            found_request = queryset.get(pk=request_id)
-        except Request.DoesNotExist:
-            return Response(data={"message": "Request with given ID does not exist"}, status=status.HTTP_404_NOT_FOUND)
+        found_request, err = self.get_request_or_error(queryset, request_id)
+        if err:
+            return err
 
         # Experts must be the assigned expert on this specific request
         if IsExpert().has_permission(request) and not IsAdmin().has_permission(request):
@@ -574,20 +568,13 @@ class RequestSubmitCloseoutFormView(BaseUserAwareRequest):
 
 
 class RequestApproveCloseoutFormByLabView(BaseUserAwareRequest):
+    permission_classes = [permissions.IsAuthenticated, CanApproveCloseoutByLab]
+
     def post(self, request, request_id=None):
-        if request_id is None:
-            return Response(data={"message": "Please provide a Request ID"}, status=status.HTTP_400_BAD_REQUEST)
-
-        if not (IsLabLead().has_permission(request) or IsAdmin().has_permission(request)):
-            return Response(data={"message": "Insufficient privilege to approve closeout form"}, status=status.HTTP_403_FORBIDDEN)
-
         queryset = self.get_actionable()
-
-        found_request = None
-        try:
-            found_request = queryset.get(pk=request_id)
-        except Request.DoesNotExist:
-            return Response(data={"message": "Request with given ID does not exist"}, status=status.HTTP_404_NOT_FOUND)
+        found_request, err = self.get_request_or_error(queryset, request_id)
+        if err:
+            return err
 
         if not hasattr(found_request, "closeout_form"):
             return Response(data={"message": "Closeout form does not exist for this request"}, status=status.HTTP_400_BAD_REQUEST)
@@ -610,20 +597,13 @@ class RequestApproveCloseoutFormByLabView(BaseUserAwareRequest):
 
 
 class RequestApproveCloseoutFormByProgramView(BaseUserAwareRequest):
+    permission_classes = [permissions.IsAuthenticated, CanApproveCloseoutByProgram]
+
     def post(self, request, request_id=None):
-        if request_id is None:
-            return Response(data={"message": "Please provide a Request ID"}, status=status.HTTP_400_BAD_REQUEST)
-
-        if not (IsProgramLead().has_permission(request) or IsAdmin().has_permission(request)):
-            return Response(data={"message": "Insufficient privilege to approve closeout form"}, status=status.HTTP_403_FORBIDDEN)
-
         queryset = self.get_actionable()
-
-        found_request = None
-        try:
-            found_request = queryset.get(pk=request_id)
-        except Request.DoesNotExist:
-            return Response(data={"message": "Request with given ID does not exist"}, status=status.HTTP_404_NOT_FOUND)
+        found_request, err = self.get_request_or_error(queryset, request_id)
+        if err:
+            return err
 
         if not hasattr(found_request, "closeout_form"):
             return Response(data={"message": "Closeout form does not exist for this request"}, status=status.HTTP_400_BAD_REQUEST)
@@ -649,20 +629,13 @@ class RequestApproveCloseoutFormByProgramView(BaseUserAwareRequest):
 
 
 class RequestReopenView(BaseUserAwareRequest):
+    permission_classes = [permissions.IsAuthenticated, IsAdmin]
+
     def post(self, request, request_id=None):
-        if request_id is None:
-            return Response(data={"message": "Please provide a Request ID"}, status=status.HTTP_400_BAD_REQUEST)
-
-        if not (IsAdmin().has_permission(request)):
-            return Response(data={"message": "Insufficient privillege to reopen request"}, status=status.HTTP_401_UNAUTHORIZED)
-
         queryset = Request.objects.filter(owner=None)
-
-        found_request = None
-        try:
-            found_request = queryset.get(pk=request_id)        
-        except:
-            return Response(data={"message": "Request with given ID does not exist"}, status=status.HTTP_404_NOT_FOUND)
+        found_request, err = self.get_request_or_error(queryset, request_id)
+        if err:
+            return err
 
         try:
             found_request.status = RequestStatus.objects.get(name=REQUEST_STATUS.SCOPING)

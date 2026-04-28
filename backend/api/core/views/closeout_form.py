@@ -18,18 +18,11 @@ class CloseoutFormView(BaseUserAwareRequest):
         Resolves the Request instance and checks that the caller has at least
         view-level access.  Returns (request_obj, error_response).
         """
-        try:
-            request_obj = Request.objects.get(pk=request_id)
-        except Request.DoesNotExist:
-            return None, Response(
-                {"message": "Request with given ID does not exist"},
-                status=status.HTTP_404_NOT_FOUND,
-            )
+        request_obj, err = self.get_request_or_error(Request.objects.all(), request_id)
+        if err:
+            return None, err
 
-        actionable = self.get_actionable()
-        downstream = self.get_downstream()
-        inactive = self.get_inactive()
-        visible = actionable | downstream | inactive
+        visible = self.get_actionable() | self.get_downstream() | self.get_inactive()
         if not visible.filter(pk=request_obj.pk).exists():
             return None, Response(
                 {"message": "Insufficient authorization to access closeout form for given request"},
