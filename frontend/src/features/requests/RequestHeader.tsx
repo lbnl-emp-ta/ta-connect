@@ -4,12 +4,14 @@ import { ExpertsPanelDataTable } from '@/features/experts/ExpertsPanelDataTable'
 import { useIdentityContext } from '@/features/identity/IdentityContext';
 import { RequestAssignBackwardButton } from '@/features/requests/RequestAssignBackwardButton';
 import { RequestAssignForwardButton } from '@/features/requests/RequestAssignForwardButton';
-import { expertsQueryOptions } from '@/utils/queryOptions';
+import { expertsQueryOptions } from '@/api/queryOptions';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import { Box, Drawer, IconButton, Stack, Typography } from '@mui/material';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { useRequestsContext } from './RequestsContext';
+import { RequestDatesDialog } from '@/features/requests/RequestDatesDialog';
+import { RequestCloseoutForm } from '@/features/requests/RequestCloseoutForm';
 
 interface RequestHeaderProps {
   request: TARequestDetail;
@@ -92,6 +94,8 @@ export const RequestHeader: React.FC<RequestHeaderProps> = ({ request }) => {
           <ExpertsPanelDataTable experts={experts || []} currentRequestId={request.id} />
         </Box>
       </Drawer>
+      <RequestDatesDialog request={request} />
+      <RequestCloseoutForm requestId={request.id} expertOwnerId={request.expert?.owner_id} />
     </Stack>
   );
 };

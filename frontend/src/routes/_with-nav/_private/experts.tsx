@@ -1,6 +1,6 @@
 import { Container, Stack } from '@mui/material';
 import { createFileRoute } from '@tanstack/react-router';
-import { expertsQueryOptions } from '@/utils/queryOptions';
+import { expertsQueryOptions } from '@/api/queryOptions';
 import { ExpertsDataTable } from '@/features/experts/ExpertsDataTable';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { useIdentityContext } from '@/features/identity/IdentityContext';

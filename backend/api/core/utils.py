@@ -2,6 +2,8 @@ import json
 
 from core.models.audit_history import AuditHistory
 from core.models.role import Role
+from core.models.request_status import RequestStatus
+from core.constants import REQUEST_STATUS
 
 
 def create_audit_history(request, request_obj, action_type, description):
@@ -28,3 +30,9 @@ def create_audit_history(request, request_obj, action_type, description):
     except (json.JSONDecodeError, Role.DoesNotExist) as e:
         print(f"Error creating audit history: {e}")
         pass
+
+
+def get_status(rs: REQUEST_STATUS) -> RequestStatus:
+    """Helper function to get RequestStatus object from REQUEST_STATUS enum value."""
+    return RequestStatus.objects.get(name=rs.value)
+

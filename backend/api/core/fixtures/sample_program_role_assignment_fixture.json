@@ -1,0 +1,22 @@
+[
+  {
+    "model": "core.ProgramRoleAssignment",
+    "pk": 1,
+    "fields": {
+      "user": 4,
+      "role": 3,
+      "instance": 1,
+      "date_assigned": "2025-09-01T08:00:00Z"
+    }
+  },
+  {
+    "model": "core.ProgramRoleAssignment",
+    "pk": 2,
+    "fields": {
+      "user": 4,
+      "role": 3,
+      "instance": 2,
+      "date_assigned": "2025-09-15T08:00:00Z"
+    }
+  }
+]

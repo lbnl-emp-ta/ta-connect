@@ -14,11 +14,7 @@ import DownloadIcon from '@mui/icons-material/Download';
 import DeleteIcon from '@mui/icons-material/Delete';
 import AddIcon from '@mui/icons-material/Add';
 import { TAAttachment, TARequestDetail } from '../../api/dashboard/types';
-import {
-  apiUrl,
-  useAttachmentMutation,
-  useDeleteAttachmentMutation,
-} from '../../utils/queryOptions';
+import { apiUrl, useAttachmentMutation, useDeleteAttachmentMutation } from '../../api/queryOptions';
 import { useIdentityContext } from '../identity/IdentityContext';
 import { getCSRFToken } from '../../utils/cookies';
 import { downloadBlob, formatDatetime } from '../../utils/utils';
@@ -89,7 +85,9 @@ export const RequestAttachments: React.FC<RequestAttachmentsProps> = ({
         Context: identity ? JSON.stringify(identity) : '',
       },
     })
-      .then((response) => {return response.blob();})
+      .then((response) => {
+        return response.blob();
+      })
       .then((blob) => downloadBlob(blob, `${attachmentTitle}`));
   };
 

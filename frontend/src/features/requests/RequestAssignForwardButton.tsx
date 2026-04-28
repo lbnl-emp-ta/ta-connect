@@ -7,12 +7,13 @@ import { ToastMessage } from '@/features/toasts/ToastMessage';
 import {
   expertsQueryOptions,
   ownersQueryOptions,
+  useApproveCloseoutByLabMutation,
+  useApproveCloseoutByProgramMutation,
   useAssignmentMutation,
-  useFinishCloseoutMutation,
-  useMarkCompleteMutation,
+  useCreateCloseoutMutation,
   useReopenMutation,
-} from '@/utils/queryOptions';
-import { getStep, Steps } from '@/utils/utils';
+} from '@/api/queryOptions';
+import { getStep, statusMap, Steps } from '@/utils/utils';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import EastIcon from '@mui/icons-material/East';
 import ErrorIcon from '@mui/icons-material/Error';
@@ -50,32 +51,60 @@ export const RequestAssignForwardButton: React.FC<RequestAssignForwardButtonProp
   const { identity, detailedIdentity } = useIdentityContext();
   const { data: owners } = useSuspenseQuery(ownersQueryOptions(identity));
   const { data: experts } = useSuspenseQuery(expertsQueryOptions(identity));
-  const { tab, nextId, previousId, setExpertsPanelOpen } = useRequestsContext();
+  const {
+    tab,
+    nextId,
+    previousId,
+    setExpertsPanelOpen,
+    setDatesDialogOpen,
+    setCloseoutDialogOpen,
+  } = useRequestsContext();
   const { setShowToast, setToastMessage } = useToastContext();
   const [searchTerm, setSearchTerm] = useState('');
   const requestOrganizationType = request.customers[0].org.type;
-  const ownersContainsExperts = owners?.some((owner) => owner.domain_type === 'expert');
+  const ownersContainsExperts =
+    owners?.some((owner) => owner.domain_type === 'expert') ||
+    request.status === 'assigned-to-lab' ||
+    request.status === 'rejected-by-expert';
+  const ownersNoun = useMemo(() => {
+    switch (request.status) {
+      case 'scoping':
+      case 'rejected-by-program':
+        return 'programs';
+      case 'assigned-to-program':
+      case 'rejected-by-lab':
+        return 'labs';
+      case 'assigned-to-lab':
+      case 'rejected-by-expert':
+        return 'experts';
+      default:
+        return 'owners';
+    }
+  }, [request.status]);
   const currentStep = useMemo(() => {
     return getStep(request);
   }, [request]);
   const forwardOwners = useMemo(() => {
-    switch (currentStep.stepIndex) {
-      case Steps.Reception:
+    switch (request.status) {
+      case 'scoping':
+      case 'rejected-by-program':
         return owners?.filter((owner) => owner.domain_type === 'program');
-      case Steps.Program:
+      case 'assigned-to-program':
+      case 'rejected-by-lab':
         return owners?.filter((owner) => owner.domain_type === 'lab');
-      case Steps.Lab:
+      case 'assigned-to-lab':
+      case 'rejected-by-expert':
         return owners?.filter((owner) => owner.domain_type === 'expert');
       default:
         return [];
     }
-  }, [owners, currentStep]);
+  }, [owners, request.status]);
   const suggestedExperts = useMemo(() => {
-    switch (currentStep.stepIndex) {
-      case Steps.Lab:
+    switch (request.status) {
+      case 'assigned-to-lab':
+      case 'rejected-by-expert':
         return forwardOwners?.filter((owner) => {
           const expert = experts?.find((expert) => expert.owner_id === owner.id);
-          console.log('Checking expert:', expert);
           const hasExpertiseInRequestTopic = expert?.expertises.some((expertise) =>
             request.topics.some((requestTopic) => requestTopic.id === expertise.topic.id)
           );
@@ -84,7 +113,7 @@ export const RequestAssignForwardButton: React.FC<RequestAssignForwardButtonProp
       default:
         return null;
     }
-  }, [owners, currentStep]);
+  }, [owners, request.status]);
   const filteredOwners = useMemo(() => {
     if (!searchTerm && suggestedExperts && suggestedExperts.length > 0) {
       return forwardOwners?.filter(
@@ -139,16 +168,40 @@ export const RequestAssignForwardButton: React.FC<RequestAssignForwardButtonProp
     onSuccess: onSuccess('Request assigned'),
     onError: onError,
   });
-  const finishCloseoutMutation = useFinishCloseoutMutation(request.id.toString(), identity, {
-    onMutate: onMutate('Finishing request closeout'),
-    onSuccess: onSuccess('Request closeout finished'),
+  const createCloseoutMutation = useCreateCloseoutMutation(request.id.toString(), identity, {
+    onMutate: onMutate('Creating closeout form'),
+    onSuccess: () => {
+      queryClient.invalidateQueries();
+      setShowToast(true);
+      setToastMessage(
+        <ToastMessage icon={<CheckCircleIcon />}>
+          Closeout form created and request marked as closeout started
+        </ToastMessage>
+      );
+      setCloseoutDialogOpen(true);
+    },
     onError: onError,
   });
-  const completeRequestMutation = useMarkCompleteMutation(request.id.toString(), identity, {
-    onMutate: onMutate('Marking request as complete'),
-    onSuccess: onSuccess('Request marked as complete'),
-    onError: onError,
-  });
+  const approveCloseoutByLabMutation = useApproveCloseoutByLabMutation(
+    request.id.toString(),
+    identity,
+    {
+      onMutate: onMutate(`Approving request closeout by ${request.lab?.name ?? 'lab'}`),
+      onSuccess: onSuccess(`Request closeout approved by ${request.lab?.name ?? 'lab'}`),
+      onError: onError,
+    }
+  );
+  const approveCloseoutByProgramMutation = useApproveCloseoutByProgramMutation(
+    request.id.toString(),
+    identity,
+    {
+      onMutate: onMutate(`Approving request closeout by ${request.program?.name ?? 'program'}`),
+      onSuccess: onSuccess(
+        `Request closeout approved by ${request.program?.name ?? 'program'} and marked as completed`
+      ),
+      onError: onError,
+    }
+  );
   const reopenRequestMutation = useReopenMutation(request.id.toString(), identity, {
     onMutate: onMutate('Reopening request'),
     onSuccess: onSuccess('Request reopened and assigned to Reception'),
@@ -181,14 +234,21 @@ export const RequestAssignForwardButton: React.FC<RequestAssignForwardButtonProp
 
   const handleForward = (owner?: TAOwner) => {
     switch (currentStep.stepIndex) {
-      case Steps.Expert:
-        finishCloseoutMutation.mutate();
+      case Steps.Delivery:
+        if (request.status === 'assigned-to-expert') {
+          setDatesDialogOpen(true);
+        } else if (request.status === 'providing-ta') {
+          createCloseoutMutation.mutate();
+        } else if (
+          request.status === 'closeout-started' ||
+          request.status === 'closeout-more-info'
+        ) {
+          setCloseoutDialogOpen(true);
+        }
         break;
-      case Steps.Approval:
-        if (request.owner?.domain_type === 'lab' && request.program) {
-          assignRequestMutation.mutate({ request: request.id, owner: request.program.owner_id });
-        } else if (request.owner?.domain_type === 'program') {
-          completeRequestMutation.mutate();
+      case Steps.Review:
+        if (request.owner?.domain_type === 'lab' || request.owner?.domain_type === 'program') {
+          setCloseoutDialogOpen(true);
         }
         break;
       case Steps.Completed:
@@ -253,93 +313,95 @@ export const RequestAssignForwardButton: React.FC<RequestAssignForwardButtonProp
         onClose={handleAssignMenuClose}
         aria-labelledby="assign-menu-button"
       >
-        <Box sx={{ padding: 1, width: 300 }}>
-          <TextField
-            variant="outlined"
-            size="small"
-            placeholder="Search assignees"
-            fullWidth
-            value={searchTerm}
-            onChange={handleSearch}
-            onKeyDown={(e) => e.stopPropagation()}
-          />
-        </Box>
-        {ownersContainsExperts && (
-          <MenuItem onClick={handleOpenExpertsPanel}>
-            <ListItemText sx={{ color: 'secondary.main' }}>
-              <Typography variant="body2" component="div">
-                <Stack direction="row" alignItems="center">
-                  <span>Explore experts</span>
-                  <EastIcon />
-                </Stack>
-              </Typography>
-            </ListItemText>
-          </MenuItem>
-        )}
-        {!searchTerm && suggestedExperts && (
-          <>
-            <Box sx={{ paddingX: 2, paddingY: 1 }}>
-              <Typography variant="subtitle2" color="text.secondary">
-                Suggested experts
-              </Typography>
-            </Box>
-            {suggestedExperts.length === 0 && (
+        <Box>
+          <Box sx={{ padding: 1, width: 300 }}>
+            <TextField
+              variant="outlined"
+              size="small"
+              placeholder={`Search ${ownersNoun}`}
+              fullWidth
+              value={searchTerm}
+              onChange={handleSearch}
+              onKeyDown={(e) => e.stopPropagation()}
+            />
+          </Box>
+          {ownersContainsExperts && (
+            <MenuItem onClick={handleOpenExpertsPanel}>
+              <ListItemText sx={{ color: statusMap['assigned-to-expert'].color }}>
+                <Typography variant="body2" component="div">
+                  <Stack direction="row" alignItems="center">
+                    <span>Explore experts</span>
+                    <EastIcon />
+                  </Stack>
+                </Typography>
+              </ListItemText>
+            </MenuItem>
+          )}
+          {!searchTerm && suggestedExperts && (
+            <>
               <Box sx={{ paddingX: 2, paddingY: 1 }}>
-                <Typography variant="body2" color="text.secondary">
-                  No experts found with relevant expertise.
+                <Typography variant="subtitle2" color="text.secondary">
+                  Suggested experts
                 </Typography>
               </Box>
-            )}
-            {suggestedExperts.length > 0 &&
-              suggestedExperts.map((owner) => (
-                <MenuItem key={owner.id} onClick={() => handleForward(owner)}>
-                  <Stack direction="row" spacing={1}>
-                    <ListItemText>{owner.domain_name}</ListItemText>
-                    <Chip label={capitalize(owner.domain_type)} size="small" />
-                  </Stack>
-                </MenuItem>
-              ))}
+              {suggestedExperts.length === 0 && (
+                <Box sx={{ paddingX: 2, paddingY: 1 }}>
+                  <Typography variant="body2" color="text.secondary">
+                    No experts found with relevant expertise.
+                  </Typography>
+                </Box>
+              )}
+              {suggestedExperts.length > 0 &&
+                suggestedExperts.map((owner) => (
+                  <MenuItem key={owner.id} onClick={() => handleForward(owner)}>
+                    <Stack direction="row" spacing={1}>
+                      <ListItemText>{owner.domain_name}</ListItemText>
+                      <Chip label={capitalize(owner.domain_type)} size="small" />
+                    </Stack>
+                  </MenuItem>
+                ))}
+              <Box sx={{ paddingX: 2, paddingY: 1 }}>
+                <Typography variant="subtitle2" color="text.secondary">
+                  Other experts
+                </Typography>
+              </Box>
+            </>
+          )}
+          {filteredOwners &&
+            filteredOwners.length > 0 &&
+            filteredOwners.map((owner) => (
+              <MenuItem key={owner.id} onClick={() => handleForward(owner)}>
+                <Stack direction="row" spacing={1}>
+                  <ListItemText>{owner.domain_name}</ListItemText>
+                  <Chip label={capitalize(owner.domain_type)} size="small" />
+                  {owner.domain_type === 'program' && (
+                    <>
+                      {checkOrganizationTypes(owner) ? (
+                        <Tooltip
+                          title={`This program supports ${requestOrganizationType.name} customers.`}
+                        >
+                          <CheckCircleIcon color="success" />
+                        </Tooltip>
+                      ) : (
+                        <Tooltip
+                          title={`This program does not support ${requestOrganizationType.name} customers.`}
+                        >
+                          <ErrorIcon color="error" />
+                        </Tooltip>
+                      )}
+                    </>
+                  )}
+                </Stack>
+              </MenuItem>
+            ))}
+          {(!filteredOwners || filteredOwners.length === 0) && (
             <Box sx={{ paddingX: 2, paddingY: 1 }}>
-              <Typography variant="subtitle2" color="text.secondary">
-                Other experts
+              <Typography variant="body2" color="text.secondary">
+                {`No other ${ownersNoun} found.`}
               </Typography>
             </Box>
-          </>
-        )}
-        {filteredOwners &&
-          filteredOwners.length > 0 &&
-          filteredOwners.map((owner) => (
-            <MenuItem key={owner.id} onClick={() => handleForward(owner)}>
-              <Stack direction="row" spacing={1}>
-                <ListItemText>{owner.domain_name}</ListItemText>
-                <Chip label={capitalize(owner.domain_type)} size="small" />
-                {owner.domain_type === 'program' && (
-                  <>
-                    {checkOrganizationTypes(owner) ? (
-                      <Tooltip
-                        title={`This program supports ${requestOrganizationType.name} customers.`}
-                      >
-                        <CheckCircleIcon color="success" />
-                      </Tooltip>
-                    ) : (
-                      <Tooltip
-                        title={`This program does not support ${requestOrganizationType.name} customers.`}
-                      >
-                        <ErrorIcon color="error" />
-                      </Tooltip>
-                    )}
-                  </>
-                )}
-              </Stack>
-            </MenuItem>
-          ))}
-        {(!filteredOwners || filteredOwners.length === 0) && (
-          <Box sx={{ paddingX: 2, paddingY: 1 }}>
-            <Typography variant="body2" color="text.secondary">
-              No other experts found.
-            </Typography>
-          </Box>
-        )}
+          )}
+        </Box>
       </Menu>
     </>
   );

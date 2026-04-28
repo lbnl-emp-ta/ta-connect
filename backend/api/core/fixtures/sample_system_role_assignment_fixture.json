@@ -1,0 +1,11 @@
+[
+  {
+    "model": "core.SystemRoleAssignment",
+    "pk": 1,
+    "fields": {
+      "user": 1,
+      "role": 1,
+      "date_assigned": "2025-09-01T08:00:00Z"
+    }
+  }
+]

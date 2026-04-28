@@ -4,7 +4,9 @@ from django.db.models import Q
 from rest_framework import views, status, permissions, authentication
 from rest_framework.response import Response
 
-from core.utils import create_audit_history
+from django.utils import timezone
+
+from core.utils import create_audit_history, get_status
 from core.serializers import * 
 from core.models import * 
 from core.models.audit_history import ActionType
@@ -43,7 +45,7 @@ class BaseUserAwareRequest(views.APIView):
             return queryset
 
         maybe_context = self.request.headers.get("Context")
-        if maybe_context is None:
+        if not maybe_context:
             return queryset.none()
             
         context = json.loads(maybe_context)
@@ -160,7 +162,7 @@ class BaseUserAwareRequest(views.APIView):
         
     def get_inactive(self):
         maybe_context = self.request.headers.get("Context")
-        if maybe_context is None:
+        if not maybe_context:
             return Request.objects.none()
             
         context = json.loads(maybe_context)
@@ -207,15 +209,15 @@ class RequestDetailView(BaseUserAwareRequest):
     """
     Used to populate Request and Customer panels.
     """
-    def get(self, request, format=None, id=None):
+    def get(self, request, format=None, request_id=None):
         queryset = self.get_actionable() | self.get_downstream() | self.get_inactive()
 
-        if id is None:
+        if request_id is None:
             return Response(data={"message": "Please provide a Request ID"}, status=status.HTTP_400_BAD_REQUEST)
 
         found_request = None
         try:
-            found_request = queryset.get(pk=id)        
+            found_request = queryset.get(pk=request_id)        
         except:
             return Response(data={"message": "Request with given ID does not exist"}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -237,20 +239,13 @@ class RequestDetailView(BaseUserAwareRequest):
         response_data["customers"] = customer_serializer.data
         response_data["owner"] = OwnerSerializer().format_owner(found_request.owner)
 
-        # Determine depth options based on request owner type
-        # When owner is reception (or system admin), depth_options remains empty
+        # Determine depth options based on request's current program.
+        # Only Program Leads, Lab Leads, Coordinators, and Admins should be able to see depth options,
+        # and only if a program is currently assigned to the request.
         depth_options = []
-        if found_request.owner:
-            if found_request.owner.domain_type == DOMAINTYPE.PROGRAM:
-                # When owner is a program, show depths associated with that program
-                program = found_request.owner.program
-                if program:
-                    depth_options = list(program.depths.values_list('name', flat=True))
-            elif found_request.owner.domain_type == DOMAINTYPE.LAB:
-                # When owner is a lab, show depths associated with the program that the request is associated with
-                if found_request.program:
-                    program = found_request.program
-                    depth_options = list(program.depths.values_list('name', flat=True))
+        if found_request.program and (IsAdmin().has_permission(request, None) or IsProgramLead().has_permission(request, None) or IsLabLead().has_permission(request, None) or IsCoordinator().has_permission(request, None)):
+            program = found_request.program
+            depth_options = list(program.depths.values_list('name', flat=True))
         
         response_data["depth_options"] = depth_options
 
@@ -281,19 +276,19 @@ class RequestDetailView(BaseUserAwareRequest):
     """
     Used for Edit action.
     """
-    def patch(self, request, id=None):
+    def patch(self, request, request_id=None):
         context = self.request.headers.get("Context")
         if context is None:
             return Response(data={"message": "Please provide context object header with request"}, status=status.HTTP_400_BAD_REQUEST)
             
-        if id is None:
+        if request_id is None:
             return Response(data={"message": "Please provide a Request ID"}, status=status.HTTP_400_BAD_REQUEST)
         
         queryset = self.get_actionable() | self.get_downstream()
 
         maybe_request = None
         try:
-            maybe_request = queryset.get(pk=id)        
+            maybe_request = queryset.get(pk=request_id)        
         except Request.DoesNotExist:
             return Response(data={"message": "Request with given ID does not exist"}, status=status.HTTP_404_NOT_FOUND)
 
@@ -315,7 +310,7 @@ class RequestDetailView(BaseUserAwareRequest):
             patch_data["description"] = new_description_data 
 
         if "depth" in body:
-            if not (IsAdmin().has_permission(request, None) or IsProgramLead().has_permission(request, None) or IsCoordinator().has_permission(request, None)):
+            if not (IsAdmin().has_permission(request, None) or IsProgramLead().has_permission(request, None) or IsLabLead().has_permission(request, None) or IsCoordinator().has_permission(request, None)):
                 return Response(data={"message": "Insufficient privillege to update 'depth' field"}, status=status.HTTP_401_UNAUTHORIZED)
             
             if body.get("depth") is None:
@@ -376,7 +371,15 @@ class RequestDetailView(BaseUserAwareRequest):
             if not(IsAnyRoleOnRequest().has_permission(request, None)):
                 return Response(data={"message": "Insufficient privillege to update 'projected completion date' field"}, status=status.HTTP_401_UNAUTHORIZED)
 
-            patch_data["proj_completion_date"] = body.get("proj_completion_date")
+            # Projected completion date can only be set if request is currently ASSIGNED_TO_EXPERT
+            # or is already PROVIDING_TA (in which case we're just updating the projected completion date).
+            # Setting it implies status should be updated to PROVIDING_TA.
+            if maybe_request.status.name in [REQUEST_STATUS.ASSIGNED_TO_EXPERT, REQUEST_STATUS.PROVIDING_TA]:
+                patch_data["proj_completion_date"] = body.get("proj_completion_date")
+                patch_data["status"] = get_status(REQUEST_STATUS.PROVIDING_TA)
+            # If projected completion date is being removed while PROVIDING_TA, revert status back to ASSIGNED_TO_EXPERT
+            if body.get("proj_completion_date") == None and maybe_request.status.name == REQUEST_STATUS.PROVIDING_TA:
+                patch_data["status"] = get_status(REQUEST_STATUS.ASSIGNED_TO_EXPERT)
             
         if "status" in body:
             if body.get("status") is None:
@@ -426,7 +429,7 @@ class RequestDetailView(BaseUserAwareRequest):
             return Response(data={"message": patch_serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
 
 
-        return self.get(request, None, id)
+        return self.get(request, None, request_id)
 
 
 """
@@ -467,8 +470,8 @@ class RequestListView(BaseUserAwareRequest):
         return Response(data=response_data, status=status.HTTP_200_OK)
 
 class RequestMarkCompleteView(BaseUserAwareRequest):
-    def post(self, request, id=None) :
-        if id is None:
+    def post(self, request, request_id=None):
+        if request_id is None:
             return Response(data={"message": "Please provide a Request ID"}, status=status.HTTP_400_BAD_REQUEST)
 
         if not (IsProgramLead().has_permission(request) or IsAdmin().has_permission(request)):
@@ -478,7 +481,7 @@ class RequestMarkCompleteView(BaseUserAwareRequest):
 
         found_request = None
         try:
-            found_request = queryset.get(pk=id)        
+            found_request = queryset.get(pk=request_id)        
         except:
             return Response(data={"message": "Request with given ID does not exist"}, status=status.HTTP_404_NOT_FOUND)
 
@@ -495,8 +498,8 @@ class RequestMarkCompleteView(BaseUserAwareRequest):
         return Response(status=status.HTTP_200_OK)
       
 class RequestCancelView(BaseUserAwareRequest):
-    def post(self, request, id=None):
-        if id is None:
+    def post(self, request, request_id=None):
+        if request_id is None:
             return Response(data={"message": "Please provide a Request ID"}, status=status.HTTP_400_BAD_REQUEST)
 
         if not (IsCoordinator().has_permission(request) or IsAdmin().has_permission(request)):
@@ -506,7 +509,7 @@ class RequestCancelView(BaseUserAwareRequest):
 
         found_request = None
         try:
-            found_request = queryset.get(pk=id)        
+            found_request = queryset.get(pk=request_id)        
         except:
             return Response(data={"message": "Request with given ID does not exist"}, status=status.HTTP_404_NOT_FOUND)
 
@@ -529,31 +532,116 @@ class RequestCancelView(BaseUserAwareRequest):
 
         return Response(status=status.HTTP_200_OK)
 
-class RequestCloseoutCompleteView(BaseUserAwareRequest):
-    def post(self, request, id=None):
-        if id is None:
+class RequestSubmitCloseoutFormView(BaseUserAwareRequest):
+    def post(self, request, request_id=None):
+        if request_id is None:
             return Response(data={"message": "Please provide a Request ID"}, status=status.HTTP_400_BAD_REQUEST)
 
         if not (IsExpert().has_permission(request) or IsAdmin().has_permission(request)):
-            return Response(data={"message": "Insufficient privillege to mark request as complete"}, status=status.HTTP_401_UNAUTHORIZED)
+            return Response(data={"message": "Insufficient privilege to submit closeout form"}, status=status.HTTP_403_FORBIDDEN)
 
         queryset = self.get_actionable()
 
         found_request = None
         try:
-            found_request = queryset.get(pk=id)        
-        except:
+            found_request = queryset.get(pk=request_id)
+        except Request.DoesNotExist:
             return Response(data={"message": "Request with given ID does not exist"}, status=status.HTTP_404_NOT_FOUND)
 
-        if found_request.expert is None:
-            return Response(data={"message": "Request must have an assigned expert in order to complete closeout"}, status=status.HTTP_404_NOT_FOUND)
+        # Experts must be the assigned expert on this specific request
+        if IsExpert().has_permission(request) and not IsAdmin().has_permission(request):
+            if found_request.expert is None or found_request.expert != request.user:
+                return Response(data={"message": "Only the assigned expert can submit the closeout form"}, status=status.HTTP_403_FORBIDDEN)
+
+        if not hasattr(found_request, "closeout_form"):
+            return Response(data={"message": "Closeout form does not exist for this request"}, status=status.HTTP_400_BAD_REQUEST)
 
         try:
-            found_request.status = RequestStatus.objects.get(name=REQUEST_STATUS.CLOSE_OUT_COMPLETED)
-            found_request.owner = found_request.lab.owner if found_request.lab else None
-            found_request.save()
-            create_audit_history(request, found_request, ActionType.StatusChange, f"Status changed to Closeout Completed")
+            with transaction.atomic():
+                closeout_form = found_request.closeout_form
+                closeout_form.submitted_date = timezone.now()
+                closeout_form.save()
 
+                found_request.status = get_status(REQUEST_STATUS.CLOSEOUT_REVIEW_BY_LAB)
+                found_request.owner = found_request.lab.owner if found_request.lab else None
+                found_request.save()
+
+                create_audit_history(request, found_request, ActionType.StatusChange, "Closeout form submitted, status changed to Closeout Review by Lab")
+        except Exception as e:
+            return Response(data={"message": f"{e}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+        return Response(status=status.HTTP_200_OK)
+
+
+class RequestApproveCloseoutFormByLabView(BaseUserAwareRequest):
+    def post(self, request, request_id=None):
+        if request_id is None:
+            return Response(data={"message": "Please provide a Request ID"}, status=status.HTTP_400_BAD_REQUEST)
+
+        if not (IsLabLead().has_permission(request) or IsAdmin().has_permission(request)):
+            return Response(data={"message": "Insufficient privilege to approve closeout form"}, status=status.HTTP_403_FORBIDDEN)
+
+        queryset = self.get_actionable()
+
+        found_request = None
+        try:
+            found_request = queryset.get(pk=request_id)
+        except Request.DoesNotExist:
+            return Response(data={"message": "Request with given ID does not exist"}, status=status.HTTP_404_NOT_FOUND)
+
+        if not hasattr(found_request, "closeout_form"):
+            return Response(data={"message": "Closeout form does not exist for this request"}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            with transaction.atomic():
+                closeout_form = found_request.closeout_form
+                closeout_form.approved_by_lab = True
+                closeout_form.save()
+
+                found_request.status = get_status(REQUEST_STATUS.CLOSEOUT_REVIEW_BY_PROGRAM)
+                found_request.owner = found_request.program.owner if found_request.program else None
+                found_request.save()
+
+                create_audit_history(request, found_request, ActionType.StatusChange, "Closeout form approved by lab, status changed to Closeout Review by Program")
+        except Exception as e:
+            return Response(data={"message": f"{e}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+        return Response(status=status.HTTP_200_OK)
+
+
+class RequestApproveCloseoutFormByProgramView(BaseUserAwareRequest):
+    def post(self, request, request_id=None):
+        if request_id is None:
+            return Response(data={"message": "Please provide a Request ID"}, status=status.HTTP_400_BAD_REQUEST)
+
+        if not (IsProgramLead().has_permission(request) or IsAdmin().has_permission(request)):
+            return Response(data={"message": "Insufficient privilege to approve closeout form"}, status=status.HTTP_403_FORBIDDEN)
+
+        queryset = self.get_actionable()
+
+        found_request = None
+        try:
+            found_request = queryset.get(pk=request_id)
+        except Request.DoesNotExist:
+            return Response(data={"message": "Request with given ID does not exist"}, status=status.HTTP_404_NOT_FOUND)
+
+        if not hasattr(found_request, "closeout_form"):
+            return Response(data={"message": "Closeout form does not exist for this request"}, status=status.HTTP_400_BAD_REQUEST)
+
+        if not found_request.closeout_form.approved_by_lab:
+            return Response(data={"message": "Closeout form must be approved by lab before program can approve"}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            with transaction.atomic():
+                closeout_form = found_request.closeout_form
+                closeout_form.approved_by_program = True
+                closeout_form.save()
+
+                found_request.status = get_status(REQUEST_STATUS.COMPLETED)
+                found_request.owner = None
+                found_request.save()
+
+                create_audit_history(request, found_request, ActionType.StatusChange, "Closeout form approved by program, status changed to Completed")
         except Exception as e:
             return Response(data={"message": f"{e}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
@@ -561,8 +649,8 @@ class RequestCloseoutCompleteView(BaseUserAwareRequest):
 
 
 class RequestReopenView(BaseUserAwareRequest):
-    def post(self, request, id=None):
-        if id is None:
+    def post(self, request, request_id=None):
+        if request_id is None:
             return Response(data={"message": "Please provide a Request ID"}, status=status.HTTP_400_BAD_REQUEST)
 
         if not (IsAdmin().has_permission(request)):
@@ -572,7 +660,7 @@ class RequestReopenView(BaseUserAwareRequest):
 
         found_request = None
         try:
-            found_request = queryset.get(pk=id)        
+            found_request = queryset.get(pk=request_id)        
         except:
             return Response(data={"message": "Request with given ID does not exist"}, status=status.HTTP_404_NOT_FOUND)
 

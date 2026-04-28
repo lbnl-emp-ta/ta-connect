@@ -1,6 +1,6 @@
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { createFileRoute, Navigate } from '@tanstack/react-router';
-import { authSessionQueryOptions } from '../../utils/queryOptions';
+import { authSessionQueryOptions } from '../../api/queryOptions';
 
 export const Route = createFileRoute('/(public)/account/provider/callback')({
   loader: async ({ context }) => {

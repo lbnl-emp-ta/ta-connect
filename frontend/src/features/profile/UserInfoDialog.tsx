@@ -8,7 +8,7 @@ import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import ErrorIcon from '@mui/icons-material/Error';
-import { useLogoutMutation, useUserMutation } from '../../utils/queryOptions';
+import { useLogoutMutation, useUserMutation } from '../../api/queryOptions';
 import { useUser } from '../../hooks/useUser';
 import { TAUser, TAUserMutation } from '../../api/dashboard/types';
 import { useEffect, useMemo, useState } from 'react';
@@ -116,7 +116,7 @@ export const UserInfoDialog: React.FC<UserInfoDialogProps> = ({
   ]);
 
   return (
-    <Dialog open={open} onClose={!hasMissingInfo ? handleCancel : undefined}>
+    <Dialog open={open} onClose={!hasMissingInfo ? handleCancel : undefined} disableRestoreFocus>
       <DialogTitle>User Information</DialogTitle>
       <DialogContent>
         <DialogContentText sx={{ marginBottom: 2 }}>

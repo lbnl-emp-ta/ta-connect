@@ -1,0 +1,13 @@
+[
+  {
+    "model": "core.Owner",
+    "pk": 1,
+    "fields": {
+      "domain_type": "reception",
+      "reception": 1,
+      "program": null,
+      "lab": null,
+      "expert": null
+    }
+  }
+]

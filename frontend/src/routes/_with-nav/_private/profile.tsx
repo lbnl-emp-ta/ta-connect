@@ -16,7 +16,7 @@ import { useSuspenseQuery } from '@tanstack/react-query';
 import { createFileRoute } from '@tanstack/react-router';
 import { RolePanel } from '@/features/profile/RolePanel';
 import { useUser } from '@/hooks/useUser';
-import { identitiesQueryOptions } from '@/utils/queryOptions';
+import { identitiesQueryOptions } from '@/api/queryOptions';
 import { useEffect, useState } from 'react';
 import { UserInfoDialog } from '@/features/profile/UserInfoDialog';
 import { TAIdentity } from '@/api/dashboard/types';
@@ -31,8 +31,7 @@ function ProfilePage() {
   const hasPlaceholderEmail = !!user?.email?.endsWith('@orcid.placeholder');
   const [isUserInfoDialogOpen, setIsUserInfoDialogOpen] = useState(false);
 
-  const handleOpenUserInfolDialog = (e: React.MouseEvent<HTMLButtonElement>) => {
-    e.currentTarget.blur();
+  const handleOpenUserInfolDialog = () => {
     setIsUserInfoDialogOpen(true);
   };
 

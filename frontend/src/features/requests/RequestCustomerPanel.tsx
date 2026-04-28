@@ -31,7 +31,7 @@ import {
   statesQueryOptions,
   transmissionPlanningRegionsQueryOptions,
   useCustomerMutation,
-} from '@/utils/queryOptions';
+} from '@/api/queryOptions';
 import { hasPermission, isValidEmail, isValidUSTelephone } from '@/utils/utils';
 import { useIdentityContext } from '@/features/identity/IdentityContext';
 import { useToastContext } from '@/features/toasts/ToastContext';

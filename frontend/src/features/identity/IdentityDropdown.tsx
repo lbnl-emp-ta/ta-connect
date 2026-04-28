@@ -3,7 +3,7 @@ import { useSuspenseQuery } from '@tanstack/react-query';
 import { useMatchRoute, useNavigate } from '@tanstack/react-router';
 import { useEffect, useState } from 'react';
 import { TAIdentity } from '../../api/dashboard/types';
-import { identitiesQueryOptions } from '../../utils/queryOptions';
+import { identitiesQueryOptions } from '../../api/queryOptions';
 import { useIdentityContext } from '../identity/IdentityContext';
 
 export const IdentityDropdown: React.FC = () => {

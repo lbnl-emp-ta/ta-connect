@@ -1,5 +1,5 @@
 import { createFileRoute, Navigate, Outlet } from '@tanstack/react-router';
-import { authSessionQueryOptions } from '@/utils/queryOptions';
+import { authSessionQueryOptions } from '@/api/queryOptions';
 import { useSuspenseQuery } from '@tanstack/react-query';
 
 export const Route = createFileRoute('/_with-nav/_private')({

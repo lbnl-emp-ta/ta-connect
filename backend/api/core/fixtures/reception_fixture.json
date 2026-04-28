@@ -1,0 +1,9 @@
+[
+  {
+    "model": "core.Reception",
+    "pk": 1,
+    "fields": {
+      "name": "Reception"
+    }
+  }
+]

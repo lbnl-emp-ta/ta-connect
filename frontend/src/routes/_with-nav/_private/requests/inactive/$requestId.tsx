@@ -5,7 +5,7 @@ import {
   ownersQueryOptions,
   requestDetailQueryOptions,
   topicsQueryOptions,
-} from '@/utils/queryOptions';
+} from '@/api/queryOptions';
 import { createFileRoute } from '@tanstack/react-router';
 
 export const Route = createFileRoute('/_with-nav/_private/requests/inactive/$requestId')({

@@ -41,12 +41,20 @@ class OwnerListView(views.APIView):
             # if we get here, it means "instance" field must be valid so no need to check
             program = Program.objects.get(pk=context.get("instance"))
 
-            lab_owners = queryset.none() 
+            lab_owners = queryset.none()
+            expert_users = User.objects.none()
             for lab in program.labs.all():
                 lab_owners = lab_owners | Owner.objects.filter(pk=lab.owner.pk)
+                expert_users = expert_users | LabRoleAssignment.objects.filter(
+                    role=Role.objects.get(name=ROLE.EXPERT),
+                    instance=lab,
+                    program=program,
+                ).values_list('user', flat=True)
 
-            # See one layer back up to reception, and one layer down to associated labs 
-            return queryset.filter(domain_type=DOMAINTYPE.RECEPTION) | lab_owners 
+            expert_owners = queryset.filter(domain_type=DOMAINTYPE.EXPERT, expert__in=expert_users)
+
+            # See one layer back up to reception, one layer down to associated labs, and experts within those labs
+            return queryset.filter(domain_type=DOMAINTYPE.RECEPTION) | lab_owners | expert_owners
 
 
         if IsLabLead().has_permission(self.request, self):

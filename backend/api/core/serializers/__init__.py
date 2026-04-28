@@ -20,6 +20,7 @@ from .cohort import CohortSerializer
 from .attachment import AttachmentUploadSerializer, AttachmentEditSerializer, AttachmentSerializer
 from .audit_history import AuditHistorySerializer
 from .note import NoteSerializer, NoteCreateSerializer
+from .closeout_form import CloseoutFormSerializer
 
 __all__ = [
     "UserLeanSerializer",
@@ -51,4 +52,5 @@ __all__ = [
     "AuditHistorySerializer",
     "NoteSerializer",
     "NoteCreateSerializer",
+    "CloseoutFormSerializer",
 ]

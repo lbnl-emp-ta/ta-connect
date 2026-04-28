@@ -30,8 +30,8 @@ import dayjs, { Dayjs } from 'dayjs';
 import { useCallback, useEffect, useState } from 'react';
 import { TARequestDetail, TARequestDetailMutation, TATopic } from '../../api/dashboard/types';
 import { InfoPanel } from '../../components/InfoPanel';
-import { topicsQueryOptions, useRequestMutation } from '../../utils/queryOptions';
-import { capitalize, formatDatetime, hasPermission } from '../../utils/utils';
+import { topicsQueryOptions, useRequestMutation } from '../../api/queryOptions';
+import { capitalize, formatDatetime, hasPermission, statusMap } from '../../utils/utils';
 import { useIdentityContext } from '../identity/IdentityContext';
 import { useToastContext } from '../toasts/ToastContext';
 import { ToastMessage } from '../toasts/ToastMessage';
@@ -116,9 +116,10 @@ export const RequestInfoPanel: React.FC<RequestInfoPanelProps> = ({ request }) =
     ) {
       mutationData.actual_completion_date = actualCompletionDate.format('YYYY-MM-DD');
     }
-    // Always send topics, even if they are unchanged.
-    // We could add a special function to check if topics have changed.
-    mutationData.topics = topics.map((topic) => topic.name);
+    if (topics !== request?.topics) {
+      mutationData.topics = topics.map((topic) => topic.name);
+    }
+
     if (Object.keys(mutationData).length === 0) {
       setEditing(false);
       return;
@@ -230,8 +231,27 @@ export const RequestInfoPanel: React.FC<RequestInfoPanelProps> = ({ request }) =
                   <TableCell>{request.id}</TableCell>
                 </TableRow>
                 <TableRow>
-                  <TableCell>Current Owner</TableCell>
+                  <TableCell>Status</TableCell>
                   <TableCell>
+                    <Stack direction="row" alignItems="center" spacing={1}>
+                      <CircleIcon
+                        fontSize="small"
+                        sx={{
+                          color: statusMap[request.status].color,
+                        }}
+                      />
+                      <span>{request.status ? statusMap[request.status].text : '-'}</span>
+                    </Stack>
+                  </TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell>Current Owner</TableCell>
+                  <TableCell
+                    sx={{
+                      color: request.owner ? statusMap[request.status].color : 'grey.900',
+                      fontWeight: 'bold',
+                    }}
+                  >
                     <Stack direction="row" spacing={1}>
                       {request.owner && <span>{capitalize(request.owner.domain_type)}</span>}
                       {request.owner && request.owner.domain_type !== 'reception' && (
@@ -240,7 +260,7 @@ export const RequestInfoPanel: React.FC<RequestInfoPanelProps> = ({ request }) =
                           <span>{request.owner.domain_name}</span>
                         </>
                       )}
-                      {!request.owner && <span>None</span>}
+                      {!request.owner && <span>-</span>}
                     </Stack>
                   </TableCell>
                 </TableRow>
@@ -257,19 +277,10 @@ export const RequestInfoPanel: React.FC<RequestInfoPanelProps> = ({ request }) =
                   <TableCell>{request.expert ? request.expert.email : 'Not assigned'}</TableCell>
                 </TableRow>
                 <TableRow>
-                  <TableCell>Status</TableCell>
-                  <TableCell>
-                    <Stack direction="row" alignItems="center" spacing={1}>
-                      <CircleIcon fontSize="small" />
-                      <span>{request.status ? request.status : 'Unknown'}</span>
-                    </Stack>
-                  </TableCell>
-                </TableRow>
-                <TableRow>
                   <TableCell>Depth</TableCell>
                   <TableCell>
                     {(!editing || !hasPermission('edit-depth', detailedIdentity)) && (
-                      <>{request.depth || 'Unknown'}</>
+                      <>{request.depth || '-'}</>
                     )}
                     {editing && hasPermission('edit-depth', detailedIdentity) && (
                       <Select value={depth} onChange={handleDepthChange}>
@@ -285,7 +296,7 @@ export const RequestInfoPanel: React.FC<RequestInfoPanelProps> = ({ request }) =
                 <TableRow>
                   <TableCell>Date Submitted</TableCell>
                   <TableCell>
-                    {request.date_created ? formatDatetime(request.date_created) : 'Unknown'}
+                    {request.date_created ? formatDatetime(request.date_created) : '-'}
                   </TableCell>
                 </TableRow>
                 <TableRow>
@@ -296,7 +307,7 @@ export const RequestInfoPanel: React.FC<RequestInfoPanelProps> = ({ request }) =
                       <>
                         {request.proj_start_date
                           ? dayjs(request.proj_start_date).format('MM/DD/YYYY')
-                          : 'Unknown'}
+                          : '-'}
                       </>
                     )}
                     {editing && hasPermission('edit-projected-start-date', detailedIdentity) && (
@@ -316,15 +327,23 @@ export const RequestInfoPanel: React.FC<RequestInfoPanelProps> = ({ request }) =
                   <TableCell>Projected Completion Date</TableCell>
                   <TableCell>
                     {(!editing ||
-                      !hasPermission('edit-projected-completion-date', detailedIdentity)) && (
+                      !hasPermission(
+                        'edit-projected-completion-date',
+                        detailedIdentity,
+                        request.status
+                      )) && (
                       <>
                         {request.proj_completion_date
                           ? dayjs(request.proj_completion_date).format('MM/DD/YYYY')
-                          : 'Unknown'}
+                          : '-'}
                       </>
                     )}
                     {editing &&
-                      hasPermission('edit-projected-completion-date', detailedIdentity) && (
+                      hasPermission(
+                        'edit-projected-completion-date',
+                        detailedIdentity,
+                        request.status
+                      ) && (
                         <DatePicker
                           value={projectedCompletionDate || null}
                           onChange={handleProjectedCompletionDateChange}
@@ -345,7 +364,7 @@ export const RequestInfoPanel: React.FC<RequestInfoPanelProps> = ({ request }) =
                       <>
                         {request.actual_completion_date
                           ? dayjs(request.actual_completion_date).format('MM/DD/YYYY')
-                          : 'Unknown'}
+                          : '-'}
                       </>
                     )}
                     {editing && hasPermission('edit-actual-completion-date', detailedIdentity) && (
@@ -364,7 +383,7 @@ export const RequestInfoPanel: React.FC<RequestInfoPanelProps> = ({ request }) =
                 <TableRow>
                   <TableCell>Topics</TableCell>
                   <TableCell>
-                    {(!editing || !hasPermission('edit-depth', detailedIdentity)) && (
+                    {(!editing || !hasPermission('edit-topics', detailedIdentity)) && (
                       <Grid container spacing={1}>
                         {request.topics && request.topics.length > 0 ? (
                           request.topics.map((topic) => (

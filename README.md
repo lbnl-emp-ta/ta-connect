@@ -134,3 +134,19 @@ Once you have an ORCiD account and have logged in on their website, you will nee
 Once you have your Client ID and Client Secret, replace the values in `backend.api/.env` for `TACONNECT_ORCID_CLIENT_ID` and `TACONNECT_ORCID_CLIENT_SECRET`.
 
 Now, the next time you run the backend and frontend, you should be able to click the "Continue with ORCID" button in the UI and authenticate with your ORCiD credentials.
+
+### Running Tests
+
+This repository has backend tests that are configured to run with every push.
+
+To run the tests locally, navigate to `backend/api`, activate your virtual environment, then run:
+
+```
+pytest
+```
+
+You can also run a single test at a time. For example, to run the test function `test_request_detail_get_view_should_succeed` which lives in `core/tests/endpoints/test_request.py`, run the following:
+
+```
+pytest core/tests/endpoints/test_request.py::test_request_detail_get_view_should_succeed
+```

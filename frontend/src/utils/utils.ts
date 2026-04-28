@@ -1,4 +1,4 @@
-import { TAIdentity, TARequestDetail, TARole } from '../api/dashboard/types';
+import { TAIdentity, TARequestDetail, TARole, TAStatusName } from '../api/dashboard/types';
 
 /**
  * Validates a US telephone number (10 digits, allows common formatting)
@@ -41,6 +41,13 @@ export const capitalize = (str: string): string => {
   if (!str) return '';
   return str.charAt(0).toUpperCase() + str.slice(1);
 };
+
+/**
+ * Parse a string value to a boolean.
+ * Returns true if the string is "true" (case-sensitive), and false otherwise.
+ * Used for radio button groups.
+ */
+export const parseBoolean = (value: string): boolean => value === 'true';
 
 /**
  * Format a datetime string to a more readable format.
@@ -93,8 +100,23 @@ type PermissionAction =
  * Note that this is used purely for changing UI elements and is not a substitute for backend permission checks.
  * The backend is the source of truth for permissions.
  */
-export const hasPermission = (action: PermissionAction, detailedIdentity?: TAIdentity): boolean => {
+export const hasPermission = (
+  action: PermissionAction,
+  detailedIdentity?: TAIdentity,
+  statusName?: TAStatusName
+): boolean => {
   if (!detailedIdentity || !detailedIdentity.role) return false;
+
+  // No one can edit the projected completion date unless
+  // the request is currently assigned-to-expert or is already providing-ta.
+  if (
+    action === 'edit-projected-completion-date' &&
+    statusName !== 'assigned-to-expert' &&
+    statusName !== 'providing-ta'
+  ) {
+    return false;
+  }
+
   switch (detailedIdentity.role.name) {
     case TARole.Admin:
       return true;
@@ -153,13 +175,11 @@ export const hasPermission = (action: PermissionAction, detailedIdentity?: TAIde
  * They should be in ascending order based on the number in the value.
  */
 export const Steps = {
-  Opened: 0,
-  Reception: 1,
-  Program: 2,
-  Lab: 3,
-  Expert: 4,
-  Approval: 5,
-  Completed: 6,
+  Intake: 0,
+  Assignment: 1,
+  Delivery: 2,
+  Review: 3,
+  Completed: 4,
 } as const;
 
 /**
@@ -196,13 +216,13 @@ interface StepInfo {
  * and stepper index. The stepIndex is based on the `steps` var in `RequestStepper.tsx`.
  */
 export const getStep = (request: TARequestDetail): StepInfo => {
-  if (request.status === 'New' && !request.owner) {
+  if (!request.status && !request.owner) {
     // This should technically never happen since we auto-assign to reception
     return {
       forwardText: 'Assign to reception',
       forwardIsMenu: true,
       backwardText: 'Cancel request',
-      stepIndex: Steps.Opened,
+      stepIndex: Steps.Intake,
       allowedRoles: [TARole.Coordinator, TARole.Admin],
     };
   } else if (request.owner?.domain_type === 'reception') {
@@ -210,7 +230,7 @@ export const getStep = (request: TARequestDetail): StepInfo => {
       forwardText: 'Assign to program',
       forwardIsMenu: true,
       backwardText: 'Cancel request',
-      stepIndex: Steps.Reception,
+      stepIndex: Steps.Assignment,
       allowedRoles: [TARole.Coordinator, TARole.Admin],
     };
   } else if (request.owner?.domain_type === 'program' && request.lab === null) {
@@ -218,7 +238,7 @@ export const getStep = (request: TARequestDetail): StepInfo => {
       forwardText: 'Assign to lab',
       forwardIsMenu: true,
       backwardText: 'Assign back to reception',
-      stepIndex: Steps.Program,
+      stepIndex: Steps.Assignment,
       allowedRoles: [TARole.ProgramLead, TARole.Admin],
     };
   } else if (request.owner?.domain_type === 'lab' && request.expert === null) {
@@ -226,36 +246,55 @@ export const getStep = (request: TARequestDetail): StepInfo => {
       forwardText: 'Assign to expert',
       forwardIsMenu: true,
       backwardText: 'Assign back to program',
-      stepIndex: Steps.Lab,
+      stepIndex: Steps.Assignment,
       allowedRoles: [TARole.LabLead, TARole.Admin],
     };
-  } else if (request.owner?.domain_type === 'expert') {
+  } else if (request.owner?.domain_type === 'expert' && request.status === 'assigned-to-expert') {
     return {
-      forwardText: 'Complete closeout',
+      forwardText: 'Start TA and add dates',
       forwardIsMenu: false,
       backwardText: 'Assign back to lab',
-      stepIndex: Steps.Expert,
+      stepIndex: Steps.Delivery,
+      allowedRoles: [TARole.Expert, TARole.Admin],
+    };
+  } else if (request.owner?.domain_type === 'expert' && request.status === 'providing-ta') {
+    return {
+      forwardText: 'Start closeout process',
+      forwardIsMenu: false,
+      backwardText: 'Assign back to lab',
+      stepIndex: Steps.Delivery,
+      allowedRoles: [TARole.Expert, TARole.Admin],
+    };
+  } else if (
+    request.owner?.domain_type === 'expert' &&
+    (request.status === 'closeout-started' || request.status === 'closeout-more-info')
+  ) {
+    return {
+      forwardText: 'Continue closeout form',
+      forwardIsMenu: false,
+      backwardText: 'Go back to providing TA',
+      stepIndex: Steps.Delivery,
       allowedRoles: [TARole.Expert, TARole.Admin],
     };
   } else if (request.owner?.domain_type === 'lab' && request.expert !== null) {
     return {
-      forwardText: 'Approve and send to program',
+      forwardText: 'Review closeout information',
       forwardIsMenu: false,
       backwardText: 'Assign back to expert',
-      stepIndex: Steps.Approval,
+      stepIndex: Steps.Review,
       allowedRoles: [TARole.LabLead, TARole.Admin],
     };
   } else if (request.owner?.domain_type === 'program' && request.expert !== null) {
     return {
-      forwardText: 'Approve and mark complete',
+      forwardText: 'Review closeout information',
       forwardIsMenu: false,
-      backwardText: 'Assign back to lab',
-      stepIndex: Steps.Approval,
+      backwardText: 'Assign back to expert',
+      stepIndex: Steps.Review,
       allowedRoles: [TARole.ProgramLead, TARole.Admin],
     };
   } else if (
     !request.owner &&
-    (request.status === 'Completed' || request.status === 'Unable to address')
+    (request.status === 'completed' || request.status === 'unable-to-address')
   ) {
     return {
       forwardText: 'Reopen request',
@@ -269,8 +308,87 @@ export const getStep = (request: TARequestDetail): StepInfo => {
     return {
       forwardText: '',
       backwardText: '',
-      stepIndex: Steps.Opened,
+      stepIndex: Steps.Intake,
       allowedRoles: [TARole.Admin],
     };
   }
+};
+
+interface StatusInfo {
+  text: string;
+  color: string;
+  contrastColor: string;
+}
+
+export const statusMap: Record<TAStatusName, StatusInfo> = {
+  scoping: {
+    text: 'Scoping',
+    color: '#444441',
+    contrastColor: 'white',
+  },
+  'assigned-to-program': {
+    text: 'Assigned to Program',
+    color: '#3d6e96',
+    contrastColor: 'white',
+  },
+  'rejected-by-program': {
+    text: 'Rejected by Program',
+    color: '#444441',
+    contrastColor: 'white',
+  },
+  'assigned-to-lab': {
+    text: 'Assigned to lab',
+    color: '#5a52a8',
+    contrastColor: 'white',
+  },
+  'rejected-by-lab': {
+    text: 'Rejected by lab',
+    color: '#3d6e96',
+    contrastColor: 'white',
+  },
+  'assigned-to-expert': {
+    text: 'Assigned to expert',
+    color: '#2e7d68',
+    contrastColor: 'white',
+  },
+  'rejected-by-expert': {
+    text: 'Rejected by expert',
+    color: '#5a52a8',
+    contrastColor: 'white',
+  },
+  'providing-ta': {
+    text: 'TA in progress',
+    color: '#2e7d68',
+    contrastColor: 'white',
+  },
+  'closeout-started': {
+    text: 'Closeout started',
+    color: '#2e7d68',
+    contrastColor: 'white',
+  },
+  'closeout-more-info': {
+    text: 'Closeout needs more info',
+    color: '#2e7d68',
+    contrastColor: 'white',
+  },
+  'closeout-review-by-lab': {
+    text: 'Closeout being reviewed by lab',
+    color: '#8a6d1a',
+    contrastColor: 'white',
+  },
+  'closeout-review-by-program': {
+    text: 'Closeout being reviewed by program',
+    color: '#8a6d1a',
+    contrastColor: 'white',
+  },
+  completed: {
+    text: 'Completed',
+    color: '#e4f2dc',
+    contrastColor: '#333333',
+  },
+  'unable-to-address': {
+    text: 'Unable to address',
+    color: '#E8F0F2',
+    contrastColor: '#333333',
+  },
 };

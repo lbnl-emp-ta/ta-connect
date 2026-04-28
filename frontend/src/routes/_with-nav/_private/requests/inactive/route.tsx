@@ -1,7 +1,7 @@
 import { useIdentityContext } from '@/features/identity/IdentityContext';
 import { RequestsProvider } from '@/features/requests/RequestsContext';
 import { RequestsLayout } from '@/features/requests/RequestsLayout';
-import { identitiesQueryOptions, requestsQueryOptions } from '@/utils/queryOptions';
+import { identitiesQueryOptions, requestsQueryOptions } from '@/api/queryOptions';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { createFileRoute } from '@tanstack/react-router';
 

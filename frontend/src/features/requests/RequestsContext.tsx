@@ -17,6 +17,10 @@ interface RequestsContextType {
   setSearchTerm: (value: string) => void;
   expertsPanelOpen: boolean;
   setExpertsPanelOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  datesDialogOpen: boolean;
+  setDatesDialogOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  closeoutDialogOpen: boolean;
+  setCloseoutDialogOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 const RequestsContext = createContext<RequestsContextType | undefined>(undefined);
@@ -40,6 +44,8 @@ export const RequestsProvider: React.FC<RequestsProviderProps> = ({ tab, childre
   const [currentIndex, setCurrentIndex] = useState(0);
   const [selectedListId, setSelectedListId] = useState<string | null>(null);
   const [expertsPanelOpen, setExpertsPanelOpen] = useState(false);
+  const [datesDialogOpen, setDatesDialogOpen] = useState(false);
+  const [closeoutDialogOpen, setCloseoutDialogOpen] = useState(false);
 
   const handleSetSortField = useCallback((value: string) => {
     localStorage.setItem(localStorageSortKey, value);
@@ -90,6 +96,10 @@ export const RequestsProvider: React.FC<RequestsProviderProps> = ({ tab, childre
       setSearchTerm: handleSetSearchTerm,
       expertsPanelOpen,
       setExpertsPanelOpen,
+      datesDialogOpen,
+      setDatesDialogOpen,
+      closeoutDialogOpen,
+      setCloseoutDialogOpen,
     };
   }, [
     currentIndex,
@@ -103,6 +113,10 @@ export const RequestsProvider: React.FC<RequestsProviderProps> = ({ tab, childre
     tab,
     expertsPanelOpen,
     setExpertsPanelOpen,
+    datesDialogOpen,
+    setDatesDialogOpen,
+    closeoutDialogOpen,
+    setCloseoutDialogOpen,
   ]);
 
   return <RequestsContext value={value}>{children}</RequestsContext>;

@@ -1,12 +1,13 @@
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import ErrorIcon from '@mui/icons-material/Error';
 import { queryOptions, useMutation, UseMutationOptions } from '@tanstack/react-query';
-import { loginMutation } from '../api/accounts/login';
-import { logoutMutation } from '../api/accounts/logout';
-import { deleteData, fetchData, patchData, postData, postForm } from '../api/dashboard';
+import { loginMutation } from './accounts/login';
+import { logoutMutation } from './accounts/logout';
+import { deleteData, fetchData, patchData, postData, postForm } from './dashboard';
 import {
   CustomerRequestRelationship,
   TAAssignment,
+  TACloseoutForm,
   TACustomerMutation,
   TAExpert,
   TAIdentity,
@@ -18,16 +19,16 @@ import {
   TAStatus,
   TATopic,
   TAUserMutation,
-} from '../api/dashboard/types';
-import { submitIntakeMutation } from '../api/forms';
+} from './dashboard/types';
+import { submitIntakeMutation } from './forms';
 import {
   IntakeFormData,
   Organization,
   OrganizationType,
   State,
   TransmissionPlanningRegion,
-} from '../api/forms/types';
-import { sessionsApi } from '../api/sessions';
+} from './forms/types';
+import { sessionsApi } from './sessions';
 import { queryClient } from '../App';
 import { Identity } from '../features/identity/IdentityContext';
 import { useToastContext } from '../features/toasts/ToastContext';
@@ -146,6 +147,23 @@ export const notesQueryOptions = (requestId: string, identity?: Identity) =>
     },
   });
 
+export const closeoutQueryOptions = (requestId: string, identity?: Identity) =>
+  queryOptions({
+    staleTime: 120_000, // stale after 2 minutes
+    retry: false,
+    queryKey: ['requests', requestId, 'closeout-form', identity],
+    queryFn: () => {
+      if (identity) {
+        return fetchData<TACloseoutForm>(
+          `${apiUrl}/requests/${requestId}/closeout-form/`,
+          identity
+        );
+      } else {
+        return null;
+      }
+    },
+  });
+
 export const statesQueryOptions = () =>
   queryOptions({
     staleTime: 120_000, // stale after 2 minutes
@@ -241,6 +259,92 @@ export const useAssignmentMutation = (
     mutationKey: ['requests', 'assign', requestId, identity],
     mutationFn: (data: TAAssignment) =>
       postData<TAAssignment>(`${apiUrl}/requests/assign/`, data, identity),
+    ...options,
+  });
+};
+
+export const useCloseoutMutation = (
+  requestId: string,
+  identity?: Identity,
+  options?: UseMutationOptions<unknown, Error, Partial<TACloseoutForm>, unknown>
+) => {
+  return useMutation({
+    mutationKey: ['requests', 'update', 'closeout-form', requestId, identity],
+    mutationFn: (data: Partial<TACloseoutForm>) =>
+      patchData<TACloseoutForm>(
+        `${import.meta.env.VITE_API_URL}/requests/${requestId}/closeout-form/`,
+        data,
+        identity
+      ),
+    onSuccess: () => queryClient.invalidateQueries(),
+    ...options,
+  });
+};
+
+export const useCreateCloseoutMutation = (
+  requestId: string,
+  identity?: Identity,
+  options?: UseMutationOptions<unknown, Error, void, unknown>
+) => {
+  return useMutation({
+    mutationKey: ['requests', 'create', 'closeout-form', requestId, identity],
+    mutationFn: () =>
+      postData(
+        `${import.meta.env.VITE_API_URL}/requests/${requestId}/closeout-form/`,
+        null,
+        identity
+      ),
+    ...options,
+  });
+};
+
+export const useSubmitCloseoutMutation = (
+  requestId: string,
+  identity?: Identity,
+  options?: UseMutationOptions<unknown, Error, void, unknown>
+) => {
+  return useMutation({
+    mutationKey: ['requests', 'submit', 'closeout-form', requestId, identity],
+    mutationFn: () =>
+      postData(
+        `${import.meta.env.VITE_API_URL}/requests/${requestId}/submit-closeout-form/`,
+        null,
+        identity
+      ),
+    ...options,
+  });
+};
+
+export const useApproveCloseoutByLabMutation = (
+  requestId: string,
+  identity?: Identity,
+  options?: UseMutationOptions<unknown, Error, void, unknown>
+) => {
+  return useMutation({
+    mutationKey: ['requests', 'approve-by-lab', 'closeout-form', requestId, identity],
+    mutationFn: () =>
+      postData(
+        `${import.meta.env.VITE_API_URL}/requests/${requestId}/approve-closeout-form-by-lab/`,
+        null,
+        identity
+      ),
+    ...options,
+  });
+};
+
+export const useApproveCloseoutByProgramMutation = (
+  requestId: string,
+  identity?: Identity,
+  options?: UseMutationOptions<unknown, Error, void, unknown>
+) => {
+  return useMutation({
+    mutationKey: ['requests', 'approve-by-program', 'closeout-form', requestId, identity],
+    mutationFn: () =>
+      postData(
+        `${import.meta.env.VITE_API_URL}/requests/${requestId}/approve-closeout-form-by-program/`,
+        null,
+        identity
+      ),
     ...options,
   });
 };

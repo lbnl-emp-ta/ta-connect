@@ -13,7 +13,7 @@ import {
 import DeleteIcon from '@mui/icons-material/Delete';
 import AddIcon from '@mui/icons-material/Add';
 import { TANote, TARequestDetail } from '../../api/dashboard/types';
-import { useCreateNoteMutation, useDeleteNoteMutation } from '../../utils/queryOptions';
+import { useCreateNoteMutation, useDeleteNoteMutation } from '../../api/queryOptions';
 import { useIdentityContext } from '../identity/IdentityContext';
 import { formatDatetime } from '../../utils/utils';
 import { useEffect, useState } from 'react';

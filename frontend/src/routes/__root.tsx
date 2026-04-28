@@ -6,7 +6,7 @@ import { TanStackRouterDevtools } from '@tanstack/react-router-devtools';
 import { TAIdentity } from '../api/dashboard/types';
 import { Identity } from '../features/identity/IdentityContext';
 import { useToastContext } from '../features/toasts/ToastContext';
-import { authSessionQueryOptions } from '../utils/queryOptions';
+import { authSessionQueryOptions } from '../api/queryOptions';
 
 export interface MyRouterContext {
   queryClient: QueryClient;

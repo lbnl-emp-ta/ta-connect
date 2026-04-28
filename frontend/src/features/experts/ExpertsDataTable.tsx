@@ -1,5 +1,5 @@
 import { CellWithPopover } from '@/components/CellWithPopover';
-import { Chip, Paper, Stack, Tooltip } from '@mui/material';
+import { Chip, Grid, Paper, Tooltip } from '@mui/material';
 import { DataGrid, GridColDef, GridRenderCellParams } from '@mui/x-data-grid';
 import { TAExpert, TAExpertise } from '../../api/dashboard/types';
 import { ExpertsToolbar } from './ExpertsToolbar';
@@ -32,16 +32,21 @@ export const expertColumns: GridColDef[] = [
       );
     },
     renderCell: (params: GridRenderCellParams<any, string>) => {
-      const values = params.value?.split('__') || [];
+      const values = params.value ? params.value.split('__') : [];
+      if (values.length === 0) {
+        return '-';
+      }
       return (
         <CellWithPopover>
-          <Stack direction="row" spacing={1} alignItems="center" sx={{ height: '100%' }}>
+          <Grid container spacing={1} sx={{ height: '100%' }}>
             {values.map((expertiseStr: string) => (
-              <Tooltip key={expertiseStr} title={expertiseStr.split('++')[1] || ''} placement="top">
-                <Chip label={`${expertiseStr.split('++')[0]}`} variant="outlined" />
-              </Tooltip>
+              <Grid key={expertiseStr}>
+                <Tooltip title={expertiseStr.split('++')[1] || ''} placement="top">
+                  <Chip label={`${expertiseStr.split('++')[0]}`} variant="outlined" />
+                </Tooltip>
+              </Grid>
             ))}
-          </Stack>
+          </Grid>
         </CellWithPopover>
       );
     },

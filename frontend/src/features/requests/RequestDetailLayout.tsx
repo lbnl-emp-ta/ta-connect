@@ -9,10 +9,31 @@ import { RequestInfoPanel } from '@/features/requests/RequestInfoPanel';
 import { RequestNotes } from '@/features/requests/RequestNotes';
 import { useRequestsContext } from '@/features/requests/RequestsContext';
 import { RequestStepper } from '@/features/requests/RequestStepper';
-import { notesQueryOptions, requestDetailQueryOptions } from '@/utils/queryOptions';
-import { Badge, Grid, Paper, Stack, Tab, Tabs, Typography } from '@mui/material';
+import {
+  closeoutQueryOptions,
+  notesQueryOptions,
+  requestDetailQueryOptions,
+} from '@/api/queryOptions';
+import {
+  Badge,
+  Button,
+  Grid,
+  Paper,
+  Stack,
+  Tab,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableRow,
+  Tabs,
+  Typography,
+} from '@mui/material';
+import ListIcon from '@mui/icons-material/List';
+import CheckIcon from '@mui/icons-material/Check';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { useEffect, useState } from 'react';
+import { formatDatetime } from '@/utils/utils';
 
 interface RequestDetailLayoutProps {
   requestId: string;
@@ -24,7 +45,9 @@ export const RequestDetailLayout: React.FC<RequestDetailLayoutProps> = ({ reques
     requestDetailQueryOptions(requestId, identity)
   );
   const { data: selectedRequestNotes } = useSuspenseQuery(notesQueryOptions(requestId, identity));
-  const { sortedRequestsMap, selectedListId, setCurrentIndex } = useRequestsContext();
+  const { data: closeoutForm } = useSuspenseQuery(closeoutQueryOptions(requestId, identity));
+  const { sortedRequestsMap, selectedListId, setCurrentIndex, setCloseoutDialogOpen } =
+    useRequestsContext();
   const sortedRequests = selectedListId ? (sortedRequestsMap[selectedListId] ?? []) : [];
   const currentIndex = sortedRequests.findIndex((request) => {
     if (requestId) {
@@ -53,7 +76,62 @@ export const RequestDetailLayout: React.FC<RequestDetailLayoutProps> = ({ reques
       </Paper>
       <Grid container spacing={2}>
         <Grid size={{ lg: 6, md: 12 }}>
-          <RequestInfoPanel request={selectedRequest!} />
+          <Stack>
+            {closeoutForm && (
+              <InfoPanel
+                header={
+                  <Stack direction="row" alignItems="center" justifyContent="space-between">
+                    <Stack direction="row" spacing={2} alignItems="center">
+                      <ListIcon color="primary" />
+                      <Typography variant="h5" component="h3" fontWeight="bold">
+                        Closeout Information
+                      </Typography>
+                    </Stack>
+                    <Button variant="outlined" onClick={() => setCloseoutDialogOpen(true)}>
+                      View Closeout Form
+                    </Button>
+                  </Stack>
+                }
+              >
+                <TableContainer>
+                  <Table
+                    size="small"
+                    sx={{
+                      '& .MuiTableCell-root:first-of-type': {
+                        color: 'grey.900',
+                        fontWeight: 'bold',
+                        width: '205px',
+                      },
+                    }}
+                  >
+                    <TableBody>
+                      <TableRow>
+                        <TableCell>Submitted by Expert</TableCell>
+                        <TableCell>
+                          {closeoutForm?.submitted_date
+                            ? formatDatetime(closeoutForm.submitted_date)
+                            : '-'}
+                        </TableCell>
+                      </TableRow>
+                      <TableRow>
+                        <TableCell>Approved by Lab</TableCell>
+                        <TableCell>
+                          {closeoutForm?.approved_by_lab ? <CheckIcon fontSize="small" /> : '-'}
+                        </TableCell>
+                      </TableRow>
+                      <TableRow>
+                        <TableCell>Approved by Program</TableCell>
+                        <TableCell>
+                          {closeoutForm?.approved_by_program ? <CheckIcon fontSize="small" /> : '-'}
+                        </TableCell>
+                      </TableRow>
+                    </TableBody>
+                  </Table>
+                </TableContainer>
+              </InfoPanel>
+            )}
+            <RequestInfoPanel request={selectedRequest!} />
+          </Stack>
         </Grid>
         <Grid size={{ lg: 6, md: 12 }}>
           <Stack>

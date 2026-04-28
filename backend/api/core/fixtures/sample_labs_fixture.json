@@ -1,0 +1,26 @@
+[
+  {
+    "model": "core.Lab",
+    "pk": 1,
+    "fields": {
+      "name": "LBNL",
+      "description": "Lawrence Berkeley National Laboratory"
+    }
+  },
+  {
+    "model": "core.Lab",
+    "pk": 2,
+    "fields": {
+      "name": "NREL",
+      "description": "National Renewable Energy Laboratory"
+    }
+  },
+  {
+    "model": "core.Lab",
+    "pk": 3,
+    "fields": {
+      "name": "PNNL",
+      "description": "Pacific Northwest National Laboratory"
+    }
+  }
+]
