@@ -1,7 +1,7 @@
 [
   {
     "model": "core.User",
-    "pk": 2,
+    "pk": 1,
     "fields": {
       "email": "admin@taconnect.gov",
       "password": "Password123?",
