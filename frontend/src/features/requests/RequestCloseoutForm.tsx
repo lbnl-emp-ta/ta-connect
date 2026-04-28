@@ -1,5 +1,6 @@
 import { useRequestsContext } from '@/features/requests/RequestsContext';
 import {
+  Box,
   Button,
   CircularProgress,
   Dialog,
@@ -393,20 +394,22 @@ export const RequestCloseoutForm: React.FC<RequestCloseoutFormProps> = ({
                   onChange={(e) => setCustomerFeedback(e.target.value)}
                 />
               </FormControl>
-              <FormControl>
-                <FormLabel id="follow-up-needed-group-label">
-                  {closeoutForm?.questions?.follow_up_needed}
-                </FormLabel>
-                <RadioGroup
-                  value={followUpNeeded}
-                  aria-labelledby="follow-up-needed-group-label"
-                  name="radio-buttons-group"
-                  onChange={(e) => setFollowUpNeeded(parseBoolean(e.target.value))}
-                >
-                  <FormControlLabel value={true} control={<Radio />} label="Yes" />
-                  <FormControlLabel value={false} control={<Radio />} label="No" />
-                </RadioGroup>
-              </FormControl>
+              <Box>
+                <FormControl>
+                  <FormLabel id="follow-up-needed-group-label">
+                    {closeoutForm?.questions?.follow_up_needed}
+                  </FormLabel>
+                  <RadioGroup
+                    value={followUpNeeded}
+                    aria-labelledby="follow-up-needed-group-label"
+                    name="radio-buttons-group"
+                    onChange={(e) => setFollowUpNeeded(parseBoolean(e.target.value))}
+                  >
+                    <FormControlLabel value={true} control={<Radio />} label="Yes" />
+                    <FormControlLabel value={false} control={<Radio />} label="No" />
+                  </RadioGroup>
+                </FormControl>
+              </Box>
               <FormControl>
                 <FormLabel>{closeoutForm?.questions?.follow_up_description}</FormLabel>
                 <OutlinedInput
@@ -432,20 +435,22 @@ export const RequestCloseoutForm: React.FC<RequestCloseoutFormProps> = ({
                   onChange={(e) => setFollowUpComments(e.target.value)}
                 />
               </FormControl>
-              <FormControl>
-                <FormLabel id="follow-same-expert-group-label">
-                  {closeoutForm?.questions?.follow_up_has_same_expert}
-                </FormLabel>
-                <RadioGroup
-                  value={followUpHasSameExpert}
-                  aria-labelledby="follow-same-expert-group-label"
-                  name="radio-buttons-group"
-                  onChange={(e) => setFollowUpHasSameExpert(parseBoolean(e.target.value))}
-                >
-                  <FormControlLabel value={true} control={<Radio />} label="Yes" />
-                  <FormControlLabel value={false} control={<Radio />} label="No" />
-                </RadioGroup>
-              </FormControl>
+              <Box>
+                <FormControl>
+                  <FormLabel id="follow-same-expert-group-label">
+                    {closeoutForm?.questions?.follow_up_has_same_expert}
+                  </FormLabel>
+                  <RadioGroup
+                    value={followUpHasSameExpert}
+                    aria-labelledby="follow-same-expert-group-label"
+                    name="radio-buttons-group"
+                    onChange={(e) => setFollowUpHasSameExpert(parseBoolean(e.target.value))}
+                  >
+                    <FormControlLabel value={true} control={<Radio />} label="Yes" />
+                    <FormControlLabel value={false} control={<Radio />} label="No" />
+                  </RadioGroup>
+                </FormControl>
+              </Box>
             </Stack>
           </form>
         )}
