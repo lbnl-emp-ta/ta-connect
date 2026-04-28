@@ -70,13 +70,14 @@ export const RequestDatesDialog: React.FC<RequestDatesDialogProps> = ({ request 
     if (projectedCompletionDate === null && request?.proj_completion_date !== null) {
       mutationData.proj_completion_date = null;
     }
-    if (
-      projectedCompletionDate &&
-      projectedCompletionDate.format('YYYY-MM-DD') !== request?.proj_completion_date
-    ) {
+    // In the outside chance that proj_completion_date is already set (by admin) and goes unchanged,
+    // we still want to trigger a mutation so that the status changes to PROVIDING_TA.
+    if (projectedCompletionDate) {
       mutationData.proj_completion_date = projectedCompletionDate.format('YYYY-MM-DD');
     }
-    updateRequestMutation.mutate(mutationData);
+    if (Object.keys(mutationData).length > 0) {
+      updateRequestMutation.mutate(mutationData);
+    }
   };
 
   const handleCancel = () => {
