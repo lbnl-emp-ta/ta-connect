@@ -130,6 +130,23 @@ export const RequestCloseoutForm: React.FC<RequestCloseoutFormProps> = ({
     closeoutForm?.follow_up_has_same_expert ?? false
   );
 
+  /**
+   * Re-initialize the form values when the closeout form data is loaded or updated.
+   * e.g. when switching between different requests that both have closeout forms.
+   */
+  useEffect(() => {
+    setExperienceDescription(closeoutForm?.experience_description ?? '');
+    setTaProvidedDescription(closeoutForm?.ta_provided_description ?? '');
+    setImpactDescription(closeoutForm?.impact_description ?? '');
+    setAlignmentDescription(closeoutForm?.alignment_description ?? '');
+    setCustomerFeedback(closeoutForm?.customer_feedback ?? '');
+    setFollowUpNeeded(closeoutForm?.follow_up_needed ?? false);
+    setFollowUpDescription(closeoutForm?.follow_up_description ?? '');
+    setFollowUpDuration(closeoutForm?.follow_up_duration ?? '');
+    setFollowUpComments(closeoutForm?.follow_up_comments ?? '');
+    setFollowUpHasSameExpert(closeoutForm?.follow_up_has_same_expert ?? false);
+  }, [closeoutForm]);
+
   const handleSave = useCallback(async () => {
     const mutationData = {} as Partial<TACloseoutForm>;
     if (experienceDescription !== closeoutForm?.experience_description) {
