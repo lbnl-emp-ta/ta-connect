@@ -228,6 +228,12 @@ class RequestDetailView(BaseUserAwareRequest):
     Used to populate Request and Customer panels.
     """
     def get(self, request, format=None, request_id=None):
+        try:
+            self.get_context()
+        except ContextError:
+            if not IsAdmin().has_permission(request):
+                return Response(data={"message": "Please provide context object header with request"}, status=status.HTTP_400_BAD_REQUEST)
+
         queryset = self.get_actionable() | self.get_downstream() | self.get_inactive()
 
         if request_id is None:
