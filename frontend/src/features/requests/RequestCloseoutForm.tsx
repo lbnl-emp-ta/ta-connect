@@ -1,5 +1,6 @@
 import { useRequestsContext } from '@/features/requests/RequestsContext';
 import {
+  Box,
   Button,
   CircularProgress,
   Dialog,
@@ -128,6 +129,23 @@ export const RequestCloseoutForm: React.FC<RequestCloseoutFormProps> = ({
   const [followUpHasSameExpert, setFollowUpHasSameExpert] = useState(
     closeoutForm?.follow_up_has_same_expert ?? false
   );
+
+  /**
+   * Re-initialize the form values when the closeout form data is loaded or updated.
+   * e.g. when switching between different requests that both have closeout forms.
+   */
+  useEffect(() => {
+    setExperienceDescription(closeoutForm?.experience_description ?? '');
+    setTaProvidedDescription(closeoutForm?.ta_provided_description ?? '');
+    setImpactDescription(closeoutForm?.impact_description ?? '');
+    setAlignmentDescription(closeoutForm?.alignment_description ?? '');
+    setCustomerFeedback(closeoutForm?.customer_feedback ?? '');
+    setFollowUpNeeded(closeoutForm?.follow_up_needed ?? false);
+    setFollowUpDescription(closeoutForm?.follow_up_description ?? '');
+    setFollowUpDuration(closeoutForm?.follow_up_duration ?? '');
+    setFollowUpComments(closeoutForm?.follow_up_comments ?? '');
+    setFollowUpHasSameExpert(closeoutForm?.follow_up_has_same_expert ?? false);
+  }, [closeoutForm]);
 
   const handleSave = useCallback(async () => {
     const mutationData = {} as Partial<TACloseoutForm>;
@@ -393,20 +411,22 @@ export const RequestCloseoutForm: React.FC<RequestCloseoutFormProps> = ({
                   onChange={(e) => setCustomerFeedback(e.target.value)}
                 />
               </FormControl>
-              <FormControl>
-                <FormLabel id="follow-up-needed-group-label">
-                  {closeoutForm?.questions?.follow_up_needed}
-                </FormLabel>
-                <RadioGroup
-                  value={followUpNeeded}
-                  aria-labelledby="follow-up-needed-group-label"
-                  name="radio-buttons-group"
-                  onChange={(e) => setFollowUpNeeded(parseBoolean(e.target.value))}
-                >
-                  <FormControlLabel value={true} control={<Radio />} label="Yes" />
-                  <FormControlLabel value={false} control={<Radio />} label="No" />
-                </RadioGroup>
-              </FormControl>
+              <Box>
+                <FormControl>
+                  <FormLabel id="follow-up-needed-group-label">
+                    {closeoutForm?.questions?.follow_up_needed}
+                  </FormLabel>
+                  <RadioGroup
+                    value={followUpNeeded}
+                    aria-labelledby="follow-up-needed-group-label"
+                    name="radio-buttons-group"
+                    onChange={(e) => setFollowUpNeeded(parseBoolean(e.target.value))}
+                  >
+                    <FormControlLabel value={true} control={<Radio />} label="Yes" />
+                    <FormControlLabel value={false} control={<Radio />} label="No" />
+                  </RadioGroup>
+                </FormControl>
+              </Box>
               <FormControl>
                 <FormLabel>{closeoutForm?.questions?.follow_up_description}</FormLabel>
                 <OutlinedInput
@@ -432,20 +452,22 @@ export const RequestCloseoutForm: React.FC<RequestCloseoutFormProps> = ({
                   onChange={(e) => setFollowUpComments(e.target.value)}
                 />
               </FormControl>
-              <FormControl>
-                <FormLabel id="follow-same-expert-group-label">
-                  {closeoutForm?.questions?.follow_up_has_same_expert}
-                </FormLabel>
-                <RadioGroup
-                  value={followUpHasSameExpert}
-                  aria-labelledby="follow-same-expert-group-label"
-                  name="radio-buttons-group"
-                  onChange={(e) => setFollowUpHasSameExpert(parseBoolean(e.target.value))}
-                >
-                  <FormControlLabel value={true} control={<Radio />} label="Yes" />
-                  <FormControlLabel value={false} control={<Radio />} label="No" />
-                </RadioGroup>
-              </FormControl>
+              <Box>
+                <FormControl>
+                  <FormLabel id="follow-same-expert-group-label">
+                    {closeoutForm?.questions?.follow_up_has_same_expert}
+                  </FormLabel>
+                  <RadioGroup
+                    value={followUpHasSameExpert}
+                    aria-labelledby="follow-same-expert-group-label"
+                    name="radio-buttons-group"
+                    onChange={(e) => setFollowUpHasSameExpert(parseBoolean(e.target.value))}
+                  >
+                    <FormControlLabel value={true} control={<Radio />} label="Yes" />
+                    <FormControlLabel value={false} control={<Radio />} label="No" />
+                  </RadioGroup>
+                </FormControl>
+              </Box>
             </Stack>
           </form>
         )}
