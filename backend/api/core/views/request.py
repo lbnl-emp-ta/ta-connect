@@ -284,9 +284,6 @@ class RequestDetailView(BaseUserAwareRequest):
             audit_data["date"] = audit.date
             response_data["audit_history"].append(audit_data)
 
-        # if found_request.expert is not None:
-        #     response_data["expert"] = UserLeanSerializer(found_request.expert).data
-
         return Response(data=response_data, status=status.HTTP_200_OK)
 
     """
