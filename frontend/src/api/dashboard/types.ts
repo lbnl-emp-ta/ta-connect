@@ -230,6 +230,7 @@ export interface TAIdentity {
     name: string;
     description: string;
   };
+  program?: TAProgram;
 }
 
 export interface TAUser {

@@ -105,6 +105,13 @@ export const RequestAssignBackwardButton: React.FC<RequestAssignBackwardButtonPr
           assignRequestMutation.mutate({ request: request.id, owner: request.lab.owner_id });
         }
         break;
+      case 'closeout-started':
+      case 'closeout-more-info':
+        // TODO: Should just change status back to PROVIDING_TA
+        if (request.lab) {
+          assignRequestMutation.mutate({ request: request.id, owner: request.lab.owner_id });
+        }
+        break;
       case 'closeout-review-by-lab':
       case 'closeout-review-by-program':
         if (request.expert) {

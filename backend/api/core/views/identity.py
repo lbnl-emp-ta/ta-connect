@@ -30,21 +30,21 @@ class IdentityListView(views.APIView):
         for assignment in system_role_assignments:
             identity = dict()
             identity["user"] = {"id": user.pk, "email": user.email}
-            identity["location"] = "System"
+            identity["location"] = "system"
             identity["role"] = RoleSerializer(assignment.role).data
             identities.append(identity)
 
         for assignment in reception_assignments:
             identity = dict()
             identity["user"] = {"id": user.pk, "email": user.email}
-            identity["location"] = "Reception"
+            identity["location"] = "reception"
             identity["role"] = RoleSerializer(assignment.role).data 
             identities.append(identity)
             
         for assignment in program_assignments:
             identity = dict()
             identity["user"] = {"id": user.pk, "email": user.email}
-            identity["location"] = "Program"
+            identity["location"] = "program"
             identity["instance"] = ProgramSerializer(assignment.instance).data
             identity["role"] = RoleSerializer(assignment.role).data 
             identities.append(identity)
@@ -52,7 +52,7 @@ class IdentityListView(views.APIView):
         for assignment in lab_assignments:
             identity = dict()
             identity["user"] = {"id": user.pk, "email": user.email}
-            identity["location"] = "Lab"
+            identity["location"] = "lab"
             identity["instance"] = LabSerializer(assignment.instance).data
             identity["program"] = ProgramSerializer(assignment.program).data
             identity["role"] = RoleSerializer(assignment.role).data 
