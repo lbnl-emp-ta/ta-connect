@@ -1,6 +1,7 @@
 import { capitalize } from '@/utils/utils';
-import { Paper, Stack, Typography } from '@mui/material';
-import { TAIdentity } from '../../api/dashboard/types';
+import { Chip, Grid, IconButton, Paper, Stack, Tooltip, Typography } from '@mui/material';
+import EditIcon from '@mui/icons-material/Edit';
+import { TAIdentity } from '@/api/dashboard/types';
 
 interface RolePanelProps {
   identity: TAIdentity;
@@ -34,6 +35,35 @@ export const RolePanel: React.FC<RolePanelProps> = ({ identity }) => {
             <Typography variant="body2" color="text.secondary">
               {identity.instance.description}
             </Typography>
+          </Stack>
+        )}
+        {identity.expertises && (
+          <Stack spacing={1}>
+            <Stack direction="row" spacing={1} alignItems="center">
+              <Typography fontWeight="bold">Expertises</Typography>
+              <IconButton size="small">
+                <EditIcon />
+              </IconButton>
+            </Stack>
+            {identity.expertises.length > 0 && (
+              <Grid container spacing={1}>
+                {identity.expertises.map((expertise) => (
+                  <Grid key={expertise.id} spacing={1}>
+                    <Tooltip
+                      title={`${expertise.topic.name} (${expertise.depth.name})`}
+                      placement="top"
+                    >
+                      <Chip label={expertise.topic.name} sx={{ maxWidth: 175 }} />
+                    </Tooltip>
+                  </Grid>
+                ))}
+              </Grid>
+            )}
+            {identity.expertises.length === 0 && (
+              <Typography variant="body2" color="text.secondary">
+                No expertises assigned.
+              </Typography>
+            )}
           </Stack>
         )}
       </Stack>

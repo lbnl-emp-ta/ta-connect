@@ -80,6 +80,7 @@ export interface TAOwner {
 }
 
 export interface TAExpertise {
+  id: number;
   topic: TATopic;
   depth: TADepth;
 }
@@ -231,6 +232,7 @@ export interface TAIdentity {
     description: string;
   };
   program?: TAProgram;
+  expertises?: TAExpertise[];
 }
 
 export interface TAUser {

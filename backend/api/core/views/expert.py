@@ -137,11 +137,4 @@ class ExpertsListView(views.APIView):
 
     @staticmethod
     def _build_expertise_list(assignment):
-        """Return serialized expertises for a specific LabRoleAssignment."""
-        expertise_list = []
-        for entry in Expertise.objects.filter(lab_role_assignment=assignment):
-            expertise_list.append({
-                "topic": TopicSerializer(entry.topic).data,
-                "depth": DepthSerializer(entry.depth).data,
-            })
-        return expertise_list
+        return ExpertiseSerializer(Expertise.objects.filter(lab_role_assignment=assignment), many=True).data

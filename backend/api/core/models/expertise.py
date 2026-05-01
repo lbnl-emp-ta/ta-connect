@@ -6,7 +6,7 @@ from core.models import *
 # expertises identified via this model to be properly filtered in expert views.
 class Expertise(models.Model):
     user = models.ForeignKey(User, on_delete=models.PROTECT)
-    lab_role_assignment = models.ForeignKey(LabRoleAssignment, on_delete=models.PROTECT)
+    lab_role_assignment = models.ForeignKey(LabRoleAssignment, on_delete=models.PROTECT, related_name="expertises")
     topic = models.ForeignKey(Topic, on_delete=models.PROTECT)
     depth = models.ForeignKey(Depth, on_delete=models.PROTECT)
 

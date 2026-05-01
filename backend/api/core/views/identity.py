@@ -3,6 +3,7 @@ from rest_framework.response import Response
 
 from allauth.headless.contrib.rest_framework.authentication import XSessionTokenAuthentication
 
+from core.constants import ROLE
 from core.models import *
 from core.serializers import *
 
@@ -56,6 +57,8 @@ class IdentityListView(views.APIView):
             identity["instance"] = LabSerializer(assignment.instance).data
             identity["program"] = ProgramSerializer(assignment.program).data
             identity["role"] = RoleSerializer(assignment.role).data 
+            if assignment.role.name == ROLE.EXPERT:
+                identity["expertises"] = [ExpertiseSerializer(expertise).data for expertise in assignment.expertises.all()]
             identities.append(identity)
         
         if not identities:

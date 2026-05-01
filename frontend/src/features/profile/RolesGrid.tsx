@@ -26,7 +26,7 @@ export const RolesGrid: React.FC<RolesGridProps> = ({ identities }) => {
         {systemIdentities.length > 0 && (
           <Grid container spacing={2}>
             {systemIdentities.map((identity) => (
-              <Grid size={{ lg: 3, md: 6, xs: 12 }} key={getIdentityKey(identity)}>
+              <Grid size={{ lg: 4, md: 6, xs: 12 }} key={getIdentityKey(identity)}>
                 <RolePanel identity={identity} />
               </Grid>
             ))}
@@ -40,7 +40,7 @@ export const RolesGrid: React.FC<RolesGridProps> = ({ identities }) => {
         {organizationalIdentities.length > 0 && (
           <Grid container spacing={2}>
             {organizationalIdentities.map((identity) => (
-              <Grid size={{ lg: 3, md: 6, xs: 12 }} key={getIdentityKey(identity)}>
+              <Grid size={{ lg: 4, md: 6, xs: 12 }} key={getIdentityKey(identity)}>
                 <RolePanel identity={identity} />
               </Grid>
             ))}

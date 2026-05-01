@@ -41,7 +41,10 @@ export const expertColumns: GridColDef[] = [
           <Grid container spacing={1} sx={{ height: '100%' }}>
             {values.map((expertiseStr: string) => (
               <Grid key={expertiseStr}>
-                <Tooltip title={expertiseStr.split('++')[1] || ''} placement="top">
+                <Tooltip
+                  title={`${expertiseStr.split('++')[0]} (${expertiseStr.split('++')[1]})`}
+                  placement="top"
+                >
                   <Chip label={`${expertiseStr.split('++')[0]}`} variant="outlined" />
                 </Tooltip>
               </Grid>
