@@ -86,8 +86,8 @@ export interface TAExpertise {
 }
 
 export interface ExpertiseMutation {
-  topic: TATopic;
-  depth: TADepth;
+  topic: number;
+  depth: number;
 }
 
 export interface TAExpert {
@@ -221,6 +221,7 @@ export enum TARole {
 }
 
 export interface TAIdentity {
+  assignment_id: number;
   user: {
     id: number;
     email: string;

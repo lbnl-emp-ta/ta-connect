@@ -54,6 +54,7 @@ export const RolesGrid: React.FC<RolesGridProps> = ({ identities }) => {
                 <RolePanel
                   identity={identity}
                   setExpertisesDialogOpen={setExpertisesDialogOpen}
+                  setEditingExpertises={setEditingExpertises}
                   setEditingLabRoleAssignmentId={setEditingLabRoleAssignmentId}
                   setDepthOptions={setDepthOptions}
                 />

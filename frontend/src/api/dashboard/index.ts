@@ -100,7 +100,7 @@ export async function postData<T>(url: string, data?: T, identity?: Identity): P
         'X-CSRFToken': getCSRFToken() || '',
         Context: identity ? JSON.stringify(identity) : '',
       },
-      body: JSON.stringify({ ...data }),
+      body: data != null ? JSON.stringify(data) : undefined,
     });
 
     if (!response.ok) {

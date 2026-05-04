@@ -1,27 +1,19 @@
-import * as React from 'react';
+import { TADepth, TAExpertise, TATopic } from '@/api/dashboard/types';
+import { topicsQueryOptions, useExpertiseMutation } from '@/api/queryOptions';
+import { useToastContext } from '@/features/toasts/ToastContext';
+import { ToastMessage } from '@/features/toasts/ToastMessage';
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import ErrorIcon from '@mui/icons-material/Error';
+import { Autocomplete, CircularProgress, Stack } from '@mui/material';
 import Button from '@mui/material/Button';
-import TextField from '@mui/material/TextField';
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
-import CheckCircleIcon from '@mui/icons-material/CheckCircle';
-import ErrorIcon from '@mui/icons-material/Error';
-import { topicsQueryOptions, useExpertiseMutation, useLogoutMutation } from '@/api/queryOptions';
-import { useUser } from '@/hooks/useUser';
-import {
-  ExpertiseMutation,
-  TADepth,
-  TAExpertise,
-  TATopic,
-  TAUser,
-  TAUserMutation,
-} from '@/api/dashboard/types';
-import { useEffect, useMemo, useState } from 'react';
-import { useToastContext } from '@/features/toasts/ToastContext';
-import { ToastMessage } from '@/features/toasts/ToastMessage';
-import { Autocomplete, Box, CircularProgress, Stack } from '@mui/material';
+import TextField from '@mui/material/TextField';
 import { useSuspenseQuery } from '@tanstack/react-query';
+import * as React from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 interface ExpertisesDialogProps {
   open: boolean;
@@ -38,21 +30,20 @@ export const ExpertisesDialog: React.FC<ExpertisesDialogProps> = ({
   labRoleAssignmentId,
   depthOptions,
 }) => {
-  const user = useUser();
   const updateExpertiseMutation = useExpertiseMutation(labRoleAssignmentId.toString() || '');
   const { data: allTopics } = useSuspenseQuery(topicsQueryOptions());
-  // const allTopics: TATopic[] = [];
-  const [newExpertises, setNewExpertises] = useState<ExpertiseMutation[]>(expertises);
+  const [newExpertises, setNewExpertises] = useState<Partial<TAExpertise>[]>(expertises);
   const defaultDepth = depthOptions[0];
   const newTopics = useMemo(() => {
     return newExpertises.map((expertise) => {
-      return expertise.topic;
+      return expertise.topic!;
     });
   }, [newExpertises]);
 
   const { setShowToast, setToastMessage, setToastAutoHideDuration } = useToastContext();
 
-  const handleTopicsChange = (_event: React.SyntheticEvent, value: TATopic[]) => {
+  const handleTopicsChange = (_event: React.SyntheticEvent, value?: TATopic[]) => {
+    if (!value) return;
     setNewExpertises(
       value.map((topic) => {
         return {
@@ -70,7 +61,14 @@ export const ExpertisesDialog: React.FC<ExpertisesDialogProps> = ({
    */
   const handleSubmit: React.FormEventHandler<HTMLFormElement> = (e) => {
     e.preventDefault();
-    updateExpertiseMutation.mutate(newExpertises);
+    console.log('Submitting expertises:', newExpertises);
+    const mutationData = newExpertises.map((expertise) => {
+      return {
+        topic: expertise.topic!.id,
+        depth: expertise.depth!.id,
+      };
+    });
+    updateExpertiseMutation.mutate(mutationData);
     onClose();
   };
 
@@ -107,7 +105,7 @@ export const ExpertisesDialog: React.FC<ExpertisesDialogProps> = ({
   ]);
 
   return (
-    <Dialog open={open} onClose={onClose} disableRestoreFocus>
+    <Dialog open={open} onClose={handleCancel} maxWidth="md" fullWidth disableRestoreFocus>
       <DialogTitle>Expertises</DialogTitle>
       <DialogContent>
         <form onSubmit={handleSubmit} id="expertises-form">
@@ -115,7 +113,7 @@ export const ExpertisesDialog: React.FC<ExpertisesDialogProps> = ({
             <Autocomplete
               multiple
               options={allTopics || []}
-              getOptionLabel={(option) => option.name}
+              getOptionLabel={(option) => option?.name || ''}
               value={newTopics || []}
               onChange={handleTopicsChange}
               renderInput={(params) => <TextField {...params} variant="outlined" label="Topics" />}

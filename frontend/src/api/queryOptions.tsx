@@ -11,7 +11,6 @@ import {
   TACloseoutForm,
   TACustomerMutation,
   TAExpert,
-  TAExpertise,
   TAIdentity,
   TANote,
   TAOwner,

@@ -1,11 +1,12 @@
 import { capitalize } from '@/utils/utils';
 import { Chip, Grid, IconButton, Paper, Stack, Tooltip, Typography } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
-import { TADepth, TAIdentity } from '@/api/dashboard/types';
+import { TADepth, TAExpertise, TAIdentity } from '@/api/dashboard/types';
 
 interface RolePanelProps {
   identity: TAIdentity;
   setExpertisesDialogOpen: (open: boolean) => void;
+  setEditingExpertises?: (expertises: TAExpertise[]) => void;
   setEditingLabRoleAssignmentId: (id: number | null) => void;
   setDepthOptions?: (options: TADepth[]) => void;
 }
@@ -13,12 +14,14 @@ interface RolePanelProps {
 export const RolePanel: React.FC<RolePanelProps> = ({
   identity,
   setExpertisesDialogOpen,
+  setEditingExpertises,
   setEditingLabRoleAssignmentId,
   setDepthOptions,
 }) => {
   const handleEditExpertises = () => {
-    setEditingLabRoleAssignmentId(identity.role.id);
+    setEditingLabRoleAssignmentId(identity.assignment_id);
     if (setDepthOptions) setDepthOptions(identity.program?.depths || []);
+    if (setEditingExpertises) setEditingExpertises(identity.expertises || []);
     setExpertisesDialogOpen(true);
   };
 
