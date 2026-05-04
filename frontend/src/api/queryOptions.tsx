@@ -6,10 +6,12 @@ import { logoutMutation } from './accounts/logout';
 import { deleteData, fetchData, patchData, postData, postForm } from './dashboard';
 import {
   CustomerRequestRelationship,
+  ExpertiseMutation,
   TAAssignment,
   TACloseoutForm,
   TACustomerMutation,
   TAExpert,
+  TAExpertise,
   TAIdentity,
   TANote,
   TAOwner,
@@ -220,6 +222,18 @@ export const useUserMutation = (userId: string) => {
     mutationKey: ['users', 'update', userId],
     mutationFn: (data: Partial<TAUserMutation>) =>
       patchData<TAUserMutation>(`${import.meta.env.VITE_API_URL}/users/${userId}`, data),
+    onSuccess: () => queryClient.invalidateQueries(),
+  });
+};
+
+export const useExpertiseMutation = (labRoleAssignmentId: string) => {
+  return useMutation({
+    mutationKey: ['expertises', 'update', labRoleAssignmentId],
+    mutationFn: (data: ExpertiseMutation[]) =>
+      postData(
+        `${import.meta.env.VITE_API_URL}/lab-role-assignments/${labRoleAssignmentId}/expertises/`,
+        data
+      ),
     onSuccess: () => queryClient.invalidateQueries(),
   });
 };

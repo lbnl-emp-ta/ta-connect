@@ -1,4 +1,4 @@
-import { identitiesQueryOptions } from '@/api/queryOptions';
+import { identitiesQueryOptions, topicsQueryOptions } from '@/api/queryOptions';
 import { RolesGrid } from '@/features/profile/RolesGrid';
 import { UserInfoDialog } from '@/features/profile/UserInfoDialog';
 import { useUser } from '@/hooks/useUser';
@@ -20,6 +20,9 @@ import { createFileRoute } from '@tanstack/react-router';
 import { useEffect, useState } from 'react';
 
 export const Route = createFileRoute('/_with-nav/_private/profile')({
+  loader: async ({ context }) => {
+    await context.queryClient.ensureQueryData(topicsQueryOptions());
+  },
   component: ProfilePage,
 });
 

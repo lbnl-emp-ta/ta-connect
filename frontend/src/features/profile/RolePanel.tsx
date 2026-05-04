@@ -1,13 +1,27 @@
 import { capitalize } from '@/utils/utils';
 import { Chip, Grid, IconButton, Paper, Stack, Tooltip, Typography } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
-import { TAIdentity } from '@/api/dashboard/types';
+import { TADepth, TAIdentity } from '@/api/dashboard/types';
 
 interface RolePanelProps {
   identity: TAIdentity;
+  setExpertisesDialogOpen: (open: boolean) => void;
+  setEditingLabRoleAssignmentId: (id: number | null) => void;
+  setDepthOptions?: (options: TADepth[]) => void;
 }
 
-export const RolePanel: React.FC<RolePanelProps> = ({ identity }) => {
+export const RolePanel: React.FC<RolePanelProps> = ({
+  identity,
+  setExpertisesDialogOpen,
+  setEditingLabRoleAssignmentId,
+  setDepthOptions,
+}) => {
+  const handleEditExpertises = () => {
+    setEditingLabRoleAssignmentId(identity.role.id);
+    if (setDepthOptions) setDepthOptions(identity.program?.depths || []);
+    setExpertisesDialogOpen(true);
+  };
+
   return (
     <Paper sx={{ height: '100%', padding: 2 }}>
       <Stack>
@@ -41,14 +55,14 @@ export const RolePanel: React.FC<RolePanelProps> = ({ identity }) => {
           <Stack spacing={1}>
             <Stack direction="row" spacing={1} alignItems="center">
               <Typography fontWeight="bold">Expertises</Typography>
-              <IconButton size="small">
+              <IconButton size="small" onClick={handleEditExpertises}>
                 <EditIcon />
               </IconButton>
             </Stack>
             {identity.expertises.length > 0 && (
               <Grid container spacing={1}>
                 {identity.expertises.map((expertise) => (
-                  <Grid key={expertise.id} spacing={1}>
+                  <Grid key={expertise.id}>
                     <Tooltip
                       title={`${expertise.topic.name} (${expertise.depth.name})`}
                       placement="top"

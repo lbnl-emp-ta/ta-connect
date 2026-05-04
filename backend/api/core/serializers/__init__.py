@@ -10,7 +10,7 @@ from .lab import LabSerializer
 from .program import ProgramSerializer
 from .reception import ReceptionSerializer
 from .expert import ExpertSerializer
-from .expertise import ExpertiseSerializer
+from .expertise import ExpertiseSerializer, ExpertiseWriteSerializer
 from .role import RoleSerializer
 from .request_status import RequestStatusSerializer
 from .owner import OwnerSerializer
@@ -55,4 +55,5 @@ __all__ = [
     "NoteSerializer",
     "NoteCreateSerializer",
     "CloseoutFormSerializer",
+    "ExpertiseWriteSerializer",
 ]

@@ -85,6 +85,11 @@ export interface TAExpertise {
   depth: TADepth;
 }
 
+export interface ExpertiseMutation {
+  topic: TATopic;
+  depth: TADepth;
+}
+
 export interface TAExpert {
   id: number;
   owner_id: number;
@@ -98,7 +103,7 @@ export interface TAExpert {
 
 export interface TAProgram {
   id: number;
-  depths: number[];
+  depths: TADepth[];
   description: string;
   filtered_orgs: number[];
   labs: number[];
