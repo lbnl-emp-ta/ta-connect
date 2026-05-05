@@ -9,8 +9,7 @@ urlpatterns = [
     path('requests/<int:request_id>', RequestDetailView.as_view(), name="request-detail"),
 
     path('requests/<int:request_id>/audit-history/', AuditHistoryListView.as_view(), name="list-audit-history"),
-    path('requests/<int:request_id>/mark-complete/', RequestMarkCompleteView.as_view(), name="mark-complete"),
-    path('requests/<int:request_id>/cancel/', RequestCancelView.as_view(), name="mark-complete"),
+    path('requests/<int:request_id>/cancel/', RequestCancelView.as_view(), name="cancel"),
     path('requests/<int:request_id>/reopen/', RequestReopenView.as_view(), name="reopen"),
 
     path('requests/<int:request_id>/upload-attachment/', UploadAttachmentView.as_view(), name="upload-attachment"),

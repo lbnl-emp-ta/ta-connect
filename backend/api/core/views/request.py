@@ -486,27 +486,6 @@ class RequestListView(BaseUserAwareRequest):
             response_data[key] = requests_data
 
         return Response(data=response_data, status=status.HTTP_200_OK)
-
-class RequestMarkCompleteView(BaseUserAwareRequest):
-    permission_classes = [permissions.IsAuthenticated, CanMarkComplete]
-
-    def post(self, request, request_id=None):
-        queryset = self.get_actionable()
-        found_request, err = self.get_request_or_error(queryset, request_id)
-        if err:
-            return err
-
-        # Maybe consider checking program/lab/expert to see if its even been serviced?
-        try:
-            found_request.status = RequestStatus.objects.get(name=REQUEST_STATUS.COMPLETED)
-            found_request.owner = None
-            found_request.save()
-            create_audit_history(request, found_request, ActionType.StatusChange, f"Status changed to Completed")
-            create_audit_history(request, found_request, ActionType.Assignment, f"Removed all assignments")
-        except Exception as e:
-            return Response(data={"message": f"{e}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
-        return Response(status=status.HTTP_200_OK)
       
 class RequestCancelView(BaseUserAwareRequest):
     permission_classes = [permissions.IsAuthenticated, CanCancel]
