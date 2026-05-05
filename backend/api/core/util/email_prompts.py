@@ -159,7 +159,9 @@ def customer_unable_to_address_email(receipient_name: str, request: Request) -> 
     
     Your request (Request #{request.id}) in TA Connect has been marked as unable to address.
 
-    If you have questions about why this request was marked as unable to address, please reach out to taconnect@lbl.gov.
+    We're sorry that we weren't able to address your issue. If you have questions about why this request was marked as unable to address, please reach out to taconnect@lbl.gov.
+
+    For any future requests, visit https://taconnect.lbl.gov/intake.
     
     Thank you,
     TA Connect
@@ -168,7 +170,8 @@ def customer_unable_to_address_email(receipient_name: str, request: Request) -> 
     html_message = f"""
     <div>Hello {receipient_name},</div>
     <p>Your request in TA Connect has been marked as <strong>{request.status}</strong>.</p>
-    <p>If you have questions about why this request was marked as unable to address, please reach out to taconnect@lbl.gov.</p>
+    <p>We're sorry that we weren't able to address your issue. If you have questions about why this request was marked as unable to address, please reach out to taconnect@lbl.gov.</p>
+    <p>For any future requests, visit <a href="https://taconnect.lbl.gov/intake" target="_blank">https://taconnect.lbl.gov/intake</a>.
     <p>
         <h2>Request Details</h2>
         <ul>
@@ -206,7 +209,7 @@ def customer_status_email(receipient_name: str, request: Request) -> tuple[str, 
     plain_text_message = f"""
     Hello {receipient_name},
     
-    Your request (Request #{request.id}) in TA Connect has been updated to {request.status}.
+    Your request (Request #{request.id}) in TA Connect has been updated to {request.status}!
     
     Thank you,
     TA Connect
@@ -214,7 +217,7 @@ def customer_status_email(receipient_name: str, request: Request) -> tuple[str, 
 
     html_message = f"""
     <div>Hello {receipient_name},</div>
-    <p>Your request in TA Connect has been updated to <strong>{request.status}</strong>.</p>
+    <p>Your request in TA Connect has been updated to <strong>{request.status}</strong>!</p>
     <p>
         <h2>Request Details</h2>
         <ul>
