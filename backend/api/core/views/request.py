@@ -622,6 +622,9 @@ class RequestReopenView(BaseUserAwareRequest):
         try:
             found_request.status = RequestStatus.objects.get(name=REQUEST_STATUS.SCOPING)
             found_request.owner = Owner.objects.get(pk=Owner.get_default_pk())
+            found_request.program = None
+            found_request.lab = None
+            found_request.expert = None
             found_request.save()
             create_audit_history(request, found_request, ActionType.StatusChange, f"Request reopened, status changed to Scoping")
             create_audit_history(request, found_request, ActionType.Assignment, f"Assigned to Reception")
