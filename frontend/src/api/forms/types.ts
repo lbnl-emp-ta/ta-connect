@@ -33,4 +33,7 @@ export interface IntakeFormData {
   organizationAddress: string;
   organizationType: string;
   description: string;
+  challenges?: string;
+  goals?: string;
+  effort: string;
 }
