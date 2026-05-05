@@ -47,8 +47,15 @@ class CloseoutFormView(BaseUserAwareRequest):
         if err:
             return err
 
+        # If the closeout form already exists, we want to return it's existing state
+        # but we want to reset the submitted_date to allow the expert to edit and resubmit.
         if hasattr(request_obj, "closeout_form"):
-            serializer = CloseoutFormSerializer(request_obj.closeout_form)
+            closeout_form = request_obj.closeout_form
+            closeout_form.submitted_date = None
+            closeout_form.approved_by_lab = None
+            closeout_form.approved_by_program = None
+            closeout_form.save()
+            serializer = CloseoutFormSerializer(closeout_form)
             return Response(serializer.data, status=status.HTTP_200_OK)
 
         if not self.get_actionable().filter(pk=request_obj.pk).exists():
@@ -62,7 +69,7 @@ class CloseoutFormView(BaseUserAwareRequest):
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
         with transaction.atomic():
-            serializer.save(request=request_obj)
+            serializer.save(request=request_obj, submitted_date=None)
             request_obj.status = get_status(REQUEST_STATUS.CLOSEOUT_STARTED)
             request_obj.save()
             create_audit_history(request, request_obj, ActionType.StatusChange, f"Status changed to Closeout Started")
