@@ -58,9 +58,12 @@ export const ExpertisesDialog: React.FC<ExpertisesDialogProps> = ({
     if (!value) return;
     setNewExpertises(
       value.map((topic) => {
+        const existingExpertise = newExpertises.find(
+          (expertise) => expertise.topic?.id === topic.id
+        );
         return {
           topic,
-          depth: defaultDepth,
+          depth: existingExpertise?.depth || defaultDepth,
         };
       })
     );
