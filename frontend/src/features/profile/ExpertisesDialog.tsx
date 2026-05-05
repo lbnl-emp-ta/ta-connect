@@ -4,7 +4,7 @@ import { useToastContext } from '@/features/toasts/ToastContext';
 import { ToastMessage } from '@/features/toasts/ToastMessage';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import ErrorIcon from '@mui/icons-material/Error';
-import { Autocomplete, CircularProgress, Stack } from '@mui/material';
+import { Autocomplete, CircularProgress, DialogContentText, Stack } from '@mui/material';
 import Button from '@mui/material/Button';
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
@@ -21,6 +21,7 @@ interface ExpertisesDialogProps {
   expertises: TAExpertise[];
   labRoleAssignmentId: number;
   depthOptions: TADepth[];
+  programName: string;
 }
 
 export const ExpertisesDialog: React.FC<ExpertisesDialogProps> = ({
@@ -29,6 +30,7 @@ export const ExpertisesDialog: React.FC<ExpertisesDialogProps> = ({
   expertises,
   labRoleAssignmentId,
   depthOptions,
+  programName,
 }) => {
   const updateExpertiseMutation = useExpertiseMutation(labRoleAssignmentId.toString() || '');
   const { data: allTopics } = useSuspenseQuery(topicsQueryOptions());
@@ -108,6 +110,9 @@ export const ExpertisesDialog: React.FC<ExpertisesDialogProps> = ({
     <Dialog open={open} onClose={handleCancel} maxWidth="md" fullWidth disableRestoreFocus>
       <DialogTitle>Expertises</DialogTitle>
       <DialogContent>
+        <DialogContentText sx={{ marginBottom: 2 }}>
+          Edit your expertises for your Expert role in the program, {programName}.
+        </DialogContentText>
         <form onSubmit={handleSubmit} id="expertises-form">
           <Stack>
             <Autocomplete
@@ -122,7 +127,7 @@ export const ExpertisesDialog: React.FC<ExpertisesDialogProps> = ({
           </Stack>
         </form>
       </DialogContent>
-      <DialogActions sx={{ justifyContent: 'space-between' }}>
+      <DialogActions sx={{ justifyContent: 'flex-end' }}>
         <Stack direction="row">
           <Button onClick={handleCancel}>Cancel</Button>
           <Button variant="contained" type="submit" form="expertises-form">

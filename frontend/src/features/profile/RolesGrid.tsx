@@ -2,7 +2,7 @@ import { RolePanel } from '@/features/profile/RolePanel';
 import { Grid, Stack, Typography } from '@mui/material';
 import { TADepth, TAExpertise, TAIdentity } from '@/api/dashboard/types';
 import { ExpertisesDialog } from '@/features/profile/ExpertisesDialog';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 
 interface RolesGridProps {
   identities: TAIdentity[];
@@ -19,6 +19,14 @@ export const RolesGrid: React.FC<RolesGridProps> = ({ identities }) => {
   const organizationalIdentities = identities.filter(
     (identity) => identity.location === 'program' || identity.location === 'lab'
   );
+  const programName = useMemo(() => {
+    return (
+      organizationalIdentities.find(
+        (identity) => identity.assignment_id === editingLabRoleAssignmentId
+      )?.program?.name || ''
+    );
+  }, [editingLabRoleAssignmentId]);
+
   const getIdentityKey = (identity: TAIdentity) => {
     return `${identity.role.id}-${identity.location}-${identity.instance?.id ?? 'none'}`;
   };
@@ -70,6 +78,7 @@ export const RolesGrid: React.FC<RolesGridProps> = ({ identities }) => {
           onClose={() => setExpertisesDialogOpen(false)}
           expertises={editingExpertises}
           labRoleAssignmentId={editingLabRoleAssignmentId}
+          programName={programName}
         />
       )}
     </Stack>
