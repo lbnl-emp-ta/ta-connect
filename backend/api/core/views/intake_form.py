@@ -17,13 +17,13 @@ class ProcessIntakeForm(CreateAPIView):
         organization = request.data.get("organization", None)
         organization_address = request.data.get("organizationAddress", None)
         organization_type = request.data.get("organizationType", None)
-        desc = request.data.get("description", None)
+        description = request.data.get("description", None)
         cohort = request.data.get("cohort", None)
         
         try:
             with transaction.atomic():
                 _request = Request.objects.create(
-                    description=desc, 
+                    description=description, 
                 )
 
                 
