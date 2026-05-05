@@ -91,6 +91,7 @@ class AssignmentView(BaseUserAwareRequest):
                         elif ta_request.status.name in [REQUEST_STATUS.ASSIGNED_TO_EXPERT, REQUEST_STATUS.PROVIDING_TA]:
                             ta_request.status = get_status(REQUEST_STATUS.REJECTED_BY_EXPERT)
                             ta_request.expert = None
+                            ta_request.proj_completion_date = None
                         # Request is being forwarded to the lab from the expert after finishing closeout
                         elif ta_request.status.name in [REQUEST_STATUS.CLOSEOUT_STARTED, REQUEST_STATUS.CLOSEOUT_MORE_INFO]:
                             ta_request.status = get_status(REQUEST_STATUS.CLOSEOUT_REVIEW_BY_LAB)

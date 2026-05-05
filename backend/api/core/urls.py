@@ -44,5 +44,6 @@ urlpatterns = [
     path('customer-request-relationships/', CustomerRequestRelationshipListView.as_view(), name="customer-request-relationship-create"),
 
     path('topics/', TopicListView.as_view(), name="topic-list"),
-    
+
+    path('lab-role-assignments/<int:lab_role_assignment_id>/expertises/', ExpertiseUpdateView.as_view(), name="update-expertises"),
 ]

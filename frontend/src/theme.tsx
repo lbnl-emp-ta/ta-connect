@@ -56,6 +56,9 @@ export const theme = createTheme({
   },
   // Control the font, size, and font weights
   typography: {
+    button: {
+      textTransform: 'none',
+    },
     htmlFontSize: 16,
     fontFamily: `"Avenir", "Helvetica", "Verdana", "Arial", sans-serif`,
     fontSize: 14,

@@ -1,3 +1,7 @@
+import { identitiesQueryOptions, topicsQueryOptions } from '@/api/queryOptions';
+import { RolesGrid } from '@/features/profile/RolesGrid';
+import { UserInfoDialog } from '@/features/profile/UserInfoDialog';
+import { useUser } from '@/hooks/useUser';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import EditIcon from '@mui/icons-material/Edit';
 import {
@@ -6,7 +10,6 @@ import {
   Box,
   Button,
   Container,
-  Grid,
   IconButton,
   Link,
   Stack,
@@ -14,14 +17,12 @@ import {
 } from '@mui/material';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { createFileRoute } from '@tanstack/react-router';
-import { RolePanel } from '@/features/profile/RolePanel';
-import { useUser } from '@/hooks/useUser';
-import { identitiesQueryOptions } from '@/api/queryOptions';
 import { useEffect, useState } from 'react';
-import { UserInfoDialog } from '@/features/profile/UserInfoDialog';
-import { TAIdentity } from '@/api/dashboard/types';
 
 export const Route = createFileRoute('/_with-nav/_private/profile')({
+  loader: async ({ context }) => {
+    await context.queryClient.ensureQueryData(topicsQueryOptions());
+  },
   component: ProfilePage,
 });
 
@@ -37,10 +38,6 @@ function ProfilePage() {
 
   const handleCloseUserInfoDialog = () => {
     setIsUserInfoDialogOpen(false);
-  };
-
-  const getIdentityKey = (identity: TAIdentity) => {
-    return `${identity.role.id}-${identity.location}-${identity.instance?.id ?? 'none'}`;
   };
 
   useEffect(() => {
@@ -84,7 +81,7 @@ function ProfilePage() {
       <Stack spacing={2}>
         <Stack direction="row" spacing={2} alignItems="center">
           <Typography variant="h4" component="h2" fontWeight="bold" sx={{ flexGrow: 1 }}>
-            Roles
+            My Roles
           </Typography>
           <Box>
             <Link href="https://forms.gle/etALWnsaZd7ZyFCeA" target="_blank">
@@ -106,15 +103,7 @@ function ProfilePage() {
             </Typography>
           </Alert>
         )}
-        {identities && identities.length > 0 && (
-          <Grid container spacing={2}>
-            {identities.map((identity) => (
-              <Grid size={{ lg: 3, md: 6, xs: 12 }} key={getIdentityKey(identity)}>
-                <RolePanel identity={identity} />
-              </Grid>
-            ))}
-          </Grid>
-        )}
+        <RolesGrid identities={identities || []} />
       </Stack>
     </Container>
   );

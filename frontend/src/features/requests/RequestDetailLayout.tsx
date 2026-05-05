@@ -88,7 +88,7 @@ export const RequestDetailLayout: React.FC<RequestDetailLayoutProps> = ({ reques
                       </Typography>
                     </Stack>
                     <Button variant="outlined" onClick={() => setCloseoutDialogOpen(true)}>
-                      View Closeout Form
+                      View closeout form
                     </Button>
                   </Stack>
                 }

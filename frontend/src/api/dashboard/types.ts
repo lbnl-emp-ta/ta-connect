@@ -80,8 +80,14 @@ export interface TAOwner {
 }
 
 export interface TAExpertise {
+  id: number;
   topic: TATopic;
   depth: TADepth;
+}
+
+export interface ExpertiseMutation {
+  topic: number;
+  depth: number;
 }
 
 export interface TAExpert {
@@ -97,7 +103,7 @@ export interface TAExpert {
 
 export interface TAProgram {
   id: number;
-  depths: number[];
+  depths: TADepth[];
   description: string;
   filtered_orgs: number[];
   labs: number[];
@@ -215,6 +221,7 @@ export enum TARole {
 }
 
 export interface TAIdentity {
+  assignment_id: number;
   user: {
     id: number;
     email: string;
@@ -230,6 +237,8 @@ export interface TAIdentity {
     name: string;
     description: string;
   };
+  program?: TAProgram;
+  expertises?: TAExpertise[];
 }
 
 export interface TAUser {

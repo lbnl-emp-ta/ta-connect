@@ -1,18 +1,16 @@
 import { TAOwner, TARequestDetail } from '@/api/dashboard/types';
+import {
+  expertsQueryOptions,
+  ownersQueryOptions,
+  useAssignmentMutation,
+  useCreateCloseoutMutation,
+  useReopenMutation,
+} from '@/api/queryOptions';
 import { queryClient } from '@/App';
 import { useIdentityContext } from '@/features/identity/IdentityContext';
 import { useRequestsContext } from '@/features/requests/RequestsContext';
 import { useToastContext } from '@/features/toasts/ToastContext';
 import { ToastMessage } from '@/features/toasts/ToastMessage';
-import {
-  expertsQueryOptions,
-  ownersQueryOptions,
-  useApproveCloseoutByLabMutation,
-  useApproveCloseoutByProgramMutation,
-  useAssignmentMutation,
-  useCreateCloseoutMutation,
-  useReopenMutation,
-} from '@/api/queryOptions';
 import { getStep, statusMap, Steps } from '@/utils/utils';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import EastIcon from '@mui/icons-material/East';
@@ -182,26 +180,6 @@ export const RequestAssignForwardButton: React.FC<RequestAssignForwardButtonProp
     },
     onError: onError,
   });
-  const approveCloseoutByLabMutation = useApproveCloseoutByLabMutation(
-    request.id.toString(),
-    identity,
-    {
-      onMutate: onMutate(`Approving request closeout by ${request.lab?.name ?? 'lab'}`),
-      onSuccess: onSuccess(`Request closeout approved by ${request.lab?.name ?? 'lab'}`),
-      onError: onError,
-    }
-  );
-  const approveCloseoutByProgramMutation = useApproveCloseoutByProgramMutation(
-    request.id.toString(),
-    identity,
-    {
-      onMutate: onMutate(`Approving request closeout by ${request.program?.name ?? 'program'}`),
-      onSuccess: onSuccess(
-        `Request closeout approved by ${request.program?.name ?? 'program'} and marked as completed`
-      ),
-      onError: onError,
-    }
-  );
   const reopenRequestMutation = useReopenMutation(request.id.toString(), identity, {
     onMutate: onMutate('Reopening request'),
     onSuccess: onSuccess('Request reopened and assigned to Reception'),

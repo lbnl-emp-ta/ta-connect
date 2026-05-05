@@ -401,7 +401,7 @@ class RequestDetailView(BaseUserAwareRequest):
             
         if "status" in body:
             if body.get("status") is None:
-                return Response(data={"message": "Cannot clear status field on request. Need to provide value replacement value."}, status=status.HTTP_400_BAD_REQUEST)
+                return Response(data={"message": "Cannot clear status field on request. Need to provide replacement value."}, status=status.HTTP_400_BAD_REQUEST)
 
             maybe_status = None
             try:
