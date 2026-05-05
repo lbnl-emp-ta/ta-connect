@@ -68,7 +68,7 @@ export const RolePanel: React.FC<RolePanelProps> = ({
                   <Grid key={expertise.id}>
                     <Tooltip
                       title={`${expertise.topic.name} (${expertise.depth.name})`}
-                      placement="top"
+                      placement="left"
                     >
                       <Chip label={expertise.topic.name} sx={{ maxWidth: 175 }} />
                     </Tooltip>

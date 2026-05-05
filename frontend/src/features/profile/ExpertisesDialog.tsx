@@ -4,7 +4,17 @@ import { useToastContext } from '@/features/toasts/ToastContext';
 import { ToastMessage } from '@/features/toasts/ToastMessage';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import ErrorIcon from '@mui/icons-material/Error';
-import { Autocomplete, CircularProgress, DialogContentText, Stack } from '@mui/material';
+import {
+  Autocomplete,
+  CircularProgress,
+  DialogContentText,
+  FormControl,
+  InputLabel,
+  MenuItem,
+  Select,
+  Stack,
+  Typography,
+} from '@mui/material';
 import Button from '@mui/material/Button';
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
@@ -52,6 +62,33 @@ export const ExpertisesDialog: React.FC<ExpertisesDialogProps> = ({
           topic,
           depth: defaultDepth,
         };
+      })
+    );
+  };
+
+  type DepthChangeEvent =
+    | React.ChangeEvent<
+        Omit<HTMLInputElement, 'value'> & {
+          value: number;
+        }
+      >
+    | (Event & {
+        target: {
+          value: number;
+          name: string;
+        };
+      });
+
+  const handleDepthChange = (event: DepthChangeEvent, topicId: number) => {
+    const newDepthId = event.target.value as number;
+    const newDepth = depthOptions.find((option) => option.id === newDepthId);
+    if (!newDepth) return;
+    setNewExpertises((prev) =>
+      prev.map((expertise) => {
+        if (expertise.topic?.id === topicId) {
+          return { ...expertise, depth: newDepth };
+        }
+        return expertise;
       })
     );
   };
@@ -115,15 +152,45 @@ export const ExpertisesDialog: React.FC<ExpertisesDialogProps> = ({
         </DialogContentText>
         <form onSubmit={handleSubmit} id="expertises-form">
           <Stack>
-            <Autocomplete
-              multiple
-              options={allTopics || []}
-              getOptionLabel={(option) => option?.name || ''}
-              value={newTopics || []}
-              onChange={handleTopicsChange}
-              renderInput={(params) => <TextField {...params} variant="outlined" label="Topics" />}
-              disableCloseOnSelect
-            />
+            <FormControl>
+              <InputLabel
+                htmlFor="expertise-topics-input"
+                sx={{ position: 'relative', transform: 'none', mb: 1, fontWeight: 'bold' }}
+              >
+                Topics
+              </InputLabel>
+              <Autocomplete
+                id="expertise-topics-input"
+                multiple
+                options={allTopics || []}
+                getOptionLabel={(option) => option?.name || ''}
+                value={newTopics || []}
+                onChange={handleTopicsChange}
+                renderInput={(params) => <TextField {...params} variant="outlined" />}
+                disableCloseOnSelect
+              />
+            </FormControl>
+            <Typography fontWeight="bold" color="textSecondary">
+              Depth per topic
+            </Typography>
+            <Stack>
+              {newExpertises.map((expertise, i) => (
+                <Stack key={expertise.id || i} direction="row" alignItems="center">
+                  <Typography>{expertise.topic?.name}</Typography>
+                  <Select
+                    size="small"
+                    value={expertise.depth?.id || ''}
+                    onChange={(e) => handleDepthChange(e, expertise.topic!.id)}
+                  >
+                    {depthOptions.map((option) => (
+                      <MenuItem key={option.id} value={option.id}>
+                        {option.name}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </Stack>
+              ))}
+            </Stack>
           </Stack>
         </form>
       </DialogContent>

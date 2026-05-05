@@ -19,7 +19,7 @@ export const RolesGrid: React.FC<RolesGridProps> = ({ identities }) => {
   const organizationalIdentities = identities.filter(
     (identity) => identity.location === 'program' || identity.location === 'lab'
   );
-  const programName = useMemo(() => {
+  const editingProgramName = useMemo(() => {
     return (
       organizationalIdentities.find(
         (identity) => identity.assignment_id === editingLabRoleAssignmentId
@@ -78,7 +78,7 @@ export const RolesGrid: React.FC<RolesGridProps> = ({ identities }) => {
           onClose={() => setExpertisesDialogOpen(false)}
           expertises={editingExpertises}
           labRoleAssignmentId={editingLabRoleAssignmentId}
-          programName={programName}
+          programName={editingProgramName}
         />
       )}
     </Stack>
