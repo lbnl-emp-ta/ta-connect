@@ -64,7 +64,7 @@ function IntakeForm() {
   const [description, setDescription] = useState('');
   const [challenges, setChallenges] = useState('');
   const [goals, setGoals] = useState('');
-  const [effort, setEffort] = useState('');
+  const [effort, setEffort] = useState('Unsure');
   const [tprName, setTprName] = useState('');
   const [phoneError, setPhoneError] = useState(false);
   const [phoneHelperText, setPhoneHelperText] = useState('');
