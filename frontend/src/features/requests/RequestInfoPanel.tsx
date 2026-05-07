@@ -41,6 +41,7 @@ import {
 import { useIdentityContext } from '../identity/IdentityContext';
 import { useToastContext } from '../toasts/ToastContext';
 import { ToastMessage } from '../toasts/ToastMessage';
+import { EffortIcon } from '@/components/EffortIcon';
 
 interface RequestInfoPanelProps {
   request?: TARequestDetail;
@@ -301,7 +302,10 @@ export const RequestInfoPanel: React.FC<RequestInfoPanelProps> = ({ request }) =
                 <TableCell>Effort</TableCell>
                 <TableCell>
                   {(!editing || !hasPermission('edit-effort', detailedIdentity)) && (
-                    <>{request.effort || '-'}</>
+                    <Stack direction="row" alignItems="center" spacing={1}>
+                      <EffortIcon effort={request.effort || ''} fontSize="small" />
+                      <span>{request.effort || '-'}</span>
+                    </Stack>
                   )}
                   {editing && hasPermission('edit-effort', detailedIdentity) && (
                     <Select value={effort} onChange={handleEffortChange}>
