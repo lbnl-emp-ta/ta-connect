@@ -31,7 +31,13 @@ import { useCallback, useEffect, useState } from 'react';
 import { TARequestDetail, TARequestDetailMutation, TATopic } from '../../api/dashboard/types';
 import { topicsQueryOptions, useRequestMutation } from '../../api/queryOptions';
 import { InfoPanel } from '../../components/InfoPanel';
-import { capitalize, formatDatetime, hasPermission, statusMap } from '../../utils/utils';
+import {
+  capitalize,
+  effortOptions,
+  formatDatetime,
+  hasPermission,
+  statusMap,
+} from '../../utils/utils';
 import { useIdentityContext } from '../identity/IdentityContext';
 import { useToastContext } from '../toasts/ToastContext';
 import { ToastMessage } from '../toasts/ToastMessage';
@@ -47,6 +53,7 @@ export const RequestInfoPanel: React.FC<RequestInfoPanelProps> = ({ request }) =
   const [editing, setEditing] = useState(false);
   const { setShowToast, setToastMessage } = useToastContext();
   const [depth, setDepth] = useState<TARequestDetail['depth']>();
+  const [effort, setEffort] = useState<TARequestDetail['effort']>();
   const [projectedStartDate, setProjectedStartDate] = useState<Dayjs>();
   const [projectedCompletionDate, setProjectedCompletionDate] = useState<Dayjs>();
   const [actualCompletionDate, setActualCompletionDate] = useState<Dayjs>();
@@ -58,6 +65,7 @@ export const RequestInfoPanel: React.FC<RequestInfoPanelProps> = ({ request }) =
   const resetFormValues = useCallback(() => {
     if (request) {
       setDepth(request.depth);
+      setEffort(request.effort);
       setProjectedStartDate(request.proj_start_date ? dayjs(request.proj_start_date) : undefined);
       setProjectedCompletionDate(
         request.proj_completion_date ? dayjs(request.proj_completion_date) : undefined
@@ -82,6 +90,9 @@ export const RequestInfoPanel: React.FC<RequestInfoPanelProps> = ({ request }) =
     const mutationData = {} as Partial<TARequestDetailMutation>;
     if (depth !== request?.depth) {
       mutationData.depth = depth;
+    }
+    if (effort !== request?.effort) {
+      mutationData.effort = effort;
     }
     if (projectedStartDate === null && request?.proj_start_date !== null) {
       mutationData.proj_start_date = null;
@@ -129,6 +140,10 @@ export const RequestInfoPanel: React.FC<RequestInfoPanelProps> = ({ request }) =
 
   const handleDepthChange = (event: SelectChangeEvent) => {
     setDepth(event.target.value);
+  };
+
+  const handleEffortChange = (event: SelectChangeEvent) => {
+    setEffort(event.target.value);
   };
 
   const handleProjectedStartDateChange = (value: PickerValue) => {
@@ -274,6 +289,23 @@ export const RequestInfoPanel: React.FC<RequestInfoPanelProps> = ({ request }) =
                   {editing && hasPermission('edit-depth', detailedIdentity) && (
                     <Select value={depth} onChange={handleDepthChange}>
                       {request.depth_options.map((option) => (
+                        <MenuItem key={option} value={option}>
+                          {option}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  )}
+                </TableCell>
+              </TableRow>
+              <TableRow>
+                <TableCell>Effort</TableCell>
+                <TableCell>
+                  {(!editing || !hasPermission('edit-effort', detailedIdentity)) && (
+                    <>{request.effort || '-'}</>
+                  )}
+                  {editing && hasPermission('edit-effort', detailedIdentity) && (
+                    <Select value={effort} onChange={handleEffortChange}>
+                      {effortOptions.map((option) => (
                         <MenuItem key={option} value={option}>
                           {option}
                         </MenuItem>

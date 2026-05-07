@@ -30,15 +30,15 @@ import {
   OrganizationType,
   State,
   TransmissionPlanningRegion,
-} from '../../api/forms/types';
-import { AppLink } from '../../components/AppLink';
+} from '@/api/forms/types';
+import { AppLink } from '@/components/AppLink';
 import {
   organizationTypesQueryOptions,
   statesQueryOptions,
   transmissionPlanningRegionsQueryOptions,
   useSubmitIntakeMutation,
-} from '../../api/queryOptions';
-import { isValidEmail, isValidUSTelephone } from '../../utils/utils';
+} from '@/api/queryOptions';
+import { effortOptions, isValidEmail, isValidUSTelephone } from '@/utils/utils';
 import { PhoneInput } from '@/components/PhoneInput';
 
 export const Route = createFileRoute('/(public)/intake')({
@@ -338,22 +338,14 @@ function IntakeForm() {
                     aria-labelledby="effort-radio-group"
                     name="effort-radio-group"
                   >
-                    <FormControlLabel
-                      value="1 day or less"
-                      control={<Radio />}
-                      label="1 day or less"
-                    />
-                    <FormControlLabel
-                      value="Up to 3 weeks (15 days)"
-                      control={<Radio />}
-                      label="Up to 3 weeks (15 days)"
-                    />
-                    <FormControlLabel
-                      value="More than 3 weeks"
-                      control={<Radio />}
-                      label="More than 3 weeks"
-                    />
-                    <FormControlLabel value="Unsure" control={<Radio />} label="Unsure" />
+                    {effortOptions.map((option) => (
+                      <FormControlLabel
+                        key={option}
+                        value={option}
+                        control={<Radio />}
+                        label={option}
+                      />
+                    ))}
                   </RadioGroup>
                 </FormControl>
               </Stack>
