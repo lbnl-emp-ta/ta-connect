@@ -87,8 +87,11 @@ export const downloadBlob = (blob: Blob, filename: string): void => {
 
 type PermissionAction =
   | 'edit-depth'
+  | 'edit-effort'
   | 'edit-topics'
   | 'edit-description'
+  | 'edit-challenges'
+  | 'edit-goals'
   | 'edit-projected-start-date'
   | 'edit-projected-completion-date'
   | 'edit-actual-completion-date'
@@ -123,8 +126,11 @@ export const hasPermission = (
     case TARole.Coordinator:
       switch (action) {
         case 'edit-depth':
+        case 'edit-effort':
         case 'edit-topics':
         case 'edit-description':
+        case 'edit-challenges':
+        case 'edit-goals':
         case 'edit-projected-start-date':
         case 'edit-projected-completion-date':
         case 'edit-actual-completion-date':
@@ -135,8 +141,11 @@ export const hasPermission = (
     case TARole.ProgramLead:
       switch (action) {
         case 'edit-depth':
+        case 'edit-effort':
         case 'edit-topics':
         case 'edit-description':
+        case 'edit-challenges':
+        case 'edit-goals':
         case 'edit-projected-start-date':
         case 'edit-projected-completion-date':
         case 'edit-actual-completion-date':
@@ -147,8 +156,11 @@ export const hasPermission = (
     case TARole.LabLead:
       switch (action) {
         case 'edit-depth':
+        case 'edit-effort':
         case 'edit-topics':
         case 'edit-description':
+        case 'edit-challenges':
+        case 'edit-goals':
         case 'edit-projected-start-date':
         case 'edit-projected-completion-date':
         case 'edit-actual-completion-date':
@@ -392,3 +404,14 @@ export const statusMap: Record<TAStatusName, StatusInfo> = {
     contrastColor: '#333333',
   },
 };
+
+/**
+ * These strings represent the exact choices allowed in the database
+ * for the effort field of a request.
+ */
+export const effortOptions = [
+  '1 day or less',
+  'Up to 3 weeks (15 days)',
+  'More than 3 weeks',
+  'Unsure',
+];

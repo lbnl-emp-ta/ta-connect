@@ -313,6 +313,7 @@ class RequestDetailView(BaseUserAwareRequest):
         body = request.data
 
         patch_data = dict()
+        updated_fields = list()
 
         if not body:
             return Response(data={"message": "Missing request body"}, status=status.HTTP_204_NO_CONTENT)
@@ -326,6 +327,34 @@ class RequestDetailView(BaseUserAwareRequest):
                 new_description_data = ""
 
             patch_data["description"] = new_description_data 
+            updated_fields.append("description")
+
+        if "challenges" in body:
+            if not CanEditDescription().has_permission(request):
+                return Response(data={"message": "Insufficient privillege to update 'challenges' field"}, status=status.HTTP_401_UNAUTHORIZED)
+            
+            new_challenges_data = body.get("challenges")
+
+            patch_data["challenges"] = new_challenges_data 
+            updated_fields.append("challenges")
+
+        if "goals" in body:
+            if not CanEditDescription().has_permission(request):
+                return Response(data={"message": "Insufficient privillege to update 'goals' field"}, status=status.HTTP_401_UNAUTHORIZED)
+            
+            new_goals_data = body.get("goals")
+
+            patch_data["goals"] = new_goals_data
+            updated_fields.append("goals")
+
+        if "effort" in body:
+            if not CanEditDescription().has_permission(request):
+                return Response(data={"message": "Insufficient privillege to update 'effort' field"}, status=status.HTTP_401_UNAUTHORIZED)
+            
+            new_effort_data = body.get("effort")
+
+            patch_data["effort"] = new_effort_data
+            updated_fields.append("effort")
 
         if "depth" in body:
             if not CanEditDepth().has_permission(request):
@@ -341,12 +370,14 @@ class RequestDetailView(BaseUserAwareRequest):
                 return Response(data={"message": "Provided depth does not exist."}, status=status.HTTP_400_BAD_REQUEST)
 
             patch_data["depth"] = maybe_depth.name
+            updated_fields.append("depth")
 
         if "actual_completion_date" in body:
             if not (IsAnyRoleOnRequest().has_permission(request)):
                 return Response(data={"message": "Insufficient privillege to update 'actual completion date' field"}, status=status.HTTP_401_UNAUTHORIZED)
 
-            patch_data["actual_completion_date"] = body.get("actual_completion_date") 
+            patch_data["actual_completion_date"] = body.get("actual_completion_date")
+            updated_fields.append("actual completion date")
 
         if "expert" in body:
             if not(IsAdmin().has_permission(request) or IsLabLead().has_permission(request)):
@@ -377,13 +408,15 @@ class RequestDetailView(BaseUserAwareRequest):
                     return Response(data={"message": "Provided expert does not reside in your lab role exist."}, status=status.HTTP_400_BAD_REQUEST)
                 
 
-            patch_data["expert"] = maybe_expert.email 
+            patch_data["expert"] = maybe_expert.email
+            updated_fields.append("expert")
         
         if "proj_start_date" in body:
             if not(IsAnyRoleOnRequest().has_permission(request)):
                 return Response(data={"message": "Insufficient privillege to update 'projected start date' field"}, status=status.HTTP_401_UNAUTHORIZED)
 
             patch_data["proj_start_date"] = body.get("proj_start_date")
+            updated_fields.append("projected start date")
 
         if "proj_completion_date" in body:
             if not(IsAnyRoleOnRequest().has_permission(request)):
@@ -398,6 +431,9 @@ class RequestDetailView(BaseUserAwareRequest):
             # If projected completion date is being removed while PROVIDING_TA, revert status back to ASSIGNED_TO_EXPERT
             if body.get("proj_completion_date") == None and maybe_request.status.name == REQUEST_STATUS.PROVIDING_TA:
                 patch_data["status"] = get_status(REQUEST_STATUS.ASSIGNED_TO_EXPERT)
+
+            updated_fields.append("projected completion date")
+            updated_fields.append("status")
             
         if "status" in body:
             if body.get("status") is None:
@@ -409,7 +445,8 @@ class RequestDetailView(BaseUserAwareRequest):
             except RequestStatus.DoesNotExist:
                 return Response(data={"message": "Provided status does not exist."}, status=status.HTTP_400_BAD_REQUEST)
 
-            patch_data["status"] = maybe_status.name 
+            patch_data["status"] = maybe_status.name
+            updated_fields.append("status")
         
         # Topics are done a special way (not using patch serializer) because they are 
         # stored as a Many-to-Many relationship in the database.
@@ -428,6 +465,8 @@ class RequestDetailView(BaseUserAwareRequest):
                     return Response(data={"message": "One of the provided topics does not exist."}, status=status.HTTP_400_BAD_REQUEST)
 
                 maybe_request.topics.add(topic)
+
+            updated_fields.append("topics")
                 
         
        # do partial save with accumulated patch 
@@ -442,7 +481,7 @@ class RequestDetailView(BaseUserAwareRequest):
                         error_msg = constraint.violation_error_message
                         break
                 return Response(data={"message": error_msg}, status=status.HTTP_400_BAD_REQUEST)
-            create_audit_history(request, maybe_request, ActionType.EditRequestDetails, f"Edited request: {str(patch_data)[:20]}...")
+            create_audit_history(request, maybe_request, ActionType.EditRequestDetails, f"Edited: {str(updated_fields)}")
         else:
             return Response(data={"message": patch_serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
 

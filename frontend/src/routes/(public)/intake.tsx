@@ -12,6 +12,7 @@ import {
   InputLabel,
   Link,
   MenuItem,
+  OutlinedInput,
   Paper,
   Radio,
   RadioGroup,
@@ -29,15 +30,16 @@ import {
   OrganizationType,
   State,
   TransmissionPlanningRegion,
-} from '../../api/forms/types';
-import { AppLink } from '../../components/AppLink';
+} from '@/api/forms/types';
+import { AppLink } from '@/components/AppLink';
 import {
   organizationTypesQueryOptions,
   statesQueryOptions,
   transmissionPlanningRegionsQueryOptions,
   useSubmitIntakeMutation,
-} from '../../api/queryOptions';
-import { isValidEmail, isValidUSTelephone } from '../../utils/utils';
+} from '@/api/queryOptions';
+import { effortOptions, isValidEmail, isValidUSTelephone } from '@/utils/utils';
+import { PhoneInput } from '@/components/PhoneInput';
 
 export const Route = createFileRoute('/(public)/intake')({
   loader: async ({ context }) => {
@@ -52,28 +54,22 @@ function IntakeForm() {
   const { data: states } = useSuspenseQuery(statesQueryOptions());
   const { data: orgTypes } = useSuspenseQuery(organizationTypesQueryOptions());
   const { data: tprs } = useSuspenseQuery(transmissionPlanningRegionsQueryOptions());
-
-  const [name, setName] = useState<string>('');
-  const [phone, setPhone] = useState<string>('');
-  const [email, setEmail] = useState<string>('');
-  const [title, setTitle] = useState<string>('');
-
+  const [name, setName] = useState('');
+  const [phone, setPhone] = useState('');
+  const [email, setEmail] = useState('');
+  const [title, setTitle] = useState('');
   const [state, setState] = useState<State | null>(null);
-
-  const [orgName, setOrgName] = useState<string>('');
-  const [orgAddress, setOrgAddress] = useState<string>('');
-  const [orgTypeName, setOrgTypeName] = useState<string>('');
-
-  const [desc, setDesc] = useState<string>('');
-
-  const [tprName, setTPRName] = useState<string>('');
-
-  const [phoneError, setPhoneError] = useState<boolean>(false);
-  const [phoneHelperText, setPhoneHelperText] = useState<string>('');
-
-  const [emailError, setEmailError] = useState<boolean>(false);
-  const [emailHelperText, setEmailHelperText] = useState<string>('');
-
+  const [orgName, setOrgName] = useState('');
+  const [orgAddress, setOrgAddress] = useState('');
+  const [orgTypeName, setOrgTypeName] = useState('');
+  const [description, setDescription] = useState('');
+  const [challenges, setChallenges] = useState('');
+  const [goals, setGoals] = useState('');
+  const [effort, setEffort] = useState('Unsure');
+  const [tprName, setTprName] = useState('');
+  const [phoneError, setPhoneError] = useState(false);
+  const [emailError, setEmailError] = useState(false);
+  const [emailHelperText, setEmailHelperText] = useState('');
   const submitIntakeMutation = useSubmitIntakeMutation();
 
   function handleSubmit(event: React.SyntheticEvent<HTMLFormElement>) {
@@ -88,7 +84,10 @@ function IntakeForm() {
       organization: orgName,
       organizationAddress: orgAddress,
       organizationType: orgTypeName,
-      description: desc,
+      description: description,
+      challenges: challenges,
+      goals: goals,
+      effort: effort,
     };
     submitIntakeMutation.mutate(formData);
   }
@@ -96,10 +95,8 @@ function IntakeForm() {
   const handlePhoneChange: ChangeEventHandler<HTMLInputElement> = (e) => {
     if (isValidUSTelephone(e.target.value)) {
       setPhoneError(false);
-      setPhoneHelperText('');
     } else {
       setPhoneError(true);
-      setPhoneHelperText('Not a valid phone number.');
     }
 
     setPhone(e.target.value);
@@ -173,15 +170,14 @@ function IntakeForm() {
                   onChange={(e) => handleEmailChange(e.target.value)}
                   value={email}
                 />
-                <TextField
+                <PhoneInput
                   variant="outlined"
+                  id="phone-input"
                   label="Phone Number"
-                  fullWidth={true}
-                  required={true}
                   value={phone}
-                  error={phoneError}
-                  helperText={phoneHelperText}
                   onChange={handlePhoneChange}
+                  error={phoneError}
+                  required
                 />
                 <TextField
                   variant="outlined"
@@ -202,7 +198,7 @@ function IntakeForm() {
                     value={
                       tprName === undefined || tprName === null || tprs?.length === 0 ? '' : tprName
                     }
-                    onChange={(e) => setTPRName(e.target.value as React.SetStateAction<string>)}
+                    onChange={(e) => setTprName(e.target.value)}
                   >
                     {tprs?.map((region: TransmissionPlanningRegion) => (
                       <MenuItem key={region.name} value={region.name}>
@@ -239,7 +235,9 @@ function IntakeForm() {
                   value={orgAddress}
                 />
                 <FormControl>
-                  <FormLabel id="org-type-radio-group">Organization Type</FormLabel>
+                  <FormLabel id="org-type-radio-group" sx={{ fontWeight: 'bold' }}>
+                    Organization Type
+                  </FormLabel>
                   <RadioGroup
                     aria-labelledby="org-type-radio-group"
                     value={orgTypeName}
@@ -260,40 +258,96 @@ function IntakeForm() {
               <Divider />
               <Stack spacing={2}>
                 <Typography variant="h4">Technical Assistance Information</Typography>
+                <FormControl required={true}>
+                  <FormLabel htmlFor="description-input" sx={{ fontWeight: 'bold' }}>
+                    Description
+                  </FormLabel>
+                  <Typography variant="body2" color="text.secondary" sx={{ marginBottom: 1 }}>
+                    What is the issue/question/task you are seeking support for? (maximum of 4000
+                    characters)
+                  </Typography>
+                  <OutlinedInput
+                    id="description-input"
+                    notched
+                    value={description}
+                    onChange={(e) => setDescription(e.target.value)}
+                    multiline
+                    rows={10}
+                    required
+                    inputProps={{ maxLength: 4000 }}
+                  />
+                </FormControl>
                 <FormControl>
-                  <Stack spacing={2}>
-                    <FormLabel id="urgency-radio-group">Urgency</FormLabel>
-                    <Typography variant="body2">
-                      How urgent is this request? Please note that this is not a guarantee that
-                      Technical Assistance can be scheduled within a specific time frame.
-                    </Typography>
-                  </Stack>
-                  <RadioGroup aria-labelledby="urgency-radio-group" name="urgency-radio-group">
-                    <FormControlLabel value="1 week" control={<Radio />} label="Within 1 week" />
-                    <FormControlLabel value="1 month" control={<Radio />} label="Within 1 month" />
-                    <FormControlLabel
-                      value="3 months"
-                      control={<Radio />}
-                      label="Within 3 months"
-                    />
-                    <FormControlLabel
-                      value="6 months"
-                      control={<Radio />}
-                      label="Within 6 months"
-                    />
-                    <FormControlLabel value="Unsure" control={<Radio />} label="Unsure" />
+                  <FormLabel htmlFor="challenges-input" sx={{ fontWeight: 'bold' }}>
+                    Challenges
+                  </FormLabel>
+                  <Typography variant="body2" color="text.secondary" sx={{ marginBottom: 1 }}>
+                    What challenges have you identified that DOE's technical assistance can help
+                    address? (e.g. Completing this request within the next 2 months is critical to
+                    meeting key deadlines) (maximum of 4000 characters)
+                  </Typography>
+                  <OutlinedInput
+                    id="challenges-input"
+                    notched
+                    value={challenges}
+                    onChange={(e) => setChallenges(e.target.value)}
+                    multiline
+                    rows={10}
+                    inputProps={{ maxLength: 4000 }}
+                  />
+                </FormControl>
+                <FormControl>
+                  <FormLabel htmlFor="goals-input" sx={{ fontWeight: 'bold' }}>
+                    Goals
+                  </FormLabel>
+                  <Typography variant="body2" color="text.secondary" sx={{ marginBottom: 1 }}>
+                    What do you hope to learn or accomplish through the requested technical
+                    assistance (e.g. receive a report, host a workshop, support with a non-litigated
+                    proceeding) (maximum of 4000 characters)
+                  </Typography>
+                  <OutlinedInput
+                    id="goals-input"
+                    notched
+                    value={goals}
+                    onChange={(e) => setGoals(e.target.value)}
+                    multiline
+                    rows={10}
+                    inputProps={{ maxLength: 4000 }}
+                  />
+                </FormControl>
+                <FormControl required={true}>
+                  <FormLabel id="effort-radio-group" sx={{ fontWeight: 'bold' }}>
+                    Please estimate the level of effort to complete your request
+                  </FormLabel>
+                  <Typography
+                    variant="body2"
+                    color="text.secondary"
+                    sx={{ display: 'block', marginBottom: 1 }}
+                  >
+                    <span>Please provide your best guess. </span>
+                    <strong>Measure work, not calendars: </strong>
+                    <span>
+                      We are looking for total hands-on working hours, not the calendar duration of
+                      the project. (For example, a project might take 15 days of total effort spread
+                      across a 6-month period). Note: 1 day = 8 hours of work
+                    </span>
+                  </Typography>
+                  <RadioGroup
+                    value={effort}
+                    onChange={(e) => setEffort(e.target.value)}
+                    aria-labelledby="effort-radio-group"
+                    name="effort-radio-group"
+                  >
+                    {effortOptions.map((option) => (
+                      <FormControlLabel
+                        key={option}
+                        value={option}
+                        control={<Radio />}
+                        label={option}
+                      />
+                    ))}
                   </RadioGroup>
                 </FormControl>
-                <TextField
-                  label="Description"
-                  placeholder="Please describe your request here (maximum of 4000 characters)."
-                  value={desc}
-                  onChange={(e) => setDesc(e.target.value)}
-                  multiline
-                  rows={10}
-                  required
-                  slotProps={{ htmlInput: { maxLength: 4000 } }}
-                />
               </Stack>
               <Divider />
               <Stack spacing={2}>

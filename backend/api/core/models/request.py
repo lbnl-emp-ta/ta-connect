@@ -6,6 +6,12 @@ class Request(models.Model):
     """
     Represent the requests coming in from customers for technical assistance.
     """
+    class EffortLevel(models.TextChoices):
+        ONE_DAY_OR_LESS = "1 day or less", "1 day or less"
+        UP_TO_THREE_WEEKS = "Up to 3 weeks (15 days)", "Up to 3 weeks (15 days)"
+        MORE_THAN_THREE_WEEKS = "More than 3 weeks", "More than 3 weeks"
+        UNSURE = "Unsure", "Unsure"
+
     owner = models.ForeignKey(Owner, on_delete=models.PROTECT, blank=True, null=True, default=Owner.get_default_pk)
     program = models.ForeignKey(Program, on_delete=models.PROTECT, blank=True, null=True)
     lab = models.ForeignKey(Lab, on_delete=models.PROTECT, blank=True, null=True)
@@ -13,6 +19,9 @@ class Request(models.Model):
     status = models.ForeignKey(RequestStatus, on_delete=models.PROTECT, default=RequestStatus.get_default_pk)
     depth = models.ForeignKey(Depth, on_delete=models.PROTECT, blank=True, null=True, default=Depth.get_default_pk)
     description = models.TextField(blank=True, null=True)
+    challenges = models.TextField(blank=True, null=True)
+    goals = models.TextField(blank=True, null=True)
+    effort = models.CharField(max_length=25, choices=EffortLevel.choices, blank=True, null=True)
     date_created = models.DateTimeField(auto_now_add=True)
     proj_start_date = models.DateField(blank=True, null=True, verbose_name="projected start date")
     proj_completion_date = models.DateField(blank=True, null=True, verbose_name="projected completion date")

@@ -7,7 +7,6 @@ import EditIcon from '@mui/icons-material/Edit';
 import ErrorIcon from '@mui/icons-material/Error';
 import {
   Autocomplete,
-  Box,
   Chip,
   CircularProgress,
   Grid,
@@ -26,16 +25,23 @@ import {
 } from '@mui/material';
 import { DatePicker } from '@mui/x-date-pickers';
 import { PickerValue } from '@mui/x-date-pickers/internals';
+import { useSuspenseQuery } from '@tanstack/react-query';
 import dayjs, { Dayjs } from 'dayjs';
 import { useCallback, useEffect, useState } from 'react';
 import { TARequestDetail, TARequestDetailMutation, TATopic } from '../../api/dashboard/types';
-import { InfoPanel } from '../../components/InfoPanel';
 import { topicsQueryOptions, useRequestMutation } from '../../api/queryOptions';
-import { capitalize, formatDatetime, hasPermission, statusMap } from '../../utils/utils';
+import { InfoPanel } from '../../components/InfoPanel';
+import {
+  capitalize,
+  effortOptions,
+  formatDatetime,
+  hasPermission,
+  statusMap,
+} from '../../utils/utils';
 import { useIdentityContext } from '../identity/IdentityContext';
 import { useToastContext } from '../toasts/ToastContext';
 import { ToastMessage } from '../toasts/ToastMessage';
-import { useSuspenseQuery } from '@tanstack/react-query';
+import { EffortIcon } from '@/components/EffortIcon';
 
 interface RequestInfoPanelProps {
   request?: TARequestDetail;
@@ -48,10 +54,10 @@ export const RequestInfoPanel: React.FC<RequestInfoPanelProps> = ({ request }) =
   const [editing, setEditing] = useState(false);
   const { setShowToast, setToastMessage } = useToastContext();
   const [depth, setDepth] = useState<TARequestDetail['depth']>();
+  const [effort, setEffort] = useState<TARequestDetail['effort']>();
   const [projectedStartDate, setProjectedStartDate] = useState<Dayjs>();
   const [projectedCompletionDate, setProjectedCompletionDate] = useState<Dayjs>();
   const [actualCompletionDate, setActualCompletionDate] = useState<Dayjs>();
-  const [description, setDescription] = useState('');
   const [topics, setTopics] = useState<TARequestDetail['topics']>([]);
 
   /**
@@ -60,6 +66,7 @@ export const RequestInfoPanel: React.FC<RequestInfoPanelProps> = ({ request }) =
   const resetFormValues = useCallback(() => {
     if (request) {
       setDepth(request.depth);
+      setEffort(request.effort);
       setProjectedStartDate(request.proj_start_date ? dayjs(request.proj_start_date) : undefined);
       setProjectedCompletionDate(
         request.proj_completion_date ? dayjs(request.proj_completion_date) : undefined
@@ -68,7 +75,6 @@ export const RequestInfoPanel: React.FC<RequestInfoPanelProps> = ({ request }) =
         request.actual_completion_date ? dayjs(request.actual_completion_date) : undefined
       );
       setTopics(request.topics || []);
-      setDescription(request.description || '');
     }
   }, [request]);
 
@@ -86,8 +92,8 @@ export const RequestInfoPanel: React.FC<RequestInfoPanelProps> = ({ request }) =
     if (depth !== request?.depth) {
       mutationData.depth = depth;
     }
-    if (description !== request?.description) {
-      mutationData.description = description;
+    if (effort !== request?.effort) {
+      mutationData.effort = effort;
     }
     if (projectedStartDate === null && request?.proj_start_date !== null) {
       mutationData.proj_start_date = null;
@@ -137,8 +143,8 @@ export const RequestInfoPanel: React.FC<RequestInfoPanelProps> = ({ request }) =
     setDepth(event.target.value);
   };
 
-  const handleDescriptionChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setDescription(event.target.value);
+  const handleEffortChange = (event: SelectChangeEvent) => {
+    setEffort(event.target.value);
   };
 
   const handleProjectedStartDateChange = (value: PickerValue) => {
@@ -213,107 +219,158 @@ export const RequestInfoPanel: React.FC<RequestInfoPanelProps> = ({ request }) =
     >
       {!request && <Typography>No request data to show.</Typography>}
       {request && (
-        <>
-          <TableContainer>
-            <Table
-              size="small"
-              sx={{
-                '& .MuiTableCell-root:first-of-type': {
-                  color: 'grey.900',
-                  fontWeight: 'bold',
-                  width: '205px',
-                },
-              }}
-            >
-              <TableBody>
-                <TableRow>
-                  <TableCell>ID</TableCell>
-                  <TableCell>{request.id}</TableCell>
-                </TableRow>
-                <TableRow>
-                  <TableCell>Status</TableCell>
-                  <TableCell>
+        <TableContainer>
+          <Table
+            size="small"
+            sx={{
+              '& .MuiTableCell-root:first-of-type': {
+                color: 'grey.900',
+                fontWeight: 'bold',
+                width: '205px',
+              },
+            }}
+          >
+            <TableBody>
+              <TableRow>
+                <TableCell>ID</TableCell>
+                <TableCell>{request.id}</TableCell>
+              </TableRow>
+              <TableRow>
+                <TableCell>Status</TableCell>
+                <TableCell>
+                  <Stack direction="row" alignItems="center" spacing={1}>
+                    <CircleIcon
+                      fontSize="small"
+                      sx={{
+                        color: statusMap[request.status].color,
+                      }}
+                    />
+                    <span>{request.status ? statusMap[request.status].text : '-'}</span>
+                  </Stack>
+                </TableCell>
+              </TableRow>
+              <TableRow>
+                <TableCell>Current Owner</TableCell>
+                <TableCell
+                  sx={{
+                    color: request.owner ? statusMap[request.status].color : 'grey.900',
+                    fontWeight: 'bold',
+                  }}
+                >
+                  <Stack direction="row" spacing={1}>
+                    {request.owner && <span>{capitalize(request.owner.domain_type)}</span>}
+                    {request.owner && request.owner.domain_type !== 'reception' && (
+                      <>
+                        <span>|</span>
+                        <span>{request.owner.domain_name}</span>
+                      </>
+                    )}
+                    {!request.owner && <span>-</span>}
+                  </Stack>
+                </TableCell>
+              </TableRow>
+              <TableRow>
+                <TableCell>Program</TableCell>
+                <TableCell>{request.program ? request.program.name : '-'}</TableCell>
+              </TableRow>
+              <TableRow>
+                <TableCell>Lab</TableCell>
+                <TableCell>{request.lab ? request.lab.name : '-'}</TableCell>
+              </TableRow>
+              <TableRow>
+                <TableCell>Assigned Expert</TableCell>
+                <TableCell>{request.expert ? request.expert.email : '-'}</TableCell>
+              </TableRow>
+              <TableRow>
+                <TableCell>Depth</TableCell>
+                <TableCell>
+                  {(!editing || !hasPermission('edit-depth', detailedIdentity)) && (
+                    <>{request.depth || '-'}</>
+                  )}
+                  {editing && hasPermission('edit-depth', detailedIdentity) && (
+                    <Select value={depth} onChange={handleDepthChange}>
+                      {request.depth_options.map((option) => (
+                        <MenuItem key={option} value={option}>
+                          {option}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  )}
+                </TableCell>
+              </TableRow>
+              <TableRow>
+                <TableCell>Effort</TableCell>
+                <TableCell>
+                  {(!editing || !hasPermission('edit-effort', detailedIdentity)) && (
                     <Stack direction="row" alignItems="center" spacing={1}>
-                      <CircleIcon
-                        fontSize="small"
-                        sx={{
-                          color: statusMap[request.status].color,
-                        }}
-                      />
-                      <span>{request.status ? statusMap[request.status].text : '-'}</span>
+                      <EffortIcon effort={request.effort || ''} fontSize="small" />
+                      <span>{request.effort || '-'}</span>
                     </Stack>
-                  </TableCell>
-                </TableRow>
-                <TableRow>
-                  <TableCell>Current Owner</TableCell>
-                  <TableCell
-                    sx={{
-                      color: request.owner ? statusMap[request.status].color : 'grey.900',
-                      fontWeight: 'bold',
-                    }}
-                  >
-                    <Stack direction="row" spacing={1}>
-                      {request.owner && <span>{capitalize(request.owner.domain_type)}</span>}
-                      {request.owner && request.owner.domain_type !== 'reception' && (
-                        <>
-                          <span>|</span>
-                          <span>{request.owner.domain_name}</span>
-                        </>
-                      )}
-                      {!request.owner && <span>-</span>}
-                    </Stack>
-                  </TableCell>
-                </TableRow>
-                <TableRow>
-                  <TableCell>Program</TableCell>
-                  <TableCell>{request.program ? request.program.name : 'Not assigned'}</TableCell>
-                </TableRow>
-                <TableRow>
-                  <TableCell>Lab</TableCell>
-                  <TableCell>{request.lab ? request.lab.name : 'Not assigned'}</TableCell>
-                </TableRow>
-                <TableRow>
-                  <TableCell>Assigned Expert</TableCell>
-                  <TableCell>{request.expert ? request.expert.email : 'Not assigned'}</TableCell>
-                </TableRow>
-                <TableRow>
-                  <TableCell>Depth</TableCell>
-                  <TableCell>
-                    {(!editing || !hasPermission('edit-depth', detailedIdentity)) && (
-                      <>{request.depth || '-'}</>
-                    )}
-                    {editing && hasPermission('edit-depth', detailedIdentity) && (
-                      <Select value={depth} onChange={handleDepthChange}>
-                        {request.depth_options.map((option) => (
-                          <MenuItem key={option} value={option}>
-                            {option}
-                          </MenuItem>
-                        ))}
-                      </Select>
-                    )}
-                  </TableCell>
-                </TableRow>
-                <TableRow>
-                  <TableCell>Date Submitted</TableCell>
-                  <TableCell>
-                    {request.date_created ? formatDatetime(request.date_created) : '-'}
-                  </TableCell>
-                </TableRow>
-                <TableRow>
-                  <TableCell>Projected Start Date</TableCell>
-                  <TableCell>
-                    {(!editing ||
-                      !hasPermission('edit-projected-start-date', detailedIdentity)) && (
-                      <>
-                        {request.proj_start_date
-                          ? dayjs(request.proj_start_date).format('MM/DD/YYYY')
-                          : '-'}
-                      </>
-                    )}
-                    {editing && hasPermission('edit-projected-start-date', detailedIdentity) && (
+                  )}
+                  {editing && hasPermission('edit-effort', detailedIdentity) && (
+                    <Select value={effort} onChange={handleEffortChange}>
+                      {effortOptions.map((option) => (
+                        <MenuItem key={option} value={option}>
+                          {option}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  )}
+                </TableCell>
+              </TableRow>
+              <TableRow>
+                <TableCell>Date Submitted</TableCell>
+                <TableCell>
+                  {request.date_created ? formatDatetime(request.date_created) : '-'}
+                </TableCell>
+              </TableRow>
+              <TableRow>
+                <TableCell>Projected Start Date</TableCell>
+                <TableCell>
+                  {(!editing || !hasPermission('edit-projected-start-date', detailedIdentity)) && (
+                    <>
+                      {request.proj_start_date
+                        ? dayjs(request.proj_start_date).format('MM/DD/YYYY')
+                        : '-'}
+                    </>
+                  )}
+                  {editing && hasPermission('edit-projected-start-date', detailedIdentity) && (
+                    <DatePicker
+                      value={projectedStartDate || null}
+                      onChange={handleProjectedStartDateChange}
+                      slotProps={{
+                        field: {
+                          clearable: true,
+                        },
+                      }}
+                    />
+                  )}
+                </TableCell>
+              </TableRow>
+              <TableRow>
+                <TableCell>Projected Completion Date</TableCell>
+                <TableCell>
+                  {(!editing ||
+                    !hasPermission(
+                      'edit-projected-completion-date',
+                      detailedIdentity,
+                      request.status
+                    )) && (
+                    <>
+                      {request.proj_completion_date
+                        ? dayjs(request.proj_completion_date).format('MM/DD/YYYY')
+                        : '-'}
+                    </>
+                  )}
+                  {editing &&
+                    hasPermission(
+                      'edit-projected-completion-date',
+                      detailedIdentity,
+                      request.status
+                    ) && (
                       <DatePicker
-                        value={projectedStartDate || null}
-                        onChange={handleProjectedStartDateChange}
+                        value={projectedCompletionDate || null}
+                        onChange={handleProjectedCompletionDateChange}
                         slotProps={{
                           field: {
                             clearable: true,
@@ -321,136 +378,71 @@ export const RequestInfoPanel: React.FC<RequestInfoPanelProps> = ({ request }) =
                         }}
                       />
                     )}
-                  </TableCell>
-                </TableRow>
-                <TableRow>
-                  <TableCell>Projected Completion Date</TableCell>
-                  <TableCell>
-                    {(!editing ||
-                      !hasPermission(
-                        'edit-projected-completion-date',
-                        detailedIdentity,
-                        request.status
-                      )) && (
-                      <>
-                        {request.proj_completion_date
-                          ? dayjs(request.proj_completion_date).format('MM/DD/YYYY')
-                          : '-'}
-                      </>
-                    )}
-                    {editing &&
-                      hasPermission(
-                        'edit-projected-completion-date',
-                        detailedIdentity,
-                        request.status
-                      ) && (
-                        <DatePicker
-                          value={projectedCompletionDate || null}
-                          onChange={handleProjectedCompletionDateChange}
-                          slotProps={{
-                            field: {
-                              clearable: true,
-                            },
-                          }}
-                        />
+                </TableCell>
+              </TableRow>
+              <TableRow>
+                <TableCell>Actual Completion Date</TableCell>
+                <TableCell>
+                  {(!editing ||
+                    !hasPermission('edit-actual-completion-date', detailedIdentity)) && (
+                    <>
+                      {request.actual_completion_date
+                        ? dayjs(request.actual_completion_date).format('MM/DD/YYYY')
+                        : '-'}
+                    </>
+                  )}
+                  {editing && hasPermission('edit-actual-completion-date', detailedIdentity) && (
+                    <DatePicker
+                      value={actualCompletionDate || null}
+                      onChange={handleActualCompletionDateChange}
+                      slotProps={{
+                        field: {
+                          clearable: true,
+                        },
+                      }}
+                    />
+                  )}
+                </TableCell>
+              </TableRow>
+              <TableRow>
+                <TableCell>Topics</TableCell>
+                <TableCell>
+                  {(!editing || !hasPermission('edit-topics', detailedIdentity)) && (
+                    <Grid container spacing={1}>
+                      {request.topics && request.topics.length > 0 ? (
+                        request.topics.map((topic) => (
+                          <Grid key={topic.id} size="auto">
+                            <Chip
+                              key={topic.name}
+                              label={topic.name}
+                              color="default"
+                              size="small"
+                            />
+                          </Grid>
+                        ))
+                      ) : (
+                        <span>None</span>
                       )}
-                  </TableCell>
-                </TableRow>
-                <TableRow>
-                  <TableCell>Actual Completion Date</TableCell>
-                  <TableCell>
-                    {(!editing ||
-                      !hasPermission('edit-actual-completion-date', detailedIdentity)) && (
-                      <>
-                        {request.actual_completion_date
-                          ? dayjs(request.actual_completion_date).format('MM/DD/YYYY')
-                          : '-'}
-                      </>
-                    )}
-                    {editing && hasPermission('edit-actual-completion-date', detailedIdentity) && (
-                      <DatePicker
-                        value={actualCompletionDate || null}
-                        onChange={handleActualCompletionDateChange}
-                        slotProps={{
-                          field: {
-                            clearable: true,
-                          },
-                        }}
-                      />
-                    )}
-                  </TableCell>
-                </TableRow>
-                <TableRow>
-                  <TableCell>Topics</TableCell>
-                  <TableCell>
-                    {(!editing || !hasPermission('edit-topics', detailedIdentity)) && (
-                      <Grid container spacing={1}>
-                        {request.topics && request.topics.length > 0 ? (
-                          request.topics.map((topic) => (
-                            <Grid key={topic.id} size="auto">
-                              <Chip
-                                key={topic.name}
-                                label={topic.name}
-                                color="default"
-                                size="small"
-                              />
-                            </Grid>
-                          ))
-                        ) : (
-                          <span>None</span>
-                        )}
-                      </Grid>
-                    )}
-                    {editing && hasPermission('edit-topics', detailedIdentity) && (
-                      <Autocomplete
-                        multiple
-                        options={allTopics || []}
-                        getOptionLabel={(option) => option.name}
-                        value={topics || []}
-                        onChange={handleTopicsChange}
-                        renderInput={(params) => (
-                          <TextField {...params} variant="outlined" label="Topics" />
-                        )}
-                        disableCloseOnSelect
-                      />
-                    )}
-                  </TableCell>
-                </TableRow>
-              </TableBody>
-            </Table>
-          </TableContainer>
-          <Stack sx={{ padding: 2 }}>
-            <Stack direction="row" alignItems="center" justifyContent="space-between">
-              <Typography fontSize="0.875rem" fontWeight="bold" color="grey.900">
-                Description
-              </Typography>
-            </Stack>
-            {(!editing || !hasPermission('edit-description', detailedIdentity)) && (
-              <Box
-                sx={{
-                  backgroundColor: 'grey.50',
-                  padding: 2,
-                  borderRadius: 1,
-                  borderLeft: '4px solid',
-                  borderColor: 'grey.500',
-                }}
-              >
-                <Typography fontSize="0.875rem">
-                  {request.description || 'No description for this request.'}
-                </Typography>
-              </Box>
-            )}
-            {editing && hasPermission('edit-topics', detailedIdentity) && (
-              <TextField
-                fullWidth
-                multiline
-                variant="outlined"
-                value={description}
-                onChange={handleDescriptionChange}
-              />
-            )}
-          </Stack>
-        </>
+                    </Grid>
+                  )}
+                  {editing && hasPermission('edit-topics', detailedIdentity) && (
+                    <Autocomplete
+                      multiple
+                      options={allTopics || []}
+                      getOptionLabel={(option) => option.name}
+                      value={topics || []}
+                      onChange={handleTopicsChange}
+                      renderInput={(params) => (
+                        <TextField {...params} variant="outlined" label="Topics" />
+                      )}
+                      disableCloseOnSelect
+                    />
+                  )}
+                </TableCell>
+              </TableRow>
+            </TableBody>
+          </Table>
+        </TableContainer>
       )}
     </InfoPanel>
   );
