@@ -31,6 +31,7 @@ import {
 } from '@mui/material';
 import ChecklistIcon from '@mui/icons-material/Checklist';
 import CheckIcon from '@mui/icons-material/Check';
+import HistoryIcon from '@mui/icons-material/History';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { useEffect, useState } from 'react';
 import { formatDatetime } from '@/utils/utils';
@@ -138,7 +139,7 @@ export const RequestDetailLayout: React.FC<RequestDetailLayoutProps> = ({ reques
         <Grid size={{ lg: 6, md: 12 }}>
           <RequestScopePanel request={selectedRequest} />
         </Grid>
-        <Grid size={{ lg: 12 }}>
+        <Grid size={{ lg: 6, md: 12 }}>
           <InfoPanel
             tabs={
               <Tabs
@@ -172,11 +173,6 @@ export const RequestDetailLayout: React.FC<RequestDetailLayoutProps> = ({ reques
                   value="attachments"
                   onClick={(event) => handleTabChange(event, 'attachments')}
                 />
-                <Tab
-                  label="Audit History"
-                  value="audit-history"
-                  onClick={(event) => handleTabChange(event, 'audit-history')}
-                />
               </Tabs>
             }
           >
@@ -189,9 +185,22 @@ export const RequestDetailLayout: React.FC<RequestDetailLayoutProps> = ({ reques
                 attachments={selectedRequest.attachments}
               />
             </TabPanel>
-            <TabPanel value={tabValue} index="audit-history">
-              <RequestAuditHistory auditHistoryItems={selectedRequest.audit_history} />
-            </TabPanel>
+          </InfoPanel>
+        </Grid>
+        <Grid size={{ lg: 6, md: 12 }}>
+          <InfoPanel
+            header={
+              <Stack direction="row" alignItems="center" justifyContent="space-between">
+                <Stack direction="row" spacing={2} alignItems="center">
+                  <HistoryIcon color="primary" />
+                  <Typography variant="h5" component="h3" fontWeight="bold">
+                    Audist History
+                  </Typography>
+                </Stack>
+              </Stack>
+            }
+          >
+            <RequestAuditHistory auditHistoryItems={selectedRequest.audit_history} />
           </InfoPanel>
         </Grid>
       </Grid>

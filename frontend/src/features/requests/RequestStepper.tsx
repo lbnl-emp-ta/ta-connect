@@ -19,7 +19,9 @@ export const RequestStepper: React.FC<RequestStepperProps> = ({ request }) => {
     <Stepper activeStep={getStep(request).stepIndex} alternativeLabel>
       {steps.map((label, i) => (
         <Step key={label}>
-          <StepLabel>
+          <StepLabel
+            sx={{ '& .MuiStepLabel-label.MuiStepLabel-alternativeLabel': { marginTop: 1 } }}
+          >
             <Stack spacing={0}>
               <Typography variant="overline" fontWeight="bold">
                 {label}

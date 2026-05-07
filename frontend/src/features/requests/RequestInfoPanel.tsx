@@ -7,7 +7,6 @@ import EditIcon from '@mui/icons-material/Edit';
 import ErrorIcon from '@mui/icons-material/Error';
 import {
   Autocomplete,
-  Box,
   Chip,
   CircularProgress,
   Grid,
@@ -26,16 +25,16 @@ import {
 } from '@mui/material';
 import { DatePicker } from '@mui/x-date-pickers';
 import { PickerValue } from '@mui/x-date-pickers/internals';
+import { useSuspenseQuery } from '@tanstack/react-query';
 import dayjs, { Dayjs } from 'dayjs';
 import { useCallback, useEffect, useState } from 'react';
 import { TARequestDetail, TARequestDetailMutation, TATopic } from '../../api/dashboard/types';
-import { InfoPanel } from '../../components/InfoPanel';
 import { topicsQueryOptions, useRequestMutation } from '../../api/queryOptions';
+import { InfoPanel } from '../../components/InfoPanel';
 import { capitalize, formatDatetime, hasPermission, statusMap } from '../../utils/utils';
 import { useIdentityContext } from '../identity/IdentityContext';
 import { useToastContext } from '../toasts/ToastContext';
 import { ToastMessage } from '../toasts/ToastMessage';
-import { useSuspenseQuery } from '@tanstack/react-query';
 
 interface RequestInfoPanelProps {
   request?: TARequestDetail;
