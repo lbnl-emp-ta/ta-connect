@@ -194,7 +194,7 @@ export const RequestDetailLayout: React.FC<RequestDetailLayoutProps> = ({ reques
                 <Stack direction="row" spacing={2} alignItems="center">
                   <HistoryIcon color="primary" />
                   <Typography variant="h5" component="h3" fontWeight="bold">
-                    Audist History
+                    Audit History
                   </Typography>
                 </Stack>
               </Stack>
