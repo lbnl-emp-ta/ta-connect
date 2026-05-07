@@ -89,6 +89,8 @@ type PermissionAction =
   | 'edit-depth'
   | 'edit-topics'
   | 'edit-description'
+  | 'edit-challenges'
+  | 'edit-goals'
   | 'edit-projected-start-date'
   | 'edit-projected-completion-date'
   | 'edit-actual-completion-date'
@@ -125,6 +127,8 @@ export const hasPermission = (
         case 'edit-depth':
         case 'edit-topics':
         case 'edit-description':
+        case 'edit-challenges':
+        case 'edit-goals':
         case 'edit-projected-start-date':
         case 'edit-projected-completion-date':
         case 'edit-actual-completion-date':
@@ -137,6 +141,8 @@ export const hasPermission = (
         case 'edit-depth':
         case 'edit-topics':
         case 'edit-description':
+        case 'edit-challenges':
+        case 'edit-goals':
         case 'edit-projected-start-date':
         case 'edit-projected-completion-date':
         case 'edit-actual-completion-date':
@@ -149,6 +155,8 @@ export const hasPermission = (
         case 'edit-depth':
         case 'edit-topics':
         case 'edit-description':
+        case 'edit-challenges':
+        case 'edit-goals':
         case 'edit-projected-start-date':
         case 'edit-projected-completion-date':
         case 'edit-actual-completion-date':

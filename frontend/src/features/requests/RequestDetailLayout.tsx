@@ -29,11 +29,12 @@ import {
   Tabs,
   Typography,
 } from '@mui/material';
-import ListIcon from '@mui/icons-material/List';
+import ChecklistIcon from '@mui/icons-material/Checklist';
 import CheckIcon from '@mui/icons-material/Check';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { useEffect, useState } from 'react';
 import { formatDatetime } from '@/utils/utils';
+import { RequestScopePanel } from '@/features/requests/RequestScopePanel';
 
 interface RequestDetailLayoutProps {
   requestId: string;
@@ -82,7 +83,7 @@ export const RequestDetailLayout: React.FC<RequestDetailLayoutProps> = ({ reques
                 header={
                   <Stack direction="row" alignItems="center" justifyContent="space-between">
                     <Stack direction="row" spacing={2} alignItems="center">
-                      <ListIcon color="primary" />
+                      <ChecklistIcon color="primary" />
                       <Typography variant="h5" component="h3" fontWeight="bold">
                         Closeout Information
                       </Typography>
@@ -130,70 +131,68 @@ export const RequestDetailLayout: React.FC<RequestDetailLayoutProps> = ({ reques
                 </TableContainer>
               </InfoPanel>
             )}
+            <RequestCustomerPanel customer={selectedRequest?.customers[0]} />
             <RequestInfoPanel request={selectedRequest!} />
           </Stack>
         </Grid>
         <Grid size={{ lg: 6, md: 12 }}>
-          <Stack>
-            <RequestCustomerPanel customer={selectedRequest?.customers[0]} />
-            <InfoPanel
-              tabs={
-                <Tabs
-                  onChange={handleTabChange}
-                  value={tabValue}
-                  textColor="inherit"
-                  indicatorColor="primary"
-                  sx={{ '& .MuiTab-root': { fontWeight: 'bold' } }}
-                >
-                  <Tab
-                    label={
-                      <Stack direction="row" spacing={2} alignItems="center">
-                        <span>Notes</span>
-                        {selectedRequestNotes?.length ? (
-                          <Badge badgeContent={selectedRequestNotes.length} color="primary" />
-                        ) : null}
-                      </Stack>
-                    }
-                    value="notes"
-                    onClick={(event) => handleTabChange(event, 'notes')}
-                  />
-                  <Tab
-                    label={
-                      <Stack direction="row" spacing={2} alignItems="center">
-                        <span>Attachments</span>
-                        {selectedRequest.attachments?.length ? (
-                          <Badge
-                            badgeContent={selectedRequest.attachments.length}
-                            color="primary"
-                          />
-                        ) : null}
-                      </Stack>
-                    }
-                    value="attachments"
-                    onClick={(event) => handleTabChange(event, 'attachments')}
-                  />
-                  <Tab
-                    label="Audit History"
-                    value="audit-history"
-                    onClick={(event) => handleTabChange(event, 'audit-history')}
-                  />
-                </Tabs>
-              }
-            >
-              <TabPanel value={tabValue} index="notes">
-                <RequestNotes requestId={selectedRequest.id} notes={selectedRequestNotes} />
-              </TabPanel>
-              <TabPanel value={tabValue} index="attachments">
-                <RequestAttachments
-                  requestId={selectedRequest.id}
-                  attachments={selectedRequest.attachments}
+          <RequestScopePanel request={selectedRequest} />
+        </Grid>
+        <Grid size={{ lg: 12 }}>
+          <InfoPanel
+            tabs={
+              <Tabs
+                onChange={handleTabChange}
+                value={tabValue}
+                textColor="inherit"
+                indicatorColor="primary"
+                sx={{ '& .MuiTab-root': { fontWeight: 'bold' } }}
+              >
+                <Tab
+                  label={
+                    <Stack direction="row" spacing={2} alignItems="center">
+                      <span>Notes</span>
+                      {selectedRequestNotes?.length ? (
+                        <Badge badgeContent={selectedRequestNotes.length} color="primary" />
+                      ) : null}
+                    </Stack>
+                  }
+                  value="notes"
+                  onClick={(event) => handleTabChange(event, 'notes')}
                 />
-              </TabPanel>
-              <TabPanel value={tabValue} index="audit-history">
-                <RequestAuditHistory auditHistoryItems={selectedRequest.audit_history} />
-              </TabPanel>
-            </InfoPanel>
-          </Stack>
+                <Tab
+                  label={
+                    <Stack direction="row" spacing={2} alignItems="center">
+                      <span>Attachments</span>
+                      {selectedRequest.attachments?.length ? (
+                        <Badge badgeContent={selectedRequest.attachments.length} color="primary" />
+                      ) : null}
+                    </Stack>
+                  }
+                  value="attachments"
+                  onClick={(event) => handleTabChange(event, 'attachments')}
+                />
+                <Tab
+                  label="Audit History"
+                  value="audit-history"
+                  onClick={(event) => handleTabChange(event, 'audit-history')}
+                />
+              </Tabs>
+            }
+          >
+            <TabPanel value={tabValue} index="notes">
+              <RequestNotes requestId={selectedRequest.id} notes={selectedRequestNotes} />
+            </TabPanel>
+            <TabPanel value={tabValue} index="attachments">
+              <RequestAttachments
+                requestId={selectedRequest.id}
+                attachments={selectedRequest.attachments}
+              />
+            </TabPanel>
+            <TabPanel value={tabValue} index="audit-history">
+              <RequestAuditHistory auditHistoryItems={selectedRequest.audit_history} />
+            </TabPanel>
+          </InfoPanel>
         </Grid>
       </Grid>
     </Stack>

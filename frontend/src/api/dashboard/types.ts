@@ -189,6 +189,9 @@ export interface TARequestDetail {
   depth: string;
   depth_options: string[];
   description: string;
+  challenges?: string;
+  goals?: string;
+  effort: string;
   date_created: string;
   customers: TACustomer[];
   expert: TAExpert | null;
@@ -206,6 +209,9 @@ export interface TARequestDetail {
 export interface TARequestDetailMutation {
   depth: string;
   description: string;
+  challenges?: string;
+  goals?: string;
+  effort: string;
   proj_start_date: string | null;
   proj_completion_date: string | null;
   actual_completion_date: string | null;
