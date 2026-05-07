@@ -1,4 +1,12 @@
-import { FormControl, Input, InputLabel, InputProps } from '@mui/material';
+import {
+  FilledInput,
+  FormControl,
+  Input,
+  InputLabel,
+  InputProps,
+  OutlinedInput,
+  TextFieldProps,
+} from '@mui/material';
 import React from 'react';
 import { IMaskInput } from 'react-imask';
 
@@ -26,16 +34,42 @@ const TextMaskCustom = React.forwardRef<HTMLInputElement, CustomProps>(
 );
 
 interface PhoneInputProps extends InputProps {
-  label?: string;
+  label?: TextFieldProps['label'];
+  variant?: TextFieldProps['variant'];
 }
 
-export const PhoneInput: React.FC<PhoneInputProps> = ({ label, id, required, ...otherProps }) => {
+export const PhoneInput: React.FC<PhoneInputProps> = ({
+  label,
+  variant = 'standard',
+  id,
+  required,
+  ...otherProps
+}) => {
   return (
-    <FormControl variant="standard">
+    <FormControl variant={variant}>
       <InputLabel htmlFor={id} required={required}>
         {label}
       </InputLabel>
-      <Input {...otherProps} id={id} required={required} inputComponent={TextMaskCustom as any} />
+      {variant === 'outlined' && (
+        <OutlinedInput
+          {...otherProps}
+          id={id}
+          required={required}
+          label={label}
+          inputComponent={TextMaskCustom as any}
+        />
+      )}
+      {variant === 'standard' && (
+        <Input {...otherProps} id={id} required={required} inputComponent={TextMaskCustom as any} />
+      )}
+      {variant === 'filled' && (
+        <FilledInput
+          {...otherProps}
+          id={id}
+          required={required}
+          inputComponent={TextMaskCustom as any}
+        />
+      )}
     </FormControl>
   );
 };

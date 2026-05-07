@@ -36,6 +36,7 @@ import { hasPermission, isValidEmail, isValidUSTelephone } from '@/utils/utils';
 import { useIdentityContext } from '@/features/identity/IdentityContext';
 import { useToastContext } from '@/features/toasts/ToastContext';
 import { ToastMessage } from '@/features/toasts/ToastMessage';
+import { PhoneInput } from '@/components/PhoneInput';
 
 interface RequestCustomerPanelProps {
   customer?: TACustomer;
@@ -59,7 +60,6 @@ export const RequestCustomerPanel: React.FC<RequestCustomerPanelProps> = ({ cust
   const [name, setName] = useState<TACustomer['name']>();
   const [phone, setPhone] = useState<TACustomer['phone']>();
   const [phoneError, setPhoneError] = useState(false);
-  const [phoneHelperText, setPhoneHelperText] = useState('');
   const [title, setTitle] = useState<TACustomer['title']>();
   const [state, setState] = useState<TACustomer['state']['id']>();
 
@@ -77,7 +77,6 @@ export const RequestCustomerPanel: React.FC<RequestCustomerPanelProps> = ({ cust
       setName(customer.name || '');
       setPhone(customer.phone);
       setPhoneError(false);
-      setPhoneHelperText('');
       setTitle(customer.title || '');
       setState(customer.state.id);
     }
@@ -151,7 +150,6 @@ export const RequestCustomerPanel: React.FC<RequestCustomerPanelProps> = ({ cust
   ) => {
     const isValid = isValidUSTelephone(event.target.value);
     setPhoneError(!isValid);
-    setPhoneHelperText(isValid ? '' : 'Not a valid U.S. phone number.');
     setPhone(event.target.value);
   };
 
@@ -312,13 +310,13 @@ export const RequestCustomerPanel: React.FC<RequestCustomerPanelProps> = ({ cust
                 <TableCell>
                   {!editing && <>{customer.phone}</>}
                   {editing && (
-                    <TextField
-                      fullWidth
+                    <PhoneInput
                       variant="outlined"
+                      id="phone-input"
                       value={phone}
-                      error={phoneError}
-                      helperText={phoneHelperText}
                       onChange={handlePhoneChange}
+                      error={phoneError}
+                      required
                     />
                   )}
                 </TableCell>

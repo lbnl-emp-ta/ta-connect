@@ -39,6 +39,7 @@ import {
   useSubmitIntakeMutation,
 } from '../../api/queryOptions';
 import { isValidEmail, isValidUSTelephone } from '../../utils/utils';
+import { PhoneInput } from '@/components/PhoneInput';
 
 export const Route = createFileRoute('/(public)/intake')({
   loader: async ({ context }) => {
@@ -67,7 +68,6 @@ function IntakeForm() {
   const [effort, setEffort] = useState('Unsure');
   const [tprName, setTprName] = useState('');
   const [phoneError, setPhoneError] = useState(false);
-  const [phoneHelperText, setPhoneHelperText] = useState('');
   const [emailError, setEmailError] = useState(false);
   const [emailHelperText, setEmailHelperText] = useState('');
   const submitIntakeMutation = useSubmitIntakeMutation();
@@ -95,10 +95,8 @@ function IntakeForm() {
   const handlePhoneChange: ChangeEventHandler<HTMLInputElement> = (e) => {
     if (isValidUSTelephone(e.target.value)) {
       setPhoneError(false);
-      setPhoneHelperText('');
     } else {
       setPhoneError(true);
-      setPhoneHelperText('Not a valid phone number.');
     }
 
     setPhone(e.target.value);
@@ -172,15 +170,14 @@ function IntakeForm() {
                   onChange={(e) => handleEmailChange(e.target.value)}
                   value={email}
                 />
-                <TextField
+                <PhoneInput
                   variant="outlined"
+                  id="phone-input"
                   label="Phone Number"
-                  fullWidth={true}
-                  required={true}
                   value={phone}
-                  error={phoneError}
-                  helperText={phoneHelperText}
                   onChange={handlePhoneChange}
+                  error={phoneError}
+                  required
                 />
                 <TextField
                   variant="outlined"
