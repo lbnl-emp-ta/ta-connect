@@ -327,6 +327,30 @@ class RequestDetailView(BaseUserAwareRequest):
 
             patch_data["description"] = new_description_data 
 
+        if "challenges" in body:
+            if not CanEditDescription().has_permission(request):
+                return Response(data={"message": "Insufficient privillege to update 'challenges' field"}, status=status.HTTP_401_UNAUTHORIZED)
+            
+            new_challenges_data = body.get("challenges")
+
+            patch_data["challenges"] = new_challenges_data 
+
+        if "goals" in body:
+            if not CanEditDescription().has_permission(request):
+                return Response(data={"message": "Insufficient privillege to update 'goals' field"}, status=status.HTTP_401_UNAUTHORIZED)
+            
+            new_goals_data = body.get("goals")
+
+            patch_data["goals"] = new_goals_data 
+
+        if "effort" in body:
+            if not CanEditDescription().has_permission(request):
+                return Response(data={"message": "Insufficient privillege to update 'effort' field"}, status=status.HTTP_401_UNAUTHORIZED)
+            
+            new_effort_data = body.get("effort")
+
+            patch_data["effort"] = new_effort_data 
+
         if "depth" in body:
             if not CanEditDepth().has_permission(request):
                 return Response(data={"message": "Insufficient privillege to update 'depth' field"}, status=status.HTTP_401_UNAUTHORIZED)

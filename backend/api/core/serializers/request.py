@@ -89,7 +89,10 @@ class RequestSerializer(serializers.Serializer):
         allow_null=True,
         queryset=Depth.objects.all()
     )
-    description = serializers.CharField(max_length=None, required=False, allow_null=True, allow_blank=True)
+    description = serializers.CharField(required=False, allow_null=True, allow_blank=True)
+    challenges = serializers.CharField(required=False, allow_null=True, allow_blank=True)
+    goals = serializers.CharField(required=False, allow_null=True, allow_blank=True)
+    effort = serializers.CharField(max_length=25, required=False, allow_null=True, allow_blank=True)
     date_created = serializers.DateTimeField()
     proj_start_date = serializers.DateField(required=False, allow_null=True)
     proj_completion_date = serializers.DateField(required=False, allow_null=True)
