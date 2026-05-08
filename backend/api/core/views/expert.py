@@ -68,14 +68,10 @@ class ExpertsListView(views.APIView):
         experts_data = []
         for assignment in expert_assignments:
             expert_user = assignment.user
-            data = {
-                "id": expert_user.pk,
-                "name": expert_user.name,
-                "email": expert_user.email,
-                "lab": LabSerializer(assignment.instance).data,
-                "program": ProgramSerializer(assignment.program).data,
-                "expertises": self._build_expertise_list(assignment),
-            }
+            data = dict(ExpertSerializer(expert_user).data)
+            data["lab"] = LabSerializer(assignment.instance).data
+            data["program"] = ProgramSerializer(assignment.program).data
+            data["expertises"] = self._build_expertise_list(assignment)
 
             expert_requests = Request.objects.filter(expert=expert_user)
             active_requests = expert_requests.exclude(owner=None)

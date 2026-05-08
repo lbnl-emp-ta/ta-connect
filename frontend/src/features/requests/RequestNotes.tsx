@@ -121,7 +121,7 @@ export const RequestNotes: React.FC<RequestNotesProps> = ({ requestId, notes }) 
               <Stack sx={{ paddingTop: 2 }}>
                 <TextField
                   value={noteDescription}
-                  label="Description"
+                  label="Message"
                   multiline
                   rows={4}
                   onChange={handleDescriptionChange}
