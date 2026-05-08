@@ -38,7 +38,7 @@ def assignment_email(receipient_name: str, request: Request, customer: Customer)
     
     html_message = f"""
     <div>Hello {receipient_name},</div>
-    <p>You are receiving this email from TA Connect because <a href="{settings.FRONTEND_URL}/dashboard/requests/{request_id}" target="_blank">Request #{request_id}</a> has been assigned to {expert_str}{location_str}.</p>
+    <p>You are receiving this email from TA Connect because <a href="{settings.FRONTEND_URL}/requests/active/{request_id}" target="_blank">Request #{request_id}</a> has been assigned to {expert_str}{location_str}.</p>
     <p>
         <h2>Request Details</h2>
         <ul>
@@ -80,7 +80,7 @@ def new_request_email(receipient_name: str, request: Request, customer: Customer
 
     html_message = f"""
     <div>Hello {receipient_name},</div>
-    <p>A new request has been submitted into TA Connect and is awaiting your review: <a href=\"{settings.FRONTEND_URL}/dashboard/requests/{request.id}\" target=\"_blank\">Request #{request.id}</a>.</p>
+    <p>A new request has been submitted into TA Connect and is awaiting your review: <a href=\"{settings.FRONTEND_URL}/requests/active/{request.id}\" target=\"_blank\">Request #{request.id}</a>.</p>
     <p>
         <h2>Request Details</h2>
         <ul>
