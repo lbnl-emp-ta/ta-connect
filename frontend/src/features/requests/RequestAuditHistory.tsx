@@ -19,7 +19,6 @@ export const RequestAuditHistory: React.FC<RequestAuditHistoryProps> = ({ auditH
           flex: 2,
           minWidth: 300,
           renderCell: (params) => {
-            console.log('Rendering cell:', params);
             return (
               <Tooltip title={params.row.description} placement="top">
                 <span>{params.value}</span>

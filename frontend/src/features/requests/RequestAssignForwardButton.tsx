@@ -61,9 +61,8 @@ export const RequestAssignForwardButton: React.FC<RequestAssignForwardButtonProp
   const [searchTerm, setSearchTerm] = useState('');
   const requestOrganizationType = request.customers[0].org.type;
   const ownersContainsExperts =
-    owners?.some((owner) => owner.domain_type === 'expert') ||
-    request.status === 'assigned-to-lab' ||
-    request.status === 'rejected-by-expert';
+    owners?.some((owner) => owner.domain_type === 'expert') &&
+    (request.status === 'assigned-to-lab' || request.status === 'rejected-by-expert');
   const ownersNoun = useMemo(() => {
     switch (request.status) {
       case 'scoping':
