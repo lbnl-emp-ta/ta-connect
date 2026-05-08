@@ -25,7 +25,7 @@ class ContextError(Exception):
 """
 Provides common functionality across all Request views. Like
 differentiating between requests that are actionable vs.
-downstream vs. not visable.
+downstream vs. not visible.
 """
 class BaseUserAwareRequest(views.APIView):
     authentication_classes = [
