@@ -97,7 +97,11 @@ type PermissionAction =
   | 'edit-actual-completion-date'
   | 'edit-customer'
   | 'edit-organization-type'
-  | 'edit-closeout-form';
+  | 'edit-closeout-form'
+  | 'approve-closeout-form-by-lab'
+  | 'approve-closeout-form-by-program'
+  | 'reject-closeout-form-by-lab'
+  | 'reject-closeout-form-by-program';
 
 /**
  * Frontend function for checking if a user has permission to perform a certain action based on their role.
@@ -118,6 +122,16 @@ export const hasPermission = (
     statusName !== 'assigned-to-expert' &&
     statusName !== 'providing-ta'
   ) {
+    return false;
+  }
+
+  // Only allow rejecting closeout by lab if the current status is "closeout-review-by-lab"
+  if (action === 'reject-closeout-form-by-lab' && statusName !== 'closeout-review-by-lab') {
+    return false;
+  }
+
+  // Only allow rejecting closeout by program if the current status is "closeout-review-by-program"
+  if (action === 'reject-closeout-form-by-program' && statusName !== 'closeout-review-by-program') {
     return false;
   }
 
@@ -151,6 +165,8 @@ export const hasPermission = (
         case 'edit-projected-completion-date':
         case 'edit-actual-completion-date':
         case 'edit-customer':
+        case 'approve-closeout-form-by-program':
+        case 'reject-closeout-form-by-program':
           return true;
       }
       return false;
@@ -166,6 +182,8 @@ export const hasPermission = (
         case 'edit-projected-completion-date':
         case 'edit-actual-completion-date':
         case 'edit-customer':
+        case 'approve-closeout-form-by-lab':
+        case 'reject-closeout-form-by-lab':
           return true;
       }
       return false;

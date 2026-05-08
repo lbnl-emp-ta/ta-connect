@@ -37,11 +37,13 @@ import { ToastMessage } from '@/features/toasts/ToastMessage';
 
 interface RequestCloseoutFormProps {
   requestId: TARequestDetail['id'];
+  requestStatus: TARequestDetail['status'];
   expertOwnerId?: TAExpert['owner_id'];
 }
 
 export const RequestCloseoutForm: React.FC<RequestCloseoutFormProps> = ({
   requestId,
+  requestStatus,
   expertOwnerId,
 }) => {
   const { identity, detailedIdentity } = useIdentityContext();
@@ -197,22 +199,21 @@ export const RequestCloseoutForm: React.FC<RequestCloseoutFormProps> = ({
     followUpHasSameExpert,
   ]);
 
-  const approveButtonText = useMemo(() => {
-    if (
-      !closeoutForm?.submitted_date ||
-      (closeoutForm.approved_by_lab && closeoutForm.approved_by_program)
-    ) {
+  const labApproveButtonText = useMemo(() => {
+    if (!closeoutForm?.submitted_date || closeoutForm.approved_by_lab) {
       return null;
     } else if (!closeoutForm.approved_by_lab) {
       return 'Approve and send to program';
+    }
+  }, [closeoutForm?.submitted_date, closeoutForm?.approved_by_lab]);
+
+  const programApproveButtonText = useMemo(() => {
+    if (!closeoutForm?.submitted_date || closeoutForm.approved_by_program) {
+      return null;
     } else if (!closeoutForm.approved_by_program) {
       return 'Approve and mark completed';
     }
-  }, [
-    closeoutForm?.submitted_date,
-    closeoutForm?.approved_by_lab,
-    closeoutForm?.approved_by_program,
-  ]);
+  }, [closeoutForm?.submitted_date, closeoutForm?.approved_by_program]);
 
   const backwardButtonText = useMemo(() => {
     if (
@@ -481,21 +482,35 @@ export const RequestCloseoutForm: React.FC<RequestCloseoutFormProps> = ({
         <Button variant="outlined" onClick={handleDialogClose}>
           Back to request
         </Button>
-        {backwardButtonText && (
-          <Button variant="contained" color="error" onClick={handleBackward}>
-            {backwardButtonText}
-          </Button>
-        )}
+        {backwardButtonText &&
+          hasPermission('reject-closeout-form-by-lab', detailedIdentity, requestStatus) && (
+            <Button variant="contained" color="error" onClick={handleBackward}>
+              {backwardButtonText}
+            </Button>
+          )}
+        {backwardButtonText &&
+          hasPermission('reject-closeout-form-by-program', detailedIdentity, requestStatus) && (
+            <Button variant="contained" color="error" onClick={handleBackward}>
+              {backwardButtonText}
+            </Button>
+          )}
         {!closeoutForm.submitted_date && hasPermission('edit-closeout-form', detailedIdentity) && (
           <Button variant="contained" color="primary" type="submit" form="closeout-form">
             Submit for review
           </Button>
         )}
-        {approveButtonText && closeoutForm.submitted_date && (
-          <Button variant="contained" color="primary" onClick={handleApprove}>
-            {approveButtonText}
-          </Button>
-        )}
+        {labApproveButtonText &&
+          hasPermission('approve-closeout-form-by-lab', detailedIdentity) && (
+            <Button variant="contained" color="primary" onClick={handleApprove}>
+              {labApproveButtonText}
+            </Button>
+          )}
+        {programApproveButtonText &&
+          hasPermission('approve-closeout-form-by-program', detailedIdentity) && (
+            <Button variant="contained" color="primary" onClick={handleApprove}>
+              {programApproveButtonText}
+            </Button>
+          )}
       </DialogActions>
     </Dialog>
   );
