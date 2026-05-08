@@ -30,7 +30,7 @@ import {
 } from '@/api/queryOptions';
 import { useIdentityContext } from '@/features/identity/IdentityContext';
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { parseBoolean } from '@/utils/utils';
+import { hasPermission, parseBoolean } from '@/utils/utils';
 import { useToastContext } from '@/features/toasts/ToastContext';
 import { queryClient } from '@/App';
 import { ToastMessage } from '@/features/toasts/ToastMessage';
@@ -44,7 +44,7 @@ export const RequestCloseoutForm: React.FC<RequestCloseoutFormProps> = ({
   requestId,
   expertOwnerId,
 }) => {
-  const { identity } = useIdentityContext();
+  const { identity, detailedIdentity } = useIdentityContext();
   const { closeoutDialogOpen, setCloseoutDialogOpen } = useRequestsContext();
   const { setShowToast, setToastMessage } = useToastContext();
   const { data: closeoutForm } = useSuspenseQuery(
@@ -278,6 +278,10 @@ export const RequestCloseoutForm: React.FC<RequestCloseoutFormProps> = ({
     return () => clearTimeout(timeout);
   }, [handleSave, closeoutDialogOpen]);
 
+  if (!closeoutForm) {
+    return null;
+  }
+
   return (
     <Dialog
       fullWidth
@@ -290,7 +294,8 @@ export const RequestCloseoutForm: React.FC<RequestCloseoutFormProps> = ({
         Closeout Questions for Expert
       </DialogTitle>
       <DialogContent>
-        {closeoutForm?.submitted_date && (
+        {(closeoutForm.submitted_date ||
+          !hasPermission('edit-closeout-form', detailedIdentity)) && (
           <Stack spacing={3} sx={{ marginTop: 2 }}>
             <Stack spacing={1}>
               <Typography variant="subtitle1" fontWeight="bold">
@@ -354,7 +359,7 @@ export const RequestCloseoutForm: React.FC<RequestCloseoutFormProps> = ({
             </Stack>
           </Stack>
         )}
-        {!closeoutForm?.submitted_date && (
+        {!closeoutForm.submitted_date && hasPermission('edit-closeout-form', detailedIdentity) && (
           <form onSubmit={handleSubmit} id="closeout-form">
             <Stack spacing={3} sx={{ marginTop: 2 }}>
               <Typography>
@@ -481,12 +486,12 @@ export const RequestCloseoutForm: React.FC<RequestCloseoutFormProps> = ({
             {backwardButtonText}
           </Button>
         )}
-        {!closeoutForm?.submitted_date && (
+        {!closeoutForm.submitted_date && hasPermission('edit-closeout-form', detailedIdentity) && (
           <Button variant="contained" color="primary" type="submit" form="closeout-form">
             Submit for review
           </Button>
         )}
-        {approveButtonText && closeoutForm?.submitted_date && (
+        {approveButtonText && closeoutForm.submitted_date && (
           <Button variant="contained" color="primary" onClick={handleApprove}>
             {approveButtonText}
           </Button>

@@ -96,7 +96,8 @@ type PermissionAction =
   | 'edit-projected-completion-date'
   | 'edit-actual-completion-date'
   | 'edit-customer'
-  | 'edit-organization-type';
+  | 'edit-organization-type'
+  | 'edit-closeout-form';
 
 /**
  * Frontend function for checking if a user has permission to perform a certain action based on their role.
@@ -173,6 +174,7 @@ export const hasPermission = (
         case 'edit-projected-start-date':
         case 'edit-projected-completion-date':
         case 'edit-actual-completion-date':
+        case 'edit-closeout-form':
           return true;
       }
       return false;
