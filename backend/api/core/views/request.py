@@ -233,7 +233,7 @@ class RequestDetailView(BaseUserAwareRequest):
         
         queryset = self.get_actionable() | self.get_downstream()
 
-        maybe_request, err = self.get_request_or_error(queryset, request_id)
+        ta_request, err = self.get_request_or_error(queryset, request_id)
         if err:
             return err
 
@@ -246,7 +246,7 @@ class RequestDetailView(BaseUserAwareRequest):
             return Response(data={"message": "Missing request body"}, status=status.HTTP_204_NO_CONTENT)
         
         if "description" in body:
-            if not CanEditDescription().has_permission(request):
+            if not CanEditDescription().has_object_permission(request, self, ta_request):
                 return Response(data={"message": "Insufficient privillege to update 'description' field"}, status=status.HTTP_401_UNAUTHORIZED)
             
             new_description_data = body.get("description")
@@ -257,7 +257,7 @@ class RequestDetailView(BaseUserAwareRequest):
             updated_fields.append("description")
 
         if "challenges" in body:
-            if not CanEditDescription().has_permission(request):
+            if not CanEditDescription().has_object_permission(request, self, ta_request):
                 return Response(data={"message": "Insufficient privillege to update 'challenges' field"}, status=status.HTTP_401_UNAUTHORIZED)
             
             new_challenges_data = body.get("challenges")
@@ -266,7 +266,7 @@ class RequestDetailView(BaseUserAwareRequest):
             updated_fields.append("challenges")
 
         if "goals" in body:
-            if not CanEditDescription().has_permission(request):
+            if not CanEditDescription().has_object_permission(request, self, ta_request):
                 return Response(data={"message": "Insufficient privillege to update 'goals' field"}, status=status.HTTP_401_UNAUTHORIZED)
             
             new_goals_data = body.get("goals")
@@ -275,7 +275,7 @@ class RequestDetailView(BaseUserAwareRequest):
             updated_fields.append("goals")
 
         if "effort" in body:
-            if not CanEditDescription().has_permission(request):
+            if not CanEditDescription().has_object_permission(request, self, ta_request):
                 return Response(data={"message": "Insufficient privillege to update 'effort' field"}, status=status.HTTP_401_UNAUTHORIZED)
             
             new_effort_data = body.get("effort")
@@ -284,7 +284,7 @@ class RequestDetailView(BaseUserAwareRequest):
             updated_fields.append("effort")
 
         if "depth" in body:
-            if not CanEditDepth().has_permission(request):
+            if not CanEditDepth().has_object_permission(request, self, ta_request):
                 return Response(data={"message": "Insufficient privillege to update 'depth' field"}, status=status.HTTP_401_UNAUTHORIZED)
             
             if body.get("depth") is None:
@@ -300,63 +300,31 @@ class RequestDetailView(BaseUserAwareRequest):
             updated_fields.append("depth")
 
         if "actual_completion_date" in body:
-            if not (IsAnyRoleOnRequest().has_permission(request)):
+            if not (IsAnyRoleOnRequest().has_object_permission(request, self, ta_request)):
                 return Response(data={"message": "Insufficient privillege to update 'actual completion date' field"}, status=status.HTTP_401_UNAUTHORIZED)
 
             patch_data["actual_completion_date"] = body.get("actual_completion_date")
             updated_fields.append("actual completion date")
-
-        if "expert" in body:
-            if not(IsAdmin().has_permission(request) or IsLabLead().has_permission(request)):
-                return Response(data={"message": "Insufficient privillege to update 'expert' field"}, status=status.HTTP_401_UNAUTHORIZED)
-            
-            new_expert_data = body.get("expert")
-            if new_expert_data is not None:
-                maybe_expert = None
-                try:
-                    maybe_expert = User.objects.get(pk=new_expert_data)
-                except User.DoesNotExist:
-                    return Response(data={"message": "Provided user in expert field does not exist."}, status=status.HTTP_400_BAD_REQUEST)
-                
-                # Need to check provided user has expert role
-                try:
-                    # if they are lab lead, check to see if expert is in their lab
-                    if IsLabLead().has_permission(request):
-                        LabRoleAssignment.objects.get(user=maybe_expert, role=Role.objects.get(name="Expert"), instance=Lab.objects.get(pk=context.get("instance")))
-
-                    # if they are admin best we can do is check if they are an expert
-                    else:
-                        LabRoleAssignment.objects.get(user=maybe_expert, role=Role.objects.get(name="Expert"))
-
-                except LabRoleAssignment.DoesNotExist:
-                    return Response(data={"message": "Provided user in expert field does not not have expert role."}, status=status.HTTP_400_BAD_REQUEST)
-
-                except Lab.DoesNotExist:
-                    return Response(data={"message": "Provided expert does not reside in your lab role exist."}, status=status.HTTP_400_BAD_REQUEST)
-                
-
-            patch_data["expert"] = maybe_expert.email
-            updated_fields.append("expert")
         
         if "proj_start_date" in body:
-            if not(IsAnyRoleOnRequest().has_permission(request)):
+            if not(IsAnyRoleOnRequest().has_object_permission(request, self, ta_request)):
                 return Response(data={"message": "Insufficient privillege to update 'projected start date' field"}, status=status.HTTP_401_UNAUTHORIZED)
 
             patch_data["proj_start_date"] = body.get("proj_start_date")
             updated_fields.append("projected start date")
 
         if "proj_completion_date" in body:
-            if not(IsAnyRoleOnRequest().has_permission(request)):
+            if not(IsAnyRoleOnRequest().has_object_permission(request, self, ta_request)):
                 return Response(data={"message": "Insufficient privillege to update 'projected completion date' field"}, status=status.HTTP_401_UNAUTHORIZED)
 
             # Projected completion date can only be set if request is currently ASSIGNED_TO_EXPERT
             # or is already PROVIDING_TA (in which case we're just updating the projected completion date).
             # Setting it implies status should be updated to PROVIDING_TA.
-            if maybe_request.status.name in [REQUEST_STATUS.ASSIGNED_TO_EXPERT, REQUEST_STATUS.PROVIDING_TA]:
+            if ta_request.status.name in [REQUEST_STATUS.ASSIGNED_TO_EXPERT, REQUEST_STATUS.PROVIDING_TA]:
                 patch_data["proj_completion_date"] = body.get("proj_completion_date")
                 patch_data["status"] = get_status(REQUEST_STATUS.PROVIDING_TA)
             # If projected completion date is being removed while PROVIDING_TA, revert status back to ASSIGNED_TO_EXPERT
-            if body.get("proj_completion_date") == None and maybe_request.status.name == REQUEST_STATUS.PROVIDING_TA:
+            if body.get("proj_completion_date") == None and ta_request.status.name == REQUEST_STATUS.PROVIDING_TA:
                 patch_data["status"] = get_status(REQUEST_STATUS.ASSIGNED_TO_EXPERT)
 
             updated_fields.append("projected completion date")
@@ -378,26 +346,26 @@ class RequestDetailView(BaseUserAwareRequest):
         # Topics are done a special way (not using patch serializer) because they are 
         # stored as a Many-to-Many relationship in the database.
         if "topics" in body:
-            if not CanEditTopics().has_permission(request):
+            if not CanEditTopics().has_object_permission(request, self, ta_request):
                 return Response(data={"message": "Insufficient privillege to update 'topics' field"}, status=status.HTTP_401_UNAUTHORIZED)
-            current_topics = maybe_request.topics.all()
-            maybe_request.topics.clear()
+            current_topics = ta_request.topics.all()
+            ta_request.topics.clear()
             
             topics = body.get("topics", list())
             for topic_name in topics:
                 try:
                     topic = Topic.objects.get(name=topic_name)
                 except Topic.DoesNotExist:
-                    maybe_request.topics.set(current_topics)
+                    ta_request.topics.set(current_topics)
                     return Response(data={"message": "One of the provided topics does not exist."}, status=status.HTTP_400_BAD_REQUEST)
 
-                maybe_request.topics.add(topic)
+                ta_request.topics.add(topic)
 
             updated_fields.append("topics")
                 
         
        # do partial save with accumulated patch 
-        patch_serializer = RequestSerializer(instance=maybe_request, data=patch_data, partial=True)
+        patch_serializer = RequestSerializer(instance=ta_request, data=patch_data, partial=True)
         if(patch_serializer.is_valid()):
             try:
                 patch_serializer.save()
@@ -408,7 +376,7 @@ class RequestDetailView(BaseUserAwareRequest):
                         error_msg = constraint.violation_error_message
                         break
                 return Response(data={"message": error_msg}, status=status.HTTP_400_BAD_REQUEST)
-            create_audit_history(request, maybe_request, ActionType.EditRequestDetails, f"Edited: {str(updated_fields)}")
+            create_audit_history(request, ta_request, ActionType.EditRequestDetails, f"Edited: {str(updated_fields)}")
         else:
             return Response(data={"message": patch_serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -491,7 +459,7 @@ class RequestSubmitCloseoutFormView(BaseUserAwareRequest):
             return err
 
         # Experts must be the assigned expert on this specific request
-        if IsExpert().has_permission(request) and not IsAdmin().has_permission(request):
+        if IsExpert().has_object_permission(request, self, ta_request) and not IsAdmin().has_permission(request):
             if ta_request.expert is None or ta_request.expert != request.user:
                 return Response(data={"message": "Only the assigned expert can submit the closeout form"}, status=status.HTTP_403_FORBIDDEN)
 
