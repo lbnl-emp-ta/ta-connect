@@ -130,9 +130,8 @@ class BaseUserAwareRequest(views.APIView):
         """
         queryset = Request.objects.filter(owner=None)
 
-        if IsAdmin().has_permission(self.request):
-            return queryset.distinct()
-        elif IsCoordinator().has_permission(self.request, self):
+        # Admins and coordinators can see all inactive requests by convention.
+        if IsAdmin().has_permission(self.request) or IsCoordinator().has_permission(self.request, self):
             return queryset.distinct()
         
         inactive_requests = queryset.none()
@@ -227,10 +226,10 @@ class RequestDetailView(BaseUserAwareRequest):
         if request_id is None:
             return Response(data={"message": "Please provide a Request ID"}, status=status.HTTP_400_BAD_REQUEST)
 
-        try:
-            context = self.get_context()
-        except ContextError:
-            return Response(data={"message": "Please provide context object header with request"}, status=status.HTTP_400_BAD_REQUEST)
+        # try:
+        #     context = self.get_context()
+        # except ContextError:
+        #     return Response(data={"message": "Please provide context object header with request"}, status=status.HTTP_400_BAD_REQUEST)
         
         queryset = self.get_actionable() | self.get_downstream()
 

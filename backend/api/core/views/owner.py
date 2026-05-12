@@ -22,25 +22,26 @@ class OwnerListView(views.APIView):
     ]
 
     def get_queryset(self):
+        """
+        Returns all Owners that the current user is allowed to assign to.
+        This is its own method so that it can be used in both GET requests and
+        assignment requests (where it validates owner assignment permission).
+        """
         queryset = Owner.objects.all()
-
-        maybe_context = self.request.headers.get("Context")
-        if maybe_context is None:
-            return queryset.none()
-
-        context = json.loads(maybe_context)
 
         if IsAdmin().has_permission(self.request, self):
             return queryset
 
         if IsCoordinator().has_permission(self.request, self):
-            # See one layer down to programs
             return queryset.filter(domain_type=DOMAINTYPE.PROGRAM)
+        
+        allowed_owners = queryset.none()
+        user = User.objects.get(pk=self.request.user.id)
+        program_assignments = ProgramRoleAssignment.objects.filter(user=user)
+        lab_assignments = LabRoleAssignment.objects.filter(user=user)
 
-        if IsProgramLead().has_permission(self.request, self):
-            # if we get here, it means "instance" field must be valid so no need to check
-            program = Program.objects.get(pk=context.get("instance"))
-
+        for assignment in program_assignments:
+            program = assignment.instance
             lab_owners = queryset.none()
             expert_users = User.objects.none()
             for lab in program.labs.all():
@@ -52,35 +53,31 @@ class OwnerListView(views.APIView):
                 ).values_list('user', flat=True)
 
             expert_owners = queryset.filter(domain_type=DOMAINTYPE.EXPERT, expert__in=expert_users)
+            reception_owners = queryset.filter(domain_type=DOMAINTYPE.RECEPTION)
+            allowed_owners = allowed_owners | reception_owners | lab_owners | expert_owners
 
-            # See one layer back up to reception, one layer down to associated labs, and experts within those labs
-            return queryset.filter(domain_type=DOMAINTYPE.RECEPTION) | lab_owners | expert_owners
+        for assignment in lab_assignments:
+            if assignment.role.name == ROLE.LAB_LEAD:
+                expert_users = LabRoleAssignment.objects.filter(
+                    role=Role.objects.get(name=ROLE.EXPERT),
+                    instance=assignment.instance,
+                    program=assignment.program,
+                ).values_list('user', flat=True)
 
+                allowed_owners = allowed_owners | queryset.filter(
+                    Q(domain_type=DOMAINTYPE.PROGRAM, program=assignment.program) |
+                    Q(domain_type=DOMAINTYPE.EXPERT, expert__in=expert_users)
+                )
+            elif assignment.role.name == ROLE.EXPERT:
+                allowed_owners = allowed_owners | queryset.filter(domain_type=DOMAINTYPE.LAB, lab=assignment.instance)
 
-        if IsLabLead().has_permission(self.request, self):
-            assignment = LabRoleAssignment.objects.get(user=User.objects.get(pk=context.get("user")), role=Role.objects.get(pk=context.get("role")), instance=Lab.objects.get(pk=context.get("instance")))
-
-            expert_users = LabRoleAssignment.objects.filter(
-                role=Role.objects.get(name=ROLE.EXPERT),
-                instance=assignment.instance,
-                program=assignment.program,
-            ).values_list('user', flat=True)
-
-            return queryset.filter(
-                Q(domain_type=DOMAINTYPE.PROGRAM, program=assignment.program) |
-                Q(domain_type=DOMAINTYPE.EXPERT, expert__in=expert_users)
-            )
-        
-        if IsExpert().has_permission(self.request, self):
-            # See the lab owner for the lab this expert is associated with
-            lab = Lab.objects.get(pk=context.get("instance"))
-            return queryset.filter(domain_type=DOMAINTYPE.LAB, lab=lab)
-        
-        return queryset.none()
+        return allowed_owners.distinct()
     
     def get(self, request, format=None):
         queryset = self.get_queryset()
 
+        # Need to format owners one at a time to include domain-specific information
+        # This could potentially be refactored at the serializer level to avoid the loop here
         owners_data = list()
         for owner in queryset.all():
             owners_data.append(OwnerSerializer().format_owner(owner))
