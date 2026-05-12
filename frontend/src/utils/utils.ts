@@ -110,10 +110,10 @@ type PermissionAction =
  */
 export const hasPermission = (
   action: PermissionAction,
-  detailedIdentity?: TAIdentity,
+  identities?: TAIdentity[] | null,
   statusName?: TAStatusName
 ): boolean => {
-  if (!detailedIdentity || !detailedIdentity.role) return false;
+  if (!identities) return false;
 
   // No one can edit the projected completion date unless
   // the request is currently assigned-to-expert or is already providing-ta.
@@ -135,70 +135,82 @@ export const hasPermission = (
     return false;
   }
 
-  switch (detailedIdentity.role.name) {
-    case TARole.Admin:
-      return true;
-    case TARole.Coordinator:
-      switch (action) {
-        case 'edit-depth':
-        case 'edit-effort':
-        case 'edit-topics':
-        case 'edit-description':
-        case 'edit-challenges':
-        case 'edit-goals':
-        case 'edit-projected-start-date':
-        case 'edit-projected-completion-date':
-        case 'edit-actual-completion-date':
-        case 'edit-customer':
-          return true;
-      }
-      return false;
-    case TARole.ProgramLead:
-      switch (action) {
-        case 'edit-depth':
-        case 'edit-effort':
-        case 'edit-topics':
-        case 'edit-description':
-        case 'edit-challenges':
-        case 'edit-goals':
-        case 'edit-projected-start-date':
-        case 'edit-projected-completion-date':
-        case 'edit-actual-completion-date':
-        case 'edit-customer':
-        case 'approve-closeout-form-by-program':
-        case 'reject-closeout-form-by-program':
-          return true;
-      }
-      return false;
-    case TARole.LabLead:
-      switch (action) {
-        case 'edit-depth':
-        case 'edit-effort':
-        case 'edit-topics':
-        case 'edit-description':
-        case 'edit-challenges':
-        case 'edit-goals':
-        case 'edit-projected-start-date':
-        case 'edit-projected-completion-date':
-        case 'edit-actual-completion-date':
-        case 'edit-customer':
-        case 'approve-closeout-form-by-lab':
-        case 'reject-closeout-form-by-lab':
-          return true;
-      }
-      return false;
-    case TARole.Expert:
-      switch (action) {
-        case 'edit-projected-start-date':
-        case 'edit-projected-completion-date':
-        case 'edit-actual-completion-date':
-        case 'edit-closeout-form':
-          return true;
-      }
-      return false;
-    default:
-      return false;
+  let doesHavePermission = false;
+  for (const identity of identities) {
+    switch (identity.role.name) {
+      case TARole.Admin:
+        doesHavePermission = true;
+        break;
+      case TARole.Coordinator:
+        switch (action) {
+          case 'edit-depth':
+          case 'edit-effort':
+          case 'edit-topics':
+          case 'edit-description':
+          case 'edit-challenges':
+          case 'edit-goals':
+          case 'edit-projected-start-date':
+          case 'edit-projected-completion-date':
+          case 'edit-actual-completion-date':
+          case 'edit-customer':
+            doesHavePermission = true;
+            break;
+        }
+        break;
+      case TARole.ProgramLead:
+        switch (action) {
+          case 'edit-depth':
+          case 'edit-effort':
+          case 'edit-topics':
+          case 'edit-description':
+          case 'edit-challenges':
+          case 'edit-goals':
+          case 'edit-projected-start-date':
+          case 'edit-projected-completion-date':
+          case 'edit-actual-completion-date':
+          case 'edit-customer':
+          case 'approve-closeout-form-by-program':
+          case 'reject-closeout-form-by-program':
+            doesHavePermission = true;
+            break;
+        }
+        break;
+      case TARole.LabLead:
+        switch (action) {
+          case 'edit-depth':
+          case 'edit-effort':
+          case 'edit-topics':
+          case 'edit-description':
+          case 'edit-challenges':
+          case 'edit-goals':
+          case 'edit-projected-start-date':
+          case 'edit-projected-completion-date':
+          case 'edit-actual-completion-date':
+          case 'edit-customer':
+          case 'approve-closeout-form-by-lab':
+          case 'reject-closeout-form-by-lab':
+            doesHavePermission = true;
+            break;
+        }
+        break;
+      case TARole.Expert:
+        switch (action) {
+          case 'edit-projected-start-date':
+          case 'edit-projected-completion-date':
+          case 'edit-actual-completion-date':
+          case 'edit-closeout-form':
+            doesHavePermission = true;
+            break;
+        }
+        break;
+      default:
+        break;
+    }
+    if (doesHavePermission) {
+      break;
+    }
   }
+  return doesHavePermission;
 };
 
 /**
