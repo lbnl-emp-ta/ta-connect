@@ -25,6 +25,5 @@ export const Route = createFileRoute('/_with-nav/_private/requests/active/$reque
 
 function ActiveRequestDetailPage() {
   const params = Route.useParams();
-
   return <RequestDetailLayout requestId={params.requestId} />;
 }
