@@ -1,4 +1,4 @@
-import { useIdentityContext } from '@/features/identity/IdentityContext';
+import { useAdminModeContext } from '@/features/admin-mode/AdminModeContext';
 import { RequestsProvider } from '@/features/requests/RequestsContext';
 import { RequestsLayout } from '@/features/requests/RequestsLayout';
 import { identitiesQueryOptions, requestsQueryOptions } from '@/api/queryOptions';
@@ -14,7 +14,7 @@ export const Route = createFileRoute('/_with-nav/_private/requests/active')({
 });
 
 function ActiveRequestsWrapper() {
-  const { identity } = useIdentityContext();
+  const { isAdminMode } = useAdminModeContext();
   const { data: requests } = useSuspenseQuery(requestsQueryOptions(identity));
   const activeRequests = [
     {

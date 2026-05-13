@@ -34,7 +34,7 @@ import {
   useCustomerMutation,
 } from '@/api/queryOptions';
 import { hasPermission, isValidEmail, isValidUSTelephone } from '@/utils/utils';
-import { useIdentityContext } from '@/features/identity/IdentityContext';
+import { useAdminModeContext } from '@/features/admin-mode/AdminModeContext';
 import { useToastContext } from '@/features/toasts/ToastContext';
 import { ToastMessage } from '@/features/toasts/ToastMessage';
 import { PhoneInput } from '@/components/PhoneInput';
@@ -44,13 +44,13 @@ interface RequestCustomerPanelProps {
 }
 
 export const RequestCustomerPanel: React.FC<RequestCustomerPanelProps> = ({ customer }) => {
-  const { identity, detailedIdentity } = useIdentityContext();
+  const { isAdminMode } = useAdminModeContext();
   const { data: identities } = useSuspenseQuery(identitiesQueryOptions());
   const { data: allOrganizations } = useSuspenseQuery(organizationQueryOptions());
   const { data: allOrganizationTypes } = useSuspenseQuery(organizationTypesQueryOptions());
   const { data: allTpr } = useSuspenseQuery(transmissionPlanningRegionsQueryOptions());
   const { data: allStates } = useSuspenseQuery(statesQueryOptions());
-  const updateCustomerMutation = useCustomerMutation(customer?.id.toString() || '', identity);
+  const updateCustomerMutation = useCustomerMutation(customer?.id.toString() || '', isAdminMode);
   const [editing, setEditing] = useState(false);
   const { setShowToast, setToastMessage } = useToastContext();
   const [org, setOrg] = useState<TACustomer['org']['id']>();

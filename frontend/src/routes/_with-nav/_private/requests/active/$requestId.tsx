@@ -11,19 +11,14 @@ import { createFileRoute } from '@tanstack/react-router';
 export const Route = createFileRoute('/_with-nav/_private/requests/active/$requestId')({
   loader: async ({ context, params }) => {
     await context.queryClient.ensureQueryData(
-      requestDetailQueryOptions(params.requestId, context.identity)
+      requestDetailQueryOptions(params.requestId, context.isAdminMode)
     );
-    await context.queryClient.ensureQueryData(ownersQueryOptions(context.identity));
+    await context.queryClient.ensureQueryData(ownersQueryOptions(context.isAdminMode));
     await context.queryClient.ensureQueryData(topicsQueryOptions());
     await context.queryClient.ensureQueryData(
-      notesQueryOptions(params.requestId, context.identity)
+      notesQueryOptions(params.requestId, context.isAdminMode)
     );
-    if (
-      context.detailedIdentity?.role.name === 'Lab Lead' ||
-      context.detailedIdentity?.role.name === 'Admin'
-    ) {
-      await context.queryClient.ensureQueryData(expertsQueryOptions(context.identity));
-    }
+    await context.queryClient.ensureQueryData(expertsQueryOptions(context.isAdminMode));
   },
   component: ActiveRequestDetailPage,
 });

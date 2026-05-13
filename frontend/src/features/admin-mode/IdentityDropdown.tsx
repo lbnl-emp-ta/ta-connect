@@ -4,12 +4,12 @@ import { useMatchRoute, useNavigate } from '@tanstack/react-router';
 import { useEffect, useState } from 'react';
 import { TAIdentity } from '../../api/dashboard/types';
 import { identitiesQueryOptions } from '../../api/queryOptions';
-import { useIdentityContext } from '../identity/IdentityContext';
+import { useAdminModeContext } from './AdminModeContext';
 
 export const IdentityDropdown: React.FC = () => {
   const navigate = useNavigate();
   const matchRoute = useMatchRoute();
-  const { identity, detailedIdentity, setIdentity, setDetailedIdentity } = useIdentityContext();
+  const { isAdminMode, setIsAdminMode } = useAdminModeContext();
   const { data: identities } = useSuspenseQuery(identitiesQueryOptions());
   const [identitiesMenuOpen, setIdentitiesMenuOpen] = useState(false);
 

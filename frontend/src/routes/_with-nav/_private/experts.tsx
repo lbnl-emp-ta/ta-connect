@@ -3,7 +3,7 @@ import { createFileRoute } from '@tanstack/react-router';
 import { expertsQueryOptions } from '@/api/queryOptions';
 import { ExpertsDataTable } from '@/features/experts/ExpertsDataTable';
 import { useSuspenseQuery } from '@tanstack/react-query';
-import { useIdentityContext } from '@/features/identity/IdentityContext';
+import { useAdminModeContext } from '@/features/admin-mode/AdminModeContext';
 
 export const Route = createFileRoute('/_with-nav/_private/experts')({
   loader: async ({ context }) => {
@@ -13,7 +13,7 @@ export const Route = createFileRoute('/_with-nav/_private/experts')({
 });
 
 function ExpertsPage() {
-  const { identity } = useIdentityContext();
+  const { isAdminMode } = useAdminModeContext();
   const { data: experts } = useSuspenseQuery(expertsQueryOptions(identity));
 
   return (

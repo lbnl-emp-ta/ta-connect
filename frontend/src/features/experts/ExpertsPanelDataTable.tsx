@@ -1,6 +1,6 @@
 import { queryClient } from '@/App';
 import { expertColumns, ExpertsDataTable } from '@/features/experts/ExpertsDataTable';
-import { useIdentityContext } from '@/features/identity/IdentityContext';
+import { useAdminModeContext } from '@/features/admin-mode/AdminModeContext';
 import { useRequestsContext } from '@/features/requests/RequestsContext';
 import { useToastContext } from '@/features/toasts/ToastContext';
 import { ToastMessage } from '@/features/toasts/ToastMessage';
@@ -28,7 +28,7 @@ export const ExpertsPanelDataTable: React.FC<ExpertsPanelDataTableProps> = ({
   currentRequestId,
 }) => {
   const navigate = useNavigate();
-  const { identity } = useIdentityContext();
+  const { isAdminMode } = useAdminModeContext();
   const { tab, nextId, previousId, setExpertsPanelOpen } = useRequestsContext();
   const { setShowToast, setToastMessage } = useToastContext();
   const onMutate = (message: string) => {
@@ -67,7 +67,7 @@ export const ExpertsPanelDataTable: React.FC<ExpertsPanelDataTableProps> = ({
     setToastMessage(<ToastMessage icon={<ErrorIcon />}>{error.message}</ToastMessage>);
   };
   const assignRequestMutation = currentRequestId
-    ? useAssignmentMutation(currentRequestId.toString(), identity, {
+    ? useAssignmentMutation(currentRequestId.toString(), isAdminMode, {
         onMutate: onMutate('Assigning request'),
         onSuccess: onSuccess('Request assigned'),
         onError: onError,

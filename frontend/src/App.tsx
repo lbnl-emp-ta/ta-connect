@@ -5,7 +5,7 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { createRouter, ErrorComponent, RouterProvider } from '@tanstack/react-router';
 import React from 'react';
-import { useIdentityContext } from './features/identity/IdentityContext';
+import { useAdminModeContext } from '@/features/admin-mode/AdminModeContext';
 import { ToastProvider } from './features/toasts/ToastContext';
 import { routeTree } from './routeTree.gen';
 import { theme } from './theme';
@@ -24,8 +24,7 @@ const router = createRouter({
   defaultPendingComponent: () => <CircularProgress size="2rem" />,
   context: {
     queryClient,
-    identity: {},
-    detailedIdentity: null,
+    isAdminMode: false,
   },
 });
 
@@ -37,7 +36,7 @@ declare module '@tanstack/react-router' {
 }
 
 const App: React.FC = () => {
-  const { identity, detailedIdentity } = useIdentityContext();
+  const { isAdminMode } = useAdminModeContext();
 
   return (
     <QueryClientProvider client={queryClient}>
@@ -45,7 +44,7 @@ const App: React.FC = () => {
         <ThemeProvider theme={theme}>
           <ToastProvider>
             <CssBaseline />
-            <RouterProvider router={router} context={{ queryClient, identity, detailedIdentity }} />
+            <RouterProvider router={router} context={{ queryClient, isAdminMode }} />
           </ToastProvider>
         </ThemeProvider>
       </LocalizationProvider>

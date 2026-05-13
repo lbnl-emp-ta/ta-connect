@@ -8,7 +8,7 @@ import {
   useReopenMutation,
 } from '@/api/queryOptions';
 import { queryClient } from '@/App';
-import { useIdentityContext } from '@/features/identity/IdentityContext';
+import { useAdminModeContext } from '@/features/admin-mode/AdminModeContext';
 import { useRequestsContext } from '@/features/requests/RequestsContext';
 import { useToastContext } from '@/features/toasts/ToastContext';
 import { ToastMessage } from '@/features/toasts/ToastMessage';
@@ -47,13 +47,13 @@ export const RequestAssignForwardButton: React.FC<RequestAssignForwardButtonProp
   request,
 }) => {
   const navigate = useNavigate();
-  const { identity, detailedIdentity } = useIdentityContext();
+  const { isAdminMode } = useAdminModeContext();
   const { data: identities } = useSuspenseQuery(identitiesQueryOptions());
   const identityRoles = useMemo(() => {
     return identities?.map((item) => item.role.name) ?? [];
   }, [identities]);
-  const { data: owners } = useSuspenseQuery(ownersQueryOptions(identity));
-  const { data: experts } = useSuspenseQuery(expertsQueryOptions(identity));
+  const { data: owners } = useSuspenseQuery(ownersQueryOptions(isAdminMode));
+  const { data: experts } = useSuspenseQuery(expertsQueryOptions(isAdminMode));
   const {
     tab,
     nextId,
@@ -165,12 +165,12 @@ export const RequestAssignForwardButton: React.FC<RequestAssignForwardButtonProp
     setShowToast(true);
     setToastMessage(<ToastMessage icon={<ErrorIcon />}>{error.message}</ToastMessage>);
   };
-  const assignRequestMutation = useAssignmentMutation(request.id.toString(), identity, {
+  const assignRequestMutation = useAssignmentMutation(request.id.toString(), isAdminMode, {
     onMutate: onMutate('Assigning request'),
     onSuccess: onSuccess('Request assigned'),
     onError: onError,
   });
-  const createCloseoutMutation = useCreateCloseoutMutation(request.id.toString(), identity, {
+  const createCloseoutMutation = useCreateCloseoutMutation(request.id.toString(), isAdminMode, {
     onMutate: onMutate('Creating closeout form'),
     onSuccess: () => {
       queryClient.invalidateQueries();
@@ -184,7 +184,7 @@ export const RequestAssignForwardButton: React.FC<RequestAssignForwardButtonProp
     },
     onError: onError,
   });
-  const reopenRequestMutation = useReopenMutation(request.id.toString(), identity, {
+  const reopenRequestMutation = useReopenMutation(request.id.toString(), isAdminMode, {
     onMutate: onMutate('Reopening request'),
     onSuccess: onSuccess('Request reopened and assigned to Reception'),
     onError: onError,
@@ -249,7 +249,7 @@ export const RequestAssignForwardButton: React.FC<RequestAssignForwardButtonProp
     return ownerOrganizationTypeIds.includes(requestOrganizationType.id);
   };
 
-  if (!detailedIdentity || !currentStep.allowedRoles.some((role) => identityRoles.includes(role))) {
+  if (!currentStep.allowedRoles.some((role) => identityRoles.includes(role))) {
     return null;
   }
 

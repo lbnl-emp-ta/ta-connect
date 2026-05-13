@@ -5,7 +5,7 @@ import { createFileRoute, Link, Outlet, useLocation, useNavigate } from '@tansta
 import { useState } from 'react';
 import { useUser } from '../../hooks/useUser';
 import { useLogoutMutation } from '../../api/queryOptions';
-import { IdentityDropdown } from '@/features/identity/IdentityDropdown';
+import { IdentityDropdown } from '@/features/admin-mode/IdentityDropdown';
 
 export const Route = createFileRoute('/_with-nav')({
   component: NavbarLayoutWrapper,

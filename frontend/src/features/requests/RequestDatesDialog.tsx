@@ -16,7 +16,7 @@ import dayjs, { Dayjs } from 'dayjs';
 import { useCallback, useEffect, useState } from 'react';
 import { TARequestDetail, TARequestDetailMutation } from '../../api/dashboard/types';
 import { useRequestMutation } from '../../api/queryOptions';
-import { useIdentityContext } from '../identity/IdentityContext';
+import { useAdminModeContext } from '../admin-mode/AdminModeContext';
 import { useToastContext } from '../toasts/ToastContext';
 import { ToastMessage } from '../toasts/ToastMessage';
 
@@ -25,8 +25,8 @@ interface RequestDatesDialogProps {
 }
 
 export const RequestDatesDialog: React.FC<RequestDatesDialogProps> = ({ request }) => {
-  const { identity } = useIdentityContext();
-  const updateRequestMutation = useRequestMutation(request?.id.toString() || '', identity);
+  const { isAdminMode } = useAdminModeContext();
+  const updateRequestMutation = useRequestMutation(request?.id.toString() || '', isAdminMode);
   const { datesDialogOpen, setDatesDialogOpen } = useRequestsContext();
   const { setShowToast, setToastMessage } = useToastContext();
   const [projectedStartDate, setProjectedStartDate] = useState<Dayjs>();

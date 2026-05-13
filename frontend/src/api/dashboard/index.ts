@@ -1,18 +1,17 @@
-import { Identity } from '../../features/identity/IdentityContext';
-import { getCSRFToken } from '../../utils/cookies';
-import { TAError } from './types';
+import { getCSRFToken } from '@/utils/cookies';
+import { TAError } from '@/api/dashboard/types';
 
 /**
  * Generic wrapper for fetch requests that injects the user CSRF token and identity context.
  */
-export async function fetchData<T>(url: string, identity?: Identity): Promise<T | null> {
+export async function fetchData<T>(url: string, isAdminMode?: boolean): Promise<T | null> {
   try {
     const response = await fetch(url, {
       credentials: 'include',
       headers: {
         'Content-Type': 'application/json',
         'X-CSRFToken': getCSRFToken() || '',
-        Context: identity ? JSON.stringify(identity) : '',
+        'X-Admin-Mode': isAdminMode ? 'true' : 'false',
       },
     });
     if (!response.ok) {
@@ -37,7 +36,7 @@ export async function fetchData<T>(url: string, identity?: Identity): Promise<T 
 export async function patchData<T>(
   url: string,
   data: Partial<T>,
-  identity?: Identity
+  isAdminMode?: boolean
 ): Promise<T | void> {
   try {
     const response = await fetch(url, {
@@ -46,7 +45,7 @@ export async function patchData<T>(
       headers: {
         'Content-Type': 'application/json',
         'X-CSRFToken': getCSRFToken() || '',
-        Context: identity ? JSON.stringify(identity) : '',
+        'X-Admin-Mode': isAdminMode ? 'true' : 'false',
       },
       body: JSON.stringify({ ...data }),
     });
@@ -90,7 +89,7 @@ export async function patchData<T>(
   }
 }
 
-export async function postData<T>(url: string, data?: T, identity?: Identity): Promise<void> {
+export async function postData<T>(url: string, data?: T, isAdminMode?: boolean): Promise<void> {
   try {
     const response = await fetch(url, {
       method: 'POST',
@@ -98,7 +97,7 @@ export async function postData<T>(url: string, data?: T, identity?: Identity): P
       headers: {
         'Content-Type': 'application/json',
         'X-CSRFToken': getCSRFToken() || '',
-        Context: identity ? JSON.stringify(identity) : '',
+        'X-Admin-Mode': isAdminMode ? 'true' : 'false',
       },
       body: data != null ? JSON.stringify(data) : undefined,
     });
@@ -121,7 +120,7 @@ export async function postData<T>(url: string, data?: T, identity?: Identity): P
 export async function postForm(
   url: string,
   formData?: FormData,
-  identity?: Identity
+  isAdminMode?: boolean
 ): Promise<void> {
   try {
     const response = await fetch(url, {
@@ -129,7 +128,7 @@ export async function postForm(
       credentials: 'include',
       headers: {
         'X-CSRFToken': getCSRFToken() || '',
-        Context: identity ? JSON.stringify(identity) : '',
+        'X-Admin-Mode': isAdminMode ? 'true' : 'false',
       },
       body: formData,
     });
@@ -149,14 +148,14 @@ export async function postForm(
   }
 }
 
-export async function deleteData(url: string, identity?: Identity): Promise<void> {
+export async function deleteData(url: string, isAdminMode?: boolean): Promise<void> {
   try {
     const response = await fetch(url, {
       method: 'DELETE',
       credentials: 'include',
       headers: {
         'X-CSRFToken': getCSRFToken() || '',
-        Context: identity ? JSON.stringify(identity) : '',
+        'X-Admin-Mode': isAdminMode ? 'true' : 'false',
       },
     });
 
