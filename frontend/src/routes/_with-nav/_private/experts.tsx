@@ -7,14 +7,14 @@ import { useAdminModeContext } from '@/features/admin-mode/AdminModeContext';
 
 export const Route = createFileRoute('/_with-nav/_private/experts')({
   loader: async ({ context }) => {
-    await context.queryClient.ensureQueryData(expertsQueryOptions(context.identity));
+    await context.queryClient.ensureQueryData(expertsQueryOptions(context.isAdminMode));
   },
   component: ExpertsPage,
 });
 
 function ExpertsPage() {
   const { isAdminMode } = useAdminModeContext();
-  const { data: experts } = useSuspenseQuery(expertsQueryOptions(identity));
+  const { data: experts } = useSuspenseQuery(expertsQueryOptions(isAdminMode));
 
   return (
     <Container maxWidth="xl" sx={{ paddingTop: 3, paddingBottom: 3 }}>

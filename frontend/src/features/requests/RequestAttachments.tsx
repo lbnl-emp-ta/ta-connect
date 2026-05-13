@@ -82,7 +82,7 @@ export const RequestAttachments: React.FC<RequestAttachmentsProps> = ({
       headers: {
         'Content-Type': 'multipart/form-data',
         'X-CSRFToken': getCSRFToken() || '',
-        Context: identity ? JSON.stringify(identity) : '',
+        'X-Admin-Mode': isAdminMode ? 'true' : 'false',
       },
     })
       .then((response) => {

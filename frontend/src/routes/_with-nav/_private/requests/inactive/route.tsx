@@ -8,14 +8,14 @@ import { createFileRoute } from '@tanstack/react-router';
 export const Route = createFileRoute('/_with-nav/_private/requests/inactive')({
   loader: async ({ context }) => {
     await context.queryClient.ensureQueryData(identitiesQueryOptions());
-    await context.queryClient.ensureQueryData(requestsQueryOptions(context.identity));
+    await context.queryClient.ensureQueryData(requestsQueryOptions(context.isAdminMode));
   },
   component: InactiveRequestsWrapper,
 });
 
 function InactiveRequestsWrapper() {
   const { isAdminMode } = useAdminModeContext();
-  const { data: requests } = useSuspenseQuery(requestsQueryOptions(identity));
+  const { data: requests } = useSuspenseQuery(requestsQueryOptions(isAdminMode));
   const inactiveRequests = [
     {
       id: 'inactive',

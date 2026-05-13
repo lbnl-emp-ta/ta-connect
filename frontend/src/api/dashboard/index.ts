@@ -2,7 +2,7 @@ import { getCSRFToken } from '@/utils/cookies';
 import { TAError } from '@/api/dashboard/types';
 
 /**
- * Generic wrapper for fetch requests that injects the user CSRF token and identity context.
+ * Generic wrapper for fetch requests that injects the user CSRF token and Admin Mode header.
  */
 export async function fetchData<T>(url: string, isAdminMode?: boolean): Promise<T | null> {
   try {

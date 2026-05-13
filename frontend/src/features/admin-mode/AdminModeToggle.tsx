@@ -1,28 +1,34 @@
-import { FormControlLabel, FormGroup, Switch } from '@mui/material';
+import { Button, Stack, Switch } from '@mui/material';
 import { useSuspenseQuery } from '@tanstack/react-query';
-import { useNavigate } from '@tanstack/react-router';
 import { identitiesQueryOptions } from '../../api/queryOptions';
 import { useAdminModeContext } from './AdminModeContext';
+import { TARole } from '@/api/dashboard/types';
 
 export const AdminModeToggle: React.FC = () => {
-  const navigate = useNavigate();
   const { isAdminMode, setIsAdminMode } = useAdminModeContext();
   const { data: identities } = useSuspenseQuery(identitiesQueryOptions());
+  const hasAdminIdentity = identities?.some((identity) => identity.role.name === TARole.Admin);
 
-  const handleToggle = (_event: React.ChangeEvent<HTMLInputElement>, checked: boolean) => {
-    setIsAdminMode(checked);
+  const handleToggle = () => {
+    setIsAdminMode(!isAdminMode);
   };
 
-  if (!identities || identities.length === 0) {
+  if (!hasAdminIdentity) {
     return null;
   }
 
   return (
-    <FormGroup>
-      <FormControlLabel
-        control={<Switch checked={isAdminMode} onChange={handleToggle} />}
-        label="Admin Mode"
-      />
-    </FormGroup>
+    <Button variant="outlined" color="success" size="small" onClick={handleToggle}>
+      <Stack direction="row" alignItems="center" spacing={0}>
+        <span>Admin Mode</span>
+        <Switch
+          color="success"
+          checked={isAdminMode}
+          sx={{
+            '& .MuiSwitch-track': { borderWidth: 1, borderStyle: 'solid', borderColor: 'grey.500' },
+          }}
+        />
+      </Stack>
+    </Button>
   );
 };

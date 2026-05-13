@@ -23,7 +23,7 @@ interface RequestHeaderProps {
 export const RequestHeader: React.FC<RequestHeaderProps> = ({ request }) => {
   const { isAdminMode } = useAdminModeContext();
   const { tab, nextId, previousId, expertsPanelOpen, setExpertsPanelOpen } = useRequestsContext();
-  const { data: experts } = useSuspenseQuery(expertsQueryOptions(identity));
+  const { data: experts } = useSuspenseQuery(expertsQueryOptions(isAdminMode));
 
   const handleCloseExpertsPanel = () => {
     setExpertsPanelOpen(false);
