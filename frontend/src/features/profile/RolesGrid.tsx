@@ -28,7 +28,7 @@ export const RolesGrid: React.FC<RolesGridProps> = ({ identities }) => {
   }, [editingLabRoleAssignmentId]);
 
   const getIdentityKey = (identity: TAIdentity) => {
-    return `${identity.role.id}-${identity.location}-${identity.instance?.id ?? 'none'}`;
+    return `${identity.role.id}-${identity.location}-${identity.program?.id ?? 'none'}-${identity.instance?.id ?? 'none'}`;
   };
 
   return (

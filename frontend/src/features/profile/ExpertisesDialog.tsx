@@ -103,7 +103,6 @@ export const ExpertisesDialog: React.FC<ExpertisesDialogProps> = ({
    */
   const handleSubmit: React.FormEventHandler<HTMLFormElement> = (e) => {
     e.preventDefault();
-    console.log('Submitting expertises:', newExpertises);
     const mutationData = newExpertises.map((expertise) => {
       return {
         topic: expertise.topic!.id,
@@ -118,6 +117,10 @@ export const ExpertisesDialog: React.FC<ExpertisesDialogProps> = ({
     setNewExpertises(expertises);
     onClose();
   };
+
+  useEffect(() => {
+    setNewExpertises(expertises);
+  }, [expertises]);
 
   useEffect(() => {
     if (updateExpertiseMutation.isPending) {
