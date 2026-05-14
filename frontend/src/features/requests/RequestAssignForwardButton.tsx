@@ -52,7 +52,7 @@ export const RequestAssignForwardButton: React.FC<RequestAssignForwardButtonProp
   const identityRoles = useMemo(() => {
     return identities?.map((item) => item.role.name) ?? [];
   }, [identities]);
-  const { data: owners } = useSuspenseQuery(ownersQueryOptions(isAdminMode));
+  const { data: owners } = useSuspenseQuery(ownersQueryOptions(request.id.toString(), isAdminMode));
   const { data: experts } = useSuspenseQuery(expertsQueryOptions(isAdminMode));
   const {
     tab,

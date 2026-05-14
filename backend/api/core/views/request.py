@@ -81,7 +81,10 @@ class BaseUserAwareRequest(views.APIView):
             actionable_requests = actionable_requests | assignment.instance.owner.request_set.all()
 
         for assignment in lab_assignments:
-            actionable_requests = actionable_requests | assignment.instance.owner.request_set.all()
+            if assignment.role.name == ROLE.LAB_LEAD:    
+                actionable_requests = actionable_requests | assignment.instance.owner.request_set.all()
+            elif assignment.role.name == ROLE.EXPERT:
+                actionable_requests = actionable_requests | assignment.user.owner.request_set.all()
 
         actionable_requests = actionable_requests.distinct()
         self._actionable_cache = actionable_requests

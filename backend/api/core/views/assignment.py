@@ -3,7 +3,7 @@ from rest_framework.response import Response
 from django.db import transaction
 
 from core.utils import create_audit_history, get_status
-from core.permissions import CanAssignExpert
+from core.permissions import *
 from core.views.owner import OwnerListView
 from core.models import *
 from core.models.audit_history import ActionType
@@ -16,7 +16,7 @@ class AssignmentView(BaseUserAwareRequest):
         body = request.data
 
         if not body:
-            return Response(data={"message": "Please provide a body for assignment which includes a request ID and an owner ID."}, status=status.HTTP_400_BAD_REQUEST)
+            return Response(data={"message": "Please provide a body for assignment which includes an owner ID."}, status=status.HTTP_400_BAD_REQUEST)
         
         owner_id = body.get("owner")
 
@@ -36,21 +36,18 @@ class AssignmentView(BaseUserAwareRequest):
             return Response(data={"message": "Request is not actionable for the current user identity."}, status=status.HTTP_400_BAD_REQUEST)
 
         if (owner_id):
-            possible_owners = OwnerListView(request=self.request).get_queryset()
-
             new_owner = None
             try:
                 new_owner = Owner.objects.get(pk=owner_id)
             except Owner.DoesNotExist:
                 return Response(data={"message": "Owner with given ID does not exist."}, status=status.HTTP_400_BAD_REQUEST)
 
-            if (not possible_owners) or (not possible_owners.filter(id=owner_id)):
-                return Response(data={"message": "Current user identity cannot assign to that owner."}, status=status.HTTP_400_BAD_REQUEST)
-
             try:
                 closeout_form = None
                 match new_owner.domain_type:
                     case DOMAINTYPE.RECEPTION:
+                        if not CanAssignReception().has_object_permission(self.request, self, ta_request):
+                            return Response(data={"message": "Insufficient privilege to assign to reception."}, status=status.HTTP_401_UNAUTHORIZED)
                         ta_request.owner = new_owner                    
                         # Resetting prior assignments if request kicked back to Reception
                         ta_request.program = None
@@ -64,6 +61,8 @@ class AssignmentView(BaseUserAwareRequest):
                         else:
                             ta_request.status = get_status(REQUEST_STATUS.SCOPING)
                     case DOMAINTYPE.PROGRAM:
+                        if not CanAssignProgram().has_object_permission(self.request, self, ta_request):
+                            return Response(data={"message": "Insufficient privilege to assign to program."}, status=status.HTTP_401_UNAUTHORIZED)
                         ta_request.owner = new_owner
                         ta_request.program = new_owner.program
                         
@@ -79,6 +78,8 @@ class AssignmentView(BaseUserAwareRequest):
                             ta_request.status = get_status(REQUEST_STATUS.ASSIGNED_TO_PROGRAM)
 
                     case DOMAINTYPE.LAB:
+                        if not CanAssignLab().has_object_permission(self.request, self, ta_request):
+                            return Response(data={"message": "Insufficient privilege to assign to lab."}, status=status.HTTP_401_UNAUTHORIZED)
                         ta_request.owner = new_owner
                         ta_request.lab = new_owner.lab
                         
@@ -96,7 +97,7 @@ class AssignmentView(BaseUserAwareRequest):
                             ta_request.status = get_status(REQUEST_STATUS.CLOSEOUT_REVIEW_BY_LAB)
                         
                     case DOMAINTYPE.EXPERT:
-                        if not CanAssignExpert().has_permission(request):
+                        if not CanAssignExpert().has_object_permission(self.request, self, ta_request):
                             return Response(data={"message": "Insufficient privilege to assign an expert."}, status=status.HTTP_401_UNAUTHORIZED)
                         ta_request.owner = new_owner
                         ta_request.expert = new_owner.expert

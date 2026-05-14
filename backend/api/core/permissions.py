@@ -149,14 +149,17 @@ def compose(*classes):
 
 
 # Composed permission aliases for common checks.
-CanAssignExpert             = compose(IsAdmin, IsLabLead, IsProgramLead)
-CanMarkComplete             = compose(IsAdmin, IsProgramLead)
-CanCancel                   = compose(IsAdmin, IsCoordinator)
-CanSubmitCloseout           = compose(IsAdmin, IsExpert)
-CanApproveCloseoutByLab     = compose(IsAdmin, IsLabLead)
+CanAssignReception = compose(IsAdmin, IsProgramLead)
+CanAssignProgram = compose(IsAdmin, IsCoordinator, IsLabLead)
+CanAssignLab = compose(IsAdmin, IsProgramLead, IsExpert)
+CanAssignExpert = compose(IsAdmin, IsLabLead, IsProgramLead)
+CanMarkComplete = compose(IsAdmin, IsProgramLead)
+CanCancel = compose(IsAdmin, IsCoordinator)
+CanSubmitCloseout = compose(IsAdmin, IsExpert)
+CanApproveCloseoutByLab = compose(IsAdmin, IsLabLead)
 CanApproveCloseoutByProgram = compose(IsAdmin, IsProgramLead)
-CanEditDescription          = compose(IsAdmin, IsProgramLead, IsCoordinator)
-CanEditDepth                = compose(IsAdmin, IsProgramLead, IsLabLead, IsCoordinator)
-CanEditTopics               = compose(IsAdmin, IsProgramLead, IsLabLead, IsCoordinator)
+CanEditDescription = compose(IsAdmin, IsProgramLead, IsCoordinator)
+CanEditDepth = compose(IsAdmin, IsProgramLead, IsLabLead, IsCoordinator)
+CanEditTopics = compose(IsAdmin, IsProgramLead, IsLabLead, IsCoordinator)
     
         

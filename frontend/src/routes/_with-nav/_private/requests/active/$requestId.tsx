@@ -13,7 +13,9 @@ export const Route = createFileRoute('/_with-nav/_private/requests/active/$reque
     await context.queryClient.ensureQueryData(
       requestDetailQueryOptions(params.requestId, context.isAdminMode)
     );
-    await context.queryClient.ensureQueryData(ownersQueryOptions(context.isAdminMode));
+    await context.queryClient.ensureQueryData(
+      ownersQueryOptions(params.requestId, context.isAdminMode)
+    );
     await context.queryClient.ensureQueryData(topicsQueryOptions());
     await context.queryClient.ensureQueryData(
       notesQueryOptions(params.requestId, context.isAdminMode)

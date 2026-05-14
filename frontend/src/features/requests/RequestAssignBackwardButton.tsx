@@ -33,7 +33,7 @@ export const RequestAssignBackwardButton: React.FC<RequestAssignBackwardButtonPr
 }) => {
   const navigate = useNavigate();
   const { isAdminMode } = useAdminModeContext();
-  const { data: owners } = useSuspenseQuery(ownersQueryOptions(isAdminMode));
+  const { data: owners } = useSuspenseQuery(ownersQueryOptions(request.id.toString(), isAdminMode));
   const { data: identities } = useSuspenseQuery(identitiesQueryOptions());
   const identityRoles = useMemo(() => {
     return identities?.map((item) => item.role.name) ?? [];
@@ -89,7 +89,7 @@ export const RequestAssignBackwardButton: React.FC<RequestAssignBackwardButtonPr
   });
 
   const handleAssignment = (owner: TAOwner) => {
-    assignRequestMutation.mutate({ request: request.id, owner: owner.id });
+    assignRequestMutation.mutate({ owner: owner.id });
   };
 
   const handleBackward = (owner?: TAOwner) => {
@@ -100,32 +100,32 @@ export const RequestAssignBackwardButton: React.FC<RequestAssignBackwardButtonPr
       case 'assigned-to-program':
       case 'rejected-by-lab':
         if (receptionOwnerId) {
-          assignRequestMutation.mutate({ request: request.id, owner: receptionOwnerId });
+          assignRequestMutation.mutate({ owner: receptionOwnerId });
         }
         break;
       case 'assigned-to-lab':
       case 'rejected-by-expert':
         if (request.program) {
-          assignRequestMutation.mutate({ request: request.id, owner: request.program.owner_id });
+          assignRequestMutation.mutate({ owner: request.program.owner_id });
         }
         break;
       case 'assigned-to-expert':
       case 'providing-ta':
         if (request.lab) {
-          assignRequestMutation.mutate({ request: request.id, owner: request.lab.owner_id });
+          assignRequestMutation.mutate({ owner: request.lab.owner_id });
         }
         break;
       case 'closeout-started':
       case 'closeout-more-info':
         // TODO: Should just change status back to PROVIDING_TA
         if (request.lab) {
-          assignRequestMutation.mutate({ request: request.id, owner: request.lab.owner_id });
+          assignRequestMutation.mutate({ owner: request.lab.owner_id });
         }
         break;
       case 'closeout-review-by-lab':
       case 'closeout-review-by-program':
         if (request.expert) {
-          assignRequestMutation.mutate({ request: request.id, owner: request.expert.owner_id });
+          assignRequestMutation.mutate({ owner: request.expert.owner_id });
         }
         break;
       case 'completed':

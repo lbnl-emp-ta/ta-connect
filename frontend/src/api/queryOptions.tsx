@@ -80,11 +80,11 @@ export const statusesQueryOptions = (isAdminMode?: boolean) =>
     queryFn: () => fetchData<TAStatus[]>(`${apiUrl}/statuses/`, isAdminMode),
   });
 
-export const ownersQueryOptions = (isAdminMode?: boolean) =>
+export const ownersQueryOptions = (requestId: string, isAdminMode?: boolean) =>
   queryOptions({
     staleTime: 120_000, // stale after 2 minutes
     queryKey: ['owners', isAdminMode],
-    queryFn: () => fetchData<TAOwner[]>(`${apiUrl}/owners/`, isAdminMode),
+    queryFn: () => fetchData<TAOwner[]>(`${apiUrl}/requests/${requestId}/owners/`, isAdminMode),
   });
 
 export const expertsQueryOptions = (isAdminMode?: boolean) =>
