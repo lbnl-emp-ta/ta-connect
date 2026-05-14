@@ -12,13 +12,12 @@ from core.views.request import BaseUserAwareRequest
 
 class AssignmentView(BaseUserAwareRequest):
 
-    def post(self, request):
+    def post(self, request, request_id=None):
         body = request.data
 
         if not body:
             return Response(data={"message": "Please provide a body for assignment which includes a request ID and an owner ID."}, status=status.HTTP_400_BAD_REQUEST)
         
-        request_id = body.get("request")
         owner_id = body.get("owner")
 
         if not request_id:

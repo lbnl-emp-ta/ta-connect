@@ -5,9 +5,9 @@ urlpatterns = [
     path('process-intake-form/', ProcessIntakeForm.as_view(), name="process-intake-form"),
     
     path('requests/', RequestListView.as_view(), name="request-list"),
-    path('requests/assign/', AssignmentView.as_view(), name="assignment"),
     path('requests/<int:request_id>', RequestDetailView.as_view(), name="request-detail"),
 
+    path('requests/<int:request_id>/assign/', AssignmentView.as_view(), name="assignment"),
     path('requests/<int:request_id>/audit-history/', AuditHistoryListView.as_view(), name="list-audit-history"),
     path('requests/<int:request_id>/cancel/', RequestCancelView.as_view(), name="cancel"),
     path('requests/<int:request_id>/reopen/', RequestReopenView.as_view(), name="reopen"),

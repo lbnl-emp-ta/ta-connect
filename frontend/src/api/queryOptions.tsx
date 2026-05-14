@@ -224,7 +224,7 @@ export const useAssignmentMutation = (
   return useMutation({
     mutationKey: ['requests', 'assign', requestId, isAdminMode],
     mutationFn: (data: TAAssignment) =>
-      postData<TAAssignment>(`${apiUrl}/requests/assign/`, data, isAdminMode),
+      postData<TAAssignment>(`${apiUrl}/requests/${requestId}/assign/`, data, isAdminMode),
     ...options,
   });
 };

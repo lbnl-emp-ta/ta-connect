@@ -201,7 +201,7 @@ export const RequestAssignForwardButton: React.FC<RequestAssignForwardButtonProp
   };
 
   const handleAssignment = (owner: TAOwner) => {
-    assignRequestMutation.mutate({ request: request.id, owner: owner.id });
+    assignRequestMutation.mutate({ owner: owner.id });
     handleAssignMenuClose();
   };
 

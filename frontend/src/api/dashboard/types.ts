@@ -290,7 +290,6 @@ export interface CustomerRequestRelationship {
 }
 
 export interface TAAssignment {
-  request: number;
   owner: number | null;
 }
 
