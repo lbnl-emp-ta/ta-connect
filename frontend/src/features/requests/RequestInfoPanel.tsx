@@ -279,10 +279,10 @@ export const RequestInfoPanel: React.FC<RequestInfoPanelProps> = ({ request }) =
               <TableRow>
                 <TableCell>Depth</TableCell>
                 <TableCell>
-                  {(!editing || !hasPermission('edit-depth', identities)) && (
+                  {(!editing || !hasPermission('edit-depth', identities, isAdminMode)) && (
                     <>{request.depth || '-'}</>
                   )}
-                  {editing && hasPermission('edit-depth', identities) && (
+                  {editing && hasPermission('edit-depth', identities, isAdminMode) && (
                     <Select value={depth} onChange={handleDepthChange}>
                       {request.depth_options.map((option) => (
                         <MenuItem key={option} value={option}>
@@ -296,13 +296,13 @@ export const RequestInfoPanel: React.FC<RequestInfoPanelProps> = ({ request }) =
               <TableRow>
                 <TableCell>Effort</TableCell>
                 <TableCell>
-                  {(!editing || !hasPermission('edit-effort', identities)) && (
+                  {(!editing || !hasPermission('edit-effort', identities, isAdminMode)) && (
                     <Stack direction="row" alignItems="center" spacing={1}>
                       <EffortIcon effort={request.effort || ''} fontSize="small" />
                       <span>{request.effort || '-'}</span>
                     </Stack>
                   )}
-                  {editing && hasPermission('edit-effort', identities) && (
+                  {editing && hasPermission('edit-effort', identities, isAdminMode) && (
                     <Select value={effort} onChange={handleEffortChange}>
                       {effortOptions.map((option) => (
                         <MenuItem key={option} value={option}>
@@ -322,24 +322,26 @@ export const RequestInfoPanel: React.FC<RequestInfoPanelProps> = ({ request }) =
               <TableRow>
                 <TableCell>Projected Start Date</TableCell>
                 <TableCell>
-                  {(!editing || !hasPermission('edit-projected-start-date', identities)) && (
+                  {(!editing ||
+                    !hasPermission('edit-projected-start-date', identities, isAdminMode)) && (
                     <>
                       {request.proj_start_date
                         ? dayjs(request.proj_start_date).format('MM/DD/YYYY')
                         : '-'}
                     </>
                   )}
-                  {editing && hasPermission('edit-projected-start-date', identities) && (
-                    <DatePicker
-                      value={projectedStartDate || null}
-                      onChange={handleProjectedStartDateChange}
-                      slotProps={{
-                        field: {
-                          clearable: true,
-                        },
-                      }}
-                    />
-                  )}
+                  {editing &&
+                    hasPermission('edit-projected-start-date', identities, isAdminMode) && (
+                      <DatePicker
+                        value={projectedStartDate || null}
+                        onChange={handleProjectedStartDateChange}
+                        slotProps={{
+                          field: {
+                            clearable: true,
+                          },
+                        }}
+                      />
+                    )}
                 </TableCell>
               </TableRow>
               <TableRow>
@@ -349,6 +351,7 @@ export const RequestInfoPanel: React.FC<RequestInfoPanelProps> = ({ request }) =
                     !hasPermission(
                       'edit-projected-completion-date',
                       identities,
+                      isAdminMode,
                       request.status
                     )) && (
                     <>
@@ -358,7 +361,12 @@ export const RequestInfoPanel: React.FC<RequestInfoPanelProps> = ({ request }) =
                     </>
                   )}
                   {editing &&
-                    hasPermission('edit-projected-completion-date', identities, request.status) && (
+                    hasPermission(
+                      'edit-projected-completion-date',
+                      identities,
+                      isAdminMode,
+                      request.status
+                    ) && (
                       <DatePicker
                         value={projectedCompletionDate || null}
                         onChange={handleProjectedCompletionDateChange}
@@ -374,30 +382,32 @@ export const RequestInfoPanel: React.FC<RequestInfoPanelProps> = ({ request }) =
               <TableRow>
                 <TableCell>Actual Completion Date</TableCell>
                 <TableCell>
-                  {(!editing || !hasPermission('edit-actual-completion-date', identities)) && (
+                  {(!editing ||
+                    !hasPermission('edit-actual-completion-date', identities, isAdminMode)) && (
                     <>
                       {request.actual_completion_date
                         ? dayjs(request.actual_completion_date).format('MM/DD/YYYY')
                         : '-'}
                     </>
                   )}
-                  {editing && hasPermission('edit-actual-completion-date', identities) && (
-                    <DatePicker
-                      value={actualCompletionDate || null}
-                      onChange={handleActualCompletionDateChange}
-                      slotProps={{
-                        field: {
-                          clearable: true,
-                        },
-                      }}
-                    />
-                  )}
+                  {editing &&
+                    hasPermission('edit-actual-completion-date', identities, isAdminMode) && (
+                      <DatePicker
+                        value={actualCompletionDate || null}
+                        onChange={handleActualCompletionDateChange}
+                        slotProps={{
+                          field: {
+                            clearable: true,
+                          },
+                        }}
+                      />
+                    )}
                 </TableCell>
               </TableRow>
               <TableRow>
                 <TableCell>Topics</TableCell>
                 <TableCell>
-                  {(!editing || !hasPermission('edit-topics', identities)) && (
+                  {(!editing || !hasPermission('edit-topics', identities, isAdminMode)) && (
                     <Grid container spacing={1}>
                       {request.topics && request.topics.length > 0 ? (
                         request.topics.map((topic) => (
@@ -415,7 +425,7 @@ export const RequestInfoPanel: React.FC<RequestInfoPanelProps> = ({ request }) =
                       )}
                     </Grid>
                   )}
-                  {editing && hasPermission('edit-topics', identities) && (
+                  {editing && hasPermission('edit-topics', identities, isAdminMode) && (
                     <Autocomplete
                       multiple
                       options={allTopics || []}

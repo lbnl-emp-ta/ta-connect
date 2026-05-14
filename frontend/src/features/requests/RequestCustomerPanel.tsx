@@ -226,12 +226,12 @@ export const RequestCustomerPanel: React.FC<RequestCustomerPanelProps> = ({ cust
               Customer Information
             </Typography>
           </Stack>
-          {hasPermission('edit-customer', identities) && !editing && (
+          {hasPermission('edit-customer', identities, isAdminMode) && !editing && (
             <IconButton onClick={handleEditClick}>
               <EditIcon />
             </IconButton>
           )}
-          {hasPermission('edit-customer', identities) && editing && (
+          {hasPermission('edit-customer', identities, isAdminMode) && editing && (
             <Stack direction="row">
               {!updateCustomerMutation.isPending && (
                 <IconButton onClick={handleEditSubmit}>
@@ -371,31 +371,37 @@ export const RequestCustomerPanel: React.FC<RequestCustomerPanelProps> = ({ cust
                 <TableCell>Organization Type</TableCell>
                 <TableCell>
                   <Stack direction="row" alignItems="center" spacing={1}>
-                    {(!editing || !hasPermission('edit-organization-type', identities)) && (
+                    {(!editing ||
+                      !hasPermission('edit-organization-type', identities, isAdminMode)) && (
                       <span>{customer.org.type.name}</span>
                     )}
-                    {editing && !hasPermission('edit-organization-type', identities) && (
-                      <Tooltip title="Only admins can edit the organization type." placement="top">
-                        <ErrorIcon sx={{ color: 'grey.500' }} />
-                      </Tooltip>
-                    )}
-                    {editing && hasPermission('edit-organization-type', identities) && (
-                      <>
-                        <Select value={orgType} onChange={handleOrgTypeChange}>
-                          {allOrganizationTypes?.map((orgTypeItem) => (
-                            <MenuItem key={orgTypeItem.id} value={orgTypeItem.id}>
-                              {orgTypeItem.name}
-                            </MenuItem>
-                          ))}
-                        </Select>
+                    {editing &&
+                      !hasPermission('edit-organization-type', identities, isAdminMode) && (
                         <Tooltip
-                          title="Changing the organization type will apply to all customers that use this organization."
+                          title="Only admins can edit the organization type."
                           placement="top"
                         >
                           <ErrorIcon sx={{ color: 'grey.500' }} />
                         </Tooltip>
-                      </>
-                    )}
+                      )}
+                    {editing &&
+                      hasPermission('edit-organization-type', identities, isAdminMode) && (
+                        <>
+                          <Select value={orgType} onChange={handleOrgTypeChange}>
+                            {allOrganizationTypes?.map((orgTypeItem) => (
+                              <MenuItem key={orgTypeItem.id} value={orgTypeItem.id}>
+                                {orgTypeItem.name}
+                              </MenuItem>
+                            ))}
+                          </Select>
+                          <Tooltip
+                            title="Changing the organization type will apply to all customers that use this organization."
+                            placement="top"
+                          >
+                            <ErrorIcon sx={{ color: 'grey.500' }} />
+                          </Tooltip>
+                        </>
+                      )}
                   </Stack>
                 </TableCell>
               </TableRow>

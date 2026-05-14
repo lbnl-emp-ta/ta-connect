@@ -1,4 +1,10 @@
-import { TAIdentity, TARequest, TARequestDetail, TARole, TAStatusName } from '../api/dashboard/types';
+import {
+  TAIdentity,
+  TARequest,
+  TARequestDetail,
+  TARole,
+  TAStatusName,
+} from '../api/dashboard/types';
 
 export const sortAndFilterRequests = (
   requests: TARequest[],
@@ -130,6 +136,7 @@ type PermissionAction =
 export const hasPermission = (
   action: PermissionAction,
   identities?: TAIdentity[] | null,
+  isAdminMode?: boolean,
   statusName?: TAStatusName
 ): boolean => {
   if (!identities) return false;
@@ -158,7 +165,9 @@ export const hasPermission = (
   for (const identity of identities) {
     switch (identity.role.name) {
       case TARole.Admin:
-        doesHavePermission = true;
+        if (isAdminMode) {
+          doesHavePermission = true;
+        }
         break;
       case TARole.Coordinator:
         switch (action) {

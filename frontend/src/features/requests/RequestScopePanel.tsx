@@ -148,7 +148,7 @@ export const RequestScopePanel: React.FC<RequestScopePanelProps> = ({ request })
                 Description
               </Typography>
             </Stack>
-            {(!editing || !hasPermission('edit-description', identities)) && (
+            {(!editing || !hasPermission('edit-description', identities, isAdminMode)) && (
               <Box
                 sx={{
                   backgroundColor: 'grey.50',
@@ -163,7 +163,7 @@ export const RequestScopePanel: React.FC<RequestScopePanelProps> = ({ request })
                 </Typography>
               </Box>
             )}
-            {editing && hasPermission('edit-description', identities) && (
+            {editing && hasPermission('edit-description', identities, isAdminMode) && (
               <TextField
                 fullWidth
                 multiline
@@ -179,7 +179,7 @@ export const RequestScopePanel: React.FC<RequestScopePanelProps> = ({ request })
                 Challenges
               </Typography>
             </Stack>
-            {(!editing || !hasPermission('edit-challenges', identities)) && (
+            {(!editing || !hasPermission('edit-challenges', identities, isAdminMode)) && (
               <Box
                 sx={{
                   backgroundColor: 'grey.50',
@@ -192,7 +192,7 @@ export const RequestScopePanel: React.FC<RequestScopePanelProps> = ({ request })
                 <Typography fontSize="0.875rem">{request.challenges || '-'}</Typography>
               </Box>
             )}
-            {editing && hasPermission('edit-challenges', identities) && (
+            {editing && hasPermission('edit-challenges', identities, isAdminMode) && (
               <TextField
                 fullWidth
                 multiline
@@ -208,7 +208,7 @@ export const RequestScopePanel: React.FC<RequestScopePanelProps> = ({ request })
                 Goals
               </Typography>
             </Stack>
-            {(!editing || !hasPermission('edit-goals', identities)) && (
+            {(!editing || !hasPermission('edit-goals', identities, isAdminMode)) && (
               <Box
                 sx={{
                   backgroundColor: 'grey.50',
@@ -221,7 +221,7 @@ export const RequestScopePanel: React.FC<RequestScopePanelProps> = ({ request })
                 <Typography fontSize="0.875rem">{request.goals || '-'}</Typography>
               </Box>
             )}
-            {editing && hasPermission('edit-goals', identities) && (
+            {editing && hasPermission('edit-goals', identities, isAdminMode) && (
               <TextField
                 fullWidth
                 multiline

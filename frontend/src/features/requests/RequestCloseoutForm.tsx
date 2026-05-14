@@ -210,17 +210,34 @@ export const RequestCloseoutForm: React.FC<RequestCloseoutFormProps> = ({
   }, [closeoutForm?.submitted_date, closeoutForm?.approved_by_lab]);
 
   const programApproveButtonText = useMemo(() => {
-    if (!closeoutForm?.submitted_date || closeoutForm.approved_by_program) {
+    if (
+      !closeoutForm?.submitted_date ||
+      !closeoutForm.approved_by_lab ||
+      closeoutForm.approved_by_program
+    ) {
       return null;
     } else if (!closeoutForm.approved_by_program) {
       return 'Approve and mark completed';
     }
   }, [closeoutForm?.submitted_date, closeoutForm?.approved_by_program]);
 
-  const backwardButtonText = useMemo(() => {
+  const labRejectButtonText = useMemo(() => {
+    if (!closeoutForm?.submitted_date || closeoutForm.approved_by_lab) {
+      return null;
+    } else {
+      return 'Reject and send back to expert';
+    }
+  }, [
+    closeoutForm?.submitted_date,
+    closeoutForm?.approved_by_lab,
+    closeoutForm?.approved_by_program,
+  ]);
+
+  const programRejectButtonText = useMemo(() => {
     if (
       !closeoutForm?.submitted_date ||
-      (closeoutForm.approved_by_lab && closeoutForm.approved_by_program)
+      !closeoutForm.approved_by_lab ||
+      closeoutForm.approved_by_program
     ) {
       return null;
     } else {
@@ -262,7 +279,7 @@ export const RequestCloseoutForm: React.FC<RequestCloseoutFormProps> = ({
 
   const handleBackward = () => {
     if (expertOwnerId) {
-      assignRequestMutation.mutate({ request: requestId, owner: expertOwnerId });
+      assignRequestMutation.mutate({ owner: expertOwnerId });
     }
     setCloseoutDialogOpen(false);
   };
@@ -483,30 +500,36 @@ export const RequestCloseoutForm: React.FC<RequestCloseoutFormProps> = ({
         <Button variant="outlined" onClick={handleDialogClose}>
           Back to request
         </Button>
-        {backwardButtonText &&
-          hasPermission('reject-closeout-form-by-lab', identities, requestStatus) && (
+        {labRejectButtonText &&
+          hasPermission('reject-closeout-form-by-lab', identities, isAdminMode, requestStatus) && (
             <Button variant="contained" color="error" onClick={handleBackward}>
-              {backwardButtonText}
+              {labRejectButtonText}
             </Button>
           )}
-        {backwardButtonText &&
-          hasPermission('reject-closeout-form-by-program', identities, requestStatus) && (
+        {programRejectButtonText &&
+          hasPermission(
+            'reject-closeout-form-by-program',
+            identities,
+            isAdminMode,
+            requestStatus
+          ) && (
             <Button variant="contained" color="error" onClick={handleBackward}>
-              {backwardButtonText}
+              {programRejectButtonText}
             </Button>
           )}
-        {!closeoutForm.submitted_date && hasPermission('edit-closeout-form', identities) && (
-          <Button variant="contained" color="primary" type="submit" form="closeout-form">
-            Submit for review
-          </Button>
-        )}
+        {!closeoutForm.submitted_date &&
+          hasPermission('edit-closeout-form', identities, isAdminMode) && (
+            <Button variant="contained" color="primary" type="submit" form="closeout-form">
+              Submit for review
+            </Button>
+          )}
         {labApproveButtonText && hasPermission('approve-closeout-form-by-lab', identities) && (
           <Button variant="contained" color="primary" onClick={handleApprove}>
             {labApproveButtonText}
           </Button>
         )}
         {programApproveButtonText &&
-          hasPermission('approve-closeout-form-by-program', identities) && (
+          hasPermission('approve-closeout-form-by-program', identities, isAdminMode) && (
             <Button variant="contained" color="primary" onClick={handleApprove}>
               {programApproveButtonText}
             </Button>
