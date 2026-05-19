@@ -5,9 +5,10 @@ urlpatterns = [
     path('process-intake-form/', ProcessIntakeForm.as_view(), name="process-intake-form"),
     
     path('requests/', RequestListView.as_view(), name="request-list"),
-    path('requests/assign/', AssignmentView.as_view(), name="assignment"),
     path('requests/<int:request_id>', RequestDetailView.as_view(), name="request-detail"),
 
+    path('requests/<int:request_id>/assign/', AssignmentView.as_view(), name="assignment"),
+    path('requests/<int:request_id>/owners/', OwnerListView.as_view(), name="owners-list"),
     path('requests/<int:request_id>/audit-history/', AuditHistoryListView.as_view(), name="list-audit-history"),
     path('requests/<int:request_id>/cancel/', RequestCancelView.as_view(), name="cancel"),
     path('requests/<int:request_id>/reopen/', RequestReopenView.as_view(), name="reopen"),
@@ -29,7 +30,6 @@ urlpatterns = [
     path('users/<int:user_id>', UserEditView.as_view(), name="user-edit"),
     path('identities/', IdentityListView.as_view(), name="identities-list"),
     path('statuses/', StatusListView.as_view(), name="statuses-list"),
-    path('owners/', OwnerListView.as_view(), name="owners-list"),
     path('experts/', ExpertsListView.as_view(), name="experts-list"),
     path('depths/', DepthListView.as_view(), name="depth-list"),
     path('states/', StateListView.as_view(), name="state-list"),

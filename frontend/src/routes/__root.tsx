@@ -3,15 +3,12 @@ import { IconButton, Snackbar, SnackbarCloseReason, Stack } from '@mui/material'
 import { type QueryClient } from '@tanstack/react-query';
 import { createRootRouteWithContext, Outlet } from '@tanstack/react-router';
 import { TanStackRouterDevtools } from '@tanstack/react-router-devtools';
-import { TAIdentity } from '../api/dashboard/types';
-import { Identity } from '../features/identity/IdentityContext';
-import { useToastContext } from '../features/toasts/ToastContext';
-import { authSessionQueryOptions } from '../api/queryOptions';
+import { useToastContext } from '@/features/toasts/ToastContext';
+import { authSessionQueryOptions } from '@/api/queryOptions';
 
 export interface MyRouterContext {
   queryClient: QueryClient;
-  identity: Identity;
-  detailedIdentity?: TAIdentity | null;
+  isAdminMode: boolean;
 }
 
 export const Route = createRootRouteWithContext<MyRouterContext>()({

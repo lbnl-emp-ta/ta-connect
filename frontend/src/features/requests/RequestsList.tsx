@@ -2,7 +2,7 @@ import { Chip, TablePagination, Paper, Stack, Typography } from '@mui/material';
 import { useNavigate, useParams } from '@tanstack/react-router';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { TARequest } from '../../api/dashboard/types';
-import { formatDatetime, statusMap } from '../../utils/utils';
+import { formatDatetime, sortAndFilterRequests, statusMap } from '../../utils/utils';
 import { useRequestsContext } from './RequestsContext';
 import HourglassBottomIcon from '@mui/icons-material/HourglassBottom';
 import TaskAltIcon from '@mui/icons-material/TaskAlt';
@@ -46,18 +46,7 @@ export const RequestsList: React.FC<RequestsListProps> = ({
   };
 
   const sortRequests = useCallback(() => {
-    const sortDirection = sortField.startsWith('-') ? 'desc' : 'asc';
-    const sortFieldName = sortField.replace('-', '') as keyof TARequest;
-    const filtered = searchTerm
-      ? requests.filter((r) =>
-          `${JSON.stringify(r)}`.toLowerCase().includes(searchTerm.toLowerCase())
-        )
-      : requests;
-    const sorted = [...filtered].sort((a, b) => {
-      if (a[sortFieldName]! < b[sortFieldName]!) return sortDirection === 'asc' ? -1 : 1;
-      if (a[sortFieldName]! > b[sortFieldName]!) return sortDirection === 'asc' ? 1 : -1;
-      return 0;
-    });
+    const sorted = sortAndFilterRequests(requests, sortField, searchTerm);
     setSortedRequestsForList(listId, sorted);
   }, [sortField, searchTerm, requests, listId, setSortedRequestsForList]);
 
@@ -85,11 +74,11 @@ export const RequestsList: React.FC<RequestsListProps> = ({
     sortRequests();
   }, [sortField, requests, searchTerm, sortRequests]);
 
-  // If there are no requests, redirect to the requests page
-  // This occurs if a request is assigned or removed and
-  // it's the only request in the list.
+  // If there are no requests, redirect to the requests page.
+  // This occurs if a request is assigned or removed and it's the only request
+  // in the list (doesn't apply to downstream lists).
   useEffect(() => {
-    if (requests.length === 0) {
+    if (requests.length === 0 && listId !== 'downstream') {
       navigate({
         to: `/requests/${tab}`,
       });

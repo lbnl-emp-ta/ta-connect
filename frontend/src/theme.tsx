@@ -7,7 +7,6 @@ import type {} from '@mui/x-data-grid/themeAugmentation';
  * Learn more about theme options: https://mui.com/material-ui/customization/theming/
  */
 export const theme = createTheme({
-  // Color palette to use throughout the app
   palette: {
     mode: 'light',
     background: {
@@ -16,8 +15,6 @@ export const theme = createTheme({
     },
     primary: {
       main: '#345a64',
-      // Exclude light, dark, or contrastText to have them
-      // calculated automatically based on the main color.
       light: '#D6E6EA',
       dark: '#0f172a',
       contrastText: '#fff',
@@ -50,11 +47,9 @@ export const theme = createTheme({
       900: '#444',
     },
   },
-  // Control the default border radius
   shape: {
     borderRadius: 4,
   },
-  // Control the font, size, and font weights
   typography: {
     button: {
       textTransform: 'none',
@@ -86,7 +81,6 @@ export const theme = createTheme({
     '0 15px 22px -9px rgb(0, 0, 0, 0.14), 0 30px 46px 4px rgb(0, 0, 0, 0.12)',
     ...Array(9).fill('0 15px 22px -9px rgb(0, 0, 0, 0.14), 0 30px 46px 4px rgb(0, 0, 0, 0.12)'),
   ] as Shadows,
-  // Default options for MUI components used throughout the app
   components: {
     /**
      * Example component customization.

@@ -84,7 +84,7 @@ CORS_ALLOWED_ORIGIN_REGEXES = [
 CORS_ALLOW_HEADERS = (
     "Content-Type",
     "X-CSRFToken",
-    "context",
+    "X-Admin-Mode",
 )
 
 CSRF_TRUSTED_ORIGINS = [

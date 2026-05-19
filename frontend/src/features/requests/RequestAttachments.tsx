@@ -15,7 +15,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import AddIcon from '@mui/icons-material/Add';
 import { TAAttachment, TARequestDetail } from '../../api/dashboard/types';
 import { apiUrl, useAttachmentMutation, useDeleteAttachmentMutation } from '../../api/queryOptions';
-import { useIdentityContext } from '../identity/IdentityContext';
+import { useAdminModeContext } from '../admin-mode/AdminModeContext';
 import { getCSRFToken } from '../../utils/cookies';
 import { downloadBlob, formatDatetime } from '../../utils/utils';
 import { useEffect, useState } from 'react';
@@ -30,12 +30,12 @@ export const RequestAttachments: React.FC<RequestAttachmentsProps> = ({
   requestId,
   attachments,
 }) => {
-  const { identity } = useIdentityContext();
+  const { isAdminMode } = useAdminModeContext();
   const [showUploadDialog, setShowUploadDialog] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [attachmentToDelete, setAttachmentToDelete] = useState<number>();
-  const uploadAttachmentMutation = useAttachmentMutation(requestId.toString(), identity);
-  const deleteAttachmentMutation = useDeleteAttachmentMutation(requestId.toString(), identity);
+  const uploadAttachmentMutation = useAttachmentMutation(requestId.toString(), isAdminMode);
+  const deleteAttachmentMutation = useDeleteAttachmentMutation(requestId.toString(), isAdminMode);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [attachmentTitle, setAttachmentTitle] = useState('');
   const [attachmentDescription, setAttachmentDescription] = useState('');
@@ -82,7 +82,7 @@ export const RequestAttachments: React.FC<RequestAttachmentsProps> = ({
       headers: {
         'Content-Type': 'multipart/form-data',
         'X-CSRFToken': getCSRFToken() || '',
-        Context: identity ? JSON.stringify(identity) : '',
+        'X-Admin-Mode': isAdminMode ? 'true' : 'false',
       },
     })
       .then((response) => {

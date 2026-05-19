@@ -14,9 +14,10 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import AddIcon from '@mui/icons-material/Add';
 import { TANote, TARequestDetail } from '../../api/dashboard/types';
 import { useCreateNoteMutation, useDeleteNoteMutation } from '../../api/queryOptions';
-import { useIdentityContext } from '../identity/IdentityContext';
+import { useAdminModeContext } from '../admin-mode/AdminModeContext';
 import { formatDatetime } from '../../utils/utils';
 import { useEffect, useState } from 'react';
+import { useUser } from '@/hooks/useUser';
 
 interface RequestNotesProps {
   requestId: TARequestDetail['id'];
@@ -24,12 +25,13 @@ interface RequestNotesProps {
 }
 
 export const RequestNotes: React.FC<RequestNotesProps> = ({ requestId, notes }) => {
-  const { identity, detailedIdentity } = useIdentityContext();
+  const { isAdminMode } = useAdminModeContext();
+  const user = useUser();
   const [showAddDialog, setShowAddDialog] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [noteToDelete, setNoteToDelete] = useState<number>();
-  const createNoteMutation = useCreateNoteMutation(requestId.toString(), identity);
-  const deleteNoteMutation = useDeleteNoteMutation(requestId.toString(), identity);
+  const createNoteMutation = useCreateNoteMutation(requestId.toString(), isAdminMode);
+  const deleteNoteMutation = useDeleteNoteMutation(requestId.toString(), isAdminMode);
   const [noteDescription, setNoteDescription] = useState('');
 
   notes?.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
@@ -46,7 +48,7 @@ export const RequestNotes: React.FC<RequestNotesProps> = ({ requestId, notes }) 
   const handleSubmit: React.FormEventHandler<HTMLFormElement> = (event) => {
     event.preventDefault();
     createNoteMutation.mutate({
-      author: identity?.user,
+      author: user?.id,
       request: requestId,
       content: noteDescription,
     });
@@ -100,7 +102,7 @@ export const RequestNotes: React.FC<RequestNotesProps> = ({ requestId, notes }) 
               <Typography variant="caption" color="textSecondary">
                 {formatDatetime(note.timestamp)}
               </Typography>
-              {detailedIdentity?.role.name === 'Admin' && (
+              {isAdminMode && (
                 <IconButton onClick={() => handleInitiateDelete(note.id)} size="small">
                   <DeleteIcon fontSize="small" />
                 </IconButton>

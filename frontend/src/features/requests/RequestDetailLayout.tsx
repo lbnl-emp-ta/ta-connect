@@ -1,6 +1,6 @@
 import { InfoPanel } from '@/components/InfoPanel';
 import { TabPanel } from '@/components/TabPanel';
-import { useIdentityContext } from '@/features/identity/IdentityContext';
+import { useAdminModeContext } from '@/features/admin-mode/AdminModeContext';
 import { RequestAttachments } from '@/features/requests/RequestAttachments';
 import { RequestAuditHistory } from '@/features/requests/RequestAuditHistory';
 import { RequestCustomerPanel } from '@/features/requests/RequestCustomerPanel';
@@ -42,12 +42,14 @@ interface RequestDetailLayoutProps {
 }
 
 export const RequestDetailLayout: React.FC<RequestDetailLayoutProps> = ({ requestId }) => {
-  const { identity } = useIdentityContext();
+  const { isAdminMode } = useAdminModeContext();
   const { data: selectedRequest } = useSuspenseQuery(
-    requestDetailQueryOptions(requestId, identity)
+    requestDetailQueryOptions(requestId, isAdminMode)
   );
-  const { data: selectedRequestNotes } = useSuspenseQuery(notesQueryOptions(requestId, identity));
-  const { data: closeoutForm } = useSuspenseQuery(closeoutQueryOptions(requestId, identity));
+  const { data: selectedRequestNotes } = useSuspenseQuery(
+    notesQueryOptions(requestId, isAdminMode)
+  );
+  const { data: closeoutForm } = useSuspenseQuery(closeoutQueryOptions(requestId, isAdminMode));
   const { sortedRequestsMap, selectedListId, setCurrentIndex, setCloseoutDialogOpen } =
     useRequestsContext();
   const sortedRequests = selectedListId ? (sortedRequestsMap[selectedListId] ?? []) : [];

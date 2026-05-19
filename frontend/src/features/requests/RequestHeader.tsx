@@ -1,7 +1,7 @@
 import { TARequestDetail } from '@/api/dashboard/types';
 import { AppLink } from '@/components/AppLink';
 import { ExpertsPanelDataTable } from '@/features/experts/ExpertsPanelDataTable';
-import { useIdentityContext } from '@/features/identity/IdentityContext';
+import { useAdminModeContext } from '@/features/admin-mode/AdminModeContext';
 import { RequestAssignBackwardButton } from '@/features/requests/RequestAssignBackwardButton';
 import { RequestAssignForwardButton } from '@/features/requests/RequestAssignForwardButton';
 import { expertsQueryOptions } from '@/api/queryOptions';
@@ -21,9 +21,9 @@ interface RequestHeaderProps {
  * Top header section to show in the request detail view
  */
 export const RequestHeader: React.FC<RequestHeaderProps> = ({ request }) => {
-  const { identity } = useIdentityContext();
+  const { isAdminMode } = useAdminModeContext();
   const { tab, nextId, previousId, expertsPanelOpen, setExpertsPanelOpen } = useRequestsContext();
-  const { data: experts } = useSuspenseQuery(expertsQueryOptions(identity));
+  const { data: experts } = useSuspenseQuery(expertsQueryOptions(isAdminMode));
 
   const handleCloseExpertsPanel = () => {
     setExpertsPanelOpen(false);

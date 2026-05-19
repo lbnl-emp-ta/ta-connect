@@ -3,18 +3,18 @@ import { createFileRoute } from '@tanstack/react-router';
 import { expertsQueryOptions } from '@/api/queryOptions';
 import { ExpertsDataTable } from '@/features/experts/ExpertsDataTable';
 import { useSuspenseQuery } from '@tanstack/react-query';
-import { useIdentityContext } from '@/features/identity/IdentityContext';
+import { useAdminModeContext } from '@/features/admin-mode/AdminModeContext';
 
 export const Route = createFileRoute('/_with-nav/_private/experts')({
   loader: async ({ context }) => {
-    await context.queryClient.ensureQueryData(expertsQueryOptions(context.identity));
+    await context.queryClient.ensureQueryData(expertsQueryOptions(context.isAdminMode));
   },
   component: ExpertsPage,
 });
 
 function ExpertsPage() {
-  const { identity } = useIdentityContext();
-  const { data: experts } = useSuspenseQuery(expertsQueryOptions(identity));
+  const { isAdminMode } = useAdminModeContext();
+  const { data: experts } = useSuspenseQuery(expertsQueryOptions(isAdminMode));
 
   return (
     <Container maxWidth="xl" sx={{ paddingTop: 3, paddingBottom: 3 }}>

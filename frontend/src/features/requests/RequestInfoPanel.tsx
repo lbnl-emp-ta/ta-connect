@@ -28,19 +28,13 @@ import { PickerValue } from '@mui/x-date-pickers/internals';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import dayjs, { Dayjs } from 'dayjs';
 import { useCallback, useEffect, useState } from 'react';
-import { TARequestDetail, TARequestDetailMutation, TATopic } from '../../api/dashboard/types';
-import { topicsQueryOptions, useRequestMutation } from '../../api/queryOptions';
-import { InfoPanel } from '../../components/InfoPanel';
-import {
-  capitalize,
-  effortOptions,
-  formatDatetime,
-  hasPermission,
-  statusMap,
-} from '../../utils/utils';
-import { useIdentityContext } from '../identity/IdentityContext';
-import { useToastContext } from '../toasts/ToastContext';
-import { ToastMessage } from '../toasts/ToastMessage';
+import { TARequestDetail, TARequestDetailMutation, TATopic } from '@/api/dashboard/types';
+import { identitiesQueryOptions, topicsQueryOptions, useRequestMutation } from '@/api/queryOptions';
+import { InfoPanel } from '@/components/InfoPanel';
+import { capitalize, effortOptions, formatDatetime, hasPermission, statusMap } from '@/utils/utils';
+import { useAdminModeContext } from '@/features/admin-mode/AdminModeContext';
+import { useToastContext } from '@/features/toasts/ToastContext';
+import { ToastMessage } from '@/features/toasts/ToastMessage';
 import { EffortIcon } from '@/components/EffortIcon';
 
 interface RequestInfoPanelProps {
@@ -48,8 +42,9 @@ interface RequestInfoPanelProps {
 }
 
 export const RequestInfoPanel: React.FC<RequestInfoPanelProps> = ({ request }) => {
-  const { identity, detailedIdentity } = useIdentityContext();
-  const updateRequestMutation = useRequestMutation(request?.id.toString() || '', identity);
+  const { isAdminMode } = useAdminModeContext();
+  const updateRequestMutation = useRequestMutation(request?.id.toString() || '', isAdminMode);
+  const { data: identities } = useSuspenseQuery(identitiesQueryOptions());
   const { data: allTopics } = useSuspenseQuery(topicsQueryOptions());
   const [editing, setEditing] = useState(false);
   const { setShowToast, setToastMessage } = useToastContext();
@@ -284,10 +279,10 @@ export const RequestInfoPanel: React.FC<RequestInfoPanelProps> = ({ request }) =
               <TableRow>
                 <TableCell>Depth</TableCell>
                 <TableCell>
-                  {(!editing || !hasPermission('edit-depth', detailedIdentity)) && (
+                  {(!editing || !hasPermission('edit-depth', identities, isAdminMode)) && (
                     <>{request.depth || '-'}</>
                   )}
-                  {editing && hasPermission('edit-depth', detailedIdentity) && (
+                  {editing && hasPermission('edit-depth', identities, isAdminMode) && (
                     <Select value={depth} onChange={handleDepthChange}>
                       {request.depth_options.map((option) => (
                         <MenuItem key={option} value={option}>
@@ -301,13 +296,13 @@ export const RequestInfoPanel: React.FC<RequestInfoPanelProps> = ({ request }) =
               <TableRow>
                 <TableCell>Effort</TableCell>
                 <TableCell>
-                  {(!editing || !hasPermission('edit-effort', detailedIdentity)) && (
+                  {(!editing || !hasPermission('edit-effort', identities, isAdminMode)) && (
                     <Stack direction="row" alignItems="center" spacing={1}>
                       <EffortIcon effort={request.effort || ''} fontSize="small" />
                       <span>{request.effort || '-'}</span>
                     </Stack>
                   )}
-                  {editing && hasPermission('edit-effort', detailedIdentity) && (
+                  {editing && hasPermission('edit-effort', identities, isAdminMode) && (
                     <Select value={effort} onChange={handleEffortChange}>
                       {effortOptions.map((option) => (
                         <MenuItem key={option} value={option}>
@@ -327,24 +322,26 @@ export const RequestInfoPanel: React.FC<RequestInfoPanelProps> = ({ request }) =
               <TableRow>
                 <TableCell>Projected Start Date</TableCell>
                 <TableCell>
-                  {(!editing || !hasPermission('edit-projected-start-date', detailedIdentity)) && (
+                  {(!editing ||
+                    !hasPermission('edit-projected-start-date', identities, isAdminMode)) && (
                     <>
                       {request.proj_start_date
                         ? dayjs(request.proj_start_date).format('MM/DD/YYYY')
                         : '-'}
                     </>
                   )}
-                  {editing && hasPermission('edit-projected-start-date', detailedIdentity) && (
-                    <DatePicker
-                      value={projectedStartDate || null}
-                      onChange={handleProjectedStartDateChange}
-                      slotProps={{
-                        field: {
-                          clearable: true,
-                        },
-                      }}
-                    />
-                  )}
+                  {editing &&
+                    hasPermission('edit-projected-start-date', identities, isAdminMode) && (
+                      <DatePicker
+                        value={projectedStartDate || null}
+                        onChange={handleProjectedStartDateChange}
+                        slotProps={{
+                          field: {
+                            clearable: true,
+                          },
+                        }}
+                      />
+                    )}
                 </TableCell>
               </TableRow>
               <TableRow>
@@ -353,7 +350,8 @@ export const RequestInfoPanel: React.FC<RequestInfoPanelProps> = ({ request }) =
                   {(!editing ||
                     !hasPermission(
                       'edit-projected-completion-date',
-                      detailedIdentity,
+                      identities,
+                      isAdminMode,
                       request.status
                     )) && (
                     <>
@@ -365,7 +363,8 @@ export const RequestInfoPanel: React.FC<RequestInfoPanelProps> = ({ request }) =
                   {editing &&
                     hasPermission(
                       'edit-projected-completion-date',
-                      detailedIdentity,
+                      identities,
+                      isAdminMode,
                       request.status
                     ) && (
                       <DatePicker
@@ -384,30 +383,31 @@ export const RequestInfoPanel: React.FC<RequestInfoPanelProps> = ({ request }) =
                 <TableCell>Actual Completion Date</TableCell>
                 <TableCell>
                   {(!editing ||
-                    !hasPermission('edit-actual-completion-date', detailedIdentity)) && (
+                    !hasPermission('edit-actual-completion-date', identities, isAdminMode)) && (
                     <>
                       {request.actual_completion_date
                         ? dayjs(request.actual_completion_date).format('MM/DD/YYYY')
                         : '-'}
                     </>
                   )}
-                  {editing && hasPermission('edit-actual-completion-date', detailedIdentity) && (
-                    <DatePicker
-                      value={actualCompletionDate || null}
-                      onChange={handleActualCompletionDateChange}
-                      slotProps={{
-                        field: {
-                          clearable: true,
-                        },
-                      }}
-                    />
-                  )}
+                  {editing &&
+                    hasPermission('edit-actual-completion-date', identities, isAdminMode) && (
+                      <DatePicker
+                        value={actualCompletionDate || null}
+                        onChange={handleActualCompletionDateChange}
+                        slotProps={{
+                          field: {
+                            clearable: true,
+                          },
+                        }}
+                      />
+                    )}
                 </TableCell>
               </TableRow>
               <TableRow>
                 <TableCell>Topics</TableCell>
                 <TableCell>
-                  {(!editing || !hasPermission('edit-topics', detailedIdentity)) && (
+                  {(!editing || !hasPermission('edit-topics', identities, isAdminMode)) && (
                     <Grid container spacing={1}>
                       {request.topics && request.topics.length > 0 ? (
                         request.topics.map((topic) => (
@@ -425,7 +425,7 @@ export const RequestInfoPanel: React.FC<RequestInfoPanelProps> = ({ request }) =
                       )}
                     </Grid>
                   )}
-                  {editing && hasPermission('edit-topics', detailedIdentity) && (
+                  {editing && hasPermission('edit-topics', identities, isAdminMode) && (
                     <Autocomplete
                       multiple
                       options={allTopics || []}

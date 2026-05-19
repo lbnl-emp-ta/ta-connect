@@ -145,8 +145,8 @@ To run the tests locally, navigate to `backend/api`, activate your virtual envir
 pytest
 ```
 
-You can also run a single test at a time. For example, to run the test function `test_request_detail_get_view_should_succeed` which lives in `core/tests/endpoints/test_request.py`, run the following:
+You can also run a single test at a time. For example, to run the test function `test_request_detail_get_view_should_succeed` which lives in `core/tests/endpoints/test_request.py` inside the `TestRequestDetailViewEndpoint` class, run the following:
 
 ```
-pytest core/tests/endpoints/test_request.py::test_request_detail_get_view_should_succeed
+pytest core/tests/endpoints/test_request.py::TestRequestDetailViewEndpoint::test_request_detail_get_view_should_succeed
 ```

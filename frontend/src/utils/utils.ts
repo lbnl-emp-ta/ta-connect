@@ -1,4 +1,29 @@
-import { TAIdentity, TARequestDetail, TARole, TAStatusName } from '../api/dashboard/types';
+import {
+  TAIdentity,
+  TARequest,
+  TARequestDetail,
+  TARole,
+  TAStatusName,
+} from '../api/dashboard/types';
+
+export const sortAndFilterRequests = (
+  requests: TARequest[],
+  sortField: string,
+  searchTerm: string
+): TARequest[] => {
+  const sortDirection = sortField.startsWith('-') ? 'desc' : 'asc';
+  const sortFieldName = sortField.replace('-', '') as keyof TARequest;
+  const filtered = searchTerm
+    ? requests.filter((r) =>
+        `${JSON.stringify(r)}`.toLowerCase().includes(searchTerm.toLowerCase())
+      )
+    : requests;
+  return [...filtered].sort((a, b) => {
+    if (a[sortFieldName]! < b[sortFieldName]!) return sortDirection === 'asc' ? -1 : 1;
+    if (a[sortFieldName]! > b[sortFieldName]!) return sortDirection === 'asc' ? 1 : -1;
+    return 0;
+  });
+};
 
 /**
  * Validates a US telephone number (10 digits, allows common formatting)
@@ -110,10 +135,11 @@ type PermissionAction =
  */
 export const hasPermission = (
   action: PermissionAction,
-  detailedIdentity?: TAIdentity,
+  identities?: TAIdentity[] | null,
+  isAdminMode?: boolean,
   statusName?: TAStatusName
 ): boolean => {
-  if (!detailedIdentity || !detailedIdentity.role) return false;
+  if (!identities) return false;
 
   // No one can edit the projected completion date unless
   // the request is currently assigned-to-expert or is already providing-ta.
@@ -135,70 +161,84 @@ export const hasPermission = (
     return false;
   }
 
-  switch (detailedIdentity.role.name) {
-    case TARole.Admin:
-      return true;
-    case TARole.Coordinator:
-      switch (action) {
-        case 'edit-depth':
-        case 'edit-effort':
-        case 'edit-topics':
-        case 'edit-description':
-        case 'edit-challenges':
-        case 'edit-goals':
-        case 'edit-projected-start-date':
-        case 'edit-projected-completion-date':
-        case 'edit-actual-completion-date':
-        case 'edit-customer':
-          return true;
-      }
-      return false;
-    case TARole.ProgramLead:
-      switch (action) {
-        case 'edit-depth':
-        case 'edit-effort':
-        case 'edit-topics':
-        case 'edit-description':
-        case 'edit-challenges':
-        case 'edit-goals':
-        case 'edit-projected-start-date':
-        case 'edit-projected-completion-date':
-        case 'edit-actual-completion-date':
-        case 'edit-customer':
-        case 'approve-closeout-form-by-program':
-        case 'reject-closeout-form-by-program':
-          return true;
-      }
-      return false;
-    case TARole.LabLead:
-      switch (action) {
-        case 'edit-depth':
-        case 'edit-effort':
-        case 'edit-topics':
-        case 'edit-description':
-        case 'edit-challenges':
-        case 'edit-goals':
-        case 'edit-projected-start-date':
-        case 'edit-projected-completion-date':
-        case 'edit-actual-completion-date':
-        case 'edit-customer':
-        case 'approve-closeout-form-by-lab':
-        case 'reject-closeout-form-by-lab':
-          return true;
-      }
-      return false;
-    case TARole.Expert:
-      switch (action) {
-        case 'edit-projected-start-date':
-        case 'edit-projected-completion-date':
-        case 'edit-actual-completion-date':
-        case 'edit-closeout-form':
-          return true;
-      }
-      return false;
-    default:
-      return false;
+  let doesHavePermission = false;
+  for (const identity of identities) {
+    switch (identity.role.name) {
+      case TARole.Admin:
+        if (isAdminMode) {
+          doesHavePermission = true;
+        }
+        break;
+      case TARole.Coordinator:
+        switch (action) {
+          case 'edit-depth':
+          case 'edit-effort':
+          case 'edit-topics':
+          case 'edit-description':
+          case 'edit-challenges':
+          case 'edit-goals':
+          case 'edit-projected-start-date':
+          case 'edit-projected-completion-date':
+          case 'edit-actual-completion-date':
+          case 'edit-customer':
+            doesHavePermission = true;
+            break;
+        }
+        break;
+      case TARole.ProgramLead:
+        switch (action) {
+          case 'edit-depth':
+          case 'edit-effort':
+          case 'edit-topics':
+          case 'edit-description':
+          case 'edit-challenges':
+          case 'edit-goals':
+          case 'edit-projected-start-date':
+          case 'edit-projected-completion-date':
+          case 'edit-actual-completion-date':
+          case 'edit-customer':
+          case 'approve-closeout-form-by-program':
+          case 'reject-closeout-form-by-program':
+            doesHavePermission = true;
+            break;
+        }
+        break;
+      case TARole.LabLead:
+        switch (action) {
+          case 'edit-depth':
+          case 'edit-effort':
+          case 'edit-topics':
+          case 'edit-description':
+          case 'edit-challenges':
+          case 'edit-goals':
+          case 'edit-projected-start-date':
+          case 'edit-projected-completion-date':
+          case 'edit-actual-completion-date':
+          case 'edit-customer':
+          case 'approve-closeout-form-by-lab':
+          case 'reject-closeout-form-by-lab':
+            doesHavePermission = true;
+            break;
+        }
+        break;
+      case TARole.Expert:
+        switch (action) {
+          case 'edit-projected-start-date':
+          case 'edit-projected-completion-date':
+          case 'edit-actual-completion-date':
+          case 'edit-closeout-form':
+            doesHavePermission = true;
+            break;
+        }
+        break;
+      default:
+        break;
+    }
+    if (doesHavePermission) {
+      break;
+    }
   }
+  return doesHavePermission;
 };
 
 /**

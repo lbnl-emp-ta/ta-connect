@@ -5,7 +5,7 @@ import { createFileRoute, Link, Outlet, useLocation, useNavigate } from '@tansta
 import { useState } from 'react';
 import { useUser } from '../../hooks/useUser';
 import { useLogoutMutation } from '../../api/queryOptions';
-import { IdentityDropdown } from '@/features/identity/IdentityDropdown';
+import { AdminModeToggle } from '@/features/admin-mode/AdminModeToggle';
 
 export const Route = createFileRoute('/_with-nav')({
   component: NavbarLayoutWrapper,
@@ -18,7 +18,7 @@ function NavbarLayoutWrapper() {
   const logoutMutation = useLogoutMutation();
   const [userMenuAnchorEl, setUserMenuAnchorEl] = useState<null | HTMLElement>(null);
   const userMenuOpen = Boolean(userMenuAnchorEl);
-  const showIdentityDropdown =
+  const pageHasAdminToggle =
     location.pathname.startsWith('/requests') || location.pathname.startsWith('/experts');
 
   const handleUserMenuClick = (event: React.MouseEvent<HTMLButtonElement>) => {
@@ -72,7 +72,7 @@ function NavbarLayoutWrapper() {
           </Stack>
           {user ? (
             <>
-              {showIdentityDropdown && <IdentityDropdown />}
+              {pageHasAdminToggle && <AdminModeToggle />}
               <div>
                 <Button
                   variant="text"
