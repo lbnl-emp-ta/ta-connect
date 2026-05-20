@@ -99,6 +99,7 @@ export const RequestHeader: React.FC<RequestHeaderProps> = ({ request }) => {
         requestId={request.id}
         requestStatus={request.status}
         expertOwnerId={request.expert?.owner_id}
+        permissions={request.permissions}
       />
     </Stack>
   );

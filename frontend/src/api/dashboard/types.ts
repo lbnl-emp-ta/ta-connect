@@ -183,6 +183,31 @@ export interface TAStatus {
   description: string;
 }
 
+export type PermissionAction =
+  | 'edit-depth'
+  | 'edit-effort'
+  | 'edit-topics'
+  | 'edit-description'
+  | 'edit-challenges'
+  | 'edit-goals'
+  | 'edit-projected-start-date'
+  | 'edit-projected-completion-date'
+  | 'edit-actual-completion-date'
+  | 'edit-customer'
+  | 'edit-customer-organization-type'
+  | 'edit-closeout-responses'
+  | 'submit-closeout'
+  | 'approve-closeout-form-by-lab'
+  | 'approve-closeout-form-by-program'
+  | 'reject-closeout-form-by-lab'
+  | 'reject-closeout-form-by-program'
+  | 'cancel-request'
+  | 'reopen-request'
+  | 'add-notes'
+  | 'delete-notes'
+  | 'add-attachment'
+  | 'delete-attachment';
+
 export interface TARequestDetail {
   id: number;
   status: TAStatusName;
@@ -204,6 +229,7 @@ export interface TARequestDetail {
   topics: TATopic[];
   attachments: TAAttachment[];
   audit_history: TAAuditHistoryItem[];
+  permissions: PermissionAction[];
 }
 
 export interface TARequestDetailMutation {

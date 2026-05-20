@@ -134,7 +134,10 @@ export const RequestDetailLayout: React.FC<RequestDetailLayoutProps> = ({ reques
                 </TableContainer>
               </InfoPanel>
             )}
-            <RequestCustomerPanel customer={selectedRequest?.customers[0]} />
+            <RequestCustomerPanel
+              customer={selectedRequest?.customers[0]}
+              permissions={selectedRequest?.permissions ?? []}
+            />
             <RequestInfoPanel request={selectedRequest!} />
           </Stack>
         </Grid>

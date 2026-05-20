@@ -220,6 +220,44 @@ class RequestDetailView(BaseUserAwareRequest):
             audit_data["date"] = audit.date
             response_data["audit_history"].append(audit_data)
 
+        # Compute which actions this user is permitted to perform on this request.
+        # The frontend uses this list to show/hide UI controls, avoiding duplicated logic.
+        permission_map = [
+            ('edit-depth', CanEditDepth),
+            ('edit-effort', CanEditEffort),
+            ('edit-topics', CanEditTopics),
+            ('edit-description', CanEditDescription),
+            ('edit-challenges', CanEditChallenges),
+            ('edit-goals', CanEditGoals),
+            ('edit-projected-start-date', CanEditProjectedStartDate),
+            ('edit-actual-completion-date', CanEditActualCompletionDate),
+            ('edit-customer', CanEditCustomerBasic),
+            ('edit-customer-organization-type', CanEditCustomerOrgType),
+            ('edit-closeout-responses', CanEditCloseoutResponses),
+            ('cancel-request', CanCancel),
+            ('add-notes', CanAddNote),
+            ('delete-notes', CanDeleteNote),
+            ('add-attachment', CanAddAttachment),
+            ('delete-attachment', CanDeleteAttachment),
+        ]
+        if ta_request.status.name in [REQUEST_STATUS.ASSIGNED_TO_EXPERT, REQUEST_STATUS.PROVIDING_TA]:
+            permission_map.append(('edit-projected-completion-date', CanEditProjectedCompletionDate))
+        if ta_request.status.name in [REQUEST_STATUS.CLOSEOUT_STARTED, REQUEST_STATUS.CLOSEOUT_MORE_INFO]:
+            permission_map.append(('submit-closeout', CanSubmitCloseout))
+        if ta_request.status.name == REQUEST_STATUS.CLOSEOUT_REVIEW_BY_LAB:
+            permission_map.append(('approve-closeout-form-by-lab', CanApproveCloseoutByLab))
+            permission_map.append(('reject-closeout-form-by-lab', CanApproveCloseoutByLab))
+        if ta_request.status.name == REQUEST_STATUS.CLOSEOUT_REVIEW_BY_PROGRAM:
+            permission_map.append(('approve-closeout-form-by-program', CanApproveCloseoutByProgram))
+            permission_map.append(('reject-closeout-form-by-program', CanApproveCloseoutByProgram))
+        if ta_request.status.name in [REQUEST_STATUS.COMPLETED, REQUEST_STATUS.UNABLE_TO_ADDRESS]:
+            permission_map.append(('reopen-request', CanReopen))
+
+        response_data["permissions"] = [
+            action for action, perm_cls in permission_map
+            if perm_cls().has_object_permission(request, self, ta_request)
+        ]
+
         return Response(data=response_data, status=status.HTTP_200_OK)
 
     """
