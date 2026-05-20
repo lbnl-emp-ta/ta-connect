@@ -28,7 +28,12 @@ import { PickerValue } from '@mui/x-date-pickers/internals';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import dayjs, { Dayjs } from 'dayjs';
 import { useCallback, useEffect, useState } from 'react';
-import { TARequestDetail, TARequestDetailMutation, TATopic } from '@/api/dashboard/types';
+import {
+  PermissionAction,
+  TARequestDetail,
+  TARequestDetailMutation,
+  TATopic,
+} from '@/api/dashboard/types';
 import { topicsQueryOptions, useRequestMutation } from '@/api/queryOptions';
 import { InfoPanel } from '@/components/InfoPanel';
 import { capitalize, effortOptions, formatDatetime, statusMap } from '@/utils/utils';
@@ -53,6 +58,15 @@ export const RequestInfoPanel: React.FC<RequestInfoPanelProps> = ({ request }) =
   const [projectedCompletionDate, setProjectedCompletionDate] = useState<Dayjs>();
   const [actualCompletionDate, setActualCompletionDate] = useState<Dayjs>();
   const [topics, setTopics] = useState<TARequestDetail['topics']>([]);
+  const possibleActions: PermissionAction[] = [
+    'edit-depth',
+    'edit-effort',
+    'edit-topics',
+    'edit-projected-start-date',
+    'edit-projected-completion-date',
+    'edit-actual-completion-date',
+  ];
+  const canEdit = request?.permissions.some((item) => possibleActions.includes(item));
 
   /**
    * Reset form values based on request data.
@@ -190,7 +204,7 @@ export const RequestInfoPanel: React.FC<RequestInfoPanelProps> = ({ request }) =
               Request Details
             </Typography>
           </Stack>
-          {!editing && (
+          {canEdit && !editing && (
             <IconButton onClick={handleEditClick}>
               <EditIcon />
             </IconButton>

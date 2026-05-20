@@ -42,14 +42,12 @@ import { ToastMessage } from '@/features/toasts/ToastMessage';
 
 interface RequestCloseoutFormProps {
   requestId: TARequestDetail['id'];
-  requestStatus: TARequestDetail['status'];
   expertOwnerId?: TAExpert['owner_id'];
   permissions: PermissionAction[];
 }
 
 export const RequestCloseoutForm: React.FC<RequestCloseoutFormProps> = ({
   requestId,
-  requestStatus,
   expertOwnerId,
   permissions,
 }) => {

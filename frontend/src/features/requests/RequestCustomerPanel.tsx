@@ -71,6 +71,8 @@ export const RequestCustomerPanel: React.FC<RequestCustomerPanelProps> = ({
   const [phoneError, setPhoneError] = useState(false);
   const [title, setTitle] = useState<TACustomer['title']>();
   const [state, setState] = useState<TACustomer['state']['id']>();
+  const possibleActions: PermissionAction[] = ['edit-customer', 'edit-customer-organization-type'];
+  const canEdit = permissions.some((item) => possibleActions.includes(item));
 
   /**
    * Reset form values based on customer data.
@@ -233,12 +235,12 @@ export const RequestCustomerPanel: React.FC<RequestCustomerPanelProps> = ({
               Customer Information
             </Typography>
           </Stack>
-          {permissions.includes('edit-customer') && !editing && (
+          {canEdit && !editing && (
             <IconButton onClick={handleEditClick}>
               <EditIcon />
             </IconButton>
           )}
-          {permissions.includes('edit-customer') && editing && (
+          {editing && (
             <Stack direction="row">
               {!updateCustomerMutation.isPending && (
                 <IconButton onClick={handleEditSubmit}>

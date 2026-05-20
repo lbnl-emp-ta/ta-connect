@@ -6,7 +6,7 @@ import EditIcon from '@mui/icons-material/Edit';
 import ErrorIcon from '@mui/icons-material/Error';
 import { Box, CircularProgress, IconButton, Stack, TextField, Typography } from '@mui/material';
 import { useCallback, useEffect, useState } from 'react';
-import { TARequestDetail, TARequestDetailMutation } from '@/api/dashboard/types';
+import { PermissionAction, TARequestDetail, TARequestDetailMutation } from '@/api/dashboard/types';
 import { useRequestMutation } from '@/api/queryOptions';
 import { InfoPanel } from '@/components/InfoPanel';
 import { useAdminModeContext } from '@/features/admin-mode/AdminModeContext';
@@ -25,6 +25,8 @@ export const RequestScopePanel: React.FC<RequestScopePanelProps> = ({ request })
   const [description, setDescription] = useState('');
   const [challenges, setChallenges] = useState<string>();
   const [goals, setGoals] = useState<string>();
+  const possibleActions: PermissionAction[] = ['edit-description', 'edit-challenges', 'edit-goals'];
+  const canEdit = request?.permissions.some((item) => possibleActions.includes(item));
 
   /**
    * Reset form values based on request data.
@@ -115,7 +117,7 @@ export const RequestScopePanel: React.FC<RequestScopePanelProps> = ({ request })
               Scope
             </Typography>
           </Stack>
-          {!editing && (
+          {canEdit && !editing && (
             <IconButton onClick={handleEditClick}>
               <EditIcon />
             </IconButton>
