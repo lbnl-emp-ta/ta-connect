@@ -372,11 +372,17 @@ export const RequestCustomerPanel: React.FC<RequestCustomerPanelProps> = ({ cust
                 <TableCell>
                   <Stack direction="row" alignItems="center" spacing={1}>
                     {(!editing ||
-                      !hasPermission('edit-organization-type', identities, isAdminMode)) && (
-                      <span>{customer.org.type.name}</span>
-                    )}
+                      !hasPermission(
+                        'edit-customer-organization-type',
+                        identities,
+                        isAdminMode
+                      )) && <span>{customer.org.type.name}</span>}
                     {editing &&
-                      !hasPermission('edit-organization-type', identities, isAdminMode) && (
+                      !hasPermission(
+                        'edit-customer-organization-type',
+                        identities,
+                        isAdminMode
+                      ) && (
                         <Tooltip
                           title="Only admins can edit the organization type."
                           placement="top"
@@ -385,7 +391,7 @@ export const RequestCustomerPanel: React.FC<RequestCustomerPanelProps> = ({ cust
                         </Tooltip>
                       )}
                     {editing &&
-                      hasPermission('edit-organization-type', identities, isAdminMode) && (
+                      hasPermission('edit-customer-organization-type', identities, isAdminMode) && (
                         <>
                           <Select value={orgType} onChange={handleOrgTypeChange}>
                             {allOrganizationTypes?.map((orgTypeItem) => (

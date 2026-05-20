@@ -121,12 +121,19 @@ type PermissionAction =
   | 'edit-projected-completion-date'
   | 'edit-actual-completion-date'
   | 'edit-customer'
-  | 'edit-organization-type'
-  | 'edit-closeout-form'
+  | 'edit-customer-organization-type'
+  | 'edit-closeout-responses'
+  | 'submit-closeout'
   | 'approve-closeout-form-by-lab'
   | 'approve-closeout-form-by-program'
   | 'reject-closeout-form-by-lab'
-  | 'reject-closeout-form-by-program';
+  | 'reject-closeout-form-by-program'
+  | 'cancel-request'
+  | 'reopen-request'
+  | 'add-notes'
+  | 'delete-notes'
+  | 'add-attachment'
+  | 'delete-attachment';
 
 /**
  * Frontend function for checking if a user has permission to perform a certain action based on their role.
@@ -151,6 +158,14 @@ export const hasPermission = (
     return false;
   }
 
+  if (
+    action == 'submit-closeout' &&
+    statusName !== 'closeout-started' &&
+    statusName !== 'closeout-more-info'
+  ) {
+    return false;
+  }
+
   // Only allow rejecting closeout by lab if the current status is "closeout-review-by-lab"
   if (action === 'reject-closeout-form-by-lab' && statusName !== 'closeout-review-by-lab') {
     return false;
@@ -158,6 +173,25 @@ export const hasPermission = (
 
   // Only allow rejecting closeout by program if the current status is "closeout-review-by-program"
   if (action === 'reject-closeout-form-by-program' && statusName !== 'closeout-review-by-program') {
+    return false;
+  }
+
+  if (action === 'approve-closeout-form-by-lab' && statusName !== 'closeout-review-by-lab') {
+    return false;
+  }
+
+  if (
+    action === 'approve-closeout-form-by-program' &&
+    statusName !== 'closeout-review-by-program'
+  ) {
+    return false;
+  }
+
+  if (
+    action === 'reopen-request' &&
+    statusName !== 'completed' &&
+    statusName !== 'unable-to-address'
+  ) {
     return false;
   }
 
@@ -170,6 +204,15 @@ export const hasPermission = (
         }
         break;
       case TARole.Coordinator:
+        // Coordinators can only edit requests in the scoping or rejected-by-program status.
+        // The only exception is that they can reopen requests that are in the completed or unable-to-address status.
+        if (
+          statusName !== 'scoping' &&
+          statusName !== 'rejected-by-program' &&
+          action !== 'reopen-request'
+        ) {
+          break;
+        }
         switch (action) {
           case 'edit-depth':
           case 'edit-effort':
@@ -181,6 +224,12 @@ export const hasPermission = (
           case 'edit-projected-completion-date':
           case 'edit-actual-completion-date':
           case 'edit-customer':
+          case 'cancel-request':
+          case 'reopen-request':
+          case 'add-notes':
+          case 'delete-notes':
+          case 'add-attachment':
+          case 'delete-attachment':
             doesHavePermission = true;
             break;
         }
@@ -197,8 +246,14 @@ export const hasPermission = (
           case 'edit-projected-completion-date':
           case 'edit-actual-completion-date':
           case 'edit-customer':
+          case 'edit-closeout-responses':
+          case 'submit-closeout':
           case 'approve-closeout-form-by-program':
           case 'reject-closeout-form-by-program':
+          case 'add-notes':
+          case 'delete-notes':
+          case 'add-attachment':
+          case 'delete-attachment':
             doesHavePermission = true;
             break;
         }
@@ -206,17 +261,19 @@ export const hasPermission = (
       case TARole.LabLead:
         switch (action) {
           case 'edit-depth':
-          case 'edit-effort':
           case 'edit-topics':
-          case 'edit-description':
-          case 'edit-challenges':
-          case 'edit-goals':
           case 'edit-projected-start-date':
           case 'edit-projected-completion-date':
           case 'edit-actual-completion-date':
           case 'edit-customer':
+          case 'edit-closeout-responses':
+          case 'submit-closeout':
           case 'approve-closeout-form-by-lab':
           case 'reject-closeout-form-by-lab':
+          case 'add-notes':
+          case 'delete-notes':
+          case 'add-attachment':
+          case 'delete-attachment':
             doesHavePermission = true;
             break;
         }
@@ -226,7 +283,12 @@ export const hasPermission = (
           case 'edit-projected-start-date':
           case 'edit-projected-completion-date':
           case 'edit-actual-completion-date':
-          case 'edit-closeout-form':
+          case 'edit-closeout-responses':
+          case 'submit-closeout':
+          case 'add-notes':
+          case 'delete-notes':
+          case 'add-attachment':
+          case 'delete-attachment':
             doesHavePermission = true;
             break;
         }

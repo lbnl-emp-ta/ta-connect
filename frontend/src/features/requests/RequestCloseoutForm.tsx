@@ -314,7 +314,7 @@ export const RequestCloseoutForm: React.FC<RequestCloseoutFormProps> = ({
         Closeout Questions for Expert
       </DialogTitle>
       <DialogContent>
-        {(closeoutForm.submitted_date || !hasPermission('edit-closeout-form', identities)) && (
+        {(closeoutForm.submitted_date || !hasPermission('edit-closeout-responses', identities)) && (
           <Stack spacing={3} sx={{ marginTop: 2 }}>
             <Stack spacing={1}>
               <Typography variant="subtitle1" fontWeight="bold">
@@ -378,7 +378,7 @@ export const RequestCloseoutForm: React.FC<RequestCloseoutFormProps> = ({
             </Stack>
           </Stack>
         )}
-        {!closeoutForm.submitted_date && hasPermission('edit-closeout-form', identities) && (
+        {!closeoutForm.submitted_date && hasPermission('edit-closeout-responses', identities) && (
           <form onSubmit={handleSubmit} id="closeout-form">
             <Stack spacing={3} sx={{ marginTop: 2 }}>
               <Typography>
@@ -518,7 +518,7 @@ export const RequestCloseoutForm: React.FC<RequestCloseoutFormProps> = ({
             </Button>
           )}
         {!closeoutForm.submitted_date &&
-          hasPermission('edit-closeout-form', identities, isAdminMode) && (
+          hasPermission('edit-closeout-responses', identities, isAdminMode) && (
             <Button variant="contained" color="primary" type="submit" form="closeout-form">
               Submit for review
             </Button>
