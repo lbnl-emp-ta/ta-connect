@@ -235,8 +235,8 @@ class RequestDetailView(BaseUserAwareRequest):
             ('edit-customer-organization-type', CanEditCustomerOrgType),
             ('edit-closeout-responses', CanEditCloseoutResponses),
             ('cancel-request', CanCancel),
-            ('add-notes', CanAddNote),
-            ('delete-notes', CanDeleteNote),
+            ('add-note', CanAddNote),
+            ('delete-note', CanDeleteNote),
             ('add-attachment', CanAddAttachment),
             ('delete-attachment', CanDeleteAttachment),
         ]

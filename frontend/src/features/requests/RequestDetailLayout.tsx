@@ -182,11 +182,16 @@ export const RequestDetailLayout: React.FC<RequestDetailLayoutProps> = ({ reques
             }
           >
             <TabPanel value={tabValue} index="notes">
-              <RequestNotes requestId={selectedRequest.id} notes={selectedRequestNotes} />
+              <RequestNotes
+                requestId={selectedRequest.id}
+                permissions={selectedRequest.permissions}
+                notes={selectedRequestNotes}
+              />
             </TabPanel>
             <TabPanel value={tabValue} index="attachments">
               <RequestAttachments
                 requestId={selectedRequest.id}
+                permissions={selectedRequest.permissions}
                 attachments={selectedRequest.attachments}
               />
             </TabPanel>

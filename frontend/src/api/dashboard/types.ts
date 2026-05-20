@@ -203,8 +203,8 @@ export type PermissionAction =
   | 'reject-closeout-form-by-program'
   | 'cancel-request'
   | 'reopen-request'
-  | 'add-notes'
-  | 'delete-notes'
+  | 'add-note'
+  | 'delete-note'
   | 'add-attachment'
   | 'delete-attachment';
 
