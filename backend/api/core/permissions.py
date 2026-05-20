@@ -187,6 +187,7 @@ CanEditCustomerOrgType = compose(IsAdmin)
 CanAddNote = compose(IsAdmin, IsCoordinator, IsProgramLead, IsLabLead, IsExpert)
 CanDeleteNote = compose(IsAdmin, IsCoordinator, IsProgramLead, IsLabLead, IsExpert)
 CanAddAttachment = compose(IsAdmin, IsCoordinator, IsProgramLead, IsLabLead, IsExpert)
+CanEditAttachment = compose(IsAdmin, IsCoordinator, IsProgramLead, IsLabLead, IsExpert)
 CanDeleteAttachment = compose(IsAdmin, IsCoordinator, IsProgramLead, IsLabLead, IsExpert)
 # Closeout
 CanEditCloseoutResponses = compose(IsAdmin, IsProgramLead, IsLabLead, IsExpert)

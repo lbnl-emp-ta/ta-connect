@@ -1,8 +1,7 @@
 import json
-from django.conf import settings
 from django.http import FileResponse
     
-from rest_framework import views, authentication, permissions, status
+from rest_framework import views, permissions, status
 from rest_framework.response import Response
 from rest_framework.parsers import MultiPartParser, FormParser
 
@@ -13,32 +12,23 @@ from core.models import Attachment, Request
 from core.models.audit_history import ActionType
 from core.permissions import *
 
-from allauth.headless.contrib.rest_framework.authentication import (
-    XSessionTokenAuthentication,
-)
-
-class UploadAttachmentView(views.APIView):
+class UploadAttachmentView(BaseUserAwareRequest):
     serializer_class = AttachmentUploadSerializer 
     
     parser_classes = [MultiPartParser, FormParser]
 
-    authentication_classes = [
-        authentication.SessionAuthentication,
-        XSessionTokenAuthentication,
-    ]
-
     permission_classes = [
         permissions.IsAuthenticated,
+        CanAddAttachment
     ]
 
     def post(self, request, request_id):
-        try:
-            request_obj = Request.objects.get(pk=request_id)
-        except Request.DoesNotExist:
-            return Response(data={"message": "Request with given id does not exist"}, status=status.HTTP_400_BAD_REQUEST)
+        ta_request, err = self.get_request_or_error(Request.objects.all(), request_id)
+        if err:
+            return err
 
-        if not BaseUserAwareRequest(request=request).get_actionable().contains(request_obj):
-            return Response(data={"message": "Insufficient authorization to upload attachment for given request"}, status=status.HTTP_400_BAD_REQUEST)
+        if not CanAddAttachment().has_object_permission(request, self, ta_request):
+            return Response(data={"message": "Insufficient authorization to upload attachment for given request"}, status=status.HTTP_403_FORBIDDEN)
 
         if not request.data.get("file"):
             return Response(data={"message": "File to upload missing"}, status=status.HTTP_400_BAD_REQUEST)
@@ -63,28 +53,22 @@ class UploadAttachmentView(views.APIView):
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         
         attachment = serializer.save()
-        create_audit_history(request, request_obj, ActionType.AddAttachment, f"Uploaded attachment: {attachment.title}")
+        create_audit_history(request, ta_request, ActionType.AddAttachment, f"Uploaded attachment: {attachment.title}")
         
         return Response(data={"message": "Attachment successfully uploaded"}, status=status.HTTP_201_CREATED)
 
-class DownloadAttachmentView(views.APIView):
-    authentication_classes = [
-        authentication.SessionAuthentication,
-        XSessionTokenAuthentication,
-    ]
-
+class DownloadAttachmentView(BaseUserAwareRequest):
     permission_classes = [
         permissions.IsAuthenticated,
     ]
 
     def get(self, request, request_id, attachment_id):
-        try:
-            request_obj = Request.objects.get(pk=request_id)
-        except Request.DoesNotExist:
-            return Response(data={"message": "Request with given id does not exist"}, status=status.HTTP_400_BAD_REQUEST)
+        visible_requests = self.get_actionable() | self.get_downstream() | self.get_inactive()
+        ta_request, err = self.get_request_or_error(visible_requests, request_id)
+        if err:
+            return err
 
-        user_aware_request_view = BaseUserAwareRequest(request=request)
-        if not (user_aware_request_view.get_actionable() | user_aware_request_view.get_downstream()).contains(request_obj):
+        if not visible_requests.contains(ta_request):
             return Response(data={"message": "Insufficient authorization to download attachment for given request"}, status=status.HTTP_400_BAD_REQUEST)
 
         try:
@@ -94,73 +78,49 @@ class DownloadAttachmentView(views.APIView):
         
         return FileResponse(open(attachment.file.path, "rb"), as_attachment=True)
 
-class DeleteAttachmentView(views.APIView):
-    authentication_classes = [
-        authentication.SessionAuthentication,
-        XSessionTokenAuthentication,
-    ]
-
+class DeleteAttachmentView(BaseUserAwareRequest):
     permission_classes = [
         permissions.IsAuthenticated,
+        CanDeleteAttachment,
     ]
     
     def delete(self, request, request_id, attachment_id):
-        try:
-            request_obj = Request.objects.get(pk=request_id)
-        except Request.DoesNotExist:
-            return Response(data={"message": "Request with given id does not exist"}, status=status.HTTP_400_BAD_REQUEST)
+        ta_request, err = self.get_request_or_error(Request.objects.all(), request_id)
+        if err:
+            return err
 
         try:
             attachment = Attachment.objects.get(pk=attachment_id)
         except Attachment.DoesNotExist:
             return Response(data={"message": "Attachment with given filename does not exist"}, status=status.HTTP_400_BAD_REQUEST) 
         
-        can_delete = False 
-
-        if IsAdmin().has_permission(request) or \
-           IsCoordinator().has_permission(request) or \
-           IsProgramLead().has_permission(request) or \
-           IsLabLead().has_permission(request):
-            
-            user_aware_request_view = BaseUserAwareRequest(request=request)
-            if (user_aware_request_view.get_actionable() | user_aware_request_view.get_downstream()).contains(request_obj):
-                can_delete = True 
-
-        elif (attachment.user_who_uploaded is not None) and \
-             (request.user.id == attachment.user_who_uploaded.pk):
-
-            can_delete = True
-             
-        if can_delete:
-            attachment_title = attachment.title  # Store title before deletion
-            attachment.delete()
-            create_audit_history(request, request_obj, ActionType.RemoveAttachment, f"Deleted attachment: {attachment_title}")
-        else:
-            return Response(data={"message": "Insufficient authorization to delete attachment for given request"}, status=status.HTTP_400_BAD_REQUEST)
+        if not CanDeleteAttachment().has_object_permission(request, self, ta_request):
+            return Response(data={"message": "Insufficient authorization to delete attachment for given request"}, status=status.HTTP_403_FORBIDDEN)
+        
+        attachment_title = attachment.title  # Store title before deletion
+        attachment.delete()
+        create_audit_history(request, ta_request, ActionType.RemoveAttachment, f"Deleted attachment: {attachment_title}")
 
         return Response(data={"message": "Attachment deleted successfully"}, status=status.HTTP_204_NO_CONTENT)
 
-class EditAttachmentView(views.APIView):
-    authentication_classes = [
-        authentication.SessionAuthentication,
-        XSessionTokenAuthentication,
-    ]
-
+class EditAttachmentView(BaseUserAwareRequest):
     permission_classes = [
         permissions.IsAuthenticated,
+        CanEditAttachment,
     ]
    
-    # filename, description
     def patch(self, request, request_id, attachment_id):
-        try:
-            request_obj = Request.objects.get(pk=request_id)
-        except Request.DoesNotExist:
-            return Response(data={"message": "Given request does not exist"}, status=status.HTTP_400_BAD_REQUEST)
+        ta_request, err = self.get_request_or_error(Request.objects.all(), request_id)
+        if err:
+            return err
 
         try:
             attachment_obj = Attachment.objects.get(pk=attachment_id)  
         except Attachment.DoesNotExist:
             return Response(data={"message": "Attachment with given filename does not exist for given request"}, status=status.HTTP_400_BAD_REQUEST)
+        
+        if not CanEditAttachment().has_object_permission(request, self, ta_request):
+            return Response(data={"message": "Insufficient authorization to edit attachment for given request"}, status=status.HTTP_403_FORBIDDEN)
          
         body = json.loads(request.body)
 
@@ -168,21 +128,6 @@ class EditAttachmentView(views.APIView):
 
         if not body:
             return Response(data={"message": "Missing request body"}, status=status.HTTP_204_NO_CONTENT)
-
-        can_edit = False
-        if IsAdmin().has_permission(request) or \
-           IsCoordinator().has_permission(request) or \
-           IsProgramLead().has_permission(request) or \
-           IsLabLead().has_permission(request):
-            
-            user_aware_request_view = BaseUserAwareRequest(request=request)
-            if (user_aware_request_view.get_actionable() | user_aware_request_view.get_downstream()).contains(request_obj):
-                can_edit = True  
-
-        elif (attachment_obj.user_who_uploaded is not None) and \
-             (request.user.id == attachment_obj.user_who_uploaded.pk):
-
-            can_edit = True
         
         if "title" in body:
             if not body.get("title"): 
@@ -199,8 +144,7 @@ class EditAttachmentView(views.APIView):
     
         
         serializer = AttachmentEditSerializer(instance=attachment_obj, data=patch_data, partial=True)
-        if can_edit and serializer.is_valid():
+        if serializer.is_valid():
             serializer.save()
         
-        # return updated attachment data
         return Response(data=AttachmentSerializer(Attachment.objects.get(pk=attachment_obj.pk)).data, status=status.HTTP_200_OK)
