@@ -194,8 +194,8 @@ CanSubmitCloseout = compose(IsAdmin, IsProgramLead, IsLabLead, IsExpert)
 CanApproveCloseoutByLab = compose(IsAdmin, IsLabLead)
 CanApproveCloseoutByProgram = compose(IsAdmin, IsProgramLead)
 # Other
-CanCancel = compose(IsAdmin, IsCoordinator)
-CanReopen = compose(IsAdmin, IsCoordinator)
+CanCancel = compose(IsAdmin, IsCoordinator, IsProgramLead)
+CanReopen = compose(IsAdmin, IsCoordinator, IsProgramLead)
 
     
         

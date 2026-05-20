@@ -414,6 +414,9 @@ class RequestCancelView(BaseUserAwareRequest):
         ta_request, err = self.get_request_or_error(queryset, request_id)
         if err:
             return err
+        
+        if not CanCancel().has_object_permission(request, self, ta_request):
+            return Response(data={"message": "Insufficient privilege to cancel this request"}, status=status.HTTP_403_FORBIDDEN)
 
         try:
             with transaction.atomic():
@@ -442,11 +445,9 @@ class RequestSubmitCloseoutFormView(BaseUserAwareRequest):
         ta_request, err = self.get_request_or_error(queryset, request_id)
         if err:
             return err
-
-        # Experts must be the assigned expert on this specific request
-        if IsExpert().has_object_permission(request, self, ta_request) and not IsAdmin().has_permission(request):
-            if ta_request.expert is None or ta_request.expert != request.user:
-                return Response(data={"message": "Only the assigned expert can submit the closeout form"}, status=status.HTTP_403_FORBIDDEN)
+        
+        if not CanSubmitCloseout().has_object_permission(request, self, ta_request):
+            return Response(data={"message": "Insufficient privilege to submit closeout form for this request"}, status=status.HTTP_403_FORBIDDEN)
 
         if not hasattr(ta_request, "closeout_form"):
             return Response(data={"message": "Closeout form does not exist for this request"}, status=status.HTTP_400_BAD_REQUEST)
@@ -476,6 +477,9 @@ class RequestApproveCloseoutFormByLabView(BaseUserAwareRequest):
         ta_request, err = self.get_request_or_error(queryset, request_id)
         if err:
             return err
+        
+        if not CanApproveCloseoutByLab().has_object_permission(request, self, ta_request):
+            return Response(data={"message": "Insufficient privilege to approve closeout form for this request"}, status=status.HTTP_403_FORBIDDEN)
 
         if not hasattr(ta_request, "closeout_form"):
             return Response(data={"message": "Closeout form does not exist for this request"}, status=status.HTTP_400_BAD_REQUEST)
@@ -506,6 +510,9 @@ class RequestApproveCloseoutFormByProgramView(BaseUserAwareRequest):
         if err:
             return err
 
+        if not CanApproveCloseoutByProgram().has_object_permission(request, self, ta_request):
+            return Response(data={"message": "Insufficient privilege to approve closeout form for this request"}, status=status.HTTP_403_FORBIDDEN)
+        
         if not hasattr(ta_request, "closeout_form"):
             return Response(data={"message": "Closeout form does not exist for this request"}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -530,13 +537,19 @@ class RequestApproveCloseoutFormByProgramView(BaseUserAwareRequest):
 
 
 class RequestReopenView(BaseUserAwareRequest):
-    permission_classes = [permissions.IsAuthenticated, IsAdmin]
+    permission_classes = [permissions.IsAuthenticated, CanReopen]
 
     def post(self, request, request_id=None):
         queryset = Request.objects.filter(owner=None)
         ta_request, err = self.get_request_or_error(queryset, request_id)
         if err:
             return err
+        
+        if not CanReopen().has_object_permission(request, self, ta_request):
+            return Response(data={"message": "Insufficient privilege to reopen this request"}, status=status.HTTP_403_FORBIDDEN)
+        
+        if not ta_request.status.name in [REQUEST_STATUS.COMPLETED, REQUEST_STATUS.UNABLE_TO_ADDRESS]:
+            return Response(data={"message": "Only requests with status Completed or Unable to Address can be reopened."}, status=status.HTTP_400_BAD_REQUEST)
 
         try:
             ta_request.status = RequestStatus.objects.get(name=REQUEST_STATUS.SCOPING)

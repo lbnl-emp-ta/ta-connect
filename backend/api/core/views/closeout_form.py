@@ -3,6 +3,7 @@ from rest_framework.response import Response
 from django.db import transaction
 from django.http import JsonResponse
 
+from core.permissions import CanEditCloseoutResponses
 from core.constants import REQUEST_STATUS
 from core.utils import create_audit_history, get_status
 from core.models import CloseoutForm, Request
@@ -81,7 +82,7 @@ class CloseoutFormView(BaseUserAwareRequest):
         if err:
             return err
 
-        if not self.get_actionable().filter(pk=request_obj.pk).exists():
+        if not CanEditCloseoutResponses().has_object_permission(request, self, request_obj):
             return Response(
                 {"message": "Insufficient authorization to update closeout form for given request"},
                 status=status.HTTP_403_FORBIDDEN,
