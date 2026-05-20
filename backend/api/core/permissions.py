@@ -69,6 +69,7 @@ class IsCoordinator(permissions.BasePermission):
         return is_coordinator(request.user)
     
     def has_object_permission(self, request, view, obj):
+        print(f"Checking IsCoordinator permissions, these should match: {obj.owner_id} AND {Owner.get_default_pk()}")
         return is_coordinator(request.user) and obj.owner_id == Owner.get_default_pk()
 
 
