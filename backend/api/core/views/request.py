@@ -228,11 +228,6 @@ class RequestDetailView(BaseUserAwareRequest):
     def patch(self, request, request_id=None):
         if request_id is None:
             return Response(data={"message": "Please provide a Request ID"}, status=status.HTTP_400_BAD_REQUEST)
-
-        # try:
-        #     context = self.get_context()
-        # except ContextError:
-        #     return Response(data={"message": "Please provide context object header with request"}, status=status.HTTP_400_BAD_REQUEST)
         
         queryset = self.get_actionable() | self.get_downstream()
 
@@ -260,7 +255,7 @@ class RequestDetailView(BaseUserAwareRequest):
             updated_fields.append("description")
 
         if "challenges" in body:
-            if not CanEditDescription().has_object_permission(request, self, ta_request):
+            if not CanEditChallenges().has_object_permission(request, self, ta_request):
                 return Response(data={"message": "Insufficient privillege to update 'challenges' field"}, status=status.HTTP_401_UNAUTHORIZED)
             
             new_challenges_data = body.get("challenges")
@@ -269,7 +264,7 @@ class RequestDetailView(BaseUserAwareRequest):
             updated_fields.append("challenges")
 
         if "goals" in body:
-            if not CanEditDescription().has_object_permission(request, self, ta_request):
+            if not CanEditGoals().has_object_permission(request, self, ta_request):
                 return Response(data={"message": "Insufficient privillege to update 'goals' field"}, status=status.HTTP_401_UNAUTHORIZED)
             
             new_goals_data = body.get("goals")
@@ -278,7 +273,7 @@ class RequestDetailView(BaseUserAwareRequest):
             updated_fields.append("goals")
 
         if "effort" in body:
-            if not CanEditDescription().has_object_permission(request, self, ta_request):
+            if not CanEditEffort().has_object_permission(request, self, ta_request):
                 return Response(data={"message": "Insufficient privillege to update 'effort' field"}, status=status.HTTP_401_UNAUTHORIZED)
             
             new_effort_data = body.get("effort")
@@ -303,21 +298,21 @@ class RequestDetailView(BaseUserAwareRequest):
             updated_fields.append("depth")
 
         if "actual_completion_date" in body:
-            if not (IsAnyRoleOnRequest().has_object_permission(request, self, ta_request)):
+            if not (CanEditActualCompletionDate().has_object_permission(request, self, ta_request)):
                 return Response(data={"message": "Insufficient privillege to update 'actual completion date' field"}, status=status.HTTP_401_UNAUTHORIZED)
 
             patch_data["actual_completion_date"] = body.get("actual_completion_date")
             updated_fields.append("actual completion date")
         
         if "proj_start_date" in body:
-            if not(IsAnyRoleOnRequest().has_object_permission(request, self, ta_request)):
+            if not(CanEditProjectedStartDate().has_object_permission(request, self, ta_request)):
                 return Response(data={"message": "Insufficient privillege to update 'projected start date' field"}, status=status.HTTP_401_UNAUTHORIZED)
 
             patch_data["proj_start_date"] = body.get("proj_start_date")
             updated_fields.append("projected start date")
 
         if "proj_completion_date" in body:
-            if not(IsAnyRoleOnRequest().has_object_permission(request, self, ta_request)):
+            if not(CanEditProjectedCompletionDate().has_object_permission(request, self, ta_request)):
                 return Response(data={"message": "Insufficient privillege to update 'projected completion date' field"}, status=status.HTTP_401_UNAUTHORIZED)
 
             # Projected completion date can only be set if request is currently ASSIGNED_TO_EXPERT
@@ -326,24 +321,13 @@ class RequestDetailView(BaseUserAwareRequest):
             if ta_request.status.name in [REQUEST_STATUS.ASSIGNED_TO_EXPERT, REQUEST_STATUS.PROVIDING_TA]:
                 patch_data["proj_completion_date"] = body.get("proj_completion_date")
                 patch_data["status"] = get_status(REQUEST_STATUS.PROVIDING_TA)
+            else:
+                return Response(data={"message": "Projected completion date can only be set if request is currently assigned to an expert."}, status=status.HTTP_400_BAD_REQUEST)
             # If projected completion date is being removed while PROVIDING_TA, revert status back to ASSIGNED_TO_EXPERT
             if body.get("proj_completion_date") == None and ta_request.status.name == REQUEST_STATUS.PROVIDING_TA:
                 patch_data["status"] = get_status(REQUEST_STATUS.ASSIGNED_TO_EXPERT)
 
             updated_fields.append("projected completion date")
-            updated_fields.append("status")
-            
-        if "status" in body:
-            if body.get("status") is None:
-                return Response(data={"message": "Cannot clear status field on request. Need to provide replacement value."}, status=status.HTTP_400_BAD_REQUEST)
-
-            maybe_status = None
-            try:
-                maybe_status = RequestStatus.objects.get(pk=body.get("status"))
-            except RequestStatus.DoesNotExist:
-                return Response(data={"message": "Provided status does not exist."}, status=status.HTTP_400_BAD_REQUEST)
-
-            patch_data["status"] = maybe_status.name
             updated_fields.append("status")
         
         # Topics are done a special way (not using patch serializer) because they are 
@@ -365,9 +349,8 @@ class RequestDetailView(BaseUserAwareRequest):
                 ta_request.topics.add(topic)
 
             updated_fields.append("topics")
-                
         
-       # do partial save with accumulated patch 
+        # Do partial save with accumulated patch 
         patch_serializer = RequestSerializer(instance=ta_request, data=patch_data, partial=True)
         if(patch_serializer.is_valid()):
             try:
@@ -382,7 +365,6 @@ class RequestDetailView(BaseUserAwareRequest):
             create_audit_history(request, ta_request, ActionType.EditRequestDetails, f"Edited: {str(updated_fields)}")
         else:
             return Response(data={"message": patch_serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
-
 
         return self.get(request, None, request_id)
 

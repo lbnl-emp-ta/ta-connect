@@ -1,5 +1,5 @@
 from rest_framework import permissions
-from core.models import Role, ReceptionRoleAssignment, SystemRoleAssignment, ProgramRoleAssignment, LabRoleAssignment
+from core.models import Role, ReceptionRoleAssignment, SystemRoleAssignment, ProgramRoleAssignment, LabRoleAssignment, Owner
 
 
 def is_admin(request) -> bool:
@@ -61,13 +61,20 @@ class IsAdmin(permissions.BasePermission):
 
 
 class IsCoordinator(permissions.BasePermission):
+    """
+    View-level: True if the user has a Coordinator role in reception.
+    Object-level: True if the user is a coordinator AND the request is currently owned by reception.
+    """
     def has_permission(self, request, view=None):
         return is_coordinator(request.user)
+    
+    def has_object_permission(self, request, view, obj):
+        return is_coordinator(request.user) and obj.owner_id == Owner.get_default_pk()
 
 
 class IsProgramLead(permissions.BasePermission):
     """
-    View-level: True if the user has any Program Lead assignment (broad check).
+    View-level: True if the user has any Program Lead assignment.
     Object-level: True if the user is the Program Lead for that specific request.
     """
     def has_permission(self, request, view=None):
@@ -82,7 +89,7 @@ class IsProgramLead(permissions.BasePermission):
 
 class IsLabLead(permissions.BasePermission):
     """
-    View-level: True if the user has any Lab Lead assignment (broad check).
+    View-level: True if the user has any Lab Lead assignment.
     Object-level: True if the user is the Lab Lead for that specific request.
     """
     def has_permission(self, request, view=None):
@@ -97,7 +104,7 @@ class IsLabLead(permissions.BasePermission):
 
 class IsExpert(permissions.BasePermission):
     """
-    View-level: True if the user has any Expert lab assignment (broad check).
+    View-level: True if the user has any Expert lab assignment.
     Object-level: True if the user is the assigned expert on that specific request.
     """
     def has_permission(self, request, view=None):
@@ -143,23 +150,52 @@ def compose(*classes):
             return any(cls().has_permission(request, view) for cls in classes)
 
         def has_object_permission(self, request, view, obj):
-            return any(cls().has_object_permission(request, view, obj) for cls in classes)
+            """
+            Check if the user can act on the current request object.
+            Make sure the user has permission for the role AND object for at least one of the classes.
+            """
+            return any(
+                cls().has_permission(request, view) and cls().has_object_permission(request, view, obj)
+                for cls in classes
+            )
 
     return Composed
 
 
 # Composed permission aliases for common checks.
+
+# Assignment
 CanAssignReception = compose(IsAdmin, IsProgramLead)
-CanAssignProgram = compose(IsAdmin, IsCoordinator, IsLabLead)
-CanAssignLab = compose(IsAdmin, IsProgramLead, IsExpert)
-CanAssignExpert = compose(IsAdmin, IsLabLead, IsProgramLead)
-CanMarkComplete = compose(IsAdmin, IsProgramLead)
-CanCancel = compose(IsAdmin, IsCoordinator)
-CanSubmitCloseout = compose(IsAdmin, IsExpert)
+CanAssignProgramForward = compose(IsAdmin, IsCoordinator)
+CanAssignProgramBackward = compose(IsAdmin, IsLabLead)
+CanAssignLabForward = compose(IsAdmin, IsProgramLead)
+CanAssignLabBackward = compose(IsAdmin, IsExpert)
+CanAssignExpert = compose(IsAdmin, IsLabLead)
+# Field Edits
+CanEditDescription = compose(IsAdmin, IsCoordinator, IsProgramLead)
+CanEditChallenges = compose(IsAdmin, IsCoordinator, IsProgramLead)
+CanEditGoals = compose(IsAdmin, IsCoordinator, IsProgramLead)
+CanEditEffort = compose(IsAdmin, IsCoordinator, IsProgramLead)
+CanEditDepth = compose(IsAdmin, IsCoordinator, IsProgramLead, IsLabLead)
+CanEditTopics = compose(IsAdmin, IsCoordinator, IsProgramLead, IsLabLead)
+CanEditProjectedStartDate = compose(IsAdmin, IsCoordinator, IsProgramLead, IsLabLead, IsExpert)
+CanEditProjectedCompletionDate = compose(IsAdmin, IsCoordinator, IsProgramLead, IsLabLead, IsExpert)
+CanEditActualCompletionDate = compose(IsAdmin, IsCoordinator, IsProgramLead, IsLabLead, IsExpert)
+CanEditCustomerBasic = compose(IsAdmin, IsCoordinator, IsProgramLead, IsLabLead)
+CanEditCustomerOrgType = compose(IsAdmin)
+# Notes and Attachments
+CanAddNote = compose(IsAdmin, IsCoordinator, IsProgramLead, IsLabLead, IsExpert)
+CanDeleteNote = compose(IsAdmin, IsCoordinator, IsProgramLead, IsLabLead, IsExpert)
+CanAddAttachment = compose(IsAdmin, IsCoordinator, IsProgramLead, IsLabLead, IsExpert)
+CanDeleteAttachment = compose(IsAdmin, IsCoordinator, IsProgramLead, IsLabLead, IsExpert)
+# Closeout
+CanEditCloseoutResponses = compose(IsAdmin, IsProgramLead, IsLabLead, IsExpert)
+CanSubmitCloseout = compose(IsAdmin, IsProgramLead, IsLabLead, IsExpert)
 CanApproveCloseoutByLab = compose(IsAdmin, IsLabLead)
 CanApproveCloseoutByProgram = compose(IsAdmin, IsProgramLead)
-CanEditDescription = compose(IsAdmin, IsProgramLead, IsCoordinator)
-CanEditDepth = compose(IsAdmin, IsProgramLead, IsLabLead, IsCoordinator)
-CanEditTopics = compose(IsAdmin, IsProgramLead, IsLabLead, IsCoordinator)
+# Other
+CanCancel = compose(IsAdmin, IsCoordinator)
+CanReopen = compose(IsAdmin, IsCoordinator)
+
     
         
