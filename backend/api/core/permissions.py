@@ -1,4 +1,5 @@
 from rest_framework import permissions
+from core.constants import REQUEST_STATUS
 from core.models import Role, ReceptionRoleAssignment, SystemRoleAssignment, ProgramRoleAssignment, LabRoleAssignment, Owner
 
 
@@ -64,12 +65,14 @@ class IsCoordinator(permissions.BasePermission):
     """
     View-level: True if the user has a Coordinator role in reception.
     Object-level: True if the user is a coordinator AND the request is currently owned by reception.
+    Unless the request is in a closed state, in which case any coordinator has object-level permission (for reopening).
     """
     def has_permission(self, request, view=None):
         return is_coordinator(request.user)
     
     def has_object_permission(self, request, view, obj):
-        print(f"Checking IsCoordinator permissions, these should match: {obj.owner_id} AND {Owner.get_default_pk()}")
+        if obj.status.name in [REQUEST_STATUS.COMPLETED, REQUEST_STATUS.UNABLE_TO_ADDRESS]:
+            return is_coordinator(request.user)
         return is_coordinator(request.user) and obj.owner_id == Owner.get_default_pk()
 
 
