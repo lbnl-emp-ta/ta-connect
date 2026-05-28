@@ -195,6 +195,7 @@ CanAddAttachment = compose(IsAdmin, IsCoordinator, IsProgramLead, IsLabLead, IsE
 CanEditAttachment = compose(IsAdmin, IsCoordinator, IsProgramLead, IsLabLead, IsExpert)
 CanDeleteAttachment = compose(IsAdmin, IsCoordinator, IsProgramLead, IsLabLead, IsExpert)
 # Closeout
+CanStartCloseout = compose(IsAdmin, IsProgramLead, IsLabLead, IsExpert)
 CanEditCloseoutResponses = compose(IsAdmin, IsProgramLead, IsLabLead, IsExpert)
 CanSubmitCloseout = compose(IsAdmin, IsProgramLead, IsLabLead, IsExpert)
 CanApproveCloseoutByLab = compose(IsAdmin, IsLabLead)

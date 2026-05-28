@@ -204,7 +204,7 @@ export const getStep = (request: TARequestDetail): StepInfo => {
   } else if (request.owner?.domain_type === 'expert' && request.status === 'providing-ta') {
     return {
       forwardText: 'Start closeout process',
-      forwardPermission: 'submit-closeout',
+      forwardPermission: 'start-closeout',
       forwardIsMenu: false,
       backwardText: 'Assign back to lab',
       backwardPermission: 'assign-back-to-lab',

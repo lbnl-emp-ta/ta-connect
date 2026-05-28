@@ -257,6 +257,8 @@ class RequestDetailView(BaseUserAwareRequest):
         if ta_request.status.name in [REQUEST_STATUS.ASSIGNED_TO_EXPERT, REQUEST_STATUS.PROVIDING_TA]:
             permission_map.append(('edit-projected-completion-date', CanEditProjectedCompletionDate))
             permission_map.append(('assign-back-to-lab', CanAssignBackToLab))
+        if ta_request.status.name in [REQUEST_STATUS.PROVIDING_TA]:
+            permission_map.append(('start-closeout', CanStartCloseout))
         if ta_request.status.name in [REQUEST_STATUS.CLOSEOUT_STARTED, REQUEST_STATUS.CLOSEOUT_MORE_INFO]:
             permission_map.append(('submit-closeout', CanSubmitCloseout))
         if ta_request.status.name == REQUEST_STATUS.CLOSEOUT_REVIEW_BY_LAB:

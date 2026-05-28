@@ -203,6 +203,7 @@ export type PermissionAction =
   | 'assign-back-to-program'
   | 'assign-back-to-lab'
   | 'assign-back-to-expert'
+  | 'start-closeout'
   | 'submit-closeout'
   | 'edit-closeout-responses'
   | 'approve-closeout-by-lab'
