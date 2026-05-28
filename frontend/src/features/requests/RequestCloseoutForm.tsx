@@ -18,11 +18,15 @@ import {
 } from '@mui/material';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import ErrorIcon from '@mui/icons-material/Error';
-import { TACloseoutForm, TAExpert, TARequestDetail } from '../../api/dashboard/types';
+import {
+  TACloseoutForm,
+  TAExpert,
+  TARequestDetail,
+  PermissionAction,
+} from '../../api/dashboard/types';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import {
   closeoutQueryOptions,
-  identitiesQueryOptions,
   useApproveCloseoutByLabMutation,
   useApproveCloseoutByProgramMutation,
   useAssignmentMutation,
@@ -31,24 +35,23 @@ import {
 } from '@/api/queryOptions';
 import { useAdminModeContext } from '@/features/admin-mode/AdminModeContext';
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { hasPermission, parseBoolean } from '@/utils/utils';
+import { parseBoolean } from '@/utils/utils';
 import { useToastContext } from '@/features/toasts/ToastContext';
 import { queryClient } from '@/App';
 import { ToastMessage } from '@/features/toasts/ToastMessage';
 
 interface RequestCloseoutFormProps {
   requestId: TARequestDetail['id'];
-  requestStatus: TARequestDetail['status'];
   expertOwnerId?: TAExpert['owner_id'];
+  permissions: PermissionAction[];
 }
 
 export const RequestCloseoutForm: React.FC<RequestCloseoutFormProps> = ({
   requestId,
-  requestStatus,
   expertOwnerId,
+  permissions,
 }) => {
   const { isAdminMode } = useAdminModeContext();
-  const { data: identities } = useSuspenseQuery(identitiesQueryOptions());
   const { closeoutDialogOpen, setCloseoutDialogOpen } = useRequestsContext();
   const { setShowToast, setToastMessage } = useToastContext();
   const { data: closeoutForm } = useSuspenseQuery(
@@ -314,7 +317,7 @@ export const RequestCloseoutForm: React.FC<RequestCloseoutFormProps> = ({
         Closeout Questions for Expert
       </DialogTitle>
       <DialogContent>
-        {(closeoutForm.submitted_date || !hasPermission('edit-closeout-form', identities)) && (
+        {(closeoutForm.submitted_date || !permissions.includes('edit-closeout-responses')) && (
           <Stack spacing={3} sx={{ marginTop: 2 }}>
             <Stack spacing={1}>
               <Typography variant="subtitle1" fontWeight="bold">
@@ -378,7 +381,7 @@ export const RequestCloseoutForm: React.FC<RequestCloseoutFormProps> = ({
             </Stack>
           </Stack>
         )}
-        {!closeoutForm.submitted_date && hasPermission('edit-closeout-form', identities) && (
+        {!closeoutForm.submitted_date && permissions.includes('edit-closeout-responses') && (
           <form onSubmit={handleSubmit} id="closeout-form">
             <Stack spacing={3} sx={{ marginTop: 2 }}>
               <Typography>
@@ -500,40 +503,31 @@ export const RequestCloseoutForm: React.FC<RequestCloseoutFormProps> = ({
         <Button variant="outlined" onClick={handleDialogClose}>
           Back to request
         </Button>
-        {labRejectButtonText &&
-          hasPermission('reject-closeout-form-by-lab', identities, isAdminMode, requestStatus) && (
-            <Button variant="contained" color="error" onClick={handleBackward}>
-              {labRejectButtonText}
-            </Button>
-          )}
-        {programRejectButtonText &&
-          hasPermission(
-            'reject-closeout-form-by-program',
-            identities,
-            isAdminMode,
-            requestStatus
-          ) && (
-            <Button variant="contained" color="error" onClick={handleBackward}>
-              {programRejectButtonText}
-            </Button>
-          )}
-        {!closeoutForm.submitted_date &&
-          hasPermission('edit-closeout-form', identities, isAdminMode) && (
-            <Button variant="contained" color="primary" type="submit" form="closeout-form">
-              Submit for review
-            </Button>
-          )}
-        {labApproveButtonText && hasPermission('approve-closeout-form-by-lab', identities) && (
+        {labRejectButtonText && permissions.includes('reject-closeout-by-lab') && (
+          <Button variant="contained" color="error" onClick={handleBackward}>
+            {labRejectButtonText}
+          </Button>
+        )}
+        {programRejectButtonText && permissions.includes('reject-closeout-by-program') && (
+          <Button variant="contained" color="error" onClick={handleBackward}>
+            {programRejectButtonText}
+          </Button>
+        )}
+        {!closeoutForm.submitted_date && permissions.includes('edit-closeout-responses') && (
+          <Button variant="contained" color="primary" type="submit" form="closeout-form">
+            Submit for review
+          </Button>
+        )}
+        {labApproveButtonText && permissions.includes('approve-closeout-by-lab') && (
           <Button variant="contained" color="primary" onClick={handleApprove}>
             {labApproveButtonText}
           </Button>
         )}
-        {programApproveButtonText &&
-          hasPermission('approve-closeout-form-by-program', identities, isAdminMode) && (
-            <Button variant="contained" color="primary" onClick={handleApprove}>
-              {programApproveButtonText}
-            </Button>
-          )}
+        {programApproveButtonText && permissions.includes('approve-closeout-by-program') && (
+          <Button variant="contained" color="primary" onClick={handleApprove}>
+            {programApproveButtonText}
+          </Button>
+        )}
       </DialogActions>
     </Dialog>
   );

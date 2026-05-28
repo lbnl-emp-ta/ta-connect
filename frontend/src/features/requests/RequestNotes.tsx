@@ -12,19 +12,20 @@ import {
 } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import AddIcon from '@mui/icons-material/Add';
-import { TANote, TARequestDetail } from '../../api/dashboard/types';
-import { useCreateNoteMutation, useDeleteNoteMutation } from '../../api/queryOptions';
-import { useAdminModeContext } from '../admin-mode/AdminModeContext';
+import { PermissionAction, TANote, TARequestDetail } from '@/api/dashboard/types';
+import { useCreateNoteMutation, useDeleteNoteMutation } from '@/api/queryOptions';
+import { useAdminModeContext } from '@/features/admin-mode/AdminModeContext';
 import { formatDatetime } from '../../utils/utils';
 import { useEffect, useState } from 'react';
 import { useUser } from '@/hooks/useUser';
 
 interface RequestNotesProps {
   requestId: TARequestDetail['id'];
+  permissions: PermissionAction[];
   notes?: TANote[] | null;
 }
 
-export const RequestNotes: React.FC<RequestNotesProps> = ({ requestId, notes }) => {
+export const RequestNotes: React.FC<RequestNotesProps> = ({ requestId, permissions, notes }) => {
   const { isAdminMode } = useAdminModeContext();
   const user = useUser();
   const [showAddDialog, setShowAddDialog] = useState(false);
@@ -83,9 +84,11 @@ export const RequestNotes: React.FC<RequestNotesProps> = ({ requestId, notes }) 
 
   return (
     <Stack spacing={1} sx={{ padding: 2 }}>
-      <Button variant="outlined" startIcon={<AddIcon />} onClick={() => setShowAddDialog(true)}>
-        Add note
-      </Button>
+      {permissions.includes('add-note') && (
+        <Button variant="outlined" startIcon={<AddIcon />} onClick={() => setShowAddDialog(true)}>
+          Add note
+        </Button>
+      )}
       {notes &&
         notes.length > 0 &&
         notes.map((note) => (
@@ -102,7 +105,7 @@ export const RequestNotes: React.FC<RequestNotesProps> = ({ requestId, notes }) 
               <Typography variant="caption" color="textSecondary">
                 {formatDatetime(note.timestamp)}
               </Typography>
-              {isAdminMode && (
+              {permissions.includes('delete-note') && (
                 <IconButton onClick={() => handleInitiateDelete(note.id)} size="small">
                   <DeleteIcon fontSize="small" />
                 </IconButton>

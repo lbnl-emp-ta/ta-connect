@@ -1,10 +1,4 @@
-import {
-  TAIdentity,
-  TARequest,
-  TARequestDetail,
-  TARole,
-  TAStatusName,
-} from '../api/dashboard/types';
+import { PermissionAction, TARequest, TARequestDetail, TAStatusName } from '../api/dashboard/types';
 
 export const sortAndFilterRequests = (
   requests: TARequest[],
@@ -110,137 +104,6 @@ export const downloadBlob = (blob: Blob, filename: string): void => {
   a.remove();
 };
 
-type PermissionAction =
-  | 'edit-depth'
-  | 'edit-effort'
-  | 'edit-topics'
-  | 'edit-description'
-  | 'edit-challenges'
-  | 'edit-goals'
-  | 'edit-projected-start-date'
-  | 'edit-projected-completion-date'
-  | 'edit-actual-completion-date'
-  | 'edit-customer'
-  | 'edit-organization-type'
-  | 'edit-closeout-form'
-  | 'approve-closeout-form-by-lab'
-  | 'approve-closeout-form-by-program'
-  | 'reject-closeout-form-by-lab'
-  | 'reject-closeout-form-by-program';
-
-/**
- * Frontend function for checking if a user has permission to perform a certain action based on their role.
- * Note that this is used purely for changing UI elements and is not a substitute for backend permission checks.
- * The backend is the source of truth for permissions.
- */
-export const hasPermission = (
-  action: PermissionAction,
-  identities?: TAIdentity[] | null,
-  isAdminMode?: boolean,
-  statusName?: TAStatusName
-): boolean => {
-  if (!identities) return false;
-
-  // No one can edit the projected completion date unless
-  // the request is currently assigned-to-expert or is already providing-ta.
-  if (
-    action === 'edit-projected-completion-date' &&
-    statusName !== 'assigned-to-expert' &&
-    statusName !== 'providing-ta'
-  ) {
-    return false;
-  }
-
-  // Only allow rejecting closeout by lab if the current status is "closeout-review-by-lab"
-  if (action === 'reject-closeout-form-by-lab' && statusName !== 'closeout-review-by-lab') {
-    return false;
-  }
-
-  // Only allow rejecting closeout by program if the current status is "closeout-review-by-program"
-  if (action === 'reject-closeout-form-by-program' && statusName !== 'closeout-review-by-program') {
-    return false;
-  }
-
-  let doesHavePermission = false;
-  for (const identity of identities) {
-    switch (identity.role.name) {
-      case TARole.Admin:
-        if (isAdminMode) {
-          doesHavePermission = true;
-        }
-        break;
-      case TARole.Coordinator:
-        switch (action) {
-          case 'edit-depth':
-          case 'edit-effort':
-          case 'edit-topics':
-          case 'edit-description':
-          case 'edit-challenges':
-          case 'edit-goals':
-          case 'edit-projected-start-date':
-          case 'edit-projected-completion-date':
-          case 'edit-actual-completion-date':
-          case 'edit-customer':
-            doesHavePermission = true;
-            break;
-        }
-        break;
-      case TARole.ProgramLead:
-        switch (action) {
-          case 'edit-depth':
-          case 'edit-effort':
-          case 'edit-topics':
-          case 'edit-description':
-          case 'edit-challenges':
-          case 'edit-goals':
-          case 'edit-projected-start-date':
-          case 'edit-projected-completion-date':
-          case 'edit-actual-completion-date':
-          case 'edit-customer':
-          case 'approve-closeout-form-by-program':
-          case 'reject-closeout-form-by-program':
-            doesHavePermission = true;
-            break;
-        }
-        break;
-      case TARole.LabLead:
-        switch (action) {
-          case 'edit-depth':
-          case 'edit-effort':
-          case 'edit-topics':
-          case 'edit-description':
-          case 'edit-challenges':
-          case 'edit-goals':
-          case 'edit-projected-start-date':
-          case 'edit-projected-completion-date':
-          case 'edit-actual-completion-date':
-          case 'edit-customer':
-          case 'approve-closeout-form-by-lab':
-          case 'reject-closeout-form-by-lab':
-            doesHavePermission = true;
-            break;
-        }
-        break;
-      case TARole.Expert:
-        switch (action) {
-          case 'edit-projected-start-date':
-          case 'edit-projected-completion-date':
-          case 'edit-actual-completion-date':
-          case 'edit-closeout-form':
-            doesHavePermission = true;
-            break;
-        }
-        break;
-      default:
-        break;
-    }
-    if (doesHavePermission) {
-      break;
-    }
-  }
-  return doesHavePermission;
-};
-
 /**
  * Map flow step names to their order in the system flow.
  * Note that the order of the keys in this object is important.
@@ -265,6 +128,10 @@ interface StepInfo {
    */
   forwardText: string | null;
   /**
+   * Permission value to check for enabling the forward action.
+   */
+  forwardPermission: PermissionAction | null;
+  /**
    * Whether the forward action should be a menu of options (true) or a single action (false).
    */
   forwardIsMenu?: boolean;
@@ -273,13 +140,13 @@ interface StepInfo {
    */
   backwardText: string | null;
   /**
+   * Permission value to check for enabling the backward action.
+   */
+  backwardPermission: PermissionAction | null;
+  /**
    * The index of the step in the system flow. Based on the `Steps` object above and the `steps` array defined in `RequestStepper.tsx`.
    */
   stepIndex: StepIndex;
-  /**
-   * Array of roles that are allowed to perform the forward action.
-   */
-  allowedRoles: TARole[];
 }
 
 /**
@@ -292,50 +159,56 @@ export const getStep = (request: TARequestDetail): StepInfo => {
     // This should technically never happen since we auto-assign to reception
     return {
       forwardText: 'Assign to reception',
+      forwardPermission: 'assign-forward-to-reception',
       forwardIsMenu: true,
       backwardText: 'Cancel request',
+      backwardPermission: 'cancel-request',
       stepIndex: Steps.Intake,
-      allowedRoles: [TARole.Coordinator, TARole.Admin],
     };
   } else if (request.owner?.domain_type === 'reception') {
     return {
       forwardText: 'Assign to program',
+      forwardPermission: 'assign-forward-to-program',
       forwardIsMenu: true,
       backwardText: 'Cancel request',
+      backwardPermission: 'cancel-request',
       stepIndex: Steps.Assignment,
-      allowedRoles: [TARole.Coordinator, TARole.Admin],
     };
   } else if (request.owner?.domain_type === 'program' && request.lab === null) {
     return {
       forwardText: 'Assign to lab',
+      forwardPermission: 'assign-forward-to-lab',
       forwardIsMenu: true,
       backwardText: 'Assign back to reception',
+      backwardPermission: 'assign-back-to-reception',
       stepIndex: Steps.Assignment,
-      allowedRoles: [TARole.ProgramLead, TARole.Admin],
     };
   } else if (request.owner?.domain_type === 'lab' && request.expert === null) {
     return {
       forwardText: 'Assign to expert',
+      forwardPermission: 'assign-forward-to-expert',
       forwardIsMenu: true,
       backwardText: 'Assign back to program',
+      backwardPermission: 'assign-back-to-program',
       stepIndex: Steps.Assignment,
-      allowedRoles: [TARole.LabLead, TARole.Admin],
     };
   } else if (request.owner?.domain_type === 'expert' && request.status === 'assigned-to-expert') {
     return {
       forwardText: 'Start TA and add dates',
+      forwardPermission: 'edit-projected-completion-date',
       forwardIsMenu: false,
       backwardText: 'Assign back to lab',
+      backwardPermission: 'assign-back-to-lab',
       stepIndex: Steps.Delivery,
-      allowedRoles: [TARole.Expert, TARole.Admin],
     };
   } else if (request.owner?.domain_type === 'expert' && request.status === 'providing-ta') {
     return {
       forwardText: 'Start closeout process',
+      forwardPermission: 'start-closeout',
       forwardIsMenu: false,
       backwardText: 'Assign back to lab',
+      backwardPermission: 'assign-back-to-lab',
       stepIndex: Steps.Delivery,
-      allowedRoles: [TARole.Expert, TARole.Admin],
     };
   } else if (
     request.owner?.domain_type === 'expert' &&
@@ -343,26 +216,29 @@ export const getStep = (request: TARequestDetail): StepInfo => {
   ) {
     return {
       forwardText: 'Continue closeout form',
+      forwardPermission: 'submit-closeout',
       forwardIsMenu: false,
       backwardText: 'Go back to providing TA',
+      backwardPermission: 'submit-closeout',
       stepIndex: Steps.Delivery,
-      allowedRoles: [TARole.Expert, TARole.Admin],
     };
   } else if (request.owner?.domain_type === 'lab' && request.expert !== null) {
     return {
       forwardText: 'Review closeout information',
+      forwardPermission: 'approve-closeout-by-lab',
       forwardIsMenu: false,
       backwardText: 'Assign back to expert',
+      backwardPermission: 'reject-closeout-by-lab',
       stepIndex: Steps.Review,
-      allowedRoles: [TARole.LabLead, TARole.Admin],
     };
   } else if (request.owner?.domain_type === 'program' && request.expert !== null) {
     return {
       forwardText: 'Review closeout information',
+      forwardPermission: 'approve-closeout-by-program',
       forwardIsMenu: false,
       backwardText: 'Assign back to expert',
+      backwardPermission: 'reject-closeout-by-program',
       stepIndex: Steps.Review,
-      allowedRoles: [TARole.ProgramLead, TARole.Admin],
     };
   } else if (
     !request.owner &&
@@ -370,18 +246,20 @@ export const getStep = (request: TARequestDetail): StepInfo => {
   ) {
     return {
       forwardText: 'Reopen request',
+      forwardPermission: 'reopen-request',
       backwardText: null,
+      backwardPermission: null,
       stepIndex: Steps.Completed,
-      allowedRoles: [TARole.Admin],
     };
   } else {
     // This case should never happen if the backend is correctly enforcing the flow,
     // but we return a default value just in case
     return {
-      forwardText: '',
-      backwardText: '',
+      forwardText: null,
+      forwardPermission: null,
+      backwardText: null,
+      backwardPermission: null,
       stepIndex: Steps.Intake,
-      allowedRoles: [TARole.Admin],
     };
   }
 };

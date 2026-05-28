@@ -6,14 +6,12 @@ import EditIcon from '@mui/icons-material/Edit';
 import ErrorIcon from '@mui/icons-material/Error';
 import { Box, CircularProgress, IconButton, Stack, TextField, Typography } from '@mui/material';
 import { useCallback, useEffect, useState } from 'react';
-import { TARequestDetail, TARequestDetailMutation } from '@/api/dashboard/types';
-import { identitiesQueryOptions, useRequestMutation } from '@/api/queryOptions';
+import { PermissionAction, TARequestDetail, TARequestDetailMutation } from '@/api/dashboard/types';
+import { useRequestMutation } from '@/api/queryOptions';
 import { InfoPanel } from '@/components/InfoPanel';
-import { hasPermission } from '@/utils/utils';
 import { useAdminModeContext } from '@/features/admin-mode/AdminModeContext';
 import { useToastContext } from '@/features/toasts/ToastContext';
 import { ToastMessage } from '@/features/toasts/ToastMessage';
-import { useSuspenseQuery } from '@tanstack/react-query';
 
 interface RequestScopePanelProps {
   request?: TARequestDetail;
@@ -21,13 +19,14 @@ interface RequestScopePanelProps {
 
 export const RequestScopePanel: React.FC<RequestScopePanelProps> = ({ request }) => {
   const { isAdminMode } = useAdminModeContext();
-  const { data: identities } = useSuspenseQuery(identitiesQueryOptions());
   const updateRequestMutation = useRequestMutation(request?.id.toString() || '', isAdminMode);
   const [editing, setEditing] = useState(false);
   const { setShowToast, setToastMessage } = useToastContext();
   const [description, setDescription] = useState('');
   const [challenges, setChallenges] = useState<string>();
   const [goals, setGoals] = useState<string>();
+  const possibleActions: PermissionAction[] = ['edit-description', 'edit-challenges', 'edit-goals'];
+  const canEdit = request?.permissions.some((item) => possibleActions.includes(item));
 
   /**
    * Reset form values based on request data.
@@ -118,7 +117,7 @@ export const RequestScopePanel: React.FC<RequestScopePanelProps> = ({ request })
               Scope
             </Typography>
           </Stack>
-          {!editing && (
+          {canEdit && !editing && (
             <IconButton onClick={handleEditClick}>
               <EditIcon />
             </IconButton>
@@ -148,7 +147,7 @@ export const RequestScopePanel: React.FC<RequestScopePanelProps> = ({ request })
                 Description
               </Typography>
             </Stack>
-            {(!editing || !hasPermission('edit-description', identities, isAdminMode)) && (
+            {(!editing || !request.permissions.includes('edit-description')) && (
               <Box
                 sx={{
                   backgroundColor: 'grey.50',
@@ -163,7 +162,7 @@ export const RequestScopePanel: React.FC<RequestScopePanelProps> = ({ request })
                 </Typography>
               </Box>
             )}
-            {editing && hasPermission('edit-description', identities, isAdminMode) && (
+            {editing && request.permissions.includes('edit-description') && (
               <TextField
                 fullWidth
                 multiline
@@ -179,7 +178,7 @@ export const RequestScopePanel: React.FC<RequestScopePanelProps> = ({ request })
                 Challenges
               </Typography>
             </Stack>
-            {(!editing || !hasPermission('edit-challenges', identities, isAdminMode)) && (
+            {(!editing || !request.permissions.includes('edit-challenges')) && (
               <Box
                 sx={{
                   backgroundColor: 'grey.50',
@@ -192,7 +191,7 @@ export const RequestScopePanel: React.FC<RequestScopePanelProps> = ({ request })
                 <Typography fontSize="0.875rem">{request.challenges || '-'}</Typography>
               </Box>
             )}
-            {editing && hasPermission('edit-challenges', identities, isAdminMode) && (
+            {editing && request.permissions.includes('edit-challenges') && (
               <TextField
                 fullWidth
                 multiline
@@ -208,7 +207,7 @@ export const RequestScopePanel: React.FC<RequestScopePanelProps> = ({ request })
                 Goals
               </Typography>
             </Stack>
-            {(!editing || !hasPermission('edit-goals', identities, isAdminMode)) && (
+            {(!editing || !request.permissions.includes('edit-goals')) && (
               <Box
                 sx={{
                   backgroundColor: 'grey.50',
@@ -221,7 +220,7 @@ export const RequestScopePanel: React.FC<RequestScopePanelProps> = ({ request })
                 <Typography fontSize="0.875rem">{request.goals || '-'}</Typography>
               </Box>
             )}
-            {editing && hasPermission('edit-goals', identities, isAdminMode) && (
+            {editing && request.permissions.includes('edit-goals') && (
               <TextField
                 fullWidth
                 multiline

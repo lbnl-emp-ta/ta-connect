@@ -13,21 +13,23 @@ import {
 import DownloadIcon from '@mui/icons-material/Download';
 import DeleteIcon from '@mui/icons-material/Delete';
 import AddIcon from '@mui/icons-material/Add';
-import { TAAttachment, TARequestDetail } from '../../api/dashboard/types';
-import { apiUrl, useAttachmentMutation, useDeleteAttachmentMutation } from '../../api/queryOptions';
-import { useAdminModeContext } from '../admin-mode/AdminModeContext';
-import { getCSRFToken } from '../../utils/cookies';
-import { downloadBlob, formatDatetime } from '../../utils/utils';
+import { PermissionAction, TAAttachment, TARequestDetail } from '@/api/dashboard/types';
+import { apiUrl, useAttachmentMutation, useDeleteAttachmentMutation } from '@/api/queryOptions';
+import { useAdminModeContext } from '@/features/admin-mode/AdminModeContext';
+import { getCSRFToken } from '@/utils/cookies';
+import { downloadBlob, formatDatetime } from '@/utils/utils';
 import { useEffect, useState } from 'react';
-import { FileUploadInput } from '../../components/FileUploadInput';
+import { FileUploadInput } from '@/components/FileUploadInput';
 
 interface RequestAttachmentsProps {
   requestId: TARequestDetail['id'];
+  permissions: PermissionAction[];
   attachments: TAAttachment[];
 }
 
 export const RequestAttachments: React.FC<RequestAttachmentsProps> = ({
   requestId,
+  permissions,
   attachments,
 }) => {
   const { isAdminMode } = useAdminModeContext();
@@ -122,9 +124,15 @@ export const RequestAttachments: React.FC<RequestAttachmentsProps> = ({
 
   return (
     <Stack spacing={1} sx={{ padding: 2 }}>
-      <Button variant="outlined" startIcon={<AddIcon />} onClick={() => setShowUploadDialog(true)}>
-        Add attachment
-      </Button>
+      {permissions.includes('add-attachment') && (
+        <Button
+          variant="outlined"
+          startIcon={<AddIcon />}
+          onClick={() => setShowUploadDialog(true)}
+        >
+          Add attachment
+        </Button>
+      )}
       {attachments.length > 0 &&
         attachments.map((attachment) => (
           <Stack
@@ -146,9 +154,11 @@ export const RequestAttachments: React.FC<RequestAttachmentsProps> = ({
                 {attachment.description || 'No description'}
               </Typography>
             </Stack>
-            <IconButton onClick={() => handleInitiateDelete(attachment.id)}>
-              <DeleteIcon />
-            </IconButton>
+            {permissions.includes('delete-attachment') && (
+              <IconButton onClick={() => handleInitiateDelete(attachment.id)}>
+                <DeleteIcon />
+              </IconButton>
+            )}
           </Stack>
         ))}
       {attachments.length === 0 && (

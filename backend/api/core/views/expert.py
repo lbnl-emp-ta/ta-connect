@@ -41,8 +41,6 @@ class ExpertsListView(views.APIView):
     ]
 
     def get(self, request, format=None):
-        maybe_context = request.headers.get("Context")
-        context = json.loads(maybe_context) if maybe_context else {}
 
         lab_id = request.query_params.get("lab")
         program_id = request.query_params.get("program")
@@ -53,17 +51,18 @@ class ExpertsListView(views.APIView):
 
         try:
             expert_assignments = self._resolve_assignments(
-                request, context, expert_role, lab_id, program_id
+                request, expert_role, lab_id, program_id
             )
         except PermissionError:
-            return Response(status=status.HTTP_403_FORBIDDEN)
+            # If the caller lacks permission to view any experts, return an empty list.
+            return Response(data=[], status=status.HTTP_200_OK)
         except ValueError as e:
             return Response(data={"message": str(e)}, status=status.HTTP_400_BAD_REQUEST)
         except Exception as e:
             return Response(data={"message": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
         if expert_assignments is None:
-            return Response(status=status.HTTP_403_FORBIDDEN)
+            return Response(data=[], status=status.HTTP_200_OK)
 
         experts_data = []
         for assignment in expert_assignments:
@@ -82,11 +81,10 @@ class ExpertsListView(views.APIView):
 
         return Response(data=experts_data, status=status.HTTP_200_OK)
 
-    def _resolve_assignments(self, request, context, expert_role, lab_id, program_id):
+    def _resolve_assignments(self, request, expert_role, lab_id, program_id):
         """Return the LabRoleAssignment queryset for experts the caller may see.
 
         Raises PermissionError when the caller lacks access.
-        Raises ValueError when a required context field is missing.
         """
         if lab_id and program_id:
             # Specific lab + program lookup — Admin or Lab Lead only
@@ -102,15 +100,9 @@ class ExpertsListView(views.APIView):
             return LabRoleAssignment.objects.filter(role=expert_role)
 
         if IsProgramLead().has_permission(request):
-            program_id = context.get("instance")
-            if not program_id:
-                raise ValueError("Please include identity context with request")
             return LabRoleAssignment.objects.filter(role=expert_role, program_id=program_id)
 
         if IsLabLead().has_permission(request) or IsExpert().has_permission(request):
-            lab_id = context.get("instance")
-            if not lab_id:
-                raise ValueError("Please include identity context with request")
             role_name = ROLE.LAB_LEAD if IsLabLead().has_permission(request) else ROLE.EXPERT
             caller_role = Role.objects.filter(name=role_name).first()
             if not caller_role:

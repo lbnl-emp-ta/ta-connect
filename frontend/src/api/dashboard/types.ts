@@ -183,6 +183,40 @@ export interface TAStatus {
   description: string;
 }
 
+export type PermissionAction =
+  | 'edit-depth'
+  | 'edit-effort'
+  | 'edit-topics'
+  | 'edit-description'
+  | 'edit-challenges'
+  | 'edit-goals'
+  | 'edit-projected-start-date'
+  | 'edit-projected-completion-date'
+  | 'edit-actual-completion-date'
+  | 'edit-customer'
+  | 'edit-customer-organization-type'
+  | 'assign-forward-to-reception'
+  | 'assign-forward-to-program'
+  | 'assign-forward-to-lab'
+  | 'assign-forward-to-expert'
+  | 'assign-back-to-reception'
+  | 'assign-back-to-program'
+  | 'assign-back-to-lab'
+  | 'assign-back-to-expert'
+  | 'start-closeout'
+  | 'submit-closeout'
+  | 'edit-closeout-responses'
+  | 'approve-closeout-by-lab'
+  | 'approve-closeout-by-program'
+  | 'reject-closeout-by-lab'
+  | 'reject-closeout-by-program'
+  | 'cancel-request'
+  | 'reopen-request'
+  | 'add-note'
+  | 'delete-note'
+  | 'add-attachment'
+  | 'delete-attachment';
+
 export interface TARequestDetail {
   id: number;
   status: TAStatusName;
@@ -204,6 +238,7 @@ export interface TARequestDetail {
   topics: TATopic[];
   attachments: TAAttachment[];
   audit_history: TAAuditHistoryItem[];
+  permissions: PermissionAction[];
 }
 
 export interface TARequestDetailMutation {

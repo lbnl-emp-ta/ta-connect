@@ -46,7 +46,7 @@ class AssignmentView(BaseUserAwareRequest):
                 closeout_form = None
                 match new_owner.domain_type:
                     case DOMAINTYPE.RECEPTION:
-                        if not CanAssignReception().has_object_permission(self.request, self, ta_request):
+                        if not (CanAssignForwardToReception().has_object_permission(self.request, self, ta_request) or CanAssignBackToReception().has_object_permission(self.request, self, ta_request)):
                             return Response(data={"message": "Insufficient privilege to assign to reception."}, status=status.HTTP_401_UNAUTHORIZED)
                         ta_request.owner = new_owner                    
                         # Resetting prior assignments if request kicked back to Reception
@@ -61,58 +61,67 @@ class AssignmentView(BaseUserAwareRequest):
                         else:
                             ta_request.status = get_status(REQUEST_STATUS.SCOPING)
                     case DOMAINTYPE.PROGRAM:
-                        if not CanAssignProgram().has_object_permission(self.request, self, ta_request):
-                            return Response(data={"message": "Insufficient privilege to assign to program."}, status=status.HTTP_401_UNAUTHORIZED)
-                        ta_request.owner = new_owner
-                        ta_request.program = new_owner.program
-                        
                         # Request is being kicked back to the program from the lab
                         if ta_request.status.name in [REQUEST_STATUS.ASSIGNED_TO_LAB, REQUEST_STATUS.REJECTED_BY_EXPERT]:
+                            if not CanAssignBackToProgram().has_object_permission(self.request, self, ta_request):
+                                return Response(data={"message": "Insufficient privilege to assign to program."}, status=status.HTTP_401_UNAUTHORIZED)
                             ta_request.status = get_status(REQUEST_STATUS.REJECTED_BY_LAB)
                             ta_request.lab = None
                         # Request is being forwarded to the program from the lab after reviewing closeout
                         elif ta_request.status.name == REQUEST_STATUS.CLOSEOUT_REVIEW_BY_LAB:
+                            if not CanApproveCloseoutByLab().has_object_permission(self.request, self, ta_request):
+                                return Response(data={"message": "Insufficient privilege to approve closeout and assign to program."}, status=status.HTTP_401_UNAUTHORIZED)
                             ta_request.status = get_status(REQUEST_STATUS.CLOSEOUT_REVIEW_BY_PROGRAM)
                         # Request is being assigned to program for the first time
                         else:
+                            if not CanAssignForwardToProgram().has_object_permission(self.request, self, ta_request):
+                                return Response(data={"message": "Insufficient privilege to assign to program."}, status=status.HTTP_401_UNAUTHORIZED)
                             ta_request.status = get_status(REQUEST_STATUS.ASSIGNED_TO_PROGRAM)
+                        ta_request.owner = new_owner
+                        ta_request.program = new_owner.program
 
                     case DOMAINTYPE.LAB:
-                        if not CanAssignLab().has_object_permission(self.request, self, ta_request):
-                            return Response(data={"message": "Insufficient privilege to assign to lab."}, status=status.HTTP_401_UNAUTHORIZED)
-                        ta_request.owner = new_owner
-                        ta_request.lab = new_owner.lab
-                        
                         # Request is being assigned to lab for the first time
                         if ta_request.status.name in [REQUEST_STATUS.ASSIGNED_TO_PROGRAM, REQUEST_STATUS.REJECTED_BY_LAB]:
+                            if not CanAssignForwardToLab().has_object_permission(self.request, self, ta_request):
+                                return Response(data={"message": "Insufficient privilege to assign to lab."}, status=status.HTTP_401_UNAUTHORIZED)
                             ta_request.status = get_status(REQUEST_STATUS.ASSIGNED_TO_LAB)
                             ta_request.expert = None
                         # Request is being kicked back to lab from expert
                         elif ta_request.status.name in [REQUEST_STATUS.ASSIGNED_TO_EXPERT, REQUEST_STATUS.PROVIDING_TA]:
+                            if not CanAssignBackToLab().has_object_permission(self.request, self, ta_request):
+                                return Response(data={"message": "Insufficient privilege to assign to lab."}, status=status.HTTP_401_UNAUTHORIZED)
                             ta_request.status = get_status(REQUEST_STATUS.REJECTED_BY_EXPERT)
                             ta_request.expert = None
                             ta_request.proj_completion_date = None
                         # Request is being forwarded to the lab from the expert after finishing closeout
+                        # This technically shouldn't ever happen. Instead this is handled by `RequestSubmitCloseoutFormView``
                         elif ta_request.status.name in [REQUEST_STATUS.CLOSEOUT_STARTED, REQUEST_STATUS.CLOSEOUT_MORE_INFO]:
+                            if not CanSubmitCloseout().has_object_permission(self.request, self, ta_request):
+                                return Response(data={"message": "Insufficient privilege to submit closeout and assign to lab."}, status=status.HTTP_401_UNAUTHORIZED)
                             ta_request.status = get_status(REQUEST_STATUS.CLOSEOUT_REVIEW_BY_LAB)
+                        ta_request.owner = new_owner
+                        ta_request.lab = new_owner.lab
                         
                     case DOMAINTYPE.EXPERT:
-                        if not CanAssignExpert().has_object_permission(self.request, self, ta_request):
-                            return Response(data={"message": "Insufficient privilege to assign an expert."}, status=status.HTTP_401_UNAUTHORIZED)
-                        ta_request.owner = new_owner
-                        ta_request.expert = new_owner.expert
-
                         # Request is being assigned to expert for the first time
                         if ta_request.status.name in [REQUEST_STATUS.ASSIGNED_TO_LAB, REQUEST_STATUS.REJECTED_BY_EXPERT]:
+                            if not CanAssignForwardToExpert().has_object_permission(self.request, self, ta_request):
+                                return Response(data={"message": "Insufficient privilege to assign an expert."}, status=status.HTTP_401_UNAUTHORIZED)
                             ta_request.status = get_status(REQUEST_STATUS.ASSIGNED_TO_EXPERT)
                         # Request is being kicked back to expert by lab or program during closeout review
                         elif ta_request.status.name in [REQUEST_STATUS.CLOSEOUT_REVIEW_BY_LAB, REQUEST_STATUS.CLOSEOUT_REVIEW_BY_PROGRAM]:
+                            if not (CanRejectCloseoutByLab().has_object_permission(self.request, self, ta_request) or CanRejectCloseoutByProgram().has_object_permission(self.request, self, ta_request)):
+                                return Response(data={"message": "Insufficient privilege to reject closeout and assign back to expert."}, status=status.HTTP_401_UNAUTHORIZED)
                             ta_request.status = get_status(REQUEST_STATUS.CLOSEOUT_MORE_INFO)
                             closeout_form = ta_request.closeout_form if hasattr(ta_request, "closeout_form") else None
                             if closeout_form:
                                 closeout_form.submitted_date = None
                                 closeout_form.approved_by_lab = False
                                 closeout_form.approved_by_program = False
+
+                        ta_request.owner = new_owner
+                        ta_request.expert = new_owner.expert
 
                     case _:
                         return Response(data={"message": "Given request's domaintype is invalid"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

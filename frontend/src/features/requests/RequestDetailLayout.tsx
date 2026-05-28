@@ -134,7 +134,10 @@ export const RequestDetailLayout: React.FC<RequestDetailLayoutProps> = ({ reques
                 </TableContainer>
               </InfoPanel>
             )}
-            <RequestCustomerPanel customer={selectedRequest?.customers[0]} />
+            <RequestCustomerPanel
+              customer={selectedRequest?.customers[0]}
+              permissions={selectedRequest?.permissions ?? []}
+            />
             <RequestInfoPanel request={selectedRequest!} />
           </Stack>
         </Grid>
@@ -179,11 +182,16 @@ export const RequestDetailLayout: React.FC<RequestDetailLayoutProps> = ({ reques
             }
           >
             <TabPanel value={tabValue} index="notes">
-              <RequestNotes requestId={selectedRequest.id} notes={selectedRequestNotes} />
+              <RequestNotes
+                requestId={selectedRequest.id}
+                permissions={selectedRequest.permissions}
+                notes={selectedRequestNotes}
+              />
             </TabPanel>
             <TabPanel value={tabValue} index="attachments">
               <RequestAttachments
                 requestId={selectedRequest.id}
+                permissions={selectedRequest.permissions}
                 attachments={selectedRequest.attachments}
               />
             </TabPanel>

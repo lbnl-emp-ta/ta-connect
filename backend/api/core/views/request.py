@@ -220,6 +220,61 @@ class RequestDetailView(BaseUserAwareRequest):
             audit_data["date"] = audit.date
             response_data["audit_history"].append(audit_data)
 
+        # Compute which actions this user is permitted to perform on this request.
+        # The frontend uses this list to show/hide UI controls, avoiding duplicated logic.
+
+        # Status-agnostic permissions
+        permission_map = [
+            ('edit-depth', CanEditDepth),
+            ('edit-effort', CanEditEffort),
+            ('edit-topics', CanEditTopics),
+            ('edit-description', CanEditDescription),
+            ('edit-challenges', CanEditChallenges),
+            ('edit-goals', CanEditGoals),
+            ('edit-projected-start-date', CanEditProjectedStartDate),
+            ('edit-actual-completion-date', CanEditActualCompletionDate),
+            ('edit-customer', CanEditCustomerBasic),
+            ('edit-customer-organization-type', CanEditCustomerOrgType),
+            ('edit-closeout-responses', CanEditCloseoutResponses),
+            ('assign-forward-to-reception', CanAssignForwardToReception),
+            ('cancel-request', CanCancel),
+            ('reopen-request', CanReopen),
+            ('add-note', CanAddNote),
+            ('delete-note', CanDeleteNote),
+            ('add-attachment', CanAddAttachment),
+            ('delete-attachment', CanDeleteAttachment),
+        ]
+
+        # Status-dependent permissions
+        if ta_request.status.name in [REQUEST_STATUS.SCOPING]:
+            permission_map.append(('assign-forward-to-program', CanAssignForwardToProgram))
+        if ta_request.status.name in [REQUEST_STATUS.ASSIGNED_TO_PROGRAM, REQUEST_STATUS.REJECTED_BY_LAB]:
+            permission_map.append(('assign-forward-to-lab', CanAssignForwardToLab))
+            permission_map.append(('assign-back-to-reception', CanAssignBackToReception))
+        if ta_request.status.name in [REQUEST_STATUS.ASSIGNED_TO_LAB, REQUEST_STATUS.REJECTED_BY_EXPERT]:
+            permission_map.append(('assign-forward-to-expert', CanAssignForwardToExpert))
+            permission_map.append(('assign-back-to-program', CanAssignBackToProgram))
+        if ta_request.status.name in [REQUEST_STATUS.ASSIGNED_TO_EXPERT, REQUEST_STATUS.PROVIDING_TA]:
+            permission_map.append(('edit-projected-completion-date', CanEditProjectedCompletionDate))
+            permission_map.append(('assign-back-to-lab', CanAssignBackToLab))
+        if ta_request.status.name in [REQUEST_STATUS.PROVIDING_TA]:
+            permission_map.append(('start-closeout', CanStartCloseout))
+        if ta_request.status.name in [REQUEST_STATUS.CLOSEOUT_STARTED, REQUEST_STATUS.CLOSEOUT_MORE_INFO]:
+            permission_map.append(('submit-closeout', CanSubmitCloseout))
+        if ta_request.status.name == REQUEST_STATUS.CLOSEOUT_REVIEW_BY_LAB:
+            permission_map.append(('approve-closeout-by-lab', CanApproveCloseoutByLab))
+            permission_map.append(('reject-closeout-by-lab', CanRejectCloseoutByLab))
+        if ta_request.status.name == REQUEST_STATUS.CLOSEOUT_REVIEW_BY_PROGRAM:
+            permission_map.append(('approve-closeout-by-program', CanApproveCloseoutByProgram))
+            permission_map.append(('reject-closeout-by-program', CanRejectCloseoutByProgram))
+        if ta_request.status.name in [REQUEST_STATUS.COMPLETED, REQUEST_STATUS.UNABLE_TO_ADDRESS]:
+            permission_map.append(('reopen-request', CanReopen))
+
+        response_data["permissions"] = [
+            action for action, perm_cls in permission_map
+            if perm_cls().has_object_permission(request, self, ta_request)
+        ]
+
         return Response(data=response_data, status=status.HTTP_200_OK)
 
     """
@@ -228,11 +283,6 @@ class RequestDetailView(BaseUserAwareRequest):
     def patch(self, request, request_id=None):
         if request_id is None:
             return Response(data={"message": "Please provide a Request ID"}, status=status.HTTP_400_BAD_REQUEST)
-
-        # try:
-        #     context = self.get_context()
-        # except ContextError:
-        #     return Response(data={"message": "Please provide context object header with request"}, status=status.HTTP_400_BAD_REQUEST)
         
         queryset = self.get_actionable() | self.get_downstream()
 
@@ -260,7 +310,7 @@ class RequestDetailView(BaseUserAwareRequest):
             updated_fields.append("description")
 
         if "challenges" in body:
-            if not CanEditDescription().has_object_permission(request, self, ta_request):
+            if not CanEditChallenges().has_object_permission(request, self, ta_request):
                 return Response(data={"message": "Insufficient privillege to update 'challenges' field"}, status=status.HTTP_401_UNAUTHORIZED)
             
             new_challenges_data = body.get("challenges")
@@ -269,7 +319,7 @@ class RequestDetailView(BaseUserAwareRequest):
             updated_fields.append("challenges")
 
         if "goals" in body:
-            if not CanEditDescription().has_object_permission(request, self, ta_request):
+            if not CanEditGoals().has_object_permission(request, self, ta_request):
                 return Response(data={"message": "Insufficient privillege to update 'goals' field"}, status=status.HTTP_401_UNAUTHORIZED)
             
             new_goals_data = body.get("goals")
@@ -278,7 +328,7 @@ class RequestDetailView(BaseUserAwareRequest):
             updated_fields.append("goals")
 
         if "effort" in body:
-            if not CanEditDescription().has_object_permission(request, self, ta_request):
+            if not CanEditEffort().has_object_permission(request, self, ta_request):
                 return Response(data={"message": "Insufficient privillege to update 'effort' field"}, status=status.HTTP_401_UNAUTHORIZED)
             
             new_effort_data = body.get("effort")
@@ -303,21 +353,21 @@ class RequestDetailView(BaseUserAwareRequest):
             updated_fields.append("depth")
 
         if "actual_completion_date" in body:
-            if not (IsAnyRoleOnRequest().has_object_permission(request, self, ta_request)):
+            if not (CanEditActualCompletionDate().has_object_permission(request, self, ta_request)):
                 return Response(data={"message": "Insufficient privillege to update 'actual completion date' field"}, status=status.HTTP_401_UNAUTHORIZED)
 
             patch_data["actual_completion_date"] = body.get("actual_completion_date")
             updated_fields.append("actual completion date")
         
         if "proj_start_date" in body:
-            if not(IsAnyRoleOnRequest().has_object_permission(request, self, ta_request)):
+            if not(CanEditProjectedStartDate().has_object_permission(request, self, ta_request)):
                 return Response(data={"message": "Insufficient privillege to update 'projected start date' field"}, status=status.HTTP_401_UNAUTHORIZED)
 
             patch_data["proj_start_date"] = body.get("proj_start_date")
             updated_fields.append("projected start date")
 
         if "proj_completion_date" in body:
-            if not(IsAnyRoleOnRequest().has_object_permission(request, self, ta_request)):
+            if not(CanEditProjectedCompletionDate().has_object_permission(request, self, ta_request)):
                 return Response(data={"message": "Insufficient privillege to update 'projected completion date' field"}, status=status.HTTP_401_UNAUTHORIZED)
 
             # Projected completion date can only be set if request is currently ASSIGNED_TO_EXPERT
@@ -326,24 +376,13 @@ class RequestDetailView(BaseUserAwareRequest):
             if ta_request.status.name in [REQUEST_STATUS.ASSIGNED_TO_EXPERT, REQUEST_STATUS.PROVIDING_TA]:
                 patch_data["proj_completion_date"] = body.get("proj_completion_date")
                 patch_data["status"] = get_status(REQUEST_STATUS.PROVIDING_TA)
+            else:
+                return Response(data={"message": "Projected completion date can only be set if request is currently assigned to an expert."}, status=status.HTTP_400_BAD_REQUEST)
             # If projected completion date is being removed while PROVIDING_TA, revert status back to ASSIGNED_TO_EXPERT
             if body.get("proj_completion_date") == None and ta_request.status.name == REQUEST_STATUS.PROVIDING_TA:
                 patch_data["status"] = get_status(REQUEST_STATUS.ASSIGNED_TO_EXPERT)
 
             updated_fields.append("projected completion date")
-            updated_fields.append("status")
-            
-        if "status" in body:
-            if body.get("status") is None:
-                return Response(data={"message": "Cannot clear status field on request. Need to provide replacement value."}, status=status.HTTP_400_BAD_REQUEST)
-
-            maybe_status = None
-            try:
-                maybe_status = RequestStatus.objects.get(pk=body.get("status"))
-            except RequestStatus.DoesNotExist:
-                return Response(data={"message": "Provided status does not exist."}, status=status.HTTP_400_BAD_REQUEST)
-
-            patch_data["status"] = maybe_status.name
             updated_fields.append("status")
         
         # Topics are done a special way (not using patch serializer) because they are 
@@ -365,9 +404,8 @@ class RequestDetailView(BaseUserAwareRequest):
                 ta_request.topics.add(topic)
 
             updated_fields.append("topics")
-                
         
-       # do partial save with accumulated patch 
+        # Do partial save with accumulated patch 
         patch_serializer = RequestSerializer(instance=ta_request, data=patch_data, partial=True)
         if(patch_serializer.is_valid()):
             try:
@@ -382,7 +420,6 @@ class RequestDetailView(BaseUserAwareRequest):
             create_audit_history(request, ta_request, ActionType.EditRequestDetails, f"Edited: {str(updated_fields)}")
         else:
             return Response(data={"message": patch_serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
-
 
         return self.get(request, None, request_id)
 
@@ -432,6 +469,9 @@ class RequestCancelView(BaseUserAwareRequest):
         ta_request, err = self.get_request_or_error(queryset, request_id)
         if err:
             return err
+        
+        if not CanCancel().has_object_permission(request, self, ta_request):
+            return Response(data={"message": "Insufficient privilege to cancel this request"}, status=status.HTTP_403_FORBIDDEN)
 
         try:
             with transaction.atomic():
@@ -460,11 +500,9 @@ class RequestSubmitCloseoutFormView(BaseUserAwareRequest):
         ta_request, err = self.get_request_or_error(queryset, request_id)
         if err:
             return err
-
-        # Experts must be the assigned expert on this specific request
-        if IsExpert().has_object_permission(request, self, ta_request) and not IsAdmin().has_permission(request):
-            if ta_request.expert is None or ta_request.expert != request.user:
-                return Response(data={"message": "Only the assigned expert can submit the closeout form"}, status=status.HTTP_403_FORBIDDEN)
+        
+        if not CanSubmitCloseout().has_object_permission(request, self, ta_request):
+            return Response(data={"message": "Insufficient privilege to submit closeout form for this request"}, status=status.HTTP_403_FORBIDDEN)
 
         if not hasattr(ta_request, "closeout_form"):
             return Response(data={"message": "Closeout form does not exist for this request"}, status=status.HTTP_400_BAD_REQUEST)
@@ -494,6 +532,9 @@ class RequestApproveCloseoutFormByLabView(BaseUserAwareRequest):
         ta_request, err = self.get_request_or_error(queryset, request_id)
         if err:
             return err
+        
+        if not CanApproveCloseoutByLab().has_object_permission(request, self, ta_request):
+            return Response(data={"message": "Insufficient privilege to approve closeout form for this request"}, status=status.HTTP_403_FORBIDDEN)
 
         if not hasattr(ta_request, "closeout_form"):
             return Response(data={"message": "Closeout form does not exist for this request"}, status=status.HTTP_400_BAD_REQUEST)
@@ -524,6 +565,9 @@ class RequestApproveCloseoutFormByProgramView(BaseUserAwareRequest):
         if err:
             return err
 
+        if not CanApproveCloseoutByProgram().has_object_permission(request, self, ta_request):
+            return Response(data={"message": "Insufficient privilege to approve closeout form for this request"}, status=status.HTTP_403_FORBIDDEN)
+        
         if not hasattr(ta_request, "closeout_form"):
             return Response(data={"message": "Closeout form does not exist for this request"}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -548,13 +592,19 @@ class RequestApproveCloseoutFormByProgramView(BaseUserAwareRequest):
 
 
 class RequestReopenView(BaseUserAwareRequest):
-    permission_classes = [permissions.IsAuthenticated, IsAdmin]
+    permission_classes = [permissions.IsAuthenticated, CanReopen]
 
     def post(self, request, request_id=None):
         queryset = Request.objects.filter(owner=None)
         ta_request, err = self.get_request_or_error(queryset, request_id)
         if err:
             return err
+        
+        if not CanReopen().has_object_permission(request, self, ta_request):
+            return Response(data={"message": "Insufficient privilege to reopen this request"}, status=status.HTTP_403_FORBIDDEN)
+        
+        if not ta_request.status.name in [REQUEST_STATUS.COMPLETED, REQUEST_STATUS.UNABLE_TO_ADDRESS]:
+            return Response(data={"message": "Only requests with status Completed or Unable to Address can be reopened."}, status=status.HTTP_400_BAD_REQUEST)
 
         try:
             ta_request.status = RequestStatus.objects.get(name=REQUEST_STATUS.SCOPING)

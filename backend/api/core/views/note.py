@@ -1,40 +1,25 @@
-from rest_framework import views, authentication, permissions, status
+from rest_framework import permissions, status
 from rest_framework.response import Response
 
 from core.models.audit_history import ActionType
 from core.utils import create_audit_history
-from core.permissions import IsAdmin
+from core.permissions import CanAddNote, CanDeleteNote
 from core.models import Note, Request
 from core.serializers import NoteSerializer, NoteCreateSerializer
 from core.views.request import BaseUserAwareRequest
 
-from allauth.headless.contrib.rest_framework.authentication import (
-    XSessionTokenAuthentication,
-)
-
-class NoteListView(views.APIView):
-    authentication_classes = [
-        authentication.SessionAuthentication,
-        XSessionTokenAuthentication,
-    ]
-
+class NoteListView(BaseUserAwareRequest):
     permission_classes = [
         permissions.IsAuthenticated,
     ]
     
     def get(self, request, request_id, format=None):
-        try:
-            request_obj = Request.objects.get(pk=request_id)
-        except Request.DoesNotExist:
-            return Response(data={"message": "Request with given ID does not exist"}, status=status.HTTP_400_BAD_REQUEST)
+        visible_requests = self.get_actionable() | self.get_downstream() | self.get_inactive()
+        ta_request, err = self.get_request_or_error(visible_requests, request_id)
+        if err:
+            return err
             
-        base_user_request_obj = BaseUserAwareRequest(request=request)
-        visible_request = base_user_request_obj.get_actionable() | base_user_request_obj.get_downstream() | base_user_request_obj.get_inactive()
-        
-        if not visible_request.contains(request_obj):
-            return Response(data={"message": "Insufficient authorization to view notes for given request"}, status=status.HTTP_400_BAD_REQUEST)
-            
-        queryset = Note.objects.all().filter(request=request_obj)
+        queryset = Note.objects.all().filter(request=ta_request)
         
         if not queryset.exists():
             return Response(data=list(), status=status.HTTP_204_NO_CONTENT)
@@ -44,24 +29,19 @@ class NoteListView(views.APIView):
         return Response(data=serializer.data, status=status.HTTP_200_OK)
 
 
-class NoteCreateView(views.APIView):
-    authentication_classes = [
-        authentication.SessionAuthentication,
-        XSessionTokenAuthentication,
-    ]
-
+class NoteCreateView(BaseUserAwareRequest):
     permission_classes = [
         permissions.IsAuthenticated,
+        CanAddNote,
     ]
     
     def post(self, request, request_id):
-        try:
-            request_obj = Request.objects.get(pk=request_id)
-        except Request.DoesNotExist:
-            return Response(data={"message":"Request does not exist for given ID"}, status=status.HTTP_400_BAD_REQUEST)
+        ta_request, err = self.get_request_or_error(Request.objects.all(), request_id)
+        if err:
+            return err
         
-        if not BaseUserAwareRequest(request=request).get_actionable().contains(request_obj):
-            return Response(data={"message": "Insufficient authorization to create note for given request"}, status=status.HTTP_400_BAD_REQUEST)
+        if not CanAddNote().has_object_permission(request, self, ta_request):
+            return Response(data={"message": "Insufficient authorization to create note for given request"}, status=status.HTTP_403_FORBIDDEN)
         
         if not "author" in self.request.data:
             return Response(data={"message":"Missing required author field"}, status=status.HTTP_400_BAD_REQUEST)
@@ -82,29 +62,24 @@ class NoteCreateView(views.APIView):
             return Response(data=serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
         response_note = serializer.save()
-        create_audit_history(request, request_obj, ActionType.AddNote, f"Added note: {response_note.content[:10]}...")
+        create_audit_history(request, ta_request, ActionType.AddNote, f"Added note: {response_note.content[:10]}...")
 
         return Response(data=(NoteSerializer(response_note)).data, status=status.HTTP_200_OK)
 
 
-class NoteDeleteView(views.APIView):
-    authentication_classes = [
-        authentication.SessionAuthentication,
-        XSessionTokenAuthentication,
-    ]
-
+class NoteDeleteView(BaseUserAwareRequest):
     permission_classes = [
         permissions.IsAuthenticated,
+        CanDeleteNote,
     ]
     
     def delete(self, request, request_id, note_id):
-        if not IsAdmin().has_permission(request):
-            return Response(data={"message": "Insufficient authorization to delete note for given request"}, status=status.HTTP_400_BAD_REQUEST)
-
-        try:
-            Request.objects.get(pk=request_id)
-        except Request.DoesNotExist:
-            return Response(data={"message":"Request does not exist for given ID"}, status=status.HTTP_400_BAD_REQUEST)
+        ta_request, err = self.get_request_or_error(Request.objects.all(), request_id)
+        if err:
+            return err
+        
+        if not CanDeleteNote().has_object_permission(request, self, ta_request):
+            return Response(data={"message": "Insufficient authorization to delete note for given request"}, status=status.HTTP_403_FORBIDDEN)
         
         try:
             note_obj = Note.objects.get(pk=note_id)

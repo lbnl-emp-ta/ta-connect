@@ -23,17 +23,21 @@ import {
 } from '@mui/material';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { ChangeEvent, useCallback, useEffect, useState } from 'react';
-import { TACustomer, TACustomerMutation, TAOrganizationType } from '@/api/dashboard/types';
+import {
+  PermissionAction,
+  TACustomer,
+  TACustomerMutation,
+  TAOrganizationType,
+} from '@/api/dashboard/types';
 import { InfoPanel } from '@/components/InfoPanel';
 import {
-  identitiesQueryOptions,
   organizationQueryOptions,
   organizationTypesQueryOptions,
   statesQueryOptions,
   transmissionPlanningRegionsQueryOptions,
   useCustomerMutation,
 } from '@/api/queryOptions';
-import { hasPermission, isValidEmail, isValidUSTelephone } from '@/utils/utils';
+import { isValidEmail, isValidUSTelephone } from '@/utils/utils';
 import { useAdminModeContext } from '@/features/admin-mode/AdminModeContext';
 import { useToastContext } from '@/features/toasts/ToastContext';
 import { ToastMessage } from '@/features/toasts/ToastMessage';
@@ -41,11 +45,14 @@ import { PhoneInput } from '@/components/PhoneInput';
 
 interface RequestCustomerPanelProps {
   customer?: TACustomer;
+  permissions: PermissionAction[];
 }
 
-export const RequestCustomerPanel: React.FC<RequestCustomerPanelProps> = ({ customer }) => {
+export const RequestCustomerPanel: React.FC<RequestCustomerPanelProps> = ({
+  customer,
+  permissions,
+}) => {
   const { isAdminMode } = useAdminModeContext();
-  const { data: identities } = useSuspenseQuery(identitiesQueryOptions());
   const { data: allOrganizations } = useSuspenseQuery(organizationQueryOptions());
   const { data: allOrganizationTypes } = useSuspenseQuery(organizationTypesQueryOptions());
   const { data: allTpr } = useSuspenseQuery(transmissionPlanningRegionsQueryOptions());
@@ -64,6 +71,8 @@ export const RequestCustomerPanel: React.FC<RequestCustomerPanelProps> = ({ cust
   const [phoneError, setPhoneError] = useState(false);
   const [title, setTitle] = useState<TACustomer['title']>();
   const [state, setState] = useState<TACustomer['state']['id']>();
+  const possibleActions: PermissionAction[] = ['edit-customer', 'edit-customer-organization-type'];
+  const canEdit = permissions.some((item) => possibleActions.includes(item));
 
   /**
    * Reset form values based on customer data.
@@ -226,12 +235,12 @@ export const RequestCustomerPanel: React.FC<RequestCustomerPanelProps> = ({ cust
               Customer Information
             </Typography>
           </Stack>
-          {hasPermission('edit-customer', identities, isAdminMode) && !editing && (
+          {canEdit && !editing && (
             <IconButton onClick={handleEditClick}>
               <EditIcon />
             </IconButton>
           )}
-          {hasPermission('edit-customer', identities, isAdminMode) && editing && (
+          {editing && (
             <Stack direction="row">
               {!updateCustomerMutation.isPending && (
                 <IconButton onClick={handleEditSubmit}>
@@ -371,37 +380,31 @@ export const RequestCustomerPanel: React.FC<RequestCustomerPanelProps> = ({ cust
                 <TableCell>Organization Type</TableCell>
                 <TableCell>
                   <Stack direction="row" alignItems="center" spacing={1}>
-                    {(!editing ||
-                      !hasPermission('edit-organization-type', identities, isAdminMode)) && (
+                    {(!editing || !permissions.includes('edit-customer-organization-type')) && (
                       <span>{customer.org.type.name}</span>
                     )}
-                    {editing &&
-                      !hasPermission('edit-organization-type', identities, isAdminMode) && (
+                    {editing && !permissions.includes('edit-customer-organization-type') && (
+                      <Tooltip title="Only admins can edit the organization type." placement="top">
+                        <ErrorIcon sx={{ color: 'grey.500' }} />
+                      </Tooltip>
+                    )}
+                    {editing && permissions.includes('edit-customer-organization-type') && (
+                      <>
+                        <Select value={orgType} onChange={handleOrgTypeChange}>
+                          {allOrganizationTypes?.map((orgTypeItem) => (
+                            <MenuItem key={orgTypeItem.id} value={orgTypeItem.id}>
+                              {orgTypeItem.name}
+                            </MenuItem>
+                          ))}
+                        </Select>
                         <Tooltip
-                          title="Only admins can edit the organization type."
+                          title="Changing the organization type will apply to all customers that use this organization."
                           placement="top"
                         >
                           <ErrorIcon sx={{ color: 'grey.500' }} />
                         </Tooltip>
-                      )}
-                    {editing &&
-                      hasPermission('edit-organization-type', identities, isAdminMode) && (
-                        <>
-                          <Select value={orgType} onChange={handleOrgTypeChange}>
-                            {allOrganizationTypes?.map((orgTypeItem) => (
-                              <MenuItem key={orgTypeItem.id} value={orgTypeItem.id}>
-                                {orgTypeItem.name}
-                              </MenuItem>
-                            ))}
-                          </Select>
-                          <Tooltip
-                            title="Changing the organization type will apply to all customers that use this organization."
-                            placement="top"
-                          >
-                            <ErrorIcon sx={{ color: 'grey.500' }} />
-                          </Tooltip>
-                        </>
-                      )}
+                      </>
+                    )}
                   </Stack>
                 </TableCell>
               </TableRow>

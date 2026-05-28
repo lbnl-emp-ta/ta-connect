@@ -76,7 +76,7 @@ export const ExpertsPanelDataTable: React.FC<ExpertsPanelDataTableProps> = ({
 
   const handleAssignment = (expert: TAExpert) => {
     if (!assignRequestMutation || !currentRequestId) return;
-    assignRequestMutation.mutate({ request: currentRequestId, owner: expert.owner_id });
+    assignRequestMutation.mutate({ owner: expert.owner_id });
     setExpertsPanelOpen(false);
   };
 
