@@ -1,4 +1,4 @@
-import { TARequest, TARequestDetail, TARole, TAStatusName } from '../api/dashboard/types';
+import { PermissionAction, TARequest, TARequestDetail, TAStatusName } from '../api/dashboard/types';
 
 export const sortAndFilterRequests = (
   requests: TARequest[],
@@ -128,6 +128,10 @@ interface StepInfo {
    */
   forwardText: string | null;
   /**
+   * Permission value to check for enabling the forward action.
+   */
+  forwardPermission: PermissionAction | null;
+  /**
    * Whether the forward action should be a menu of options (true) or a single action (false).
    */
   forwardIsMenu?: boolean;
@@ -136,13 +140,13 @@ interface StepInfo {
    */
   backwardText: string | null;
   /**
+   * Permission value to check for enabling the backward action.
+   */
+  backwardPermission: PermissionAction | null;
+  /**
    * The index of the step in the system flow. Based on the `Steps` object above and the `steps` array defined in `RequestStepper.tsx`.
    */
   stepIndex: StepIndex;
-  /**
-   * Array of roles that are allowed to perform the forward action.
-   */
-  allowedRoles: TARole[];
 }
 
 /**
@@ -155,50 +159,56 @@ export const getStep = (request: TARequestDetail): StepInfo => {
     // This should technically never happen since we auto-assign to reception
     return {
       forwardText: 'Assign to reception',
+      forwardPermission: 'assign-forward-to-reception',
       forwardIsMenu: true,
       backwardText: 'Cancel request',
+      backwardPermission: 'cancel-request',
       stepIndex: Steps.Intake,
-      allowedRoles: [TARole.Coordinator, TARole.Admin],
     };
   } else if (request.owner?.domain_type === 'reception') {
     return {
       forwardText: 'Assign to program',
+      forwardPermission: 'assign-forward-to-program',
       forwardIsMenu: true,
       backwardText: 'Cancel request',
+      backwardPermission: 'cancel-request',
       stepIndex: Steps.Assignment,
-      allowedRoles: [TARole.Coordinator, TARole.Admin],
     };
   } else if (request.owner?.domain_type === 'program' && request.lab === null) {
     return {
       forwardText: 'Assign to lab',
+      forwardPermission: 'assign-forward-to-lab',
       forwardIsMenu: true,
       backwardText: 'Assign back to reception',
+      backwardPermission: 'assign-back-to-reception',
       stepIndex: Steps.Assignment,
-      allowedRoles: [TARole.ProgramLead, TARole.Admin],
     };
   } else if (request.owner?.domain_type === 'lab' && request.expert === null) {
     return {
       forwardText: 'Assign to expert',
+      forwardPermission: 'assign-forward-to-expert',
       forwardIsMenu: true,
       backwardText: 'Assign back to program',
+      backwardPermission: 'assign-back-to-program',
       stepIndex: Steps.Assignment,
-      allowedRoles: [TARole.LabLead, TARole.Admin],
     };
   } else if (request.owner?.domain_type === 'expert' && request.status === 'assigned-to-expert') {
     return {
       forwardText: 'Start TA and add dates',
+      forwardPermission: 'edit-projected-completion-date',
       forwardIsMenu: false,
       backwardText: 'Assign back to lab',
+      backwardPermission: 'assign-back-to-lab',
       stepIndex: Steps.Delivery,
-      allowedRoles: [TARole.Expert, TARole.Admin],
     };
   } else if (request.owner?.domain_type === 'expert' && request.status === 'providing-ta') {
     return {
       forwardText: 'Start closeout process',
+      forwardPermission: 'submit-closeout',
       forwardIsMenu: false,
       backwardText: 'Assign back to lab',
+      backwardPermission: 'assign-back-to-lab',
       stepIndex: Steps.Delivery,
-      allowedRoles: [TARole.Expert, TARole.Admin],
     };
   } else if (
     request.owner?.domain_type === 'expert' &&
@@ -206,26 +216,29 @@ export const getStep = (request: TARequestDetail): StepInfo => {
   ) {
     return {
       forwardText: 'Continue closeout form',
+      forwardPermission: 'submit-closeout',
       forwardIsMenu: false,
       backwardText: 'Go back to providing TA',
+      backwardPermission: 'submit-closeout',
       stepIndex: Steps.Delivery,
-      allowedRoles: [TARole.Expert, TARole.Admin],
     };
   } else if (request.owner?.domain_type === 'lab' && request.expert !== null) {
     return {
       forwardText: 'Review closeout information',
+      forwardPermission: 'approve-closeout-by-lab',
       forwardIsMenu: false,
       backwardText: 'Assign back to expert',
+      backwardPermission: 'reject-closeout-by-lab',
       stepIndex: Steps.Review,
-      allowedRoles: [TARole.LabLead, TARole.Admin],
     };
   } else if (request.owner?.domain_type === 'program' && request.expert !== null) {
     return {
       forwardText: 'Review closeout information',
+      forwardPermission: 'approve-closeout-by-program',
       forwardIsMenu: false,
       backwardText: 'Assign back to expert',
+      backwardPermission: 'reject-closeout-by-program',
       stepIndex: Steps.Review,
-      allowedRoles: [TARole.ProgramLead, TARole.Admin],
     };
   } else if (
     !request.owner &&
@@ -233,18 +246,20 @@ export const getStep = (request: TARequestDetail): StepInfo => {
   ) {
     return {
       forwardText: 'Reopen request',
+      forwardPermission: 'reopen-request',
       backwardText: null,
+      backwardPermission: null,
       stepIndex: Steps.Completed,
-      allowedRoles: [TARole.Admin],
     };
   } else {
     // This case should never happen if the backend is correctly enforcing the flow,
     // but we return a default value just in case
     return {
-      forwardText: '',
-      backwardText: '',
+      forwardText: null,
+      forwardPermission: null,
+      backwardText: null,
+      backwardPermission: null,
       stepIndex: Steps.Intake,
-      allowedRoles: [TARole.Admin],
     };
   }
 };

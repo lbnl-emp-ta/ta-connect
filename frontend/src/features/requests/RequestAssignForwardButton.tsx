@@ -1,7 +1,6 @@
 import { TAOwner, TARequestDetail } from '@/api/dashboard/types';
 import {
   expertsQueryOptions,
-  identitiesQueryOptions,
   ownersQueryOptions,
   useAssignmentMutation,
   useCreateCloseoutMutation,
@@ -48,10 +47,6 @@ export const RequestAssignForwardButton: React.FC<RequestAssignForwardButtonProp
 }) => {
   const navigate = useNavigate();
   const { isAdminMode } = useAdminModeContext();
-  const { data: identities } = useSuspenseQuery(identitiesQueryOptions());
-  const identityRoles = useMemo(() => {
-    return identities?.map((item) => item.role.name) ?? [];
-  }, [identities]);
   const { data: owners } = useSuspenseQuery(ownersQueryOptions(request.id.toString(), isAdminMode));
   const { data: experts } = useSuspenseQuery(expertsQueryOptions(isAdminMode));
   const {
@@ -249,7 +244,10 @@ export const RequestAssignForwardButton: React.FC<RequestAssignForwardButtonProp
     return ownerOrganizationTypeIds.includes(requestOrganizationType.id);
   };
 
-  if (!currentStep.allowedRoles.some((role) => identityRoles.includes(role))) {
+  if (
+    !currentStep.forwardPermission ||
+    !request.permissions.includes(currentStep.forwardPermission)
+  ) {
     return null;
   }
 

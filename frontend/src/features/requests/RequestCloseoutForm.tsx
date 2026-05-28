@@ -503,12 +503,12 @@ export const RequestCloseoutForm: React.FC<RequestCloseoutFormProps> = ({
         <Button variant="outlined" onClick={handleDialogClose}>
           Back to request
         </Button>
-        {labRejectButtonText && permissions.includes('reject-closeout-form-by-lab') && (
+        {labRejectButtonText && permissions.includes('reject-closeout-by-lab') && (
           <Button variant="contained" color="error" onClick={handleBackward}>
             {labRejectButtonText}
           </Button>
         )}
-        {programRejectButtonText && permissions.includes('reject-closeout-form-by-program') && (
+        {programRejectButtonText && permissions.includes('reject-closeout-by-program') && (
           <Button variant="contained" color="error" onClick={handleBackward}>
             {programRejectButtonText}
           </Button>
@@ -518,12 +518,12 @@ export const RequestCloseoutForm: React.FC<RequestCloseoutFormProps> = ({
             Submit for review
           </Button>
         )}
-        {labApproveButtonText && permissions.includes('approve-closeout-form-by-lab') && (
+        {labApproveButtonText && permissions.includes('approve-closeout-by-lab') && (
           <Button variant="contained" color="primary" onClick={handleApprove}>
             {labApproveButtonText}
           </Button>
         )}
-        {programApproveButtonText && permissions.includes('approve-closeout-form-by-program') && (
+        {programApproveButtonText && permissions.includes('approve-closeout-by-program') && (
           <Button variant="contained" color="primary" onClick={handleApprove}>
             {programApproveButtonText}
           </Button>

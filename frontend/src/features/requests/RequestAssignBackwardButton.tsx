@@ -1,23 +1,17 @@
 import { TAOwner, TARequestDetail } from '@/api/dashboard/types';
+import { ownersQueryOptions, useAssignmentMutation, useCancelMutation } from '@/api/queryOptions';
 import { queryClient } from '@/App';
 import { useAdminModeContext } from '@/features/admin-mode/AdminModeContext';
 import { useRequestsContext } from '@/features/requests/RequestsContext';
 import { useToastContext } from '@/features/toasts/ToastContext';
 import { ToastMessage } from '@/features/toasts/ToastMessage';
-import {
-  identitiesQueryOptions,
-  ownersQueryOptions,
-  useAssignmentMutation,
-  useCancelMutation,
-} from '@/api/queryOptions';
 import { getStep } from '@/utils/utils';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
-import WestIcon from '@mui/icons-material/West';
 import ErrorIcon from '@mui/icons-material/Error';
+import WestIcon from '@mui/icons-material/West';
 import { Button, CircularProgress, Stack } from '@mui/material';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { useNavigate } from '@tanstack/react-router';
-import { useMemo } from 'react';
 
 interface RequestAssignBackwardButtonProps {
   request: TARequestDetail;
@@ -34,10 +28,6 @@ export const RequestAssignBackwardButton: React.FC<RequestAssignBackwardButtonPr
   const navigate = useNavigate();
   const { isAdminMode } = useAdminModeContext();
   const { data: owners } = useSuspenseQuery(ownersQueryOptions(request.id.toString(), isAdminMode));
-  const { data: identities } = useSuspenseQuery(identitiesQueryOptions());
-  const identityRoles = useMemo(() => {
-    return identities?.map((item) => item.role.name) ?? [];
-  }, [identities]);
   const receptionOwnerId = owners?.find((owner) => owner.domain_type === 'reception')?.id;
   const { tab, nextId, previousId } = useRequestsContext();
   const { setShowToast, setToastMessage } = useToastContext();
@@ -138,8 +128,8 @@ export const RequestAssignBackwardButton: React.FC<RequestAssignBackwardButtonPr
   };
 
   if (
-    !currentStep.backwardText ||
-    !currentStep.allowedRoles.some((role) => identityRoles.includes(role))
+    !currentStep.backwardPermission ||
+    !request.permissions.includes(currentStep.backwardPermission)
   ) {
     return null;
   }

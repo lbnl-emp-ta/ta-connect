@@ -169,12 +169,13 @@ def compose(*classes):
 # Composed permission aliases for common checks.
 
 # Assignment
-CanAssignReception = compose(IsAdmin, IsProgramLead)
-CanAssignProgramForward = compose(IsAdmin, IsCoordinator)
-CanAssignProgramBackward = compose(IsAdmin, IsLabLead)
-CanAssignLabForward = compose(IsAdmin, IsProgramLead)
-CanAssignLabBackward = compose(IsAdmin, IsExpert)
-CanAssignExpert = compose(IsAdmin, IsLabLead)
+CanAssignForwardToReception = compose(IsAdmin)
+CanAssignBackToReception = compose(IsAdmin, IsProgramLead)
+CanAssignForwardToProgram = compose(IsAdmin, IsCoordinator)
+CanAssignBackToProgram = compose(IsAdmin, IsLabLead)
+CanAssignForwardToLab = compose(IsAdmin, IsProgramLead)
+CanAssignBackToLab = compose(IsAdmin, IsExpert)
+CanAssignForwardToExpert = compose(IsAdmin, IsProgramLead, IsLabLead)
 # Field Edits
 CanEditDescription = compose(IsAdmin, IsCoordinator, IsProgramLead)
 CanEditChallenges = compose(IsAdmin, IsCoordinator, IsProgramLead)
@@ -197,7 +198,9 @@ CanDeleteAttachment = compose(IsAdmin, IsCoordinator, IsProgramLead, IsLabLead, 
 CanEditCloseoutResponses = compose(IsAdmin, IsProgramLead, IsLabLead, IsExpert)
 CanSubmitCloseout = compose(IsAdmin, IsProgramLead, IsLabLead, IsExpert)
 CanApproveCloseoutByLab = compose(IsAdmin, IsLabLead)
+CanRejectCloseoutByLab = compose(IsAdmin, IsLabLead)
 CanApproveCloseoutByProgram = compose(IsAdmin, IsProgramLead)
+CanRejectCloseoutByProgram = compose(IsAdmin, IsProgramLead)
 # Other
 CanCancel = compose(IsAdmin, IsCoordinator, IsProgramLead)
 CanReopen = compose(IsAdmin, IsCoordinator, IsProgramLead)

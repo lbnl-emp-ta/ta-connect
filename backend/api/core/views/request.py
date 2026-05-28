@@ -222,6 +222,8 @@ class RequestDetailView(BaseUserAwareRequest):
 
         # Compute which actions this user is permitted to perform on this request.
         # The frontend uses this list to show/hide UI controls, avoiding duplicated logic.
+
+        # Status-agnostic permissions
         permission_map = [
             ('edit-depth', CanEditDepth),
             ('edit-effort', CanEditEffort),
@@ -234,22 +236,35 @@ class RequestDetailView(BaseUserAwareRequest):
             ('edit-customer', CanEditCustomerBasic),
             ('edit-customer-organization-type', CanEditCustomerOrgType),
             ('edit-closeout-responses', CanEditCloseoutResponses),
+            ('assign-forward-to-reception', CanAssignForwardToReception),
             ('cancel-request', CanCancel),
+            ('reopen-request', CanReopen),
             ('add-note', CanAddNote),
             ('delete-note', CanDeleteNote),
             ('add-attachment', CanAddAttachment),
             ('delete-attachment', CanDeleteAttachment),
         ]
+
+        # Status-dependent permissions
+        if ta_request.status.name in [REQUEST_STATUS.SCOPING]:
+            permission_map.append(('assign-forward-to-program', CanAssignForwardToProgram))
+        if ta_request.status.name in [REQUEST_STATUS.ASSIGNED_TO_PROGRAM, REQUEST_STATUS.REJECTED_BY_LAB]:
+            permission_map.append(('assign-forward-to-lab', CanAssignForwardToLab))
+            permission_map.append(('assign-back-to-reception', CanAssignBackToReception))
+        if ta_request.status.name in [REQUEST_STATUS.ASSIGNED_TO_LAB, REQUEST_STATUS.REJECTED_BY_EXPERT]:
+            permission_map.append(('assign-forward-to-expert', CanAssignForwardToExpert))
+            permission_map.append(('assign-back-to-program', CanAssignBackToProgram))
         if ta_request.status.name in [REQUEST_STATUS.ASSIGNED_TO_EXPERT, REQUEST_STATUS.PROVIDING_TA]:
             permission_map.append(('edit-projected-completion-date', CanEditProjectedCompletionDate))
+            permission_map.append(('assign-back-to-lab', CanAssignBackToLab))
         if ta_request.status.name in [REQUEST_STATUS.CLOSEOUT_STARTED, REQUEST_STATUS.CLOSEOUT_MORE_INFO]:
             permission_map.append(('submit-closeout', CanSubmitCloseout))
         if ta_request.status.name == REQUEST_STATUS.CLOSEOUT_REVIEW_BY_LAB:
-            permission_map.append(('approve-closeout-form-by-lab', CanApproveCloseoutByLab))
-            permission_map.append(('reject-closeout-form-by-lab', CanApproveCloseoutByLab))
+            permission_map.append(('approve-closeout-by-lab', CanApproveCloseoutByLab))
+            permission_map.append(('reject-closeout-by-lab', CanRejectCloseoutByLab))
         if ta_request.status.name == REQUEST_STATUS.CLOSEOUT_REVIEW_BY_PROGRAM:
-            permission_map.append(('approve-closeout-form-by-program', CanApproveCloseoutByProgram))
-            permission_map.append(('reject-closeout-form-by-program', CanApproveCloseoutByProgram))
+            permission_map.append(('approve-closeout-by-program', CanApproveCloseoutByProgram))
+            permission_map.append(('reject-closeout-by-program', CanRejectCloseoutByProgram))
         if ta_request.status.name in [REQUEST_STATUS.COMPLETED, REQUEST_STATUS.UNABLE_TO_ADDRESS]:
             permission_map.append(('reopen-request', CanReopen))
 
