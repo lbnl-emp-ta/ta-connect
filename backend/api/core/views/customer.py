@@ -1,5 +1,6 @@
 from rest_framework import views, authentication, permissions, status
 from rest_framework.response import Response
+from rest_framework.generics import ListAPIView
 
 from core.views.request import BaseUserAwareRequest
 from core.models import * 
@@ -10,7 +11,23 @@ from allauth.headless.contrib.rest_framework.authentication import (
     XSessionTokenAuthentication,
 )
 
-class CustomerEditView(views.APIView):
+
+class CustomerListView(ListAPIView):
+    queryset = Customer.objects.all()
+    serializer_class = CustomerSerializer
+
+    authentication_classes = [
+        authentication.SessionAuthentication,
+        XSessionTokenAuthentication,
+    ]
+
+    permission_classes = [
+        permissions.IsAuthenticated,
+        IsAdmin|IsProgramLead|IsCoordinator|IsLabLead
+    ]
+
+
+class CustomerDetailView(views.APIView):
     queryset = Customer.objects.all()
     serializer_class = CustomerSerializer
 

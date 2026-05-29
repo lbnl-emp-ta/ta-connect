@@ -31,6 +31,7 @@ import {
 } from '@/api/dashboard/types';
 import { InfoPanel } from '@/components/InfoPanel';
 import {
+  customersQueryOptions,
   organizationQueryOptions,
   organizationTypesQueryOptions,
   statesQueryOptions,
@@ -57,6 +58,8 @@ export const RequestCustomerPanel: React.FC<RequestCustomerPanelProps> = ({
   const { data: allOrganizationTypes } = useSuspenseQuery(organizationTypesQueryOptions());
   const { data: allTpr } = useSuspenseQuery(transmissionPlanningRegionsQueryOptions());
   const { data: allStates } = useSuspenseQuery(statesQueryOptions());
+  const { data: allCustomers } = useSuspenseQuery(customersQueryOptions());
+  console.log('All customers:', allCustomers);
   const updateCustomerMutation = useCustomerMutation(customer?.id.toString() || '', isAdminMode);
   const [editing, setEditing] = useState(false);
   const { setShowToast, setToastMessage } = useToastContext();

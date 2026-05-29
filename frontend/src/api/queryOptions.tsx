@@ -5,7 +5,7 @@ import { loginMutation } from '@/api/accounts/login';
 import { logoutMutation } from '@/api/accounts/logout';
 import { deleteData, fetchData, patchData, postData, postForm } from '@/api/dashboard';
 import {
-  CustomerRequestRelationship,
+  Customer,
   ExpertiseMutation,
   TAAssignment,
   TACloseoutForm,
@@ -43,12 +43,11 @@ export const authSessionQueryOptions = () =>
     queryFn: () => sessionsApi.getSession(),
   });
 
-export const customerRequestRelationshipOptions = () =>
+export const customersQueryOptions = () =>
   queryOptions({
     staleTime: 120_000, // stale after 2 minutes
-    queryKey: ['customerRequestRelationships'],
-    queryFn: () =>
-      fetchData<CustomerRequestRelationship[]>(`${apiUrl}/customer-request-relationships/`),
+    queryKey: ['customers'],
+    queryFn: () => fetchData<Customer[]>(`${apiUrl}/customers/`),
   });
 
 export const identitiesQueryOptions = () =>

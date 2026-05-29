@@ -39,7 +39,8 @@ urlpatterns = [
     path('transmission-planning-regions/', TransmissionPlanningRegionListView.as_view(), name="transmission-planning-regions-list"),
     path('customer-request-relationships/', CustomerRequestRelationshipListView.as_view(), name="customer-request-relationships-list"),
     
-    path('customers/<int:customer_id>', CustomerEditView.as_view(), name="customer-edit"),
+    path('customers/', CustomerListView.as_view(), name="customer-list"),
+    path('customers/<int:customer_id>', CustomerDetailView.as_view(), name="customer-edit"),
     path('customer-request-relationships/', CustomerRequestRelationshipListView.as_view(), name="customer-request-relationship-create"),
 
     path('topics/', TopicListView.as_view(), name="topic-list"),

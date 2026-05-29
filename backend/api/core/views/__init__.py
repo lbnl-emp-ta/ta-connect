@@ -10,7 +10,7 @@ from .state import StateListView
 from .organization_type import OrganizationTypeListView
 from .organization import OrganizationListView
 from .transmission_planning_region import TransmissionPlanningRegionListView
-from .customer import CustomerEditView
+from .customer import CustomerDetailView, CustomerListView
 from .customer_request_relationship import CustomerRequestRelationshipListView
 from .intake_form import ProcessIntakeForm
 from .identity import IdentityListView
@@ -47,7 +47,8 @@ __all__ = [
     "CustomerRequestRelationshipListView",
     "OrganizationListView",
     "TransmissionPlanningRegionListView",
-    "CustomerEditView",
+    "CustomerDetailView",
+    "CustomerListView",
     "CustomerRequestRelationshipListView",
     "ProcessIntakeForm",
     "UploadAttachmentView",
