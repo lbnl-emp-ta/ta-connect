@@ -5,7 +5,7 @@
     "fields": {
       "request": 1,
       "customer": 1,
-      "customer_type": 1
+      "is_poc": true
     }
   },
   {
@@ -14,7 +14,7 @@
     "fields": {
       "request": 2,
       "customer": 2,
-      "customer_type": 1
+      "is_poc": true
     }
   },
   {
@@ -23,7 +23,7 @@
     "fields": {
       "request": 3,
       "customer": 3,
-      "customer_type": 1
+      "is_poc": true
     }
   },
   {
@@ -32,7 +32,7 @@
     "fields": {
       "request": 4,
       "customer": 1,
-      "customer_type": 1
+      "is_poc": true
     }
   },
   {
@@ -41,7 +41,7 @@
     "fields": {
       "request": 5,
       "customer": 3,
-      "customer_type": 1
+      "is_poc": true
     }
   }
 ]

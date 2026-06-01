@@ -311,17 +311,15 @@ export interface Customer {
   title: string;
 }
 
-export interface CustomerType {
-  id: number;
-  name: string;
-  description: string;
+export interface TACustomerTransferMutation {
+  customer_id: number;
 }
 
 export interface CustomerRequestRelationship {
   id: number;
   request: TARequest;
   customer: Customer;
-  customer_type: CustomerType;
+  is_poc: Boolean;
 }
 
 export interface TAAssignment {

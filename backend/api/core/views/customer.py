@@ -116,12 +116,17 @@ class CustomerTransferView(BaseUserAwareRequest):
         IsAdmin|IsProgramLead|IsCoordinator|IsLabLead|IsExpert
     ]
 
-    def post(self, request, request_id=None, customer_id=None):
+    def post(self, request, request_id=None):
         if not request_id:
             return Response(data={"message": "Please provide a request ID for transfer."}, status=status.HTTP_400_BAD_REQUEST)
 
-        if not customer_id:
-            return Response(data={"message": "Please provide a customer ID for transfer."}, status=status.HTTP_400_BAD_REQUEST)
+        if not request.data:
+            return Response(data={"message": "Missing request body with customer_id"}, status=status.HTTP_400_BAD_REQUEST)
+        
+        if "customer_id" in request.data and (request.data.get("customer_id") is not None):
+            customer_id = request.data.get("customer_id")
+        else:
+            return Response(data={"message": "Missing customer_id in request body"}, status=status.HTTP_400_BAD_REQUEST)
 
         try:
             customer_obj = Customer.objects.get(pk=customer_id)
@@ -131,16 +136,15 @@ class CustomerTransferView(BaseUserAwareRequest):
         ta_request, err = self.get_request_or_error(Request.objects.all(), request_id)
         if err:
             return err
+        
+        existing_relationship = CustomerRequestRelationship.objects.filter(request=ta_request).first()
 
-        # if not BaseUserAwareRequest(request=request).get_actionable().filter(id=request_id).exists():
-        #     return Response(data={"message": "Request is not actionable for the current user identity."}, status=status.HTTP_400_BAD_REQUEST)
-
-        old_customer_relationship = CustomerRequestRelationship.objects.filter(request=ta_request).first()
+        existing_relationship.delete()
 
         CustomerRequestRelationship.objects.get_or_create(
             request=ta_request,
             customer=customer_obj,
-            customer_type=None
+            is_poc=True
         )
         ta_request.save()
 

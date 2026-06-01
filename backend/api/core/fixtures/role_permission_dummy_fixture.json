@@ -39,7 +39,7 @@
     "fields": {
       "request": 1,
       "customer": 1,
-      "customer_type": 1
+      "is_poc": true
     }
   },
   {
@@ -82,7 +82,7 @@
     "fields": {
       "request": 2,
       "customer": 2,
-      "customer_type": 1
+      "is_poc": true
     }
   },
   {

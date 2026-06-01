@@ -10,6 +10,7 @@ import {
   TAAssignment,
   TACloseoutForm,
   TACustomerMutation,
+  TACustomerTransferMutation,
   TAExpert,
   TAIdentity,
   TANote,
@@ -189,12 +190,12 @@ export const useExpertiseMutation = (labRoleAssignmentId: string) => {
   });
 };
 
-export const useCustomerAssignmentMutation = (customerId: string, isAdminMode?: boolean) => {
+export const useCustomerTransferMutation = (requestId: string, isAdminMode?: boolean) => {
   return useMutation({
-    mutationKey: ['customer', 'assign', customerId, isAdminMode],
-    mutationFn: (data: Partial<TACustomerMutation>) =>
-      patchData<TACustomerMutation>(
-        `${import.meta.env.VITE_API_URL}/customers/${customerId}`,
+    mutationKey: ['customer', 'transfer', requestId, isAdminMode],
+    mutationFn: (data: TACustomerTransferMutation) =>
+      postData(
+        `${import.meta.env.VITE_API_URL}/requests/${requestId}/transfer/`,
         data,
         isAdminMode
       ),

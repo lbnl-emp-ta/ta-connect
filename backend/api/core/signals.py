@@ -116,7 +116,7 @@ def notify_reception_on_new_request(sender, instance, created, **kwargs):
             return
 
         primary_customer = instance.customers.filter(
-            customerrequestrelationship__customer_type__name="Primary Contact"
+            customerrequestrelationship__is_poc=True
         ).first()
 
         for recipient in recipients:
@@ -192,7 +192,7 @@ def notify_owners_on_assignment(sender, instance, created, **kwargs):
             recipients = []
 
     primary_customer = instance.customers.filter(
-        customerrequestrelationship__customer_type__name="Primary Contact"
+        customerrequestrelationship__is_poc=True
     ).first()
 
     for recipient in recipients:

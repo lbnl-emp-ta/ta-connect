@@ -48,27 +48,29 @@ import { useAdminModeContext } from '@/features/admin-mode/AdminModeContext';
 import { useToastContext } from '@/features/toasts/ToastContext';
 import { ToastMessage } from '@/features/toasts/ToastMessage';
 import { PhoneInput } from '@/components/PhoneInput';
+import { CustomerTransferDialog } from '@/features/customers/CustomerTransferDialog';
 
 interface RequestCustomerPanelProps {
-  customer?: TACustomer;
+  customer: TACustomer;
   permissions: PermissionAction[];
+  requestId: number;
 }
 
 export const RequestCustomerPanel: React.FC<RequestCustomerPanelProps> = ({
   customer,
   permissions,
+  requestId,
 }) => {
   const { isAdminMode } = useAdminModeContext();
   const { data: allOrganizations } = useSuspenseQuery(organizationQueryOptions());
   const { data: allOrganizationTypes } = useSuspenseQuery(organizationTypesQueryOptions());
   const { data: allTpr } = useSuspenseQuery(transmissionPlanningRegionsQueryOptions());
   const { data: allStates } = useSuspenseQuery(statesQueryOptions());
-  const { data: allCustomers } = useSuspenseQuery(customersQueryOptions());
-  console.log('All customers:', allCustomers);
   const updateCustomerMutation = useCustomerMutation(customer?.id.toString() || '', isAdminMode);
   const [editing, setEditing] = useState(false);
   const [customerMenuAnchorEl, setCustomerMenuAnchorEl] = useState<null | HTMLElement>(null);
   const customerMenuOpen = Boolean(customerMenuAnchorEl);
+  const [customerTransferDialogOpen, setCustomerTransferDialogOpen] = useState(false);
   const { setShowToast, setToastMessage } = useToastContext();
   const [org, setOrg] = useState<TACustomer['org']['id']>();
   const [orgType, setOrgType] = useState<TAOrganizationType['id']>();
@@ -88,19 +90,17 @@ export const RequestCustomerPanel: React.FC<RequestCustomerPanelProps> = ({
    * Reset form values based on customer data.
    */
   const resetFormValues = useCallback(() => {
-    if (customer) {
-      setOrg(customer.org.id);
-      setOrgType(customer.org.type.id);
-      setTpr(customer.tpr.id);
-      setEmail(customer.email || '');
-      setEmailError(false);
-      setEmailHelperText('');
-      setName(customer.name || '');
-      setPhone(customer.phone);
-      setPhoneError(false);
-      setTitle(customer.title || '');
-      setState(customer.state.id);
-    }
+    setOrg(customer.org.id);
+    setOrgType(customer.org.type.id);
+    setTpr(customer.tpr.id);
+    setEmail(customer.email || '');
+    setEmailError(false);
+    setEmailHelperText('');
+    setName(customer.name || '');
+    setPhone(customer.phone);
+    setPhoneError(false);
+    setTitle(customer.title || '');
+    setState(customer.state.id);
   }, [customer]);
 
   const handleCustomerMenuClick = (event: React.MouseEvent<HTMLButtonElement>) => {
@@ -109,6 +109,11 @@ export const RequestCustomerPanel: React.FC<RequestCustomerPanelProps> = ({
 
   const handleCustomerMenuClose = () => {
     setCustomerMenuAnchorEl(null);
+  };
+
+  const handleOpenCustomerTransferDialog = () => {
+    setCustomerMenuAnchorEl(null);
+    setCustomerTransferDialogOpen(true);
   };
 
   const handleEditClick = () => {
@@ -279,11 +284,11 @@ export const RequestCustomerPanel: React.FC<RequestCustomerPanelProps> = ({
             aria-labelledby="assign-menu-button"
             onClose={handleCustomerMenuClose}
           >
-            <MenuItem>
+            <MenuItem onClick={handleOpenCustomerTransferDialog}>
               <ListItemText>
                 <Stack direction="row" alignItems="center" spacing={1}>
                   <SwapHorizIcon />
-                  <Typography>Reassign to a different customer</Typography>
+                  <Typography>Transfer request to a different customer</Typography>
                 </Stack>
               </ListItemText>
             </MenuItem>
@@ -296,6 +301,12 @@ export const RequestCustomerPanel: React.FC<RequestCustomerPanelProps> = ({
               </ListItemText>
             </MenuItem>
           </Menu>
+          <CustomerTransferDialog
+            open={customerTransferDialogOpen}
+            onClose={() => setCustomerTransferDialogOpen(false)}
+            requestId={requestId}
+            currentCustomerId={customer.id}
+          />
           {/* {canEdit && !editing && (
             <IconButton onClick={handleEditClick}>
               <EditIcon />
@@ -317,177 +328,170 @@ export const RequestCustomerPanel: React.FC<RequestCustomerPanelProps> = ({
         </Stack>
       }
     >
-      {!customer && (
-        <Box>
-          <Typography>No customer data to show.</Typography>
-        </Box>
-      )}
-      {customer && (
-        <TableContainer>
-          <Table
-            size="small"
-            sx={{
-              '& .MuiTableCell-root:first-of-type': {
-                color: 'grey.900',
-                fontWeight: 'bold',
-                width: '205px',
-              },
-            }}
-          >
-            <TableBody>
-              {editing && (
-                <TableRow>
-                  <TableCell colSpan={2}>
-                    <Alert severity="info">
-                      Changes to customer information will apply to all requests associated with
-                      this customer. If you need to change the associated customer, please contact
-                      an administrator or taconnect@lbl.gov.
-                    </Alert>
-                  </TableCell>
-                </TableRow>
-              )}
+      <TableContainer>
+        <Table
+          size="small"
+          sx={{
+            '& .MuiTableCell-root:first-of-type': {
+              color: 'grey.900',
+              fontWeight: 'bold',
+              width: '205px',
+            },
+          }}
+        >
+          <TableBody>
+            {editing && (
               <TableRow>
-                <TableCell>Name</TableCell>
-                <TableCell>
-                  {!editing && <>{customer.name}</>}
-                  {editing && (
-                    <TextField
-                      fullWidth
-                      variant="outlined"
-                      value={name}
-                      onChange={handleNameChange}
-                    />
-                  )}
+                <TableCell colSpan={2}>
+                  <Alert severity="info">
+                    Changes to customer information will apply to all requests associated with this
+                    customer. If you need to change the associated customer, please contact an
+                    administrator or taconnect@lbl.gov.
+                  </Alert>
                 </TableCell>
               </TableRow>
-              <TableRow>
-                <TableCell>Email</TableCell>
-                <TableCell>
-                  {!editing && <>{customer.email}</>}
-                  {editing && (
-                    <TextField
-                      fullWidth
-                      variant="outlined"
-                      value={email}
-                      error={emailError}
-                      helperText={emailHelperText}
-                      onChange={handleEmailChange}
-                      type="email"
-                    />
+            )}
+            <TableRow>
+              <TableCell>Name</TableCell>
+              <TableCell>
+                {!editing && <>{customer.name}</>}
+                {editing && (
+                  <TextField
+                    fullWidth
+                    variant="outlined"
+                    value={name}
+                    onChange={handleNameChange}
+                  />
+                )}
+              </TableCell>
+            </TableRow>
+            <TableRow>
+              <TableCell>Email</TableCell>
+              <TableCell>
+                {!editing && <>{customer.email}</>}
+                {editing && (
+                  <TextField
+                    fullWidth
+                    variant="outlined"
+                    value={email}
+                    error={emailError}
+                    helperText={emailHelperText}
+                    onChange={handleEmailChange}
+                    type="email"
+                  />
+                )}
+              </TableCell>
+            </TableRow>
+            <TableRow>
+              <TableCell>Phone</TableCell>
+              <TableCell>
+                {!editing && <>{customer.phone}</>}
+                {editing && (
+                  <PhoneInput
+                    variant="outlined"
+                    id="phone-input"
+                    value={phone}
+                    onChange={handlePhoneChange}
+                    error={phoneError}
+                    required
+                  />
+                )}
+              </TableCell>
+            </TableRow>
+            <TableRow>
+              <TableCell>Job Title</TableCell>
+              <TableCell>
+                {!editing && <>{customer.title}</>}
+                {editing && (
+                  <TextField
+                    fullWidth
+                    variant="outlined"
+                    value={title}
+                    onChange={handleTitleChange}
+                  />
+                )}
+              </TableCell>
+            </TableRow>
+            <TableRow>
+              <TableCell>Transmission Planning Region</TableCell>
+              <TableCell>
+                {!editing && <>{customer.tpr.name}</>}
+                {editing && (
+                  <Select value={tpr} onChange={handleTprChange}>
+                    {allTpr?.map((tprItem) => (
+                      <MenuItem key={tprItem.id} value={tprItem.id}>
+                        {tprItem.name}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                )}
+              </TableCell>
+            </TableRow>
+            <TableRow>
+              <TableCell>Organization</TableCell>
+              <TableCell>
+                {!editing && <>{customer.org.name}</>}
+                {editing && (
+                  <Select value={org} onChange={handleOrgChange}>
+                    {allOrganizations?.map((orgItem) => (
+                      <MenuItem key={orgItem.id} value={orgItem.id}>
+                        {orgItem.name}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                )}
+              </TableCell>
+            </TableRow>
+            <TableRow>
+              <TableCell>Organization Type</TableCell>
+              <TableCell>
+                <Stack direction="row" alignItems="center" spacing={1}>
+                  {(!editing || !permissions.includes('edit-customer-organization-type')) && (
+                    <span>{customer.org.type.name}</span>
                   )}
-                </TableCell>
-              </TableRow>
-              <TableRow>
-                <TableCell>Phone</TableCell>
-                <TableCell>
-                  {!editing && <>{customer.phone}</>}
-                  {editing && (
-                    <PhoneInput
-                      variant="outlined"
-                      id="phone-input"
-                      value={phone}
-                      onChange={handlePhoneChange}
-                      error={phoneError}
-                      required
-                    />
+                  {editing && !permissions.includes('edit-customer-organization-type') && (
+                    <Tooltip title="Only admins can edit the organization type." placement="top">
+                      <ErrorIcon sx={{ color: 'grey.500' }} />
+                    </Tooltip>
                   )}
-                </TableCell>
-              </TableRow>
-              <TableRow>
-                <TableCell>Job Title</TableCell>
-                <TableCell>
-                  {!editing && <>{customer.title}</>}
-                  {editing && (
-                    <TextField
-                      fullWidth
-                      variant="outlined"
-                      value={title}
-                      onChange={handleTitleChange}
-                    />
-                  )}
-                </TableCell>
-              </TableRow>
-              <TableRow>
-                <TableCell>Transmission Planning Region</TableCell>
-                <TableCell>
-                  {!editing && <>{customer.tpr.name}</>}
-                  {editing && (
-                    <Select value={tpr} onChange={handleTprChange}>
-                      {allTpr?.map((tprItem) => (
-                        <MenuItem key={tprItem.id} value={tprItem.id}>
-                          {tprItem.name}
-                        </MenuItem>
-                      ))}
-                    </Select>
-                  )}
-                </TableCell>
-              </TableRow>
-              <TableRow>
-                <TableCell>Organization</TableCell>
-                <TableCell>
-                  {!editing && <>{customer.org.name}</>}
-                  {editing && (
-                    <Select value={org} onChange={handleOrgChange}>
-                      {allOrganizations?.map((orgItem) => (
-                        <MenuItem key={orgItem.id} value={orgItem.id}>
-                          {orgItem.name}
-                        </MenuItem>
-                      ))}
-                    </Select>
-                  )}
-                </TableCell>
-              </TableRow>
-              <TableRow>
-                <TableCell>Organization Type</TableCell>
-                <TableCell>
-                  <Stack direction="row" alignItems="center" spacing={1}>
-                    {(!editing || !permissions.includes('edit-customer-organization-type')) && (
-                      <span>{customer.org.type.name}</span>
-                    )}
-                    {editing && !permissions.includes('edit-customer-organization-type') && (
-                      <Tooltip title="Only admins can edit the organization type." placement="top">
+                  {editing && permissions.includes('edit-customer-organization-type') && (
+                    <>
+                      <Select value={orgType} onChange={handleOrgTypeChange}>
+                        {allOrganizationTypes?.map((orgTypeItem) => (
+                          <MenuItem key={orgTypeItem.id} value={orgTypeItem.id}>
+                            {orgTypeItem.name}
+                          </MenuItem>
+                        ))}
+                      </Select>
+                      <Tooltip
+                        title="Changing the organization type will apply to all customers that use this organization."
+                        placement="top"
+                      >
                         <ErrorIcon sx={{ color: 'grey.500' }} />
                       </Tooltip>
-                    )}
-                    {editing && permissions.includes('edit-customer-organization-type') && (
-                      <>
-                        <Select value={orgType} onChange={handleOrgTypeChange}>
-                          {allOrganizationTypes?.map((orgTypeItem) => (
-                            <MenuItem key={orgTypeItem.id} value={orgTypeItem.id}>
-                              {orgTypeItem.name}
-                            </MenuItem>
-                          ))}
-                        </Select>
-                        <Tooltip
-                          title="Changing the organization type will apply to all customers that use this organization."
-                          placement="top"
-                        >
-                          <ErrorIcon sx={{ color: 'grey.500' }} />
-                        </Tooltip>
-                      </>
-                    )}
-                  </Stack>
-                </TableCell>
-              </TableRow>
-              <TableRow>
-                <TableCell>State</TableCell>
-                <TableCell>
-                  {!editing && <>{customer.state.name}</>}
-                  {editing && (
-                    <Select value={state} onChange={handleStateChange}>
-                      {allStates?.map((stateItem) => (
-                        <MenuItem key={stateItem.id} value={stateItem.id}>
-                          {stateItem.name}
-                        </MenuItem>
-                      ))}
-                    </Select>
+                    </>
                   )}
-                </TableCell>
-              </TableRow>
-            </TableBody>
-          </Table>
-        </TableContainer>
-      )}
+                </Stack>
+              </TableCell>
+            </TableRow>
+            <TableRow>
+              <TableCell>State</TableCell>
+              <TableCell>
+                {!editing && <>{customer.state.name}</>}
+                {editing && (
+                  <Select value={state} onChange={handleStateChange}>
+                    {allStates?.map((stateItem) => (
+                      <MenuItem key={stateItem.id} value={stateItem.id}>
+                        {stateItem.name}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                )}
+              </TableCell>
+            </TableRow>
+          </TableBody>
+        </Table>
+      </TableContainer>
     </InfoPanel>
   );
 };
