@@ -13,7 +13,6 @@ from .closeout_form import CloseoutForm
 from .state import State
 from .transmission_planning_region import TransmissionPlanningRegion
 from .customer import Customer
-from .customer_type import CustomerType
 from .customer_request_relationship import CustomerRequestRelationship
 from .cohort import Cohort
 from .cohort_participant import CohortParticipant
@@ -44,7 +43,6 @@ __all__ = [
     "Organization",
     "TransmissionPlanningRegion",
     "Customer",
-    "CustomerType",
     "CustomerRequestRelationship",
     "Cohort",
     "CohortParticipant",

@@ -69,7 +69,6 @@ class ProcessIntakeForm(CreateAPIView):
                 CustomerRequestRelationship.objects.create(
                     request=_request,
                     customer=_customer,
-                    customer_type = CustomerType.objects.get(name="Primary Contact")
                 )
                 
                 response_data = {

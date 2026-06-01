@@ -37,8 +37,3 @@ def test_customer(django_db_setup):
 def test_request(django_db_setup):
     return Request.objects.get(pk=1) 
     
-    
-@pytest.fixture(scope="function")
-def test_customer_type(django_db_setup):
-    return CustomerType.objects.get(pk=1) 
-    
