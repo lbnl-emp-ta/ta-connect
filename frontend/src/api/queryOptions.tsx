@@ -189,6 +189,19 @@ export const useExpertiseMutation = (labRoleAssignmentId: string) => {
   });
 };
 
+export const useCustomerAssignmentMutation = (customerId: string, isAdminMode?: boolean) => {
+  return useMutation({
+    mutationKey: ['customer', 'assign', customerId, isAdminMode],
+    mutationFn: (data: Partial<TACustomerMutation>) =>
+      patchData<TACustomerMutation>(
+        `${import.meta.env.VITE_API_URL}/customers/${customerId}`,
+        data,
+        isAdminMode
+      ),
+    onSuccess: () => queryClient.invalidateQueries(),
+  });
+};
+
 export const useCustomerMutation = (customerId: string, isAdminMode?: boolean) => {
   return useMutation({
     mutationKey: ['customers', 'update', customerId, isAdminMode],

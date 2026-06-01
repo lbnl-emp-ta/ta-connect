@@ -2,13 +2,18 @@ import CheckIcon from '@mui/icons-material/Check';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import ClearIcon from '@mui/icons-material/Clear';
 import EditIcon from '@mui/icons-material/Edit';
+import SwapHorizIcon from '@mui/icons-material/SwapHoriz';
 import ErrorIcon from '@mui/icons-material/Error';
+import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import PeopleAltIcon from '@mui/icons-material/PeopleAlt';
 import {
   Alert,
   Box,
+  Button,
   CircularProgress,
   IconButton,
+  ListItemText,
+  Menu,
   MenuItem,
   Select,
   Stack,
@@ -62,6 +67,8 @@ export const RequestCustomerPanel: React.FC<RequestCustomerPanelProps> = ({
   console.log('All customers:', allCustomers);
   const updateCustomerMutation = useCustomerMutation(customer?.id.toString() || '', isAdminMode);
   const [editing, setEditing] = useState(false);
+  const [customerMenuAnchorEl, setCustomerMenuAnchorEl] = useState<null | HTMLElement>(null);
+  const customerMenuOpen = Boolean(customerMenuAnchorEl);
   const { setShowToast, setToastMessage } = useToastContext();
   const [org, setOrg] = useState<TACustomer['org']['id']>();
   const [orgType, setOrgType] = useState<TAOrganizationType['id']>();
@@ -95,6 +102,14 @@ export const RequestCustomerPanel: React.FC<RequestCustomerPanelProps> = ({
       setState(customer.state.id);
     }
   }, [customer]);
+
+  const handleCustomerMenuClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+    setCustomerMenuAnchorEl(event.currentTarget);
+  };
+
+  const handleCustomerMenuClose = () => {
+    setCustomerMenuAnchorEl(null);
+  };
 
   const handleEditClick = () => {
     setEditing(true);
@@ -238,7 +253,50 @@ export const RequestCustomerPanel: React.FC<RequestCustomerPanelProps> = ({
               Customer Information
             </Typography>
           </Stack>
-          {canEdit && !editing && (
+          <Button
+            id="customer-menu-button"
+            aria-controls={customerMenuOpen ? 'customer-menu' : undefined}
+            aria-haspopup="true"
+            aria-expanded={customerMenuOpen ? 'true' : undefined}
+            variant="outlined"
+            endIcon={<ArrowDropDownIcon />}
+            onClick={handleCustomerMenuClick}
+          >
+            Change customer
+          </Button>
+          <Menu
+            id="customer-menu"
+            anchorEl={customerMenuAnchorEl}
+            anchorOrigin={{
+              vertical: 'bottom',
+              horizontal: 'right',
+            }}
+            transformOrigin={{
+              vertical: 'top',
+              horizontal: 'right',
+            }}
+            open={customerMenuOpen}
+            aria-labelledby="assign-menu-button"
+            onClose={handleCustomerMenuClose}
+          >
+            <MenuItem>
+              <ListItemText>
+                <Stack direction="row" alignItems="center" spacing={1}>
+                  <SwapHorizIcon />
+                  <Typography>Reassign to a different customer</Typography>
+                </Stack>
+              </ListItemText>
+            </MenuItem>
+            <MenuItem>
+              <ListItemText>
+                <Stack direction="row" alignItems="center" spacing={1}>
+                  <EditIcon />
+                  <Typography>Edit current customer information</Typography>
+                </Stack>
+              </ListItemText>
+            </MenuItem>
+          </Menu>
+          {/* {canEdit && !editing && (
             <IconButton onClick={handleEditClick}>
               <EditIcon />
             </IconButton>
@@ -255,7 +313,7 @@ export const RequestCustomerPanel: React.FC<RequestCustomerPanelProps> = ({
                 <ClearIcon />
               </IconButton>
             </Stack>
-          )}
+          )} */}
         </Stack>
       }
     >

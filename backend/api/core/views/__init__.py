@@ -4,13 +4,12 @@ from .state import StateListView
 from .organization_type import OrganizationTypeListView
 from .organization import OrganizationListView
 from .transmission_planning_region import TransmissionPlanningRegionListView
-from .customer_request_relationship import CustomerRequestRelationshipListView
 from .depth import DepthListView
 from .state import StateListView
 from .organization_type import OrganizationTypeListView
 from .organization import OrganizationListView
 from .transmission_planning_region import TransmissionPlanningRegionListView
-from .customer import CustomerDetailView, CustomerListView
+from .customer import CustomerDetailView, CustomerListView, CustomerTransferView
 from .customer_request_relationship import CustomerRequestRelationshipListView
 from .intake_form import ProcessIntakeForm
 from .identity import IdentityListView
@@ -44,11 +43,11 @@ __all__ = [
     "OrganizationTypeListView",
     "OrganizationListView",
     "TransmissionPlanningRegionListView",
-    "CustomerRequestRelationshipListView",
     "OrganizationListView",
     "TransmissionPlanningRegionListView",
     "CustomerDetailView",
     "CustomerListView",
+    "CustomerTransferView",
     "CustomerRequestRelationshipListView",
     "ProcessIntakeForm",
     "UploadAttachmentView",
