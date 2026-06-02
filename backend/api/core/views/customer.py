@@ -144,6 +144,9 @@ class CustomerTransferView(BaseUserAwareRequest):
         if err:
             return err
         
+        if not CanTransferCustomer().has_object_permission(request, self, ta_request):
+            return Response(data={"message": "Insufficient authorization to transfer customer for given request"}, status=status.HTTP_400_BAD_REQUEST)
+        
         existing_relationship = CustomerRequestRelationship.objects.filter(request=ta_request).first()
 
         existing_relationship.delete()

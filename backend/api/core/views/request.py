@@ -233,6 +233,7 @@ class RequestDetailView(BaseUserAwareRequest):
             ('edit-projected-start-date', CanEditProjectedStartDate),
             ('edit-actual-completion-date', CanEditActualCompletionDate),
             ('edit-customer-info', CanEditCustomerInfo),
+            ('transfer-customer', CanTransferCustomer),
             ('edit-customer-info-organization-type', CanEditCustomerOrgType),
             ('edit-closeout-responses', CanEditCloseoutResponses),
             ('assign-forward-to-reception', CanAssignForwardToReception),

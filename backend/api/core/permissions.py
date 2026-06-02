@@ -186,7 +186,9 @@ CanEditTopics = compose(IsAdmin, IsCoordinator, IsProgramLead, IsLabLead)
 CanEditProjectedStartDate = compose(IsAdmin, IsCoordinator, IsProgramLead, IsLabLead, IsExpert)
 CanEditProjectedCompletionDate = compose(IsAdmin, IsCoordinator, IsProgramLead, IsLabLead, IsExpert)
 CanEditActualCompletionDate = compose(IsAdmin, IsCoordinator, IsProgramLead, IsLabLead, IsExpert)
+# Customer Edits
 CanEditCustomerInfo = compose(IsAdmin, IsCoordinator, IsProgramLead, IsLabLead)
+CanTransferCustomer = compose(IsAdmin, IsCoordinator, IsProgramLead, IsLabLead, IsExpert)
 CanEditCustomerOrgType = compose(IsAdmin)
 # Notes and Attachments
 CanAddNote = compose(IsAdmin, IsCoordinator, IsProgramLead, IsLabLead, IsExpert)

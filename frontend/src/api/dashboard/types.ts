@@ -194,6 +194,7 @@ export type PermissionAction =
   | 'edit-projected-completion-date'
   | 'edit-actual-completion-date'
   | 'edit-customer-info'
+  | 'transfer-customer'
   | 'edit-customer-info-organization-type'
   | 'assign-forward-to-reception'
   | 'assign-forward-to-program'

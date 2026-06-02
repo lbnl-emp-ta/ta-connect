@@ -1,17 +1,33 @@
-import CheckIcon from '@mui/icons-material/Check';
-import CheckCircleIcon from '@mui/icons-material/CheckCircle';
-import ClearIcon from '@mui/icons-material/Clear';
-import EditIcon from '@mui/icons-material/Edit';
-import SwapHorizIcon from '@mui/icons-material/SwapHoriz';
-import ErrorIcon from '@mui/icons-material/Error';
+import {
+  PermissionAction,
+  TACustomer,
+  TACustomerMutation,
+  TAOrganizationType,
+} from '@/api/dashboard/types';
+import {
+  organizationQueryOptions,
+  organizationTypesQueryOptions,
+  statesQueryOptions,
+  transmissionPlanningRegionsQueryOptions,
+  useCustomerMutation,
+} from '@/api/queryOptions';
+import { InfoPanel } from '@/components/InfoPanel';
+import { PhoneInput } from '@/components/PhoneInput';
+import { useAdminModeContext } from '@/features/admin-mode/AdminModeContext';
+import { CustomerEditDialog } from '@/features/customers/CustomerEditDialog';
+import { CustomerTransferDialog } from '@/features/customers/CustomerTransferDialog';
+import { useToastContext } from '@/features/toasts/ToastContext';
+import { ToastMessage } from '@/features/toasts/ToastMessage';
+import { isValidEmail, isValidUSTelephone } from '@/utils/utils';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import EditIcon from '@mui/icons-material/Edit';
+import ErrorIcon from '@mui/icons-material/Error';
 import PeopleAltIcon from '@mui/icons-material/PeopleAlt';
+import SwapHorizIcon from '@mui/icons-material/SwapHoriz';
 import {
   Alert,
-  Box,
   Button,
-  CircularProgress,
-  IconButton,
   ListItemText,
   Menu,
   MenuItem,
@@ -28,28 +44,6 @@ import {
 } from '@mui/material';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { ChangeEvent, useCallback, useEffect, useState } from 'react';
-import {
-  PermissionAction,
-  TACustomer,
-  TACustomerMutation,
-  TAOrganizationType,
-} from '@/api/dashboard/types';
-import { InfoPanel } from '@/components/InfoPanel';
-import {
-  customersQueryOptions,
-  organizationQueryOptions,
-  organizationTypesQueryOptions,
-  statesQueryOptions,
-  transmissionPlanningRegionsQueryOptions,
-  useCustomerMutation,
-} from '@/api/queryOptions';
-import { isValidEmail, isValidUSTelephone } from '@/utils/utils';
-import { useAdminModeContext } from '@/features/admin-mode/AdminModeContext';
-import { useToastContext } from '@/features/toasts/ToastContext';
-import { ToastMessage } from '@/features/toasts/ToastMessage';
-import { PhoneInput } from '@/components/PhoneInput';
-import { CustomerTransferDialog } from '@/features/customers/CustomerTransferDialog';
-import { CustomerEditDialog } from '@/features/customers/CustomerEditDialog';
 
 interface RequestCustomerPanelProps {
   customer: TACustomer;
@@ -85,10 +79,7 @@ export const RequestCustomerPanel: React.FC<RequestCustomerPanelProps> = ({
   const [phoneError, setPhoneError] = useState(false);
   const [title, setTitle] = useState<TACustomer['title']>();
   const [state, setState] = useState<TACustomer['state']['id']>();
-  const possibleActions: PermissionAction[] = [
-    'edit-customer-info',
-    'edit-customer-info-organization-type',
-  ];
+  const possibleActions: PermissionAction[] = ['edit-customer-info', 'transfer-customer'];
   const canEdit = permissions.some((item) => possibleActions.includes(item));
 
   /**
@@ -264,80 +255,68 @@ export const RequestCustomerPanel: React.FC<RequestCustomerPanelProps> = ({
               Customer Information
             </Typography>
           </Stack>
-          <Button
-            id="customer-menu-button"
-            aria-controls={customerMenuOpen ? 'customer-menu' : undefined}
-            aria-haspopup="true"
-            aria-expanded={customerMenuOpen ? 'true' : undefined}
-            variant="outlined"
-            endIcon={<ArrowDropDownIcon />}
-            onClick={handleCustomerMenuClick}
-          >
-            Change customer
-          </Button>
-          <Menu
-            id="customer-menu"
-            anchorEl={customerMenuAnchorEl}
-            anchorOrigin={{
-              vertical: 'bottom',
-              horizontal: 'right',
-            }}
-            transformOrigin={{
-              vertical: 'top',
-              horizontal: 'right',
-            }}
-            open={customerMenuOpen}
-            aria-labelledby="assign-menu-button"
-            onClose={handleCustomerMenuClose}
-          >
-            <MenuItem onClick={handleOpenCustomerTransferDialog}>
-              <ListItemText>
-                <Stack direction="row" alignItems="center" spacing={1}>
-                  <SwapHorizIcon />
-                  <Typography>Transfer request to a different customer</Typography>
-                </Stack>
-              </ListItemText>
-            </MenuItem>
-            {permissions.includes('edit-customer-info') && (
-              <MenuItem onClick={handleOpenCustomerEditDialog}>
-                <ListItemText>
-                  <Stack direction="row" alignItems="center" spacing={1}>
-                    <EditIcon />
-                    <Typography>Edit current customer information</Typography>
-                  </Stack>
-                </ListItemText>
-              </MenuItem>
-            )}
-          </Menu>
-          <CustomerTransferDialog
-            open={customerTransferDialogOpen}
-            onClose={() => setCustomerTransferDialogOpen(false)}
-            requestId={requestId}
-            currentCustomerId={customer.id}
-          />
-          <CustomerEditDialog
-            open={customerEditDialogOpen}
-            onClose={() => setCustomerEditDialogOpen(false)}
-            customer={customer}
-          />
-          {/* {canEdit && !editing && (
-            <IconButton onClick={handleEditClick}>
-              <EditIcon />
-            </IconButton>
+          {canEdit && (
+            <>
+              <Button
+                id="customer-menu-button"
+                aria-controls={customerMenuOpen ? 'customer-menu' : undefined}
+                aria-haspopup="true"
+                aria-expanded={customerMenuOpen ? 'true' : undefined}
+                variant="outlined"
+                endIcon={<ArrowDropDownIcon />}
+                onClick={handleCustomerMenuClick}
+              >
+                Change customer
+              </Button>
+              <Menu
+                id="customer-menu"
+                anchorEl={customerMenuAnchorEl}
+                anchorOrigin={{
+                  vertical: 'bottom',
+                  horizontal: 'right',
+                }}
+                transformOrigin={{
+                  vertical: 'top',
+                  horizontal: 'right',
+                }}
+                open={customerMenuOpen}
+                aria-labelledby="assign-menu-button"
+                onClose={handleCustomerMenuClose}
+              >
+                {permissions.includes('transfer-customer') && (
+                  <MenuItem onClick={handleOpenCustomerTransferDialog}>
+                    <ListItemText>
+                      <Stack direction="row" alignItems="center" spacing={1}>
+                        <SwapHorizIcon />
+                        <Typography>Transfer request to a different customer</Typography>
+                      </Stack>
+                    </ListItemText>
+                  </MenuItem>
+                )}
+                {permissions.includes('edit-customer-info') && (
+                  <MenuItem onClick={handleOpenCustomerEditDialog}>
+                    <ListItemText>
+                      <Stack direction="row" alignItems="center" spacing={1}>
+                        <EditIcon />
+                        <Typography>Edit current customer information</Typography>
+                      </Stack>
+                    </ListItemText>
+                  </MenuItem>
+                )}
+              </Menu>
+              <CustomerTransferDialog
+                open={customerTransferDialogOpen}
+                onClose={() => setCustomerTransferDialogOpen(false)}
+                requestId={requestId}
+                currentCustomerId={customer.id}
+              />
+              <CustomerEditDialog
+                open={customerEditDialogOpen}
+                onClose={() => setCustomerEditDialogOpen(false)}
+                customer={customer}
+              />
+            </>
           )}
-          {editing && (
-            <Stack direction="row">
-              {!updateCustomerMutation.isPending && (
-                <IconButton onClick={handleEditSubmit}>
-                  <CheckIcon />
-                </IconButton>
-              )}
-              {updateCustomerMutation.isPending && <CircularProgress />}
-              <IconButton onClick={handleEditCancel}>
-                <ClearIcon />
-              </IconButton>
-            </Stack>
-          )} */}
         </Stack>
       }
     >
@@ -353,77 +332,21 @@ export const RequestCustomerPanel: React.FC<RequestCustomerPanelProps> = ({
           }}
         >
           <TableBody>
-            {editing && (
-              <TableRow>
-                <TableCell colSpan={2}>
-                  <Alert severity="info">
-                    Changes to customer information will apply to all requests associated with this
-                    customer. If you need to change the associated customer, please contact an
-                    administrator or taconnect@lbl.gov.
-                  </Alert>
-                </TableCell>
-              </TableRow>
-            )}
             <TableRow>
               <TableCell>Name</TableCell>
-              <TableCell>
-                {!editing && <>{customer.name}</>}
-                {editing && (
-                  <TextField
-                    fullWidth
-                    variant="outlined"
-                    value={name}
-                    onChange={handleNameChange}
-                  />
-                )}
-              </TableCell>
+              <TableCell>{customer.name}</TableCell>
             </TableRow>
             <TableRow>
               <TableCell>Email</TableCell>
-              <TableCell>
-                {!editing && <>{customer.email}</>}
-                {editing && (
-                  <TextField
-                    fullWidth
-                    variant="outlined"
-                    value={email}
-                    error={emailError}
-                    helperText={emailHelperText}
-                    onChange={handleEmailChange}
-                    type="email"
-                  />
-                )}
-              </TableCell>
+              <TableCell>{customer.email}</TableCell>
             </TableRow>
             <TableRow>
               <TableCell>Phone</TableCell>
-              <TableCell>
-                {!editing && <>{customer.phone}</>}
-                {editing && (
-                  <PhoneInput
-                    variant="outlined"
-                    id="phone-input"
-                    value={phone}
-                    onChange={handlePhoneChange}
-                    error={phoneError}
-                    required
-                  />
-                )}
-              </TableCell>
+              <TableCell>{customer.phone}</TableCell>
             </TableRow>
             <TableRow>
               <TableCell>Job Title</TableCell>
-              <TableCell>
-                {!editing && <>{customer.title}</>}
-                {editing && (
-                  <TextField
-                    fullWidth
-                    variant="outlined"
-                    value={title}
-                    onChange={handleTitleChange}
-                  />
-                )}
-              </TableCell>
+              <TableCell>{customer.title}</TableCell>
             </TableRow>
             <TableRow>
               <TableCell>Transmission Planning Region</TableCell>
