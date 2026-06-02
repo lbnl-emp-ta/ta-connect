@@ -49,6 +49,7 @@ import { useToastContext } from '@/features/toasts/ToastContext';
 import { ToastMessage } from '@/features/toasts/ToastMessage';
 import { PhoneInput } from '@/components/PhoneInput';
 import { CustomerTransferDialog } from '@/features/customers/CustomerTransferDialog';
+import { CustomerEditDialog } from '@/features/customers/CustomerEditDialog';
 
 interface RequestCustomerPanelProps {
   customer: TACustomer;
@@ -71,6 +72,7 @@ export const RequestCustomerPanel: React.FC<RequestCustomerPanelProps> = ({
   const [customerMenuAnchorEl, setCustomerMenuAnchorEl] = useState<null | HTMLElement>(null);
   const customerMenuOpen = Boolean(customerMenuAnchorEl);
   const [customerTransferDialogOpen, setCustomerTransferDialogOpen] = useState(false);
+  const [customerEditDialogOpen, setCustomerEditDialogOpen] = useState(false);
   const { setShowToast, setToastMessage } = useToastContext();
   const [org, setOrg] = useState<TACustomer['org']['id']>();
   const [orgType, setOrgType] = useState<TAOrganizationType['id']>();
@@ -83,7 +85,10 @@ export const RequestCustomerPanel: React.FC<RequestCustomerPanelProps> = ({
   const [phoneError, setPhoneError] = useState(false);
   const [title, setTitle] = useState<TACustomer['title']>();
   const [state, setState] = useState<TACustomer['state']['id']>();
-  const possibleActions: PermissionAction[] = ['edit-customer', 'edit-customer-organization-type'];
+  const possibleActions: PermissionAction[] = [
+    'edit-customer-info',
+    'edit-customer-info-organization-type',
+  ];
   const canEdit = permissions.some((item) => possibleActions.includes(item));
 
   /**
@@ -116,8 +121,9 @@ export const RequestCustomerPanel: React.FC<RequestCustomerPanelProps> = ({
     setCustomerTransferDialogOpen(true);
   };
 
-  const handleEditClick = () => {
-    setEditing(true);
+  const handleOpenCustomerEditDialog = () => {
+    setCustomerMenuAnchorEl(null);
+    setCustomerEditDialogOpen(true);
   };
 
   /**
@@ -292,20 +298,27 @@ export const RequestCustomerPanel: React.FC<RequestCustomerPanelProps> = ({
                 </Stack>
               </ListItemText>
             </MenuItem>
-            <MenuItem>
-              <ListItemText>
-                <Stack direction="row" alignItems="center" spacing={1}>
-                  <EditIcon />
-                  <Typography>Edit current customer information</Typography>
-                </Stack>
-              </ListItemText>
-            </MenuItem>
+            {permissions.includes('edit-customer-info') && (
+              <MenuItem onClick={handleOpenCustomerEditDialog}>
+                <ListItemText>
+                  <Stack direction="row" alignItems="center" spacing={1}>
+                    <EditIcon />
+                    <Typography>Edit current customer information</Typography>
+                  </Stack>
+                </ListItemText>
+              </MenuItem>
+            )}
           </Menu>
           <CustomerTransferDialog
             open={customerTransferDialogOpen}
             onClose={() => setCustomerTransferDialogOpen(false)}
             requestId={requestId}
             currentCustomerId={customer.id}
+          />
+          <CustomerEditDialog
+            open={customerEditDialogOpen}
+            onClose={() => setCustomerEditDialogOpen(false)}
+            customer={customer}
           />
           {/* {canEdit && !editing && (
             <IconButton onClick={handleEditClick}>
@@ -446,15 +459,15 @@ export const RequestCustomerPanel: React.FC<RequestCustomerPanelProps> = ({
               <TableCell>Organization Type</TableCell>
               <TableCell>
                 <Stack direction="row" alignItems="center" spacing={1}>
-                  {(!editing || !permissions.includes('edit-customer-organization-type')) && (
+                  {(!editing || !permissions.includes('edit-customer-info-organization-type')) && (
                     <span>{customer.org.type.name}</span>
                   )}
-                  {editing && !permissions.includes('edit-customer-organization-type') && (
+                  {editing && !permissions.includes('edit-customer-info-organization-type') && (
                     <Tooltip title="Only admins can edit the organization type." placement="top">
                       <ErrorIcon sx={{ color: 'grey.500' }} />
                     </Tooltip>
                   )}
-                  {editing && permissions.includes('edit-customer-organization-type') && (
+                  {editing && permissions.includes('edit-customer-info-organization-type') && (
                     <>
                       <Select value={orgType} onChange={handleOrgTypeChange}>
                         {allOrganizationTypes?.map((orgTypeItem) => (

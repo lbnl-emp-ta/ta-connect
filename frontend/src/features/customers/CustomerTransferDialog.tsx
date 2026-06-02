@@ -88,13 +88,13 @@ export const CustomerTransferDialog: React.FC<CustomerTransferDialogProps> = ({
       setShowToast(true);
       setToastAutoHideDuration(null);
       setToastMessage(
-        <ToastMessage icon={<CircularProgress />}>Saving user information</ToastMessage>
+        <ToastMessage icon={<CircularProgress />}>Saving customer information</ToastMessage>
       );
     } else if (transferCustomerMutation.isSuccess) {
       setShowToast(true);
       setToastAutoHideDuration(6000);
       setToastMessage(
-        <ToastMessage icon={<CheckCircleIcon />}>User information saved</ToastMessage>
+        <ToastMessage icon={<CheckCircleIcon />}>Customer information saved</ToastMessage>
       );
     } else if (transferCustomerMutation.isError) {
       setShowToast(true);

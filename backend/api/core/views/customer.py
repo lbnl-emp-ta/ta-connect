@@ -46,11 +46,18 @@ class CustomerDetailView(views.APIView):
             customer_obj = Customer.objects.get(pk=customer_id)
         except Customer.DoesNotExist:
             return Response(data={"message":"Customer with given ID does not exist"})
+        
+        # Make sure the customer that is being edited is associated with at least
+        # one request that the user has a role on. i.e. preventing user from editing arbitrary customers in system.
+        customer_relationships = CustomerRequestRelationship.objects.filter(customer=customer_obj)
+        has_permission = False
+        for relationship in customer_relationships:
+            ta_request = relationship.request
+            if CanEditCustomerInfo().has_object_permission(request, self, ta_request):
+                has_permission = True
+                break
 
-        # Making sure the customer that is being edited is associated with a request that is actionable for the user
-        # i.e. preventing user from editing arbitrary customers in system.
-        # Admins can edit any customer
-        if not IsAdmin().has_permission(request) and not CustomerRequestRelationship.objects.filter(customer=customer_obj).filter(request__in=BaseUserAwareRequest(request=request).get_actionable()):
+        if not has_permission:
             return Response(data={"message": "Insufficient authorization to edit given customer's information"}, status=status.HTTP_400_BAD_REQUEST)
 
         customer_patch_data = dict() 
