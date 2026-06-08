@@ -20,6 +20,14 @@ export interface TAOrganization {
   };
 }
 
+export interface TAOrganizationMutation {
+  name?: string;
+  address?: string;
+  type?: number;
+  state?: number;
+  transmission_planning_region?: number;
+}
+
 export interface TAOrganizationTransferMutation {
   organization_id: number;
 }
@@ -30,21 +38,6 @@ export interface TACustomer {
   name: string;
   phone: string;
   title: string;
-  org: {
-    id: number;
-    address: string;
-    name: string;
-    type: TAOrganizationType;
-  };
-  state: {
-    id: number;
-    name: string;
-    abbreviation: string;
-  };
-  tpr: {
-    id: number;
-    name: string;
-  };
   requests: number[];
 }
 
@@ -215,7 +208,9 @@ export type PermissionAction =
   | 'edit-actual-completion-date'
   | 'edit-customer-info'
   | 'transfer-customer'
-  | 'edit-customer-info-organization-type'
+  | 'transfer-organization'
+  | 'edit-organization-info'
+  | 'transfer-organization-type'
   | 'assign-forward-to-reception'
   | 'assign-forward-to-program'
   | 'assign-forward-to-lab'
@@ -249,6 +244,7 @@ export interface TARequestDetail {
   effort: string;
   date_created: string;
   customers: TACustomer[];
+  organization: TAOrganization;
   expert: TAExpert | null;
   owner?: TAOwner;
   program?: TAProgram | null;

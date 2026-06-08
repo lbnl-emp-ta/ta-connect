@@ -1,14 +1,18 @@
-import { TACustomer, TACustomerMutation } from '@/api/dashboard/types';
-import { useCustomerMutation } from '@/api/queryOptions';
-import { PhoneInput } from '@/components/PhoneInput';
+import { TAOrganization, TAOrganizationMutation } from '@/api/dashboard/types';
+import { State, TransmissionPlanningRegion } from '@/api/forms/types';
+import {
+  statesQueryOptions,
+  transmissionPlanningRegionsQueryOptions,
+  useOrganizationMutation,
+} from '@/api/queryOptions';
 import { useAdminModeContext } from '@/features/admin-mode/AdminModeContext';
 import { useToastContext } from '@/features/toasts/ToastContext';
 import { ToastMessage } from '@/features/toasts/ToastMessage';
-import { isValidEmail, isValidUSTelephone } from '@/utils/utils';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import ErrorIcon from '@mui/icons-material/Error';
 import {
   Alert,
+  Autocomplete,
   Button,
   CircularProgress,
   Dialog,
@@ -18,42 +22,45 @@ import {
   Stack,
   TextField,
 } from '@mui/material';
+import { useSuspenseQuery } from '@tanstack/react-query';
 import { useCallback, useEffect, useState } from 'react';
 
 interface OrganizationEditDialogProps {
   open: boolean;
   onClose: () => void;
-  customer: TACustomer;
+  organization: TAOrganization;
 }
 
 export const OrganizationEditDialog: React.FC<OrganizationEditDialogProps> = ({
   open,
   onClose,
-  customer,
+  organization,
 }) => {
   const { isAdminMode } = useAdminModeContext();
-  const updateCustomerMutation = useCustomerMutation(customer?.id.toString() || '', isAdminMode);
+  const updateOrganizationMutation = useOrganizationMutation(
+    organization?.id.toString() || '',
+    isAdminMode
+  );
+  const { data: allTransmissionPlanningRegions } = useSuspenseQuery(
+    transmissionPlanningRegionsQueryOptions()
+  );
+  const { data: allStates } = useSuspenseQuery(statesQueryOptions());
   const { setShowToast, setToastMessage, setToastAutoHideDuration } = useToastContext();
-  const [email, setEmail] = useState<TACustomer['email']>();
-  const [emailError, setEmailError] = useState(false);
-  const [emailHelperText, setEmailHelperText] = useState('');
-  const [name, setName] = useState<TACustomer['name']>();
-  const [phone, setPhone] = useState<TACustomer['phone']>();
-  const [phoneError, setPhoneError] = useState(false);
-  const [title, setTitle] = useState<TACustomer['title']>();
+  const [name, setName] = useState<TAOrganization['name']>();
+  const [address, setAddress] = useState<TAOrganization['address']>();
+  const [transmissionPlanningRegion, setTransmissionPlanningRegion] =
+    useState<TransmissionPlanningRegion>();
+  const [state, setState] = useState<State>();
 
   /**
-   * Reset form values based on customer data.
+   * Reset form values based on organization data.
    */
   const resetFormValues = useCallback(() => {
-    setEmail(customer.email || '');
-    setEmailError(false);
-    setEmailHelperText('');
-    setName(customer.name || '');
-    setPhone(customer.phone);
-    setPhoneError(false);
-    setTitle(customer.title || '');
-  }, [customer]);
+    setName(organization.name || '');
+    setAddress(organization.address || '');
+    setTransmissionPlanningRegion(organization.transmission_planning_region);
+    setState(organization.state);
+  }, [organization]);
 
   /**
    * Handle submission of edited request information.
@@ -62,28 +69,28 @@ export const OrganizationEditDialog: React.FC<OrganizationEditDialogProps> = ({
    */
   const handleEditSubmit: React.FormEventHandler<HTMLFormElement> = (e) => {
     e.preventDefault();
-    const mutationData = {} as Partial<TACustomerMutation>;
-    if (name !== customer?.name) {
+    const mutationData = {} as Partial<TAOrganizationMutation>;
+    if (name !== organization?.name) {
       mutationData.name = name;
     }
-    if (email !== customer?.email) {
-      mutationData.email = email;
+    if (address !== organization?.address) {
+      mutationData.address = address;
     }
-    if (phone !== customer?.phone) {
-      mutationData.phone = phone;
+    if (transmissionPlanningRegion !== organization?.transmission_planning_region) {
+      mutationData.transmission_planning_region = transmissionPlanningRegion?.id;
     }
-    if (title !== customer?.title) {
-      mutationData.title = title;
+    if (state !== organization?.state) {
+      mutationData.state = state?.id;
     }
     if (Object.keys(mutationData).length === 0) {
       onClose();
       return;
     }
-    updateCustomerMutation.mutate(mutationData);
+    updateOrganizationMutation.mutate(mutationData);
   };
 
   const handleEditCancel = () => {
-    updateCustomerMutation.reset();
+    updateOrganizationMutation.reset();
     resetFormValues();
     onClose();
   };
@@ -94,66 +101,64 @@ export const OrganizationEditDialog: React.FC<OrganizationEditDialogProps> = ({
     setName(event.target.value);
   };
 
-  const handleEmailChange: React.ChangeEventHandler<HTMLInputElement | HTMLTextAreaElement> = (
+  const handleAddressChange: React.ChangeEventHandler<HTMLInputElement | HTMLTextAreaElement> = (
     event
   ) => {
-    const isValid = isValidEmail(event.target.value);
-    setEmailError(!isValid);
-    setEmailHelperText(isValid ? '' : 'Not a valid email address.');
-    setEmail(event.target.value);
+    setAddress(event.target.value);
   };
 
-  const handlePhoneChange: React.ChangeEventHandler<HTMLInputElement | HTMLTextAreaElement> = (
-    event
+  const handleTransmissionPlanningRegionChange = (
+    _event: React.SyntheticEvent<Element, Event>,
+    newValue: TransmissionPlanningRegion | null
   ) => {
-    const isValid = isValidUSTelephone(event.target.value);
-    setPhoneError(!isValid);
-    setPhone(event.target.value);
+    setTransmissionPlanningRegion(newValue || undefined);
   };
 
-  const handleTitleChange: React.ChangeEventHandler<HTMLInputElement | HTMLTextAreaElement> = (
-    event
+  const handleStateChange = (
+    _event: React.SyntheticEvent<Element, Event>,
+    newValue: State | null
   ) => {
-    setTitle(event.target.value);
+    setState(newValue || undefined);
   };
 
   useEffect(() => {
     resetFormValues();
-  }, [customer, resetFormValues]);
+  }, [organization, resetFormValues]);
 
   useEffect(() => {
-    if (updateCustomerMutation.isPending) {
+    if (updateOrganizationMutation.isPending) {
       setShowToast(true);
       setToastAutoHideDuration(null);
       setToastMessage(
-        <ToastMessage icon={<CircularProgress />}>Saving customer information</ToastMessage>
+        <ToastMessage icon={<CircularProgress />}>Saving organization information</ToastMessage>
       );
-    } else if (updateCustomerMutation.isSuccess) {
+    } else if (updateOrganizationMutation.isSuccess) {
       onClose();
       setShowToast(true);
       setToastMessage(
-        <ToastMessage icon={<CheckCircleIcon />}>Customer information saved</ToastMessage>
+        <ToastMessage icon={<CheckCircleIcon />}>Organization information saved</ToastMessage>
       );
-    } else if (updateCustomerMutation.isError) {
+    } else if (updateOrganizationMutation.isError) {
       setShowToast(true);
       setToastMessage(
-        <ToastMessage icon={<ErrorIcon />}>{updateCustomerMutation.error.message}</ToastMessage>
+        <ToastMessage icon={<ErrorIcon />}>{updateOrganizationMutation.error.message}</ToastMessage>
       );
     }
   }, [
-    updateCustomerMutation.isSuccess,
-    updateCustomerMutation.isError,
-    updateCustomerMutation.error?.message,
+    updateOrganizationMutation.isSuccess,
+    updateOrganizationMutation.isError,
+    updateOrganizationMutation.error?.message,
   ]);
 
   return (
     <Dialog open={open} maxWidth="md" fullWidth onClose={handleEditCancel} disableRestoreFocus>
-      <DialogTitle>Edit Customer</DialogTitle>
+      <DialogTitle>Edit Organization</DialogTitle>
       <DialogContent>
         <Alert severity="info" sx={{ marginBottom: 4 }}>
-          Changes to customer information will apply to all requests associated with this customer.
+          Changes to organization information will apply to all requests associated with this
+          organization.
         </Alert>
-        <form onSubmit={handleEditSubmit} id="customer-edit-form">
+        <form onSubmit={handleEditSubmit} id="organization-edit-form">
           <Stack>
             <TextField
               label="Full Name"
@@ -163,30 +168,31 @@ export const OrganizationEditDialog: React.FC<OrganizationEditDialogProps> = ({
               onChange={handleNameChange}
             />
             <TextField
-              label="Email"
+              label="Address"
               fullWidth
               variant="outlined"
-              value={email}
-              error={emailError}
-              helperText={emailHelperText}
-              onChange={handleEmailChange}
-              type="email"
+              value={address}
+              onChange={handleAddressChange}
+              multiline
+              rows={4}
             />
-            <PhoneInput
-              label="Phone"
-              variant="outlined"
-              id="phone-input"
-              value={phone}
-              onChange={handlePhoneChange}
-              error={phoneError}
-              required
+            <Autocomplete
+              value={transmissionPlanningRegion}
+              options={allTransmissionPlanningRegions || []}
+              getOptionLabel={(option) => option.name}
+              onChange={handleTransmissionPlanningRegionChange}
+              renderInput={(params) => (
+                <TextField {...params} label="Transmission Planning Region" />
+              )}
+              isOptionEqualToValue={(option, value) => option.id === value.id}
             />
-            <TextField
-              label="Job Title"
-              fullWidth
-              variant="outlined"
-              value={title}
-              onChange={handleTitleChange}
+            <Autocomplete
+              value={state}
+              options={allStates || []}
+              getOptionLabel={(option) => option.name}
+              onChange={handleStateChange}
+              renderInput={(params) => <TextField {...params} label="State" />}
+              isOptionEqualToValue={(option, value) => option.id === value.id}
             />
           </Stack>
         </form>
@@ -197,7 +203,7 @@ export const OrganizationEditDialog: React.FC<OrganizationEditDialogProps> = ({
           <Button variant="outlined" onClick={handleEditCancel}>
             Cancel
           </Button>
-          <Button variant="contained" type="submit" form="customer-edit-form">
+          <Button variant="contained" type="submit" form="organization-edit-form">
             Save
           </Button>
         </Stack>

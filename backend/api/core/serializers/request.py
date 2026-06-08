@@ -10,6 +10,7 @@ class RequestDetailSerializer(serializers.Serializer):
     program = ProgramSerializer(read_only=True)
     lab = LabSerializer(read_only=True)
     expert = ExpertSerializer(read_only=True)
+    organization = OrganizationSerializer(read_only=True)
     status = serializers.SlugRelatedField(
         slug_field="name", 
         required=False, 

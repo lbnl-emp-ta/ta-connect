@@ -59,7 +59,7 @@ export const RequestAssignForwardButton: React.FC<RequestAssignForwardButtonProp
   } = useRequestsContext();
   const { setShowToast, setToastMessage } = useToastContext();
   const [searchTerm, setSearchTerm] = useState('');
-  const requestOrganizationType = request.customers[0].org.type;
+  const requestOrganizationType = request.organization.type;
   const ownersContainsExperts =
     owners?.some((owner) => owner.domain_type === 'expert') &&
     (request.status === 'assigned-to-lab' || request.status === 'rejected-by-expert');

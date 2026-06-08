@@ -35,12 +35,13 @@ urlpatterns = [
     path('experts/', ExpertsListView.as_view(), name="experts-list"),
     path('depths/', DepthListView.as_view(), name="depth-list"),
     path('states/', StateListView.as_view(), name="state-list"),
+
     path('organizations/', OrganizationListView.as_view(), name="organization-list"),
-    
+    path('organizations/<int:organization_id>', OrganizationDetailView.as_view(), name="organization-list"),
     path('organization-types/', OrganizationTypeListView.as_view(), name="organization-type-list"),
     path('transmission-planning-regions/', TransmissionPlanningRegionListView.as_view(), name="transmission-planning-regions-list"),
+
     path('customer-request-relationships/', CustomerRequestRelationshipListView.as_view(), name="customer-request-relationships-list"),
-    
     path('customers/', CustomerListView.as_view(), name="customer-list"),
     path('customers/<int:customer_id>', CustomerDetailView.as_view(), name="customer-edit"),
     path('customer-request-relationships/', CustomerRequestRelationshipListView.as_view(), name="customer-request-relationship-create"),

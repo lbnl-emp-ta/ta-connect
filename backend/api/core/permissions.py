@@ -189,7 +189,10 @@ CanEditActualCompletionDate = compose(IsAdmin, IsCoordinator, IsProgramLead, IsL
 # Customer Edits
 CanEditCustomerInfo = compose(IsAdmin, IsCoordinator, IsProgramLead, IsLabLead)
 CanTransferCustomer = compose(IsAdmin, IsCoordinator, IsProgramLead, IsLabLead, IsExpert)
-CanEditCustomerOrgType = compose(IsAdmin)
+# Organization Edits
+CanEditOrganizationInfo = compose(IsAdmin, IsCoordinator)
+CanTransferOrganization = compose(IsAdmin, IsCoordinator, IsProgramLead)
+CanTransferOrganizationType = compose(IsAdmin)
 # Notes and Attachments
 CanAddNote = compose(IsAdmin, IsCoordinator, IsProgramLead, IsLabLead, IsExpert)
 CanDeleteNote = compose(IsAdmin, IsCoordinator, IsProgramLead, IsLabLead, IsExpert)

@@ -142,7 +142,7 @@ export const RequestDetailLayout: React.FC<RequestDetailLayoutProps> = ({ reques
               requestId={selectedRequest.id}
             />
             <RequestOrganizationPanel
-              customer={selectedRequest.customers[0]}
+              organization={selectedRequest.organization}
               permissions={selectedRequest.permissions ?? []}
               requestId={selectedRequest.id}
             />

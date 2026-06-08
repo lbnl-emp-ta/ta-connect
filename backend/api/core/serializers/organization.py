@@ -1,12 +1,23 @@
 from rest_framework import serializers
 
-from core.models import Organization
+from core.models import Organization, State, TransmissionPlanningRegion
 from core.serializers import *
 
 class OrganizationSerializer(serializers.ModelSerializer):
     state = StateSerializer()
     transmission_planning_region = TransmissionPlanningRegionSerializer()
     type = OrganizationTypeSerializer()
+
+    class Meta:
+        model = Organization
+        fields = "__all__"
+
+
+class OrganizationEditSerializer(serializers.ModelSerializer):
+    name = serializers.CharField(max_length=256, required=False)
+    address = serializers.CharField(max_length=512, required=False)
+    transmission_planning_region = serializers.PrimaryKeyRelatedField(queryset=TransmissionPlanningRegion.objects.all(), required=False)
+    state = serializers.PrimaryKeyRelatedField(queryset=State.objects.all(), required=False)
 
     class Meta:
         model = Organization

@@ -1,6 +1,6 @@
 import { TAOrganizationTransferMutation } from '@/api/dashboard/types';
 import { AutocompleteOption } from '@/api/forms/types';
-import { organizationQueryOptions, useOrganizationTransferMutation } from '@/api/queryOptions';
+import { organizationsQueryOptions, useOrganizationTransferMutation } from '@/api/queryOptions';
 import { AppLink } from '@/components/AppLink';
 import { useAdminModeContext } from '@/features/admin-mode/AdminModeContext';
 import { useToastContext } from '@/features/toasts/ToastContext';
@@ -37,7 +37,7 @@ export const OrganizationTransferDialog: React.FC<OrganizationTransferDialogProp
     requestId.toString(),
     isAdminMode
   );
-  const { data: organizations } = useSuspenseQuery(organizationQueryOptions());
+  const { data: organizations } = useSuspenseQuery(organizationsQueryOptions());
   const organizationOptions: AutocompleteOption[] =
     organizations?.map((org) => {
       return {

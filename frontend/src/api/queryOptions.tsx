@@ -1,6 +1,3 @@
-import CheckCircleIcon from '@mui/icons-material/CheckCircle';
-import ErrorIcon from '@mui/icons-material/Error';
-import { queryOptions, useMutation, UseMutationOptions } from '@tanstack/react-query';
 import { loginMutation } from '@/api/accounts/login';
 import { logoutMutation } from '@/api/accounts/logout';
 import { deleteData, fetchData, patchData, postData, postForm } from '@/api/dashboard';
@@ -14,6 +11,8 @@ import {
   TAExpert,
   TAIdentity,
   TANote,
+  TAOrganization,
+  TAOrganizationMutation,
   TAOrganizationTransferMutation,
   TAOwner,
   TARequestDetail,
@@ -26,7 +25,6 @@ import {
 import { submitIntakeMutation } from '@/api/forms';
 import {
   IntakeFormData,
-  Organization,
   OrganizationType,
   State,
   TransmissionPlanningRegion,
@@ -35,6 +33,9 @@ import { sessionsApi } from '@/api/sessions';
 import { queryClient } from '@/App';
 import { useToastContext } from '@/features/toasts/ToastContext';
 import { ToastMessage } from '@/features/toasts/ToastMessage';
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import ErrorIcon from '@mui/icons-material/Error';
+import { queryOptions, useMutation, UseMutationOptions } from '@tanstack/react-query';
 
 export const apiUrl = import.meta.env.VITE_API_URL as string;
 
@@ -126,11 +127,11 @@ export const statesQueryOptions = () =>
     queryFn: () => fetchData<State[]>(`${apiUrl}/states/`),
   });
 
-export const organizationQueryOptions = () =>
+export const organizationsQueryOptions = () =>
   queryOptions({
     staleTime: 120_000, // stale after 2 minutes
-    queryKey: ['organization'],
-    queryFn: () => fetchData<Organization[]>(`${apiUrl}/organizations/`),
+    queryKey: ['organizations'],
+    queryFn: () => fetchData<TAOrganization[]>(`${apiUrl}/organizations/`),
   });
 
 export const organizationTypesQueryOptions = () =>
@@ -223,6 +224,19 @@ export const useOrganizationTransferMutation = (requestId: string, isAdminMode?:
     mutationFn: (data: TAOrganizationTransferMutation) =>
       postData(
         `${import.meta.env.VITE_API_URL}/requests/${requestId}/transfer-organization/`,
+        data,
+        isAdminMode
+      ),
+    onSuccess: () => queryClient.invalidateQueries(),
+  });
+};
+
+export const useOrganizationMutation = (organizationId: string, isAdminMode?: boolean) => {
+  return useMutation({
+    mutationKey: ['organizations', 'update', organizationId, isAdminMode],
+    mutationFn: (data: Partial<TAOrganizationMutation>) =>
+      patchData<TACustomerMutation>(
+        `${import.meta.env.VITE_API_URL}/organizations/${organizationId}`,
         data,
         isAdminMode
       ),

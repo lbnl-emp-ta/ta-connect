@@ -1,49 +1,25 @@
-import {
-  PermissionAction,
-  TACustomer,
-  TACustomerMutation,
-  TAOrganizationType,
-} from '@/api/dashboard/types';
-import {
-  organizationQueryOptions,
-  organizationTypesQueryOptions,
-  statesQueryOptions,
-  transmissionPlanningRegionsQueryOptions,
-  useCustomerMutation,
-} from '@/api/queryOptions';
+import { PermissionAction, TACustomer } from '@/api/dashboard/types';
 import { InfoPanel } from '@/components/InfoPanel';
-import { PhoneInput } from '@/components/PhoneInput';
-import { useAdminModeContext } from '@/features/admin-mode/AdminModeContext';
 import { CustomerEditDialog } from '@/features/customers/CustomerEditDialog';
 import { CustomerTransferDialog } from '@/features/customers/CustomerTransferDialog';
-import { useToastContext } from '@/features/toasts/ToastContext';
-import { ToastMessage } from '@/features/toasts/ToastMessage';
-import { isValidEmail, isValidUSTelephone } from '@/utils/utils';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
-import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import EditIcon from '@mui/icons-material/Edit';
-import ErrorIcon from '@mui/icons-material/Error';
 import PeopleAltIcon from '@mui/icons-material/PeopleAlt';
 import SwapHorizIcon from '@mui/icons-material/SwapHoriz';
 import {
-  Alert,
   Button,
   ListItemText,
   Menu,
   MenuItem,
-  Select,
   Stack,
   Table,
   TableBody,
   TableCell,
   TableContainer,
   TableRow,
-  TextField,
-  Tooltip,
   Typography,
 } from '@mui/material';
-import { useSuspenseQuery } from '@tanstack/react-query';
-import { ChangeEvent, useCallback, useEffect, useState } from 'react';
+import { useState } from 'react';
 
 interface RequestCustomerPanelProps {
   customer: TACustomer;
@@ -56,48 +32,12 @@ export const RequestCustomerPanel: React.FC<RequestCustomerPanelProps> = ({
   permissions,
   requestId,
 }) => {
-  const { isAdminMode } = useAdminModeContext();
-  const { data: allOrganizations } = useSuspenseQuery(organizationQueryOptions());
-  const { data: allOrganizationTypes } = useSuspenseQuery(organizationTypesQueryOptions());
-  const { data: allTpr } = useSuspenseQuery(transmissionPlanningRegionsQueryOptions());
-  const { data: allStates } = useSuspenseQuery(statesQueryOptions());
-  const updateCustomerMutation = useCustomerMutation(customer?.id.toString() || '', isAdminMode);
-  const [editing, setEditing] = useState(false);
   const [customerMenuAnchorEl, setCustomerMenuAnchorEl] = useState<null | HTMLElement>(null);
   const customerMenuOpen = Boolean(customerMenuAnchorEl);
   const [customerTransferDialogOpen, setCustomerTransferDialogOpen] = useState(false);
   const [customerEditDialogOpen, setCustomerEditDialogOpen] = useState(false);
-  const { setShowToast, setToastMessage } = useToastContext();
-  const [org, setOrg] = useState<TACustomer['org']['id']>();
-  const [orgType, setOrgType] = useState<TAOrganizationType['id']>();
-  const [tpr, setTpr] = useState<TACustomer['tpr']['id']>();
-  const [email, setEmail] = useState<TACustomer['email']>();
-  const [emailError, setEmailError] = useState(false);
-  const [emailHelperText, setEmailHelperText] = useState('');
-  const [name, setName] = useState<TACustomer['name']>();
-  const [phone, setPhone] = useState<TACustomer['phone']>();
-  const [phoneError, setPhoneError] = useState(false);
-  const [title, setTitle] = useState<TACustomer['title']>();
-  const [state, setState] = useState<TACustomer['state']['id']>();
   const possibleActions: PermissionAction[] = ['edit-customer-info', 'transfer-customer'];
   const canEdit = permissions.some((item) => possibleActions.includes(item));
-
-  /**
-   * Reset form values based on customer data.
-   */
-  const resetFormValues = useCallback(() => {
-    setOrg(customer.org.id);
-    setOrgType(customer.org.type.id);
-    setTpr(customer.tpr.id);
-    setEmail(customer.email || '');
-    setEmailError(false);
-    setEmailHelperText('');
-    setName(customer.name || '');
-    setPhone(customer.phone);
-    setPhoneError(false);
-    setTitle(customer.title || '');
-    setState(customer.state.id);
-  }, [customer]);
 
   const handleCustomerMenuClick = (event: React.MouseEvent<HTMLButtonElement>) => {
     setCustomerMenuAnchorEl(event.currentTarget);
@@ -116,134 +56,6 @@ export const RequestCustomerPanel: React.FC<RequestCustomerPanelProps> = ({
     setCustomerMenuAnchorEl(null);
     setCustomerEditDialogOpen(true);
   };
-
-  /**
-   * Handle submission of edited request information.
-   * Only send fields that have changed to the API.
-   * If a field is set explicitly to null, it will be cleared in the API.
-   */
-  const handleEditSubmit = () => {
-    const mutationData = {} as Partial<TACustomerMutation>;
-    if (name !== customer?.name) {
-      mutationData.name = name;
-    }
-    if (email !== customer?.email) {
-      mutationData.email = email;
-    }
-    if (phone !== customer?.phone) {
-      mutationData.phone = phone;
-    }
-    if (title !== customer?.title) {
-      mutationData.title = title;
-    }
-    if (org !== customer?.org.id) {
-      mutationData.org = org;
-    }
-    if (orgType !== customer?.org.type.id) {
-      mutationData.orgType = orgType;
-    }
-    if (tpr !== customer?.tpr.id) {
-      mutationData.tpr = tpr;
-    }
-    if (state !== customer?.state.id) {
-      mutationData.state = state;
-    }
-    if (Object.keys(mutationData).length === 0) {
-      setEditing(false);
-      return;
-    }
-    updateCustomerMutation.mutate(mutationData);
-  };
-
-  const handleEditCancel = () => {
-    updateCustomerMutation.reset();
-    resetFormValues();
-    setEditing(false);
-  };
-
-  const handleNameChange: React.ChangeEventHandler<HTMLInputElement | HTMLTextAreaElement> = (
-    event
-  ) => {
-    setName(event.target.value);
-  };
-
-  const handleEmailChange: React.ChangeEventHandler<HTMLInputElement | HTMLTextAreaElement> = (
-    event
-  ) => {
-    const isValid = isValidEmail(event.target.value);
-    setEmailError(!isValid);
-    setEmailHelperText(isValid ? '' : 'Not a valid email address.');
-    setEmail(event.target.value);
-  };
-
-  const handlePhoneChange: React.ChangeEventHandler<HTMLInputElement | HTMLTextAreaElement> = (
-    event
-  ) => {
-    const isValid = isValidUSTelephone(event.target.value);
-    setPhoneError(!isValid);
-    setPhone(event.target.value);
-  };
-
-  const handleTitleChange: React.ChangeEventHandler<HTMLInputElement | HTMLTextAreaElement> = (
-    event
-  ) => {
-    setTitle(event.target.value);
-  };
-
-  const handleOrgChange = (
-    event:
-      | ChangeEvent<Omit<HTMLInputElement, 'value'> & { value: number }>
-      | (Event & { target: { value: number; name: string } })
-  ) => {
-    setOrg(event.target.value);
-  };
-
-  const handleOrgTypeChange = (
-    event:
-      | ChangeEvent<Omit<HTMLInputElement, 'value'> & { value: number }>
-      | (Event & { target: { value: number; name: string } })
-  ) => {
-    setOrgType(event.target.value);
-  };
-
-  const handleTprChange = (
-    event:
-      | ChangeEvent<Omit<HTMLInputElement, 'value'> & { value: number }>
-      | (Event & { target: { value: number; name: string } })
-  ) => {
-    setTpr(event.target.value);
-  };
-
-  const handleStateChange = (
-    event:
-      | ChangeEvent<Omit<HTMLInputElement, 'value'> & { value: number }>
-      | (Event & { target: { value: number; name: string } })
-  ) => {
-    setState(event.target.value);
-  };
-
-  useEffect(() => {
-    resetFormValues();
-  }, [customer, resetFormValues]);
-
-  useEffect(() => {
-    if (updateCustomerMutation.isSuccess) {
-      setEditing(false);
-      setShowToast(true);
-      setToastMessage(
-        <ToastMessage icon={<CheckCircleIcon />}>Request information saved</ToastMessage>
-      );
-    } else if (updateCustomerMutation.isError) {
-      setShowToast(true);
-      setToastMessage(
-        <ToastMessage icon={<ErrorIcon />}>{updateCustomerMutation.error.message}</ToastMessage>
-      );
-    }
-  }, [
-    updateCustomerMutation.isSuccess,
-    updateCustomerMutation.isError,
-    updateCustomerMutation.error?.message,
-  ]);
 
   return (
     <InfoPanel
