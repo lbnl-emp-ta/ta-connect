@@ -1,4 +1,5 @@
 import { TACustomerTransferMutation } from '@/api/dashboard/types';
+import { AutocompleteOption } from '@/api/forms/types';
 import { customersQueryOptions, useCustomerTransferMutation } from '@/api/queryOptions';
 import { AppLink } from '@/components/AppLink';
 import { useAdminModeContext } from '@/features/admin-mode/AdminModeContext';
@@ -25,11 +26,6 @@ interface CustomerTransferDialogProps {
   currentCustomerId: number;
 }
 
-interface CustomerOption {
-  label: string;
-  id: number;
-}
-
 export const CustomerTransferDialog: React.FC<CustomerTransferDialogProps> = ({
   open,
   onClose,
@@ -39,7 +35,7 @@ export const CustomerTransferDialog: React.FC<CustomerTransferDialogProps> = ({
   const { isAdminMode } = useAdminModeContext();
   const transferCustomerMutation = useCustomerTransferMutation(requestId.toString(), isAdminMode);
   const { data: customers } = useSuspenseQuery(customersQueryOptions());
-  const customerOptions: CustomerOption[] =
+  const customerOptions: AutocompleteOption[] =
     customers?.map((customer) => {
       return {
         label: customer.name,
@@ -47,14 +43,14 @@ export const CustomerTransferDialog: React.FC<CustomerTransferDialogProps> = ({
       };
     }) || [];
   const currentCustomerOption = customerOptions.find((option) => option.id === currentCustomerId);
-  const [newCustomerChoice, setNewCustomerChoice] = useState<CustomerOption>(
+  const [newCustomerChoice, setNewCustomerChoice] = useState<AutocompleteOption>(
     currentCustomerOption || customerOptions[0]
   );
   const { setShowToast, setToastMessage, setToastAutoHideDuration } = useToastContext();
 
   const handleCustomerChange = (
     _event: React.SyntheticEvent<Element, Event>,
-    newValue: CustomerOption | null
+    newValue: AutocompleteOption | null
   ) => {
     setNewCustomerChoice(newValue || currentCustomerOption || customerOptions[0]);
   };

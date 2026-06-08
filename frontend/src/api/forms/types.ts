@@ -37,3 +37,8 @@ export interface IntakeFormData {
   goals?: string;
   effort: string;
 }
+
+export interface AutocompleteOption {
+  label: string;
+  id: number;
+}

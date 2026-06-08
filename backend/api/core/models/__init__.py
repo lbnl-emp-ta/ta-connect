@@ -3,6 +3,8 @@ from .depth import Depth
 from .user import User
 from .reception import Reception
 from .lab import Lab
+from .state import State
+from .transmission_planning_region import TransmissionPlanningRegion
 from .organization_type import OrganizationType
 from .organization import Organization
 from .topic import Topic
@@ -10,8 +12,6 @@ from .program import Program
 from .owner import Owner
 from .request import Request
 from .closeout_form import CloseoutForm
-from .state import State
-from .transmission_planning_region import TransmissionPlanningRegion
 from .customer import Customer
 from .customer_request_relationship import CustomerRequestRelationship
 from .cohort import Cohort

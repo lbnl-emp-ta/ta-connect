@@ -36,6 +36,7 @@ import { useSuspenseQuery } from '@tanstack/react-query';
 import { useEffect, useState } from 'react';
 import { formatDatetime } from '@/utils/utils';
 import { RequestScopePanel } from '@/features/requests/RequestScopePanel';
+import { RequestOrganizationPanel } from '@/features/requests/RequestOrganizationPanel';
 
 interface RequestDetailLayoutProps {
   requestId: string;
@@ -134,12 +135,17 @@ export const RequestDetailLayout: React.FC<RequestDetailLayoutProps> = ({ reques
                 </TableContainer>
               </InfoPanel>
             )}
+            <RequestInfoPanel request={selectedRequest!} />
             <RequestCustomerPanel
               customer={selectedRequest.customers[0]}
               permissions={selectedRequest.permissions ?? []}
               requestId={selectedRequest.id}
             />
-            <RequestInfoPanel request={selectedRequest!} />
+            <RequestOrganizationPanel
+              customer={selectedRequest.customers[0]}
+              permissions={selectedRequest.permissions ?? []}
+              requestId={selectedRequest.id}
+            />
           </Stack>
         </Grid>
         <Grid size={{ lg: 6, md: 12 }}>
@@ -204,7 +210,7 @@ export const RequestDetailLayout: React.FC<RequestDetailLayoutProps> = ({ reques
               <Stack direction="row" alignItems="center" justifyContent="space-between">
                 <Stack direction="row" spacing={2} alignItems="center">
                   <HistoryIcon color="primary" />
-                  <Typography variant="h5" component="h3" fontWeight="bold">
+                  <Typography variant="h6" component="h3" fontWeight="bold">
                     Audit History
                   </Typography>
                 </Stack>

@@ -1,9 +1,4 @@
-import {
-  PermissionAction,
-  TACustomer,
-  TACustomerMutation,
-  TAOrganizationType,
-} from '@/api/dashboard/types';
+import { PermissionAction, TACustomer, TAOrganizationType } from '@/api/dashboard/types';
 import {
   organizationQueryOptions,
   organizationTypesQueryOptions,
@@ -12,21 +7,18 @@ import {
   useCustomerMutation,
 } from '@/api/queryOptions';
 import { InfoPanel } from '@/components/InfoPanel';
-import { PhoneInput } from '@/components/PhoneInput';
 import { useAdminModeContext } from '@/features/admin-mode/AdminModeContext';
 import { CustomerEditDialog } from '@/features/customers/CustomerEditDialog';
 import { CustomerTransferDialog } from '@/features/customers/CustomerTransferDialog';
 import { useToastContext } from '@/features/toasts/ToastContext';
 import { ToastMessage } from '@/features/toasts/ToastMessage';
-import { isValidEmail, isValidUSTelephone } from '@/utils/utils';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
+import BusinessIcon from '@mui/icons-material/Business';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import EditIcon from '@mui/icons-material/Edit';
 import ErrorIcon from '@mui/icons-material/Error';
-import PeopleAltIcon from '@mui/icons-material/PeopleAlt';
 import SwapHorizIcon from '@mui/icons-material/SwapHoriz';
 import {
-  Alert,
   Button,
   ListItemText,
   Menu,
@@ -38,20 +30,19 @@ import {
   TableCell,
   TableContainer,
   TableRow,
-  TextField,
   Tooltip,
   Typography,
 } from '@mui/material';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { ChangeEvent, useCallback, useEffect, useState } from 'react';
 
-interface RequestCustomerPanelProps {
+interface RequestOrganizationPanelProps {
   customer: TACustomer;
   permissions: PermissionAction[];
   requestId: number;
 }
 
-export const RequestCustomerPanel: React.FC<RequestCustomerPanelProps> = ({
+export const RequestOrganizationPanel: React.FC<RequestOrganizationPanelProps> = ({
   customer,
   permissions,
   requestId,
@@ -71,13 +62,6 @@ export const RequestCustomerPanel: React.FC<RequestCustomerPanelProps> = ({
   const [org, setOrg] = useState<TACustomer['org']['id']>();
   const [orgType, setOrgType] = useState<TAOrganizationType['id']>();
   const [tpr, setTpr] = useState<TACustomer['tpr']['id']>();
-  const [email, setEmail] = useState<TACustomer['email']>();
-  const [emailError, setEmailError] = useState(false);
-  const [emailHelperText, setEmailHelperText] = useState('');
-  const [name, setName] = useState<TACustomer['name']>();
-  const [phone, setPhone] = useState<TACustomer['phone']>();
-  const [phoneError, setPhoneError] = useState(false);
-  const [title, setTitle] = useState<TACustomer['title']>();
   const [state, setState] = useState<TACustomer['state']['id']>();
   const possibleActions: PermissionAction[] = ['edit-customer-info', 'transfer-customer'];
   const canEdit = permissions.some((item) => possibleActions.includes(item));
@@ -89,13 +73,6 @@ export const RequestCustomerPanel: React.FC<RequestCustomerPanelProps> = ({
     setOrg(customer.org.id);
     setOrgType(customer.org.type.id);
     setTpr(customer.tpr.id);
-    setEmail(customer.email || '');
-    setEmailError(false);
-    setEmailHelperText('');
-    setName(customer.name || '');
-    setPhone(customer.phone);
-    setPhoneError(false);
-    setTitle(customer.title || '');
     setState(customer.state.id);
   }, [customer]);
 
@@ -115,79 +92,6 @@ export const RequestCustomerPanel: React.FC<RequestCustomerPanelProps> = ({
   const handleOpenCustomerEditDialog = () => {
     setCustomerMenuAnchorEl(null);
     setCustomerEditDialogOpen(true);
-  };
-
-  /**
-   * Handle submission of edited request information.
-   * Only send fields that have changed to the API.
-   * If a field is set explicitly to null, it will be cleared in the API.
-   */
-  const handleEditSubmit = () => {
-    const mutationData = {} as Partial<TACustomerMutation>;
-    if (name !== customer?.name) {
-      mutationData.name = name;
-    }
-    if (email !== customer?.email) {
-      mutationData.email = email;
-    }
-    if (phone !== customer?.phone) {
-      mutationData.phone = phone;
-    }
-    if (title !== customer?.title) {
-      mutationData.title = title;
-    }
-    if (org !== customer?.org.id) {
-      mutationData.org = org;
-    }
-    if (orgType !== customer?.org.type.id) {
-      mutationData.orgType = orgType;
-    }
-    if (tpr !== customer?.tpr.id) {
-      mutationData.tpr = tpr;
-    }
-    if (state !== customer?.state.id) {
-      mutationData.state = state;
-    }
-    if (Object.keys(mutationData).length === 0) {
-      setEditing(false);
-      return;
-    }
-    updateCustomerMutation.mutate(mutationData);
-  };
-
-  const handleEditCancel = () => {
-    updateCustomerMutation.reset();
-    resetFormValues();
-    setEditing(false);
-  };
-
-  const handleNameChange: React.ChangeEventHandler<HTMLInputElement | HTMLTextAreaElement> = (
-    event
-  ) => {
-    setName(event.target.value);
-  };
-
-  const handleEmailChange: React.ChangeEventHandler<HTMLInputElement | HTMLTextAreaElement> = (
-    event
-  ) => {
-    const isValid = isValidEmail(event.target.value);
-    setEmailError(!isValid);
-    setEmailHelperText(isValid ? '' : 'Not a valid email address.');
-    setEmail(event.target.value);
-  };
-
-  const handlePhoneChange: React.ChangeEventHandler<HTMLInputElement | HTMLTextAreaElement> = (
-    event
-  ) => {
-    const isValid = isValidUSTelephone(event.target.value);
-    setPhoneError(!isValid);
-    setPhone(event.target.value);
-  };
-
-  const handleTitleChange: React.ChangeEventHandler<HTMLInputElement | HTMLTextAreaElement> = (
-    event
-  ) => {
-    setTitle(event.target.value);
   };
 
   const handleOrgChange = (
@@ -250,9 +154,9 @@ export const RequestCustomerPanel: React.FC<RequestCustomerPanelProps> = ({
       header={
         <Stack direction="row" alignItems="center" justifyContent="space-between">
           <Stack direction="row" spacing={2} alignItems="center">
-            <PeopleAltIcon color="primary" />
+            <BusinessIcon color="primary" />
             <Typography variant="h6" component="h3" fontWeight="bold">
-              Customer Information
+              Customer Organization
             </Typography>
           </Stack>
           {canEdit && (
@@ -266,7 +170,7 @@ export const RequestCustomerPanel: React.FC<RequestCustomerPanelProps> = ({
                 endIcon={<ArrowDropDownIcon />}
                 onClick={handleCustomerMenuClick}
               >
-                Change customer
+                Change organization
               </Button>
               <Menu
                 id="customer-menu"
@@ -288,7 +192,7 @@ export const RequestCustomerPanel: React.FC<RequestCustomerPanelProps> = ({
                     <ListItemText>
                       <Stack direction="row" alignItems="center" spacing={1}>
                         <SwapHorizIcon />
-                        <Typography>Transfer request to a different customer</Typography>
+                        <Typography>Transfer request to a different organization</Typography>
                       </Stack>
                     </ListItemText>
                   </MenuItem>
@@ -298,7 +202,7 @@ export const RequestCustomerPanel: React.FC<RequestCustomerPanelProps> = ({
                     <ListItemText>
                       <Stack direction="row" alignItems="center" spacing={1}>
                         <EditIcon />
-                        <Typography>Edit current customer information</Typography>
+                        <Typography>Edit current organization information</Typography>
                       </Stack>
                     </ListItemText>
                   </MenuItem>
@@ -333,20 +237,81 @@ export const RequestCustomerPanel: React.FC<RequestCustomerPanelProps> = ({
         >
           <TableBody>
             <TableRow>
-              <TableCell>Name</TableCell>
-              <TableCell>{customer.name}</TableCell>
+              <TableCell>Organization</TableCell>
+              <TableCell>
+                {!editing && <>{customer.org.name}</>}
+                {editing && (
+                  <Select value={org} onChange={handleOrgChange}>
+                    {allOrganizations?.map((orgItem) => (
+                      <MenuItem key={orgItem.id} value={orgItem.id}>
+                        {orgItem.name}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                )}
+              </TableCell>
             </TableRow>
             <TableRow>
-              <TableCell>Email</TableCell>
-              <TableCell>{customer.email}</TableCell>
+              <TableCell>Organization Type</TableCell>
+              <TableCell>
+                <Stack direction="row" alignItems="center" spacing={1}>
+                  {(!editing || !permissions.includes('edit-customer-info-organization-type')) && (
+                    <span>{customer.org.type.name}</span>
+                  )}
+                  {editing && !permissions.includes('edit-customer-info-organization-type') && (
+                    <Tooltip title="Only admins can edit the organization type." placement="top">
+                      <ErrorIcon sx={{ color: 'grey.500' }} />
+                    </Tooltip>
+                  )}
+                  {editing && permissions.includes('edit-customer-info-organization-type') && (
+                    <>
+                      <Select value={orgType} onChange={handleOrgTypeChange}>
+                        {allOrganizationTypes?.map((orgTypeItem) => (
+                          <MenuItem key={orgTypeItem.id} value={orgTypeItem.id}>
+                            {orgTypeItem.name}
+                          </MenuItem>
+                        ))}
+                      </Select>
+                      <Tooltip
+                        title="Changing the organization type will apply to all customers that use this organization."
+                        placement="top"
+                      >
+                        <ErrorIcon sx={{ color: 'grey.500' }} />
+                      </Tooltip>
+                    </>
+                  )}
+                </Stack>
+              </TableCell>
             </TableRow>
             <TableRow>
-              <TableCell>Phone</TableCell>
-              <TableCell>{customer.phone}</TableCell>
+              <TableCell>Transmission Planning Region</TableCell>
+              <TableCell>
+                {!editing && <>{customer.tpr.name}</>}
+                {editing && (
+                  <Select value={tpr} onChange={handleTprChange}>
+                    {allTpr?.map((tprItem) => (
+                      <MenuItem key={tprItem.id} value={tprItem.id}>
+                        {tprItem.name}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                )}
+              </TableCell>
             </TableRow>
             <TableRow>
-              <TableCell>Job Title</TableCell>
-              <TableCell>{customer.title}</TableCell>
+              <TableCell>State</TableCell>
+              <TableCell>
+                {!editing && <>{customer.state.name}</>}
+                {editing && (
+                  <Select value={state} onChange={handleStateChange}>
+                    {allStates?.map((stateItem) => (
+                      <MenuItem key={stateItem.id} value={stateItem.id}>
+                        {stateItem.name}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                )}
+              </TableCell>
             </TableRow>
           </TableBody>
         </Table>

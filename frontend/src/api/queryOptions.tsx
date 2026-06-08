@@ -14,6 +14,7 @@ import {
   TAExpert,
   TAIdentity,
   TANote,
+  TAOrganizationTransferMutation,
   TAOwner,
   TARequestDetail,
   TARequestDetailMutation,
@@ -195,7 +196,7 @@ export const useCustomerTransferMutation = (requestId: string, isAdminMode?: boo
     mutationKey: ['customer', 'transfer', requestId, isAdminMode],
     mutationFn: (data: TACustomerTransferMutation) =>
       postData(
-        `${import.meta.env.VITE_API_URL}/requests/${requestId}/transfer/`,
+        `${import.meta.env.VITE_API_URL}/requests/${requestId}/transfer-customer/`,
         data,
         isAdminMode
       ),
@@ -209,6 +210,19 @@ export const useCustomerMutation = (customerId: string, isAdminMode?: boolean) =
     mutationFn: (data: Partial<TACustomerMutation>) =>
       patchData<TACustomerMutation>(
         `${import.meta.env.VITE_API_URL}/customers/${customerId}`,
+        data,
+        isAdminMode
+      ),
+    onSuccess: () => queryClient.invalidateQueries(),
+  });
+};
+
+export const useOrganizationTransferMutation = (requestId: string, isAdminMode?: boolean) => {
+  return useMutation({
+    mutationKey: ['organization', 'transfer', requestId, isAdminMode],
+    mutationFn: (data: TAOrganizationTransferMutation) =>
+      postData(
+        `${import.meta.env.VITE_API_URL}/requests/${requestId}/transfer-organization/`,
         data,
         isAdminMode
       ),

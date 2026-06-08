@@ -316,6 +316,10 @@ export interface TACustomerTransferMutation {
   customer_id: number;
 }
 
+export interface TAOrganizationTransferMutation {
+  organization_id: number;
+}
+
 export interface CustomerRequestRelationship {
   id: number;
   request: TARequest;
