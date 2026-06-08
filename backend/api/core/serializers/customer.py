@@ -13,10 +13,6 @@ class CustomerSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 class CustomerEditSerializer(serializers.ModelSerializer):
-    org = serializers.PrimaryKeyRelatedField(queryset=Organization.objects.all(), required=False)
-    orgType = serializers.PrimaryKeyRelatedField(queryset=OrganizationType.objects.all(), required=False)
-    state = serializers.PrimaryKeyRelatedField(queryset=State.objects.all(), required=False)
-    tpr = serializers.PrimaryKeyRelatedField(queryset=TransmissionPlanningRegion.objects.all(), required=False)
     email = serializers.EmailField(max_length=256, required=False, allow_null=True)
     name = serializers.CharField(max_length=256, required=False, allow_null=True)
     phone = serializers.CharField(max_length=64, required=False, allow_null=True)

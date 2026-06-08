@@ -454,7 +454,6 @@ class RequestListView(BaseUserAwareRequest):
                 poc_customer = Request.objects.get(pk=request["id"]).customerrequestrelationship_set.filter(is_poc=True).first().customer
                 data["customer_name"] = poc_customer.name 
                 data["customer_email"] = poc_customer.email 
-                data["customer_state_abbreviation"] = poc_customer.state.abbreviation 
                 requests_data.append(data)
             
             response_data[key] = requests_data

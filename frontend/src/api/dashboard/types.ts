@@ -4,6 +4,26 @@ export interface TAOrganizationType {
   description: string;
 }
 
+export interface TAOrganization {
+  id: number;
+  name: string;
+  address: string;
+  type: TAOrganizationType;
+  state: {
+    id: number;
+    name: string;
+    abbreviation: string;
+  };
+  transmission_planning_region: {
+    id: number;
+    name: string;
+  };
+}
+
+export interface TAOrganizationTransferMutation {
+  organization_id: number;
+}
+
 export interface TACustomer {
   id: number;
   email: string;
@@ -170,7 +190,7 @@ export interface TARequest {
   date_created: string;
   customer_email: string;
   customer_name: string;
-  customer_state_abbreviation: string;
+  organization: TAOrganization;
   expert: Partial<TAExpert> | null;
   proj_start_date: string | null;
   proj_completion_date: string | null;
@@ -314,10 +334,6 @@ export interface Customer {
 
 export interface TACustomerTransferMutation {
   customer_id: number;
-}
-
-export interface TAOrganizationTransferMutation {
-  organization_id: number;
 }
 
 export interface CustomerRequestRelationship {

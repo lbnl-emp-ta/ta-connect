@@ -46,6 +46,8 @@ class RequestListSerializer(serializers.Serializer):
         required=False,
         queryset=Depth.objects.all()
     )
+
+    organization = OrganizationSerializer(read_only=True)
     
     expert = UserLeanSerializer(required=False) 
 
