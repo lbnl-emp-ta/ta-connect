@@ -82,6 +82,75 @@ export const RequestDetailLayout: React.FC<RequestDetailLayoutProps> = ({ reques
       <Grid container spacing={2}>
         <Grid size={{ lg: 6, md: 12 }}>
           <Stack>
+            <RequestInfoPanel request={selectedRequest!} />
+            <RequestCustomerPanel
+              customer={selectedRequest.customers[0]}
+              permissions={selectedRequest.permissions ?? []}
+              requestId={selectedRequest.id}
+            />
+            <RequestOrganizationPanel
+              organization={selectedRequest.organization}
+              permissions={selectedRequest.permissions ?? []}
+              requestId={selectedRequest.id}
+            />
+            <InfoPanel
+              tabs={
+                <Tabs
+                  onChange={handleTabChange}
+                  value={tabValue}
+                  textColor="inherit"
+                  indicatorColor="primary"
+                  sx={{ '& .MuiTab-root': { fontWeight: 'bold' } }}
+                >
+                  <Tab
+                    label={
+                      <Stack direction="row" spacing={2} alignItems="center">
+                        <span>Notes</span>
+                        {selectedRequestNotes?.length ? (
+                          <Badge badgeContent={selectedRequestNotes.length} color="primary" />
+                        ) : null}
+                      </Stack>
+                    }
+                    value="notes"
+                    onClick={(event) => handleTabChange(event, 'notes')}
+                  />
+                  <Tab
+                    label={
+                      <Stack direction="row" spacing={2} alignItems="center">
+                        <span>Attachments</span>
+                        {selectedRequest.attachments?.length ? (
+                          <Badge
+                            badgeContent={selectedRequest.attachments.length}
+                            color="primary"
+                          />
+                        ) : null}
+                      </Stack>
+                    }
+                    value="attachments"
+                    onClick={(event) => handleTabChange(event, 'attachments')}
+                  />
+                </Tabs>
+              }
+            >
+              <TabPanel value={tabValue} index="notes">
+                <RequestNotes
+                  requestId={selectedRequest.id}
+                  permissions={selectedRequest.permissions}
+                  notes={selectedRequestNotes}
+                />
+              </TabPanel>
+              <TabPanel value={tabValue} index="attachments">
+                <RequestAttachments
+                  requestId={selectedRequest.id}
+                  permissions={selectedRequest.permissions}
+                  attachments={selectedRequest.attachments}
+                />
+              </TabPanel>
+            </InfoPanel>
+          </Stack>
+        </Grid>
+        <Grid size={{ lg: 6, md: 12 }}>
+          <Stack sx={{ height: '100%' }}>
             {closeoutForm && (
               <InfoPanel
                 header={
@@ -97,6 +166,7 @@ export const RequestDetailLayout: React.FC<RequestDetailLayoutProps> = ({ reques
                     </Button>
                   </Stack>
                 }
+                sx={{ flex: 0 }}
               >
                 <TableContainer>
                   <Table
@@ -135,90 +205,22 @@ export const RequestDetailLayout: React.FC<RequestDetailLayoutProps> = ({ reques
                 </TableContainer>
               </InfoPanel>
             )}
-            <RequestInfoPanel request={selectedRequest!} />
-            <RequestCustomerPanel
-              customer={selectedRequest.customers[0]}
-              permissions={selectedRequest.permissions ?? []}
-              requestId={selectedRequest.id}
-            />
-            <RequestOrganizationPanel
-              organization={selectedRequest.organization}
-              permissions={selectedRequest.permissions ?? []}
-              requestId={selectedRequest.id}
-            />
-          </Stack>
-        </Grid>
-        <Grid size={{ lg: 6, md: 12 }}>
-          <RequestScopePanel request={selectedRequest} />
-        </Grid>
-        <Grid size={{ lg: 6, md: 12 }}>
-          <InfoPanel
-            tabs={
-              <Tabs
-                onChange={handleTabChange}
-                value={tabValue}
-                textColor="inherit"
-                indicatorColor="primary"
-                sx={{ '& .MuiTab-root': { fontWeight: 'bold' } }}
-              >
-                <Tab
-                  label={
-                    <Stack direction="row" spacing={2} alignItems="center">
-                      <span>Notes</span>
-                      {selectedRequestNotes?.length ? (
-                        <Badge badgeContent={selectedRequestNotes.length} color="primary" />
-                      ) : null}
-                    </Stack>
-                  }
-                  value="notes"
-                  onClick={(event) => handleTabChange(event, 'notes')}
-                />
-                <Tab
-                  label={
-                    <Stack direction="row" spacing={2} alignItems="center">
-                      <span>Attachments</span>
-                      {selectedRequest.attachments?.length ? (
-                        <Badge badgeContent={selectedRequest.attachments.length} color="primary" />
-                      ) : null}
-                    </Stack>
-                  }
-                  value="attachments"
-                  onClick={(event) => handleTabChange(event, 'attachments')}
-                />
-              </Tabs>
-            }
-          >
-            <TabPanel value={tabValue} index="notes">
-              <RequestNotes
-                requestId={selectedRequest.id}
-                permissions={selectedRequest.permissions}
-                notes={selectedRequestNotes}
-              />
-            </TabPanel>
-            <TabPanel value={tabValue} index="attachments">
-              <RequestAttachments
-                requestId={selectedRequest.id}
-                permissions={selectedRequest.permissions}
-                attachments={selectedRequest.attachments}
-              />
-            </TabPanel>
-          </InfoPanel>
-        </Grid>
-        <Grid size={{ lg: 6, md: 12 }}>
-          <InfoPanel
-            header={
-              <Stack direction="row" alignItems="center" justifyContent="space-between">
-                <Stack direction="row" spacing={2} alignItems="center">
-                  <HistoryIcon color="primary" />
-                  <Typography variant="h6" component="h3" fontWeight="bold">
-                    Audit History
-                  </Typography>
+            <RequestScopePanel request={selectedRequest} />
+            <InfoPanel
+              header={
+                <Stack direction="row" alignItems="center" justifyContent="space-between">
+                  <Stack direction="row" spacing={2} alignItems="center">
+                    <HistoryIcon color="primary" />
+                    <Typography variant="h6" component="h3" fontWeight="bold">
+                      Audit History
+                    </Typography>
+                  </Stack>
                 </Stack>
-              </Stack>
-            }
-          >
-            <RequestAuditHistory auditHistoryItems={selectedRequest.audit_history} />
-          </InfoPanel>
+              }
+            >
+              <RequestAuditHistory auditHistoryItems={selectedRequest.audit_history} />
+            </InfoPanel>
+          </Stack>
         </Grid>
       </Grid>
     </Stack>

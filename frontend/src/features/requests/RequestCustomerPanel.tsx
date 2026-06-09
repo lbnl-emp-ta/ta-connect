@@ -64,7 +64,7 @@ export const RequestCustomerPanel: React.FC<RequestCustomerPanelProps> = ({
           <Stack direction="row" spacing={2} alignItems="center">
             <PeopleAltIcon color="primary" />
             <Typography variant="h6" component="h3" fontWeight="bold">
-              Customer Information
+              Customer Contact
             </Typography>
           </Stack>
           {canEdit && (

@@ -66,7 +66,7 @@ export const RequestOrganizationPanel: React.FC<RequestOrganizationPanelProps> =
           <Stack direction="row" spacing={2} alignItems="center">
             <BusinessIcon color="primary" />
             <Typography variant="h6" component="h3" fontWeight="bold">
-              Organization Organization
+              Customer Organization
             </Typography>
           </Stack>
           {canEdit && (

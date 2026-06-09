@@ -2,7 +2,7 @@ from .request import RequestListView, RequestDetailView, RequestCancelView, Requ
 from .depth import DepthListView
 from .state import StateListView
 from .organization_type import OrganizationTypeListView
-from .organization import OrganizationListView, OrganizationDetailView
+from .organization import OrganizationListView, OrganizationDetailView, OrganizationTransferView
 from .transmission_planning_region import TransmissionPlanningRegionListView
 from .depth import DepthListView
 from .state import StateListView
@@ -43,6 +43,7 @@ __all__ = [
     "OrganizationTypeListView",
     "OrganizationListView",
     "OrganizationDetailView",
+    "OrganizationTransferView",
     "TransmissionPlanningRegionListView",
     "OrganizationListView",
     "TransmissionPlanningRegionListView",
