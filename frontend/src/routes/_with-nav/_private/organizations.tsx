@@ -107,7 +107,7 @@ function OrganizationsPage() {
           </Typography>
           <Stack justifyContent="center">
             <Button variant="contained" startIcon={<AddIcon />} onClick={handleAddOrganization}>
-              Add a organization
+              Add an organization
             </Button>
           </Stack>
         </Stack>
