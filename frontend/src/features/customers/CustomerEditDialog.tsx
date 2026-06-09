@@ -1,5 +1,5 @@
 import { TACustomer, TACustomerMutation } from '@/api/dashboard/types';
-import { useCustomerMutation } from '@/api/queryOptions';
+import { useCreateCustomerMutation, useCustomerMutation } from '@/api/queryOptions';
 import { PhoneInput } from '@/components/PhoneInput';
 import { useAdminModeContext } from '@/features/admin-mode/AdminModeContext';
 import { useToastContext } from '@/features/toasts/ToastContext';
@@ -23,7 +23,7 @@ import { useCallback, useEffect, useState } from 'react';
 interface CustomerEditDialogProps {
   open: boolean;
   onClose: () => void;
-  customer: TACustomer;
+  customer?: TACustomer;
 }
 
 export const CustomerEditDialog: React.FC<CustomerEditDialogProps> = ({
@@ -32,7 +32,11 @@ export const CustomerEditDialog: React.FC<CustomerEditDialogProps> = ({
   customer,
 }) => {
   const { isAdminMode } = useAdminModeContext();
-  const updateCustomerMutation = useCustomerMutation(customer?.id.toString() || '', isAdminMode);
+  // If customer prop is provided, use the edit mutation. Otherwise, use the create mutation.
+  const customerMutation = customer
+    ? useCustomerMutation(customer?.id.toString() || '', isAdminMode)
+    : useCreateCustomerMutation();
+  const customerData: TACustomer = customer || ({} as TACustomer);
   const { setShowToast, setToastMessage, setToastAutoHideDuration } = useToastContext();
   const [email, setEmail] = useState<TACustomer['email']>();
   const [emailError, setEmailError] = useState(false);
@@ -46,13 +50,13 @@ export const CustomerEditDialog: React.FC<CustomerEditDialogProps> = ({
    * Reset form values based on customer data.
    */
   const resetFormValues = useCallback(() => {
-    setEmail(customer.email || '');
+    setEmail(customerData.email || '');
     setEmailError(false);
     setEmailHelperText('');
-    setName(customer.name || '');
-    setPhone(customer.phone);
+    setName(customerData.name || '');
+    setPhone(customerData.phone);
     setPhoneError(false);
-    setTitle(customer.title || '');
+    setTitle(customerData.title || '');
   }, [customer]);
 
   /**
@@ -79,11 +83,11 @@ export const CustomerEditDialog: React.FC<CustomerEditDialogProps> = ({
       onClose();
       return;
     }
-    updateCustomerMutation.mutate(mutationData);
+    customerMutation.mutate(mutationData);
   };
 
   const handleEditCancel = () => {
-    updateCustomerMutation.reset();
+    customerMutation.reset();
     resetFormValues();
     onClose();
   };
@@ -122,37 +126,36 @@ export const CustomerEditDialog: React.FC<CustomerEditDialogProps> = ({
   }, [customer, resetFormValues]);
 
   useEffect(() => {
-    if (updateCustomerMutation.isPending) {
+    if (customerMutation.isPending) {
       setShowToast(true);
       setToastAutoHideDuration(null);
       setToastMessage(
         <ToastMessage icon={<CircularProgress />}>Saving customer information</ToastMessage>
       );
-    } else if (updateCustomerMutation.isSuccess) {
+    } else if (customerMutation.isSuccess) {
       onClose();
       setShowToast(true);
       setToastMessage(
         <ToastMessage icon={<CheckCircleIcon />}>Customer information saved</ToastMessage>
       );
-    } else if (updateCustomerMutation.isError) {
+    } else if (customerMutation.isError) {
       setShowToast(true);
       setToastMessage(
-        <ToastMessage icon={<ErrorIcon />}>{updateCustomerMutation.error.message}</ToastMessage>
+        <ToastMessage icon={<ErrorIcon />}>{customerMutation.error.message}</ToastMessage>
       );
     }
-  }, [
-    updateCustomerMutation.isSuccess,
-    updateCustomerMutation.isError,
-    updateCustomerMutation.error?.message,
-  ]);
+  }, [customerMutation.isSuccess, customerMutation.isError, customerMutation.error?.message]);
 
   return (
     <Dialog open={open} maxWidth="md" fullWidth onClose={handleEditCancel} disableRestoreFocus>
-      <DialogTitle>Edit Customer</DialogTitle>
+      <DialogTitle>{customer ? 'Edit' : 'Create'} Customer</DialogTitle>
       <DialogContent>
-        <Alert severity="info" sx={{ marginBottom: 4 }}>
-          Changes to customer information will apply to all requests associated with this customer.
-        </Alert>
+        {customer && (
+          <Alert severity="info" sx={{ marginBottom: 4 }}>
+            Changes to customer information will apply to all requests associated with this
+            customer.
+          </Alert>
+        )}
         <form onSubmit={handleEditSubmit} id="customer-edit-form">
           <Stack>
             <TextField

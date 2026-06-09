@@ -3,6 +3,7 @@ import { State, TransmissionPlanningRegion } from '@/api/forms/types';
 import {
   statesQueryOptions,
   transmissionPlanningRegionsQueryOptions,
+  useCreateOrganizationMutation,
   useOrganizationMutation,
 } from '@/api/queryOptions';
 import { useAdminModeContext } from '@/features/admin-mode/AdminModeContext';
@@ -28,7 +29,7 @@ import { useCallback, useEffect, useState } from 'react';
 interface OrganizationEditDialogProps {
   open: boolean;
   onClose: () => void;
-  organization: TAOrganization;
+  organization?: TAOrganization;
 }
 
 export const OrganizationEditDialog: React.FC<OrganizationEditDialogProps> = ({
@@ -37,10 +38,11 @@ export const OrganizationEditDialog: React.FC<OrganizationEditDialogProps> = ({
   organization,
 }) => {
   const { isAdminMode } = useAdminModeContext();
-  const updateOrganizationMutation = useOrganizationMutation(
-    organization?.id.toString() || '',
-    isAdminMode
-  );
+  // If organization prop is provided, use the edit mutation. Otherwise, use the create mutation.
+  const organizationMutation = organization
+    ? useOrganizationMutation(organization?.id.toString() || '', isAdminMode)
+    : useCreateOrganizationMutation();
+  const organizationData: TAOrganization = organization || ({} as TAOrganization);
   const { data: allTransmissionPlanningRegions } = useSuspenseQuery(
     transmissionPlanningRegionsQueryOptions()
   );
@@ -56,10 +58,10 @@ export const OrganizationEditDialog: React.FC<OrganizationEditDialogProps> = ({
    * Reset form values based on organization data.
    */
   const resetFormValues = useCallback(() => {
-    setName(organization.name || '');
-    setAddress(organization.address || '');
-    setTransmissionPlanningRegion(organization.transmission_planning_region);
-    setState(organization.state);
+    setName(organizationData.name || '');
+    setAddress(organizationData.address || '');
+    setTransmissionPlanningRegion(organizationData.transmission_planning_region);
+    setState(organizationData.state);
   }, [organization]);
 
   /**
@@ -86,11 +88,11 @@ export const OrganizationEditDialog: React.FC<OrganizationEditDialogProps> = ({
       onClose();
       return;
     }
-    updateOrganizationMutation.mutate(mutationData);
+    organizationMutation.mutate(mutationData);
   };
 
   const handleEditCancel = () => {
-    updateOrganizationMutation.reset();
+    organizationMutation.reset();
     resetFormValues();
     onClose();
   };
@@ -126,38 +128,40 @@ export const OrganizationEditDialog: React.FC<OrganizationEditDialogProps> = ({
   }, [organization, resetFormValues]);
 
   useEffect(() => {
-    if (updateOrganizationMutation.isPending) {
+    if (organizationMutation.isPending) {
       setShowToast(true);
       setToastAutoHideDuration(null);
       setToastMessage(
         <ToastMessage icon={<CircularProgress />}>Saving organization information</ToastMessage>
       );
-    } else if (updateOrganizationMutation.isSuccess) {
+    } else if (organizationMutation.isSuccess) {
       onClose();
       setShowToast(true);
       setToastMessage(
         <ToastMessage icon={<CheckCircleIcon />}>Organization information saved</ToastMessage>
       );
-    } else if (updateOrganizationMutation.isError) {
+    } else if (organizationMutation.isError) {
       setShowToast(true);
       setToastMessage(
-        <ToastMessage icon={<ErrorIcon />}>{updateOrganizationMutation.error.message}</ToastMessage>
+        <ToastMessage icon={<ErrorIcon />}>{organizationMutation.error.message}</ToastMessage>
       );
     }
   }, [
-    updateOrganizationMutation.isSuccess,
-    updateOrganizationMutation.isError,
-    updateOrganizationMutation.error?.message,
+    organizationMutation.isSuccess,
+    organizationMutation.isError,
+    organizationMutation.error?.message,
   ]);
 
   return (
     <Dialog open={open} maxWidth="md" fullWidth onClose={handleEditCancel} disableRestoreFocus>
-      <DialogTitle>Edit Organization</DialogTitle>
+      <DialogTitle>{organization ? 'Edit' : 'Create'} Organization</DialogTitle>
       <DialogContent>
-        <Alert severity="info" sx={{ marginBottom: 4 }}>
-          Changes to organization information will apply to all requests associated with this
-          organization.
-        </Alert>
+        {organization && (
+          <Alert severity="info" sx={{ marginBottom: 4 }}>
+            Changes to organization information will apply to all requests associated with this
+            organization.
+          </Alert>
+        )}
         <form onSubmit={handleEditSubmit} id="organization-edit-form">
           <Stack>
             <TextField

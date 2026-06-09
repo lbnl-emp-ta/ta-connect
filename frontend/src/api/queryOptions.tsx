@@ -218,6 +218,15 @@ export const useCustomerMutation = (customerId: string, isAdminMode?: boolean) =
   });
 };
 
+export const useCreateCustomerMutation = () => {
+  return useMutation({
+    mutationKey: ['customers', 'create'],
+    mutationFn: (data: Partial<TACustomerMutation>) =>
+      postData<TACustomerMutation>(`${import.meta.env.VITE_API_URL}/customers/create/`, data),
+    onSuccess: () => queryClient.invalidateQueries(),
+  });
+};
+
 export const useOrganizationTransferMutation = (requestId: string, isAdminMode?: boolean) => {
   return useMutation({
     mutationKey: ['organization', 'transfer', requestId, isAdminMode],
@@ -240,6 +249,15 @@ export const useOrganizationMutation = (organizationId: string, isAdminMode?: bo
         data,
         isAdminMode
       ),
+    onSuccess: () => queryClient.invalidateQueries(),
+  });
+};
+
+export const useCreateOrganizationMutation = () => {
+  return useMutation({
+    mutationKey: ['organizations', 'create'],
+    mutationFn: (data: Partial<TAOrganizationMutation>) =>
+      postData<TACustomerMutation>(`${import.meta.env.VITE_API_URL}/organizations/create/`, data),
     onSuccess: () => queryClient.invalidateQueries(),
   });
 };
