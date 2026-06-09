@@ -111,6 +111,17 @@ export const theme = createTheme({
       styleOverrides: {
         root: {
           textDecoration: 'none',
+          transition: '0.25s',
+          color: '#1C50B0',
+          '&:hover:not([data-status="active"])': {
+            color: '#d996c8',
+          },
+          '&[data-status="active"]': {
+            color: '#345a64',
+          },
+          '&:visited:not(.nav-link)': {
+            color: '#C45BAA',
+          },
         },
       },
     },

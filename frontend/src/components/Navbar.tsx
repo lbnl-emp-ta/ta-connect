@@ -5,7 +5,7 @@ import { useUser } from '@/hooks/useUser';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import { AppBar, Button, Menu, MenuItem, Stack, Toolbar, Typography } from '@mui/material';
-import { Link, useLocation, useNavigate } from '@tanstack/react-router';
+import { useLocation, useNavigate } from '@tanstack/react-router';
 import { useState } from 'react';
 
 export const Navbar: React.FC = () => {
@@ -64,26 +64,40 @@ export const Navbar: React.FC = () => {
         }}
       >
         <Stack direction="row" spacing={4} alignItems="center" sx={{ flexGrow: 1 }}>
-          <Link to="/requests/active">
-            <Typography variant="h5" fontWeight="bold">
+          <AppLink className="nav-link" to="/requests/active">
+            <Typography variant="h5" fontWeight="bold" sx={{ color: 'common.white' }}>
               TA Connect
             </Typography>
-          </Link>
+          </AppLink>
           <Stack direction="row" spacing={2} alignItems="center">
             <AppLink
+              className="nav-link"
               to="/requests/active"
               sx={location.pathname.startsWith('/requests') ? activeLinkSx : linkSx}
               color="inherit"
             >
               Requests
             </AppLink>
-            <AppLink to="/experts" sx={linkSx} activeProps={{ sx: activeLinkSx }} color="inherit">
+            <AppLink
+              className="nav-link"
+              to="/experts"
+              sx={linkSx}
+              activeProps={{ sx: activeLinkSx }}
+              color="inherit"
+            >
               Experts
             </AppLink>
-            <AppLink to="/customers" sx={linkSx} activeProps={{ sx: activeLinkSx }} color="inherit">
+            <AppLink
+              className="nav-link"
+              to="/customers"
+              sx={linkSx}
+              activeProps={{ sx: activeLinkSx }}
+              color="inherit"
+            >
               Customers
             </AppLink>
             <AppLink
+              className="nav-link"
               to="/organizations"
               sx={linkSx}
               activeProps={{ sx: activeLinkSx }}
@@ -91,7 +105,9 @@ export const Navbar: React.FC = () => {
             >
               Organizations
             </AppLink>
-            <Link to="/intake">Intake</Link>
+            <AppLink className="nav-link" to="/intake" color="inherit" sx={linkSx}>
+              Intake
+            </AppLink>
           </Stack>
         </Stack>
         {user ? (
@@ -126,9 +142,9 @@ export const Navbar: React.FC = () => {
             </div>
           </>
         ) : (
-          <Link to="/login" search={{ redirect: '/' }}>
+          <AppLink className="nav-link" to="/login" search={{ redirect: '/' }}>
             <Typography color="primary">Login</Typography>
-          </Link>
+          </AppLink>
         )}
       </Toolbar>
     </AppBar>

@@ -124,6 +124,7 @@ def notify_reception_on_new_request(sender, instance, created, **kwargs):
                 receipient_name=recipient["name"],
                 request=instance,
                 customer=primary_customer,
+                organization=instance.organization
             )
             send_email_notification(
                 subject="TA Connect - New Request Submitted",
@@ -199,7 +200,8 @@ def notify_owners_on_assignment(sender, instance, created, **kwargs):
         plain_text_message, html_message = assignment_email(
             receipient_name=recipient["name"],
             request=instance,
-            customer=primary_customer
+            customer=primary_customer,
+            organization=instance.organization
         )
         send_email_notification(
             subject="TA Connect - Request Assigned to You",
