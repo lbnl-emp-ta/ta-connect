@@ -67,6 +67,8 @@ function NavbarLayoutWrapper() {
             <Stack direction="row" spacing={2} alignItems="center">
               <Link to="/requests/active">Requests</Link>
               <Link to="/experts">Experts</Link>
+              <Link to="/customers">Customers</Link>
+              <Link to="/organizations">Organizations</Link>
               <Link to="/intake">Intake</Link>
             </Stack>
           </Stack>

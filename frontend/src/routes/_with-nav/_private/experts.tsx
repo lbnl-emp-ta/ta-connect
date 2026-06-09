@@ -1,4 +1,4 @@
-import { Container, Stack } from '@mui/material';
+import { Container, Stack, Typography } from '@mui/material';
 import { createFileRoute } from '@tanstack/react-router';
 import { expertsQueryOptions } from '@/api/queryOptions';
 import { ExpertsDataTable } from '@/features/experts/ExpertsDataTable';
@@ -19,6 +19,9 @@ function ExpertsPage() {
   return (
     <Container maxWidth="xl" sx={{ paddingTop: 3, paddingBottom: 3 }}>
       <Stack>
+        <Typography variant="h3" component="h1" fontWeight="bold">
+          Experts
+        </Typography>
         <ExpertsDataTable experts={experts || []} />
       </Stack>
     </Container>

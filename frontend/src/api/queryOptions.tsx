@@ -2,7 +2,7 @@ import { loginMutation } from '@/api/accounts/login';
 import { logoutMutation } from '@/api/accounts/logout';
 import { deleteData, fetchData, patchData, postData, postForm } from '@/api/dashboard';
 import {
-  Customer,
+  TACustomer,
   ExpertiseMutation,
   TAAssignment,
   TACloseoutForm,
@@ -50,7 +50,7 @@ export const customersQueryOptions = () =>
   queryOptions({
     staleTime: 120_000, // stale after 2 minutes
     queryKey: ['customers'],
-    queryFn: () => fetchData<Customer[]>(`${apiUrl}/customers/`),
+    queryFn: () => fetchData<TACustomer[]>(`${apiUrl}/customers/`),
   });
 
 export const identitiesQueryOptions = () =>

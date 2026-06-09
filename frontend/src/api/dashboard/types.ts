@@ -42,14 +42,21 @@ export interface TACustomer {
 }
 
 export interface TACustomerMutation {
-  org?: number;
-  orgType?: number;
-  tpr?: number;
   email?: string;
   name?: string;
   phone?: string;
   title?: string;
-  state?: number;
+}
+
+export interface TACustomerTransferMutation {
+  customer_id: number;
+}
+
+export interface TACustomerRequestRelationship {
+  id: number;
+  request: TARequest;
+  customer: TACustomer;
+  is_poc: Boolean;
 }
 
 export interface TATopic {
@@ -318,25 +325,6 @@ export interface TARequestsResponse {
   actionable: TARequest[];
   downstream: TARequest[];
   inactive: TARequest[];
-}
-
-export interface Customer {
-  id: number;
-  email: string;
-  name: string;
-  phone: string;
-  title: string;
-}
-
-export interface TACustomerTransferMutation {
-  customer_id: number;
-}
-
-export interface CustomerRequestRelationship {
-  id: number;
-  request: TARequest;
-  customer: Customer;
-  is_poc: Boolean;
 }
 
 export interface TAAssignment {
