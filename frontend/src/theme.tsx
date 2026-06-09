@@ -130,6 +130,16 @@ export const theme = createTheme({
         spacing: 2,
       },
     },
+    MuiDialogTitle: {
+      styleOverrides: {
+        root: {
+          paddingBottom: 0,
+          '&+.MuiDialogContent-root': {
+            paddingTop: '1.25rem !important',
+          },
+        },
+      },
+    },
     MuiDataGrid: {
       styleOverrides: {
         root: {

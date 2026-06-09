@@ -1,6 +1,7 @@
-import { TAOrganization, TAOrganizationMutation } from '@/api/dashboard/types';
+import { TAOrganization, TAOrganizationMutation, TAOrganizationType } from '@/api/dashboard/types';
 import { State, TransmissionPlanningRegion } from '@/api/forms/types';
 import {
+  organizationTypesQueryOptions,
   statesQueryOptions,
   transmissionPlanningRegionsQueryOptions,
   useCreateOrganizationMutation,
@@ -47,12 +48,14 @@ export const OrganizationEditDialog: React.FC<OrganizationEditDialogProps> = ({
     transmissionPlanningRegionsQueryOptions()
   );
   const { data: allStates } = useSuspenseQuery(statesQueryOptions());
+  const { data: allOrganizationTypes } = useSuspenseQuery(organizationTypesQueryOptions());
   const { setShowToast, setToastMessage, setToastAutoHideDuration } = useToastContext();
   const [name, setName] = useState<TAOrganization['name']>();
   const [address, setAddress] = useState<TAOrganization['address']>();
   const [transmissionPlanningRegion, setTransmissionPlanningRegion] =
     useState<TransmissionPlanningRegion>();
   const [state, setState] = useState<State>();
+  const [orgType, setOrgType] = useState<TAOrganizationType>();
 
   /**
    * Reset form values based on organization data.
@@ -62,6 +65,7 @@ export const OrganizationEditDialog: React.FC<OrganizationEditDialogProps> = ({
     setAddress(organizationData.address || '');
     setTransmissionPlanningRegion(organizationData.transmission_planning_region);
     setState(organizationData.state);
+    setOrgType(organizationData.type);
   }, [organization]);
 
   /**
@@ -83,6 +87,9 @@ export const OrganizationEditDialog: React.FC<OrganizationEditDialogProps> = ({
     }
     if (state !== organization?.state) {
       mutationData.state = state?.id;
+    }
+    if (orgType !== organization?.type) {
+      mutationData.type = orgType?.id;
     }
     if (Object.keys(mutationData).length === 0) {
       onClose();
@@ -121,6 +128,13 @@ export const OrganizationEditDialog: React.FC<OrganizationEditDialogProps> = ({
     newValue: State | null
   ) => {
     setState(newValue || undefined);
+  };
+
+  const handleOrgTypeChange = (
+    _event: React.SyntheticEvent<Element, Event>,
+    newValue: TAOrganizationType | null
+  ) => {
+    setOrgType(newValue || undefined);
   };
 
   useEffect(() => {
@@ -196,6 +210,14 @@ export const OrganizationEditDialog: React.FC<OrganizationEditDialogProps> = ({
               getOptionLabel={(option) => option.name}
               onChange={handleStateChange}
               renderInput={(params) => <TextField {...params} label="State" />}
+              isOptionEqualToValue={(option, value) => option.id === value.id}
+            />
+            <Autocomplete
+              value={orgType}
+              options={allOrganizationTypes || []}
+              getOptionLabel={(option) => option.name}
+              onChange={handleOrgTypeChange}
+              renderInput={(params) => <TextField {...params} label="Organization Type" />}
               isOptionEqualToValue={(option, value) => option.id === value.id}
             />
           </Stack>

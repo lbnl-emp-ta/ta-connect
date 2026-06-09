@@ -102,6 +102,28 @@ class OrganizationDetailView(views.APIView):
         return Response(data=OrganizationSerializer(Organization.objects.get(pk=organization_id)).data,status=status.HTTP_200_OK)
     
 
+class OrganizationCreateView(views.APIView):
+    authentication_classes = [
+        authentication.SessionAuthentication,
+        XSessionTokenAuthentication,
+    ]
+
+    permission_classes = [
+        permissions.IsAuthenticated,
+        IsAdmin|IsProgramLead|IsCoordinator|IsLabLead
+    ]
+
+    def post(self, request):
+        if not request.data:
+            return Response(data={"message": "Missing request body"}, status=status.HTTP_400_BAD_REQUEST)
+
+        serializer = OrganizationEditSerializer(data=request.data)
+        if serializer.is_valid():
+            organization = serializer.save()
+            return Response(data=OrganizationSerializer(organization).data, status=status.HTTP_201_CREATED)
+        return Response(data=serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
 class OrganizationTransferView(BaseUserAwareRequest):
     permission_classes = [
         permissions.IsAuthenticated,

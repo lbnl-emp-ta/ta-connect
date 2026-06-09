@@ -117,6 +117,28 @@ class CustomerDetailView(views.APIView):
         return Response(data=CustomerSerializer(Customer.objects.get(pk=customer_id)).data,status=status.HTTP_200_OK)
     
 
+class CustomerCreateView(views.APIView):
+    authentication_classes = [
+        authentication.SessionAuthentication,
+        XSessionTokenAuthentication,
+    ]
+
+    permission_classes = [
+        permissions.IsAuthenticated,
+        IsAdmin|IsProgramLead|IsCoordinator|IsLabLead
+    ]
+
+    def post(self, request):
+        if not request.data:
+            return Response(data={"message": "Missing request body"}, status=status.HTTP_400_BAD_REQUEST)
+
+        serializer = CustomerEditSerializer(data=request.data)
+        if serializer.is_valid():
+            customer = serializer.save()
+            return Response(data=CustomerSerializer(customer).data, status=status.HTTP_201_CREATED)
+        return Response(data=serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
 class CustomerTransferView(BaseUserAwareRequest):
     permission_classes = [
         permissions.IsAuthenticated,
