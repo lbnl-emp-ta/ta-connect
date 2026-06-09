@@ -125,12 +125,15 @@ class CustomerCreateView(views.APIView):
 
     permission_classes = [
         permissions.IsAuthenticated,
-        IsAdmin|IsProgramLead|IsCoordinator|IsLabLead
+        IsAdmin|IsProgramLead|IsCoordinator|IsLabLead|IsExpert
     ]
 
     def post(self, request):
         if not request.data:
             return Response(data={"message": "Missing request body"}, status=status.HTTP_400_BAD_REQUEST)
+        
+        if not CanCreateCustomer().has_permission(request, self):
+            return Response(data={"message": "Insufficient authorization to create customer"}, status=status.HTTP_401_UNAUTHORIZED)
 
         serializer = CustomerEditSerializer(data=request.data)
         if serializer.is_valid():
