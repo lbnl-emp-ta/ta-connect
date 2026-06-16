@@ -114,7 +114,7 @@ export const CustomerTransferDialog: React.FC<CustomerTransferDialogProps> = ({
           <DialogContentText>Transfer this request over to a different customer.</DialogContentText>
           <DialogContentText>
             Need to create a new customer?{' '}
-            <AppLink to="/experts">Head to the Customers page.</AppLink>
+            <AppLink to="/customers">Head to the Customers page.</AppLink>
           </DialogContentText>
           <form onSubmit={handleSubmit} id="customer-transfer-form">
             <Autocomplete

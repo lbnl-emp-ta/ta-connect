@@ -123,7 +123,7 @@ export const OrganizationTransferDialog: React.FC<OrganizationTransferDialogProp
           </DialogContentText>
           <DialogContentText>
             Need to create a new organization?{' '}
-            <AppLink to="/experts">Head to the Organizations page.</AppLink>
+            <AppLink to="/organizations">Head to the Organizations page.</AppLink>
           </DialogContentText>
           <form onSubmit={handleSubmit} id="org-transfer-form">
             <Autocomplete
