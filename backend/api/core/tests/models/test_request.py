@@ -1,6 +1,6 @@
 import datetime
 
-from core.models import Request
+from core.models import Request, Organization
 from django.db.utils import IntegrityError
 from django.utils import timezone
 import pytest
@@ -60,6 +60,7 @@ class TestRequestModel():
             Request.objects.create(
                 description="test",
                 depth=test_depth,
+                organization=Organization.objects.get(pk=1),
                 proj_start_date=arbitrary_future_date, 
                 proj_completion_date=None
             )
@@ -82,6 +83,7 @@ class TestRequestModel():
             Request.objects.create(
                 description="test",
                 depth=test_depth,
+                organization=Organization.objects.get(pk=1),
                 proj_start_date=None, 
                 proj_completion_date=arbitrary_future_date
             )

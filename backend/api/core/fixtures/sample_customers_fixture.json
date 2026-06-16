@@ -3,9 +3,6 @@
     "model": "core.Customer",
     "pk": 1,
     "fields": {
-      "org": 1,
-      "state": 47,
-      "tpr": 5,
       "email": "jwalker@nyenergy.gov",
       "name": "Jonathan Walker",
       "phone": "631-889-8894",
@@ -16,9 +13,6 @@
     "model": "core.Customer",
     "pk": 2,
     "fields": {
-      "org": 2,
-      "state": 5,
-      "tpr": 1,
       "email": "ehumming@energy.ca.gov",
       "name": "Elizabeth Hummings",
       "phone": "916-555-2347",
@@ -29,9 +23,6 @@
     "model": "core.Customer",
     "pk": 3,
     "fields": {
-      "org": 3,
-      "state": 44,
-      "tpr": 7,
       "email": "rmorales@puc.texas.gov",
       "name": "Roberto Morales",
       "phone": "512-555-9012",

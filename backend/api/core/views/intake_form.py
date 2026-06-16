@@ -25,36 +25,35 @@ class ProcessIntakeForm(CreateAPIView):
         
         try:
             with transaction.atomic():
+                _org = Organization.objects.filter(name=organization)
+                if not _org.exists():
+                    _org = Organization.objects.create(
+                        name=organization,
+                        address=organization_address,
+                        state=State.objects.get(abbreviation=state_abbr),
+                        transmission_planning_region=TransmissionPlanningRegion.objects.get(name=tpr),
+                        type=OrganizationType.objects.get(name=organization_type)
+                    )
+                else:
+                    _org = _org.first()
+
                 _request = Request.objects.create(
+                    organization=_org,
                     description=description,
                     challenges=challenges,
                     goals=goals,
                     effort=effort
                 )
 
-                
-                _org = Organization.objects.filter(name=organization)
-                if not _org.exists():
-                    _org = Organization.objects.create(
-                        name=organization, 
-                        address=organization_address, 
-                        type=OrganizationType.objects.get(name=organization_type)
-                    )
-                else:
-                    _org = _org.first()
-            
                 _customer = Customer.objects.filter(email=email)
-                if(not _customer.exists()):
+                if not _customer.exists():
                     _customer = Customer.objects.create(
-                        org = _org,
-                        state = State.objects.get(abbreviation=state_abbr),
-                        tpr = TransmissionPlanningRegion.objects.get(name=tpr),
                         email=email,
                         name=name,
                         phone=phone,
                         title=title
                     )
-                else: 
+                else:
                     _customer = _customer.first()
                 
                 _cohort = None
@@ -77,11 +76,11 @@ class ProcessIntakeForm(CreateAPIView):
                     "email": _customer.email,
                     "phone": _customer.phone,
                     "title": _customer.title,
-                    "tpr": _customer.tpr.name,
-                    "state": _customer.state.abbreviation,
-                    "organization": _customer.org.name,
-                    "organizationAddress": _customer.org.address,
-                    "organizationType": _customer.org.type.name,
+                    "tpr": _org.transmission_planning_region.name,
+                    "state": _org.state.abbreviation,
+                    "organization": _org.name,
+                    "organizationAddress": _org.address,
+                    "organizationType": _org.type.name,
                     "description": _request.description,
                 }
                 
