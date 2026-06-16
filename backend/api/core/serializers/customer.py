@@ -4,6 +4,15 @@ from core.models import *
 from core.serializers import * 
 
 class CustomerSerializer(serializers.ModelSerializer):
+    active_requests_count = serializers.SerializerMethodField()
+    total_requests_count = serializers.SerializerMethodField()
+
+    def get_active_requests_count(self, obj):
+        return obj.customerrequestrelationship_set.exclude(request__owner=None).count()
+
+    def get_total_requests_count(self, obj):
+        return obj.customerrequestrelationship_set.count()
+
     class Meta:
         model = Customer
         fields = "__all__"

@@ -7,6 +7,14 @@ class OrganizationSerializer(serializers.ModelSerializer):
     state = StateSerializer()
     transmission_planning_region = TransmissionPlanningRegionSerializer()
     type = OrganizationTypeSerializer()
+    active_requests_count = serializers.SerializerMethodField()
+    total_requests_count = serializers.SerializerMethodField()
+
+    def get_active_requests_count(self, obj):
+        return obj.requests.exclude(owner=None).count()
+
+    def get_total_requests_count(self, obj):
+        return obj.requests.count()
 
     class Meta:
         model = Organization
