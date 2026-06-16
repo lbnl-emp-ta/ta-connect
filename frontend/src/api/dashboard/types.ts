@@ -188,8 +188,8 @@ export interface TARequest {
   depth: string;
   description: string;
   date_created: string;
-  customer_email: string;
-  customer_name: string;
+  customer_email?: string;
+  customer_name?: string;
   organization?: TAOrganization;
   expert: Partial<TAExpert> | null;
   proj_start_date: string | null;

@@ -2,6 +2,7 @@ import { customersQueryOptions } from '@/api/queryOptions';
 import { CustomersDataTable } from '@/features/customers/CustomersDataTable';
 import { Box, Button, Container, IconButton, Stack, Typography } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
+import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { createFileRoute } from '@tanstack/react-router';
@@ -9,6 +10,8 @@ import { CustomerEditDialog } from '@/features/customers/CustomerEditDialog';
 import { useState } from 'react';
 import { TACustomer } from '@/api/dashboard/types';
 import { GridColDef } from '@mui/x-data-grid';
+import { CustomerDeleteDialog } from '@/features/customers/CustomerDeleteDialog';
+import { useUser } from '@/hooks/useUser';
 
 export const Route = createFileRoute('/_with-nav/_private/customers')({
   loader: async ({ context }) => {
@@ -18,14 +21,20 @@ export const Route = createFileRoute('/_with-nav/_private/customers')({
 });
 
 function CustomersPage() {
+  const user = useUser();
   const { data: customers } = useSuspenseQuery(customersQueryOptions());
   const [customerEditDialogOpen, setCustomerEditDialogOpen] = useState(false);
-  // const [customerDeleteDialogOpen, setCustomerDeleteDialogOpen] = useState(false);
+  const [customerDeleteDialogOpen, setCustomerDeleteDialogOpen] = useState(false);
   const [selectedCustomer, setSelectedCustomer] = useState<TACustomer>();
 
   const handleRowEdit = (customer: TACustomer) => {
     setSelectedCustomer(customer);
     setCustomerEditDialogOpen(true);
+  };
+
+  const handleRowDelete = (customer: TACustomer) => {
+    setSelectedCustomer(customer);
+    setCustomerDeleteDialogOpen(true);
   };
 
   const handleAddCustomer = () => {
@@ -71,11 +80,17 @@ function CustomersPage() {
               <EditIcon />
             </IconButton>
           </Box>
-          {/* <Box>
-            <IconButton color="primary" size="small">
-              <DeleteIcon />
-            </IconButton>
-          </Box> */}
+          {user?.is_staff && (
+            <Box>
+              <IconButton
+                color="primary"
+                size="small"
+                onClick={() => handleRowDelete(params.row as TACustomer)}
+              >
+                <DeleteIcon />
+              </IconButton>
+            </Box>
+          )}
         </Stack>
       ),
     },
@@ -101,6 +116,13 @@ function CustomersPage() {
         onClose={() => setCustomerEditDialogOpen(false)}
         customer={selectedCustomer}
       />
+      {selectedCustomer && (
+        <CustomerDeleteDialog
+          open={customerDeleteDialogOpen}
+          onClose={() => setCustomerDeleteDialogOpen(false)}
+          customer={selectedCustomer}
+        />
+      )}
     </Container>
   );
 }

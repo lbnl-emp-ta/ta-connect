@@ -107,7 +107,7 @@ export const RequestOrganizationPanel: React.FC<RequestOrganizationPanelProps> =
                     </ListItemText>
                   </MenuItem>
                 )}
-                {permissions.includes('edit-organization-info') && (
+                {organization && permissions.includes('edit-organization-info') && (
                   <MenuItem onClick={handleOpenOrganizationEditDialog}>
                     <ListItemText>
                       <Stack direction="row" alignItems="center" spacing={1}>
@@ -124,11 +124,13 @@ export const RequestOrganizationPanel: React.FC<RequestOrganizationPanelProps> =
                 requestId={requestId}
                 currentOrganizationId={organization?.id}
               />
-              <OrganizationEditDialog
-                open={organizationEditDialogOpen}
-                onClose={() => setOrganizationEditDialogOpen(false)}
-                organization={organization}
-              />
+              {organization && (
+                <OrganizationEditDialog
+                  open={organizationEditDialogOpen}
+                  onClose={() => setOrganizationEditDialogOpen(false)}
+                  organization={organization}
+                />
+              )}
             </>
           )}
         </Stack>

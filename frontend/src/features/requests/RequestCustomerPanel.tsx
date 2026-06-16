@@ -22,7 +22,7 @@ import {
 import { useState } from 'react';
 
 interface RequestCustomerPanelProps {
-  customer: TACustomer;
+  customer?: TACustomer;
   permissions: PermissionAction[];
   requestId: number;
 }
@@ -105,7 +105,7 @@ export const RequestCustomerPanel: React.FC<RequestCustomerPanelProps> = ({
                     </ListItemText>
                   </MenuItem>
                 )}
-                {permissions.includes('edit-customer-info') && (
+                {customer && permissions.includes('edit-customer-info') && (
                   <MenuItem onClick={handleOpenCustomerEditDialog}>
                     <ListItemText>
                       <Stack direction="row" alignItems="center" spacing={1}>
@@ -120,13 +120,15 @@ export const RequestCustomerPanel: React.FC<RequestCustomerPanelProps> = ({
                 open={customerTransferDialogOpen}
                 onClose={() => setCustomerTransferDialogOpen(false)}
                 requestId={requestId}
-                currentCustomerId={customer.id}
+                currentCustomerId={customer?.id}
               />
-              <CustomerEditDialog
-                open={customerEditDialogOpen}
-                onClose={() => setCustomerEditDialogOpen(false)}
-                customer={customer}
-              />
+              {customer && (
+                <CustomerEditDialog
+                  open={customerEditDialogOpen}
+                  onClose={() => setCustomerEditDialogOpen(false)}
+                  customer={customer}
+                />
+              )}
             </>
           )}
         </Stack>
@@ -146,19 +148,19 @@ export const RequestCustomerPanel: React.FC<RequestCustomerPanelProps> = ({
           <TableBody>
             <TableRow>
               <TableCell>Name</TableCell>
-              <TableCell>{customer.name}</TableCell>
+              <TableCell>{customer?.name || '-'}</TableCell>
             </TableRow>
             <TableRow>
               <TableCell>Email</TableCell>
-              <TableCell>{customer.email}</TableCell>
+              <TableCell>{customer?.email || '-'}</TableCell>
             </TableRow>
             <TableRow>
               <TableCell>Phone</TableCell>
-              <TableCell>{customer.phone}</TableCell>
+              <TableCell>{customer?.phone || '-'}</TableCell>
             </TableRow>
             <TableRow>
               <TableCell>Job Title</TableCell>
-              <TableCell>{customer.title}</TableCell>
+              <TableCell>{customer?.title || '-'}</TableCell>
             </TableRow>
           </TableBody>
         </Table>

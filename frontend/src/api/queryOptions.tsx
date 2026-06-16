@@ -227,6 +227,15 @@ export const useCreateCustomerMutation = () => {
   });
 };
 
+export const useDeleteCustomerMutation = (customerId: string) => {
+  return useMutation({
+    mutationKey: ['customers', 'delete', customerId],
+    // isAdminMode is turned on by default for simplicity. Only admins can see the delete button.
+    mutationFn: () => deleteData(`${import.meta.env.VITE_API_URL}/customers/${customerId}`, true),
+    onSuccess: () => queryClient.invalidateQueries(),
+  });
+};
+
 export const useOrganizationTransferMutation = (requestId: string, isAdminMode?: boolean) => {
   return useMutation({
     mutationKey: ['organization', 'transfer', requestId, isAdminMode],
@@ -253,7 +262,7 @@ export const useOrganizationMutation = (organizationId: string, isAdminMode?: bo
   });
 };
 
-export const useOrganizationDeleteMutation = (organizationId: string) => {
+export const useDeleteOrganizationMutation = (organizationId: string) => {
   return useMutation({
     mutationKey: ['organizations', 'delete', organizationId],
     // isAdminMode is turned on by default for simplicity. Only admins can see the delete button.

@@ -182,7 +182,7 @@ class RequestDetailView(BaseUserAwareRequest):
                 customer["is_poc"] = customer_relationship.is_poc
 
             except CustomerRequestRelationship.DoesNotExist:
-                return Response(data={"message": "Customer relationship data is missing!"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+                customer["is_poc"] = False
 
         request_serializer = self.serializer_class(ta_request)
 
@@ -453,9 +453,10 @@ class RequestListView(BaseUserAwareRequest):
             requests_data = list() 
             for request in serializer.data:
                 data = request
-                poc_customer = Request.objects.get(pk=request["id"]).customerrequestrelationship_set.filter(is_poc=True).first().customer
-                data["customer_name"] = poc_customer.name 
-                data["customer_email"] = poc_customer.email 
+                poc_rel = Request.objects.get(pk=request["id"]).customerrequestrelationship_set.filter(is_poc=True).first()
+                poc_customer = poc_rel.customer if poc_rel else None
+                data["customer_name"] = poc_customer.name if poc_customer else None
+                data["customer_email"] = poc_customer.email if poc_customer else None
                 requests_data.append(data)
             
             response_data[key] = requests_data

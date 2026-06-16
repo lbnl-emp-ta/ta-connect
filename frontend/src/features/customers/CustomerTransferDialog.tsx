@@ -23,7 +23,7 @@ interface CustomerTransferDialogProps {
   open: boolean;
   onClose: () => void;
   requestId: number;
-  currentCustomerId: number;
+  currentCustomerId?: number;
 }
 
 export const CustomerTransferDialog: React.FC<CustomerTransferDialogProps> = ({

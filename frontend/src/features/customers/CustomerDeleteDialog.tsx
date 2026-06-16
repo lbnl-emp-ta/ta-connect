@@ -1,5 +1,5 @@
-import { TAOrganization } from '@/api/dashboard/types';
-import { useDeleteOrganizationMutation } from '@/api/queryOptions';
+import { TACustomer } from '@/api/dashboard/types';
+import { useDeleteCustomerMutation } from '@/api/queryOptions';
 import { useToastContext } from '@/features/toasts/ToastContext';
 import { ToastMessage } from '@/features/toasts/ToastMessage';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
@@ -14,18 +14,18 @@ import DialogTitle from '@mui/material/DialogTitle';
 import * as React from 'react';
 import { useEffect } from 'react';
 
-interface OrganizationDeleteDialogProps {
+interface CustomerDeleteDialogProps {
   open: boolean;
   onClose: () => void;
-  organization: TAOrganization;
+  customer: TACustomer;
 }
 
-export const OrganizationDeleteDialog: React.FC<OrganizationDeleteDialogProps> = ({
+export const CustomerDeleteDialog: React.FC<CustomerDeleteDialogProps> = ({
   open,
   onClose,
-  organization,
+  customer,
 }) => {
-  const deleteOrganizationMutation = useDeleteOrganizationMutation(organization.id.toString());
+  const deleteCustomerMutation = useDeleteCustomerMutation(customer.id.toString());
   const { setShowToast, setToastMessage, setToastAutoHideDuration } = useToastContext();
 
   /**
@@ -34,7 +34,7 @@ export const OrganizationDeleteDialog: React.FC<OrganizationDeleteDialogProps> =
    * If a field is set explicitly to null, it will be cleared in the API.
    */
   const handleConfirm = () => {
-    deleteOrganizationMutation.mutate();
+    deleteCustomerMutation.mutate();
     onClose();
   };
 
@@ -43,40 +43,42 @@ export const OrganizationDeleteDialog: React.FC<OrganizationDeleteDialogProps> =
   };
 
   useEffect(() => {
-    if (deleteOrganizationMutation.isPending) {
+    if (deleteCustomerMutation.isPending) {
       setShowToast(true);
       setToastAutoHideDuration(null);
-      setToastMessage(
-        <ToastMessage icon={<CircularProgress />}>Deleting organization</ToastMessage>
-      );
-    } else if (deleteOrganizationMutation.isSuccess) {
+      setToastMessage(<ToastMessage icon={<CircularProgress />}>Deleting customer</ToastMessage>);
+    } else if (deleteCustomerMutation.isSuccess) {
       setShowToast(true);
       setToastAutoHideDuration(6000);
-      setToastMessage(<ToastMessage icon={<CheckCircleIcon />}>Organization deleted</ToastMessage>);
-    } else if (deleteOrganizationMutation.isError) {
+      setToastMessage(<ToastMessage icon={<CheckCircleIcon />}>Customer deleted</ToastMessage>);
+    } else if (deleteCustomerMutation.isError) {
       setShowToast(true);
       setToastAutoHideDuration(6000);
       setToastMessage(
-        <ToastMessage icon={<ErrorIcon />}>{deleteOrganizationMutation.error.message}</ToastMessage>
+        <ToastMessage icon={<ErrorIcon />}>{deleteCustomerMutation.error.message}</ToastMessage>
       );
     }
   }, [
-    deleteOrganizationMutation.isPending,
-    deleteOrganizationMutation.isSuccess,
-    deleteOrganizationMutation.isError,
-    deleteOrganizationMutation.error?.message,
+    deleteCustomerMutation.isPending,
+    deleteCustomerMutation.isSuccess,
+    deleteCustomerMutation.isError,
+    deleteCustomerMutation.error?.message,
   ]);
 
   return (
     <Dialog open={open} maxWidth="sm" fullWidth onClose={handleCancel} disableRestoreFocus>
-      <DialogTitle>Delete Organization</DialogTitle>
+      <DialogTitle>Delete Customer</DialogTitle>
       <DialogContent>
         <DialogContentText>
-          Are you sure you want to delete the organization <strong>{organization.name}</strong>?
+          Are you sure you want to delete the customer{' '}
+          <strong>
+            {customer.name} ({customer.email})
+          </strong>
+          ?
         </DialogContentText>
         <DialogContentText sx={{ mt: 2 }}>
-          This action cannot be undone. Deleting this organization will remove it from all
-          associated requests. Those requests will need to be assigned to a new organization.
+          This action cannot be undone. Deleting this customer will remove it from all associated
+          requests. Those requests will need to be assigned to a new customer.
         </DialogContentText>
       </DialogContent>
       <DialogActions sx={{ justifyContent: 'space-between' }}>

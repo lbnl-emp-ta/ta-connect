@@ -124,7 +124,9 @@ class CustomerDetailView(views.APIView):
 
         if not CanDeleteCustomer().has_permission(request, self):
             return Response(data={"message": "Insufficient authorization to delete given customer"}, status=status.HTTP_403_FORBIDDEN)
-
+        
+        customer_relationships = CustomerRequestRelationship.objects.filter(customer=customer_obj)
+        customer_relationships.delete()
         customer_obj.delete()
 
         return Response(status=status.HTTP_204_NO_CONTENT)
@@ -187,7 +189,8 @@ class CustomerTransferView(BaseUserAwareRequest):
         
         existing_relationship = CustomerRequestRelationship.objects.filter(request=ta_request).first()
 
-        existing_relationship.delete()
+        if existing_relationship:
+            existing_relationship.delete()
 
         CustomerRequestRelationship.objects.get_or_create(
             request=ta_request,
