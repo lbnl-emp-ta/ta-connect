@@ -14,9 +14,10 @@ class ProcessIntakeForm(CreateAPIView):
         title = request.data.get("title", None)
         tpr = request.data.get("tpr", None)
         state_abbr = request.data.get("state", None)
-        organization = request.data.get("organization", None)
-        organization_address = request.data.get("organizationAddress", None)
-        organization_type = request.data.get("organizationType", None)
+        organization_id = request.data.get("organization_id", None)
+        organization_name = request.data.get("organization_name", None)
+        organization_address = request.data.get("organization_address", None)
+        organization_type = request.data.get("organization_type", None)
         description = request.data.get("description", None)
         challenges = request.data.get("challenges", None)
         goals = request.data.get("goals", None)
@@ -25,17 +26,15 @@ class ProcessIntakeForm(CreateAPIView):
         
         try:
             with transaction.atomic():
-                _org = Organization.objects.filter(name=organization)
-                if not _org.exists():
+                _org = Organization.objects.filter(id=organization_id).first()
+                if not _org:
                     _org = Organization.objects.create(
-                        name=organization,
+                        name=organization_name,
                         address=organization_address,
                         state=State.objects.get(abbreviation=state_abbr),
                         transmission_planning_region=TransmissionPlanningRegion.objects.get(name=tpr),
                         type=OrganizationType.objects.get(name=organization_type)
                     )
-                else:
-                    _org = _org.first()
 
                 _request = Request.objects.create(
                     organization=_org,

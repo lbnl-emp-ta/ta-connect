@@ -24,7 +24,7 @@ import {
 import { createFileRoute } from '@tanstack/react-router';
 
 import { useSuspenseQuery } from '@tanstack/react-query';
-import { ChangeEventHandler, useEffect, useState } from 'react';
+import { ChangeEventHandler, useEffect, useMemo, useState } from 'react';
 import {
   IntakeFormData,
   OrganizationType,
@@ -33,6 +33,7 @@ import {
 } from '@/api/forms/types';
 import { AppLink } from '@/components/AppLink';
 import {
+  organizationsQueryOptions,
   organizationTypesQueryOptions,
   statesQueryOptions,
   transmissionPlanningRegionsQueryOptions,
@@ -40,10 +41,12 @@ import {
 } from '@/api/queryOptions';
 import { effortOptions, isValidEmail, isValidUSTelephone } from '@/utils/utils';
 import { PhoneInput } from '@/components/PhoneInput';
+import { TAOrganization } from '@/api/dashboard/types';
 
 export const Route = createFileRoute('/(public)/intake')({
   loader: async ({ context }) => {
     await context.queryClient.ensureQueryData(statesQueryOptions());
+    await context.queryClient.ensureQueryData(organizationsQueryOptions());
     await context.queryClient.ensureQueryData(organizationTypesQueryOptions());
     await context.queryClient.ensureQueryData(transmissionPlanningRegionsQueryOptions());
   },
@@ -51,6 +54,7 @@ export const Route = createFileRoute('/(public)/intake')({
 });
 
 function IntakeForm() {
+  const { data: organizations } = useSuspenseQuery(organizationsQueryOptions());
   const { data: states } = useSuspenseQuery(statesQueryOptions());
   const { data: orgTypes } = useSuspenseQuery(organizationTypesQueryOptions());
   const { data: tprs } = useSuspenseQuery(transmissionPlanningRegionsQueryOptions());
@@ -58,6 +62,7 @@ function IntakeForm() {
   const [phone, setPhone] = useState('');
   const [email, setEmail] = useState('');
   const [title, setTitle] = useState('');
+  const [org, setOrg] = useState<TAOrganization>();
   const [state, setState] = useState<State | null>(null);
   const [orgName, setOrgName] = useState('');
   const [orgAddress, setOrgAddress] = useState('');
@@ -70,6 +75,10 @@ function IntakeForm() {
   const [phoneError, setPhoneError] = useState(false);
   const [emailError, setEmailError] = useState(false);
   const [emailHelperText, setEmailHelperText] = useState('');
+  const organizationOptions = useMemo(() => {
+    if (!organizations) return [];
+    return [...organizations, { id: -1, name: 'Other' } as TAOrganization];
+  }, [organizations]);
   const submitIntakeMutation = useSubmitIntakeMutation();
 
   function handleSubmit(event: React.SyntheticEvent<HTMLFormElement>) {
@@ -81,9 +90,10 @@ function IntakeForm() {
       title: title,
       tpr: tprName,
       state: state?.abbreviation || '',
-      organization: orgName,
-      organizationAddress: orgAddress,
-      organizationType: orgTypeName,
+      organization_id: org?.id,
+      organization_name: orgName,
+      organization_address: orgAddress,
+      organization_type: orgTypeName,
       description: description,
       challenges: challenges,
       goals: goals,
@@ -107,6 +117,10 @@ function IntakeForm() {
     setEmailError(!isValid);
     setEmailHelperText(isValid ? '' : 'Not a valid email address.');
     setEmail(newEmail);
+  };
+
+  const handleOrgChange = (_: any, newValue: TAOrganization | null) => {
+    setOrg(newValue || undefined);
   };
 
   useEffect(() => {
@@ -135,7 +149,9 @@ function IntakeForm() {
         <Paper sx={{ padding: 2 }}>
           <form className="intake-form form" onSubmit={handleSubmit}>
             <Stack spacing={2}>
-              <Typography variant="h2">TA Request Form</Typography>
+              <Typography variant="h2" component="h1">
+                TA Request Form
+              </Typography>
               <Typography>
                 As a reminder, this program is limited to State PUCs and SEOs only. Employees at
                 these State organizations can submit an unlimited number of Help Desk and Expert
@@ -143,15 +159,12 @@ function IntakeForm() {
                 Please email TA3@lbl.gov regarding the status of any existing requests or
                 submissions.
               </Typography>
-              <Typography id="info" variant="subtitle1">
-                Required fields are followed by{' '}
-                <strong>
-                  <span aria-label="required"> *</span>
-                </strong>
-              </Typography>
+              <Typography>Required fields are followed by *</Typography>
               <Divider />
               <Stack spacing={2}>
-                <Typography variant="h4">Personal Information</Typography>
+                <Typography variant="h4" component="h2">
+                  Personal Information
+                </Typography>
                 <TextField
                   variant="outlined"
                   label="First & Last Name"
@@ -187,77 +200,105 @@ function IntakeForm() {
                   onChange={(e) => setTitle(e.target.value)}
                   value={title}
                 />
-                <FormControl fullWidth required={true}>
-                  <InputLabel id="tpr-label">Tramission Planning Region</InputLabel>
-                  <Select
-                    id="tpr-select"
-                    label="Tramission Planning Region"
-                    labelId="tpr-label"
-                    required={true}
-                    defaultValue=""
-                    value={
-                      tprName === undefined || tprName === null || tprs?.length === 0 ? '' : tprName
-                    }
-                    onChange={(e) => setTprName(e.target.value)}
-                  >
-                    {tprs?.map((region: TransmissionPlanningRegion) => (
-                      <MenuItem key={region.name} value={region.name}>
-                        {region.name}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
+                <Typography variant="h6" component="h3">
+                  Organization
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  Select the organization that is requesting this technical assistance. If your
+                  organization is not listed, please select "Other" and manually enter your
+                  organization's information.
+                </Typography>
                 <Autocomplete
                   disablePortal
-                  options={states || []}
-                  getOptionLabel={(option: State) => option.name}
-                  sx={{ width: 300 }}
-                  renderInput={(params) => <TextField {...params} required={true} label="State" />}
-                  value={state}
-                  onChange={(_, newValue: State | null) => {
-                    setState(newValue);
-                  }}
+                  options={organizationOptions}
+                  getOptionLabel={(option) => option.name}
+                  renderInput={(params) => (
+                    <TextField {...params} required={true} label="Organization" />
+                  )}
+                  onChange={handleOrgChange}
+                  value={org}
                 />
-                <TextField
-                  variant="outlined"
-                  label="Organization Name"
-                  fullWidth={true}
-                  required={true}
-                  onChange={(e) => setOrgName(e.target.value)}
-                  value={orgName}
-                />
-                <TextField
-                  variant="outlined"
-                  label="Organization Address"
-                  fullWidth={true}
-                  required={true}
-                  onChange={(e) => setOrgAddress(e.target.value)}
-                  value={orgAddress}
-                />
-                <FormControl>
-                  <FormLabel id="org-type-radio-group" sx={{ fontWeight: 'bold' }}>
-                    Organization Type
-                  </FormLabel>
-                  <RadioGroup
-                    aria-labelledby="org-type-radio-group"
-                    value={orgTypeName}
-                    onChange={(e) => setOrgTypeName(e.target.value)}
-                    name="org-type-radio-group"
-                  >
-                    {orgTypes?.map((type: OrganizationType) => (
-                      <FormControlLabel
-                        key={type.name}
-                        value={type.name}
-                        control={<Radio />}
-                        label={type.name}
-                      />
-                    ))}
-                  </RadioGroup>
-                </FormControl>
+                {org?.name === 'Other' && (
+                  <>
+                    <TextField
+                      variant="outlined"
+                      label="Organization Name"
+                      fullWidth={true}
+                      required={true}
+                      onChange={(e) => setOrgName(e.target.value)}
+                      value={orgName}
+                    />
+                    <FormControl fullWidth required={true}>
+                      <InputLabel id="tpr-label">Tramission Planning Region</InputLabel>
+                      <Select
+                        id="tpr-select"
+                        label="Tramission Planning Region"
+                        labelId="tpr-label"
+                        required={true}
+                        defaultValue=""
+                        value={
+                          tprName === undefined || tprName === null || tprs?.length === 0
+                            ? ''
+                            : tprName
+                        }
+                        onChange={(e) => setTprName(e.target.value)}
+                      >
+                        {tprs?.map((region: TransmissionPlanningRegion) => (
+                          <MenuItem key={region.name} value={region.name}>
+                            {region.name}
+                          </MenuItem>
+                        ))}
+                      </Select>
+                    </FormControl>
+                    <Autocomplete
+                      disablePortal
+                      options={states || []}
+                      getOptionLabel={(option: State) => option.name}
+                      sx={{ width: 300 }}
+                      renderInput={(params) => (
+                        <TextField {...params} required={true} label="State" />
+                      )}
+                      value={state}
+                      onChange={(_, newValue: State | null) => {
+                        setState(newValue);
+                      }}
+                    />
+                    <TextField
+                      variant="outlined"
+                      label="Organization Address"
+                      fullWidth={true}
+                      required={true}
+                      onChange={(e) => setOrgAddress(e.target.value)}
+                      value={orgAddress}
+                    />
+                    <FormControl>
+                      <FormLabel id="org-type-radio-group" sx={{ fontWeight: 'bold' }}>
+                        Organization Type
+                      </FormLabel>
+                      <RadioGroup
+                        aria-labelledby="org-type-radio-group"
+                        value={orgTypeName}
+                        onChange={(e) => setOrgTypeName(e.target.value)}
+                        name="org-type-radio-group"
+                      >
+                        {orgTypes?.map((type: OrganizationType) => (
+                          <FormControlLabel
+                            key={type.name}
+                            value={type.name}
+                            control={<Radio />}
+                            label={type.name}
+                          />
+                        ))}
+                      </RadioGroup>
+                    </FormControl>
+                  </>
+                )}
               </Stack>
               <Divider />
               <Stack spacing={2}>
-                <Typography variant="h4">Technical Assistance Information</Typography>
+                <Typography variant="h4" component="h2">
+                  Technical Assistance Information
+                </Typography>
                 <FormControl required={true}>
                   <FormLabel htmlFor="description-input" sx={{ fontWeight: 'bold' }}>
                     Description
