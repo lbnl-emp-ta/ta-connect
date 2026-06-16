@@ -16,16 +16,6 @@ class OrganizationListView(ListAPIView):
     queryset = Organization.objects.all()
     serializer_class = OrganizationSerializer
 
-    authentication_classes = [
-        authentication.SessionAuthentication,
-        XSessionTokenAuthentication,
-    ]
-
-    permission_classes = [
-        permissions.IsAuthenticated,
-        IsAdmin|IsProgramLead|IsCoordinator|IsLabLead|IsExpert
-    ]
-
 
 class OrganizationDetailView(views.APIView):
     queryset = Organization.objects.all()
