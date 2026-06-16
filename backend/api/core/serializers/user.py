@@ -5,4 +5,4 @@ from core.models import User
 class UserLeanSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ["email", "name", "phone"]
+        fields = ["email", "name", "phone", "is_staff"]

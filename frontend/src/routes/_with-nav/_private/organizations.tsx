@@ -10,6 +10,7 @@ import { useState } from 'react';
 import { TAOrganization, TAOrganizationType } from '@/api/dashboard/types';
 import { GridColDef } from '@mui/x-data-grid';
 import { TransmissionPlanningRegion, State } from '@/api/forms/types';
+import { useUser } from '@/hooks/useUser';
 
 export const Route = createFileRoute('/_with-nav/_private/organizations')({
   loader: async ({ context }) => {
@@ -19,6 +20,8 @@ export const Route = createFileRoute('/_with-nav/_private/organizations')({
 });
 
 function OrganizationsPage() {
+  const user = useUser();
+  console.log('User in OrganizationsPage:', user);
   const { data: organizations } = useSuspenseQuery(organizationsQueryOptions());
   const [organizationEditDialogOpen, setOrganizationEditDialogOpen] = useState(false);
   // const [organizationDeleteDialogOpen, setOrganizationDeleteDialogOpen] = useState(false);
