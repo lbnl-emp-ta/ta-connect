@@ -124,7 +124,7 @@ export const RequestsList: React.FC<RequestsListProps> = ({
                   {request.customer_name}
                 </Typography>
                 <Typography component="h4" fontWeight="bold">
-                  ({request.organization.state.name})
+                  ({request.organization?.state.name})
                 </Typography>
               </Stack>
               <Typography>#{request.id}</Typography>

@@ -22,7 +22,7 @@ import {
 import { useState } from 'react';
 
 interface RequestOrganizationPanelProps {
-  organization: TAOrganization;
+  organization?: TAOrganization;
   permissions: PermissionAction[];
   requestId: number;
 }
@@ -122,7 +122,7 @@ export const RequestOrganizationPanel: React.FC<RequestOrganizationPanelProps> =
                 open={organizationTransferDialogOpen}
                 onClose={() => setOrganizationTransferDialogOpen(false)}
                 requestId={requestId}
-                currentOrganizationId={organization.id}
+                currentOrganizationId={organization?.id}
               />
               <OrganizationEditDialog
                 open={organizationEditDialogOpen}
@@ -148,19 +148,19 @@ export const RequestOrganizationPanel: React.FC<RequestOrganizationPanelProps> =
           <TableBody>
             <TableRow>
               <TableCell>Organization</TableCell>
-              <TableCell>{organization.name}</TableCell>
+              <TableCell>{organization?.name || '-'}</TableCell>
             </TableRow>
             <TableRow>
               <TableCell>Organization Type</TableCell>
-              <TableCell>{organization.type.name}</TableCell>
+              <TableCell>{organization?.type.name || '-'}</TableCell>
             </TableRow>
             <TableRow>
               <TableCell>Transmission Planning Region</TableCell>
-              <TableCell>{organization.transmission_planning_region.name}</TableCell>
+              <TableCell>{organization?.transmission_planning_region.name || '-'}</TableCell>
             </TableRow>
             <TableRow>
               <TableCell>State</TableCell>
-              <TableCell>{organization.state.name}</TableCell>
+              <TableCell>{organization?.state.name || '-'}</TableCell>
             </TableRow>
           </TableBody>
         </Table>

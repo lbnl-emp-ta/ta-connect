@@ -190,7 +190,7 @@ export interface TARequest {
   date_created: string;
   customer_email: string;
   customer_name: string;
-  organization: TAOrganization;
+  organization?: TAOrganization;
   expert: Partial<TAExpert> | null;
   proj_start_date: string | null;
   proj_completion_date: string | null;
@@ -251,7 +251,7 @@ export interface TARequestDetail {
   effort: string;
   date_created: string;
   customers: TACustomer[];
-  organization: TAOrganization;
+  organization?: TAOrganization;
   expert: TAExpert | null;
   owner?: TAOwner;
   program?: TAProgram | null;
@@ -310,6 +310,7 @@ export interface TAUser {
   display: string;
   has_usable_password: boolean;
   id: number;
+  is_staff: boolean;
   email?: string;
   name?: string;
   phone?: string;

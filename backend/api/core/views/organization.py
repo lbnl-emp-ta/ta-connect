@@ -91,6 +91,19 @@ class OrganizationDetailView(views.APIView):
 
         return Response(data=OrganizationSerializer(Organization.objects.get(pk=organization_id)).data,status=status.HTTP_200_OK)
     
+    def delete(self, request, organization_id):
+        try:
+            organization_obj = Organization.objects.get(pk=organization_id)
+        except Organization.DoesNotExist:
+            return Response(data={"message":"Organization with given ID does not exist"})
+
+        if not CanDeleteOrganization().has_permission(request, self):
+            return Response(data={"message": "Insufficient authorization to delete given organization"}, status=status.HTTP_403_FORBIDDEN)
+
+        organization_obj.delete()
+
+        return Response(status=status.HTTP_204_NO_CONTENT)
+    
 
 class OrganizationCreateView(views.APIView):
     authentication_classes = [

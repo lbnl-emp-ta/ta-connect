@@ -253,6 +253,16 @@ export const useOrganizationMutation = (organizationId: string, isAdminMode?: bo
   });
 };
 
+export const useOrganizationDeleteMutation = (organizationId: string) => {
+  return useMutation({
+    mutationKey: ['organizations', 'delete', organizationId],
+    // isAdminMode is turned on by default for simplicity. Only admins can see the delete button.
+    mutationFn: () =>
+      deleteData(`${import.meta.env.VITE_API_URL}/organizations/${organizationId}`, true),
+    onSuccess: () => queryClient.invalidateQueries(),
+  });
+};
+
 export const useCreateOrganizationMutation = () => {
   return useMutation({
     mutationKey: ['organizations', 'create'],

@@ -59,7 +59,7 @@ export const RequestAssignForwardButton: React.FC<RequestAssignForwardButtonProp
   } = useRequestsContext();
   const { setShowToast, setToastMessage } = useToastContext();
   const [searchTerm, setSearchTerm] = useState('');
-  const requestOrganizationType = request.organization.type;
+  const requestOrganizationType = request.organization?.type;
   const ownersContainsExperts =
     owners?.some((owner) => owner.domain_type === 'expert') &&
     (request.status === 'assigned-to-lab' || request.status === 'rejected-by-expert');
@@ -241,7 +241,7 @@ export const RequestAssignForwardButton: React.FC<RequestAssignForwardButtonProp
       return false;
     }
     const ownerOrganizationTypeIds = owner.domain_organization_types.map((orgType) => orgType.id);
-    return ownerOrganizationTypeIds.includes(requestOrganizationType.id);
+    return ownerOrganizationTypeIds.includes(requestOrganizationType?.id ?? -1);
   };
 
   if (
@@ -358,13 +358,13 @@ export const RequestAssignForwardButton: React.FC<RequestAssignForwardButtonProp
                     <>
                       {checkOrganizationTypes(owner) ? (
                         <Tooltip
-                          title={`This program supports ${requestOrganizationType.name} customers.`}
+                          title={`This program supports ${requestOrganizationType?.name} customers.`}
                         >
                           <CheckCircleIcon color="success" />
                         </Tooltip>
                       ) : (
                         <Tooltip
-                          title={`This program does not support ${requestOrganizationType.name} customers.`}
+                          title={`This program does not support ${requestOrganizationType?.name} customers.`}
                         >
                           <ErrorIcon color="error" />
                         </Tooltip>

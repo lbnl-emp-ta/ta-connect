@@ -116,6 +116,19 @@ class CustomerDetailView(views.APIView):
 
         return Response(data=CustomerSerializer(Customer.objects.get(pk=customer_id)).data,status=status.HTTP_200_OK)
     
+    def delete(self, request, customer_id):
+        try:
+            customer_obj = Customer.objects.get(pk=customer_id)
+        except Customer.DoesNotExist:
+            return Response(data={"message":"Customer with given ID does not exist"})
+
+        if not CanDeleteCustomer().has_permission(request, self):
+            return Response(data={"message": "Insufficient authorization to delete given customer"}, status=status.HTTP_403_FORBIDDEN)
+
+        customer_obj.delete()
+
+        return Response(status=status.HTTP_204_NO_CONTENT)
+    
 
 class CustomerCreateView(views.APIView):
     authentication_classes = [

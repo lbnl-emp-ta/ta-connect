@@ -2,6 +2,7 @@ import { organizationsQueryOptions } from '@/api/queryOptions';
 import { OrganizationsDataTable } from '@/features/organizations/OrganizationsDataTable';
 import { Box, Button, Container, IconButton, Stack, Typography } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
+import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { createFileRoute } from '@tanstack/react-router';
@@ -11,6 +12,7 @@ import { TAOrganization, TAOrganizationType } from '@/api/dashboard/types';
 import { GridColDef } from '@mui/x-data-grid';
 import { TransmissionPlanningRegion, State } from '@/api/forms/types';
 import { useUser } from '@/hooks/useUser';
+import { OrganizationDeleteDialog } from '@/features/organizations/OrganizationDeleteDialog';
 
 export const Route = createFileRoute('/_with-nav/_private/organizations')({
   loader: async ({ context }) => {
@@ -21,15 +23,19 @@ export const Route = createFileRoute('/_with-nav/_private/organizations')({
 
 function OrganizationsPage() {
   const user = useUser();
-  console.log('User in OrganizationsPage:', user);
   const { data: organizations } = useSuspenseQuery(organizationsQueryOptions());
   const [organizationEditDialogOpen, setOrganizationEditDialogOpen] = useState(false);
-  // const [organizationDeleteDialogOpen, setOrganizationDeleteDialogOpen] = useState(false);
+  const [organizationDeleteDialogOpen, setOrganizationDeleteDialogOpen] = useState(false);
   const [selectedOrganization, setSelectedOrganization] = useState<TAOrganization>();
 
   const handleRowEdit = (organization: TAOrganization) => {
     setSelectedOrganization(organization);
     setOrganizationEditDialogOpen(true);
+  };
+
+  const handleRowDelete = (organization: TAOrganization) => {
+    setSelectedOrganization(organization);
+    setOrganizationDeleteDialogOpen(true);
   };
 
   const handleAddOrganization = () => {
@@ -91,11 +97,17 @@ function OrganizationsPage() {
               <EditIcon />
             </IconButton>
           </Box>
-          {/* <Box>
-            <IconButton color="primary" size="small">
-              <DeleteIcon />
-            </IconButton>
-          </Box> */}
+          {user?.is_staff && (
+            <Box>
+              <IconButton
+                color="primary"
+                size="small"
+                onClick={() => handleRowDelete(params.row as TAOrganization)}
+              >
+                <DeleteIcon />
+              </IconButton>
+            </Box>
+          )}
         </Stack>
       ),
     },
@@ -121,6 +133,13 @@ function OrganizationsPage() {
         onClose={() => setOrganizationEditDialogOpen(false)}
         organization={selectedOrganization}
       />
+      {selectedOrganization && (
+        <OrganizationDeleteDialog
+          open={organizationDeleteDialogOpen}
+          onClose={() => setOrganizationDeleteDialogOpen(false)}
+          organization={selectedOrganization}
+        />
+      )}
     </Container>
   );
 }

@@ -87,4 +87,5 @@ class CustomHeadlessAdapter(DefaultHeadlessAdapter):
         ret = super().serialize_user(user)
         ret['name'] = user.name
         ret['phone'] = user.phone
+        ret['is_staff'] = user.is_staff
         return ret

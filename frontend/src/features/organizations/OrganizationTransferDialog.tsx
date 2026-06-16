@@ -23,7 +23,7 @@ interface OrganizationTransferDialogProps {
   open: boolean;
   onClose: () => void;
   requestId: number;
-  currentOrganizationId: number;
+  currentOrganizationId?: number;
 }
 
 export const OrganizationTransferDialog: React.FC<OrganizationTransferDialogProps> = ({
