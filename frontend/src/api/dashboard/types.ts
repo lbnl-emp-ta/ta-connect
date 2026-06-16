@@ -4,39 +4,59 @@ export interface TAOrganizationType {
   description: string;
 }
 
+export interface TAOrganization {
+  id: number;
+  name: string;
+  address: string;
+  type: TAOrganizationType;
+  state: {
+    id: number;
+    name: string;
+    abbreviation: string;
+  };
+  transmission_planning_region: {
+    id: number;
+    name: string;
+  };
+}
+
+export interface TAOrganizationMutation {
+  name?: string;
+  address?: string;
+  type?: number;
+  state?: number;
+  transmission_planning_region?: number;
+}
+
+export interface TAOrganizationTransferMutation {
+  organization_id: number;
+}
+
 export interface TACustomer {
   id: number;
   email: string;
   name: string;
   phone: string;
   title: string;
-  org: {
-    id: number;
-    address: string;
-    name: string;
-    type: TAOrganizationType;
-  };
-  state: {
-    id: number;
-    name: string;
-    abbreviation: string;
-  };
-  tpr: {
-    id: number;
-    name: string;
-  };
   requests: number[];
 }
 
 export interface TACustomerMutation {
-  org?: number;
-  orgType?: number;
-  tpr?: number;
   email?: string;
   name?: string;
   phone?: string;
   title?: string;
-  state?: number;
+}
+
+export interface TACustomerTransferMutation {
+  customer_id: number;
+}
+
+export interface TACustomerRequestRelationship {
+  id: number;
+  request: TARequest;
+  customer: TACustomer;
+  is_poc: Boolean;
 }
 
 export interface TATopic {
@@ -168,9 +188,9 @@ export interface TARequest {
   depth: string;
   description: string;
   date_created: string;
-  customer_email: string;
-  customer_name: string;
-  customer_state_abbreviation: string;
+  customer_email?: string;
+  customer_name?: string;
+  organization?: TAOrganization;
   expert: Partial<TAExpert> | null;
   proj_start_date: string | null;
   proj_completion_date: string | null;
@@ -193,8 +213,11 @@ export type PermissionAction =
   | 'edit-projected-start-date'
   | 'edit-projected-completion-date'
   | 'edit-actual-completion-date'
-  | 'edit-customer'
-  | 'edit-customer-organization-type'
+  | 'edit-customer-info'
+  | 'transfer-customer'
+  | 'transfer-organization'
+  | 'edit-organization-info'
+  | 'transfer-organization-type'
   | 'assign-forward-to-reception'
   | 'assign-forward-to-program'
   | 'assign-forward-to-lab'
@@ -228,6 +251,7 @@ export interface TARequestDetail {
   effort: string;
   date_created: string;
   customers: TACustomer[];
+  organization?: TAOrganization;
   expert: TAExpert | null;
   owner?: TAOwner;
   program?: TAProgram | null;
@@ -286,6 +310,7 @@ export interface TAUser {
   display: string;
   has_usable_password: boolean;
   id: number;
+  is_staff: boolean;
   email?: string;
   name?: string;
   phone?: string;
@@ -301,27 +326,6 @@ export interface TARequestsResponse {
   actionable: TARequest[];
   downstream: TARequest[];
   inactive: TARequest[];
-}
-
-export interface Customer {
-  id: number;
-  email: string;
-  name: string;
-  phone: string;
-  title: string;
-}
-
-export interface CustomerType {
-  id: number;
-  name: string;
-  description: string;
-}
-
-export interface CustomerRequestRelationship {
-  id: number;
-  request: TARequest;
-  customer: Customer;
-  customer_type: CustomerType;
 }
 
 export interface TAAssignment {

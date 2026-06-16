@@ -3,7 +3,7 @@ from django.db import transaction
 from django.db.models.signals import pre_save, post_save, post_delete
 from django.dispatch import receiver
 
-from core.models import Attachment, User, ReceptionRoleAssignment, Role, Request, Owner, ReceptionRoleAssignment, ProgramRoleAssignment, LabRoleAssignment, Lab, Program
+from core.models import Attachment, User, ReceptionRoleAssignment, Role, Request, Owner, ReceptionRoleAssignment, ProgramRoleAssignment, LabRoleAssignment, Lab, Program, SystemRoleAssignment
 
 _UNSET = object()
 from core.constants import DOMAINTYPE, ROLE
@@ -116,7 +116,7 @@ def notify_reception_on_new_request(sender, instance, created, **kwargs):
             return
 
         primary_customer = instance.customers.filter(
-            customerrequestrelationship__customer_type__name="Primary Contact"
+            customerrequestrelationship__is_poc=True
         ).first()
 
         for recipient in recipients:
@@ -124,6 +124,7 @@ def notify_reception_on_new_request(sender, instance, created, **kwargs):
                 receipient_name=recipient["name"],
                 request=instance,
                 customer=primary_customer,
+                organization=instance.organization
             )
             send_email_notification(
                 subject="TA Connect - New Request Submitted",
@@ -192,14 +193,15 @@ def notify_owners_on_assignment(sender, instance, created, **kwargs):
             recipients = []
 
     primary_customer = instance.customers.filter(
-        customerrequestrelationship__customer_type__name="Primary Contact"
+        customerrequestrelationship__is_poc=True
     ).first()
 
     for recipient in recipients:
         plain_text_message, html_message = assignment_email(
             receipient_name=recipient["name"],
             request=instance,
-            customer=primary_customer
+            customer=primary_customer,
+            organization=instance.organization
         )
         send_email_notification(
             subject="TA Connect - Request Assigned to You",
@@ -254,6 +256,32 @@ def create_owner_on_lab_role_assignment(sender, instance, created, **kwargs):
             domain_type=DOMAINTYPE.EXPERT,
             expert=user,
         )
+
+
+@receiver(post_save, sender=SystemRoleAssignment)
+def set_staff_on_admin_assignment(sender, instance, created, **kwargs):
+    """
+    When a SystemRoleAssignment is created that assigns a user to the Admin role,
+    set the user's is_staff field to True so they can access the Django admin.
+    """
+    if created and instance.role.name == ROLE.ADMIN:
+        user = instance.user
+        if not user.is_staff:
+            user.is_staff = True
+            user.save()
+
+
+@receiver(post_delete, sender=SystemRoleAssignment)
+def clear_staff_on_admin_assignment_delete(sender, instance, **kwargs):
+    """
+    When a SystemRoleAssignment is deleted that removes a user from the Admin role,
+    set the user's is_staff field to False if they no longer have any Admin role assignments.
+    """
+    if instance.role.name == ROLE.ADMIN:
+        user = instance.user
+        if not SystemRoleAssignment.objects.filter(user=user, role__name=ROLE.ADMIN).exists():
+            user.is_staff = False
+            user.save()
 
 
 @receiver(post_delete, sender=Attachment)

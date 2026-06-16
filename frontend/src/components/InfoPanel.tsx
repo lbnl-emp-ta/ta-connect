@@ -1,4 +1,4 @@
-import { Box, Paper } from '@mui/material';
+import { Box, Paper, SxProps } from '@mui/material';
 
 interface InfoPanelProps {
   header?: React.ReactNode;
@@ -8,18 +8,20 @@ interface InfoPanelProps {
    */
   tabs?: React.ReactNode;
   children: React.ReactNode;
+  sx?: SxProps;
 }
 
 /**
  * Consistently styled panel for informational content.
  * The header can be plain text or a more complex React node.
  */
-export const InfoPanel: React.FC<InfoPanelProps> = ({ header, tabs, children }) => {
+export const InfoPanel: React.FC<InfoPanelProps> = ({ header, tabs, children, sx }) => {
   return (
     <Paper
       sx={{
         height: 'stretch',
         width: 'stretch',
+        ...sx,
       }}
     >
       {tabs && (

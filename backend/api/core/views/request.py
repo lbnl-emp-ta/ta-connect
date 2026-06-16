@@ -178,12 +178,11 @@ class RequestDetailView(BaseUserAwareRequest):
         customers_response_data = customer_serializer.data
         for customer in customers_response_data:
             try:
-                customer_type = CustomerRequestRelationship.objects.get(request=ta_request, customer=Customer.objects.get(pk=customer["id"])).customer_type
-                customer_type_data = CustomerTypeSerializer(customer_type).data
-                customer["type"] = customer_type_data
+                customer_relationship = CustomerRequestRelationship.objects.get(request=ta_request, customer=Customer.objects.get(pk=customer["id"]))
+                customer["is_poc"] = customer_relationship.is_poc
 
             except CustomerRequestRelationship.DoesNotExist:
-                return Response(data={"message": "Customer relationship data is missing!"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+                customer["is_poc"] = False
 
         request_serializer = self.serializer_class(ta_request)
 
@@ -233,8 +232,11 @@ class RequestDetailView(BaseUserAwareRequest):
             ('edit-goals', CanEditGoals),
             ('edit-projected-start-date', CanEditProjectedStartDate),
             ('edit-actual-completion-date', CanEditActualCompletionDate),
-            ('edit-customer', CanEditCustomerBasic),
-            ('edit-customer-organization-type', CanEditCustomerOrgType),
+            ('edit-customer-info', CanEditCustomerInfo),
+            ('transfer-customer', CanTransferCustomer),
+            ('edit-organization-info', CanEditOrganizationInfo),
+            ('transfer-organization', CanTransferOrganization),
+            ('transfer-organization-type', CanTransferOrganizationType),
             ('edit-closeout-responses', CanEditCloseoutResponses),
             ('assign-forward-to-reception', CanAssignForwardToReception),
             ('cancel-request', CanCancel),
@@ -451,10 +453,10 @@ class RequestListView(BaseUserAwareRequest):
             requests_data = list() 
             for request in serializer.data:
                 data = request
-                poc_customer = Request.objects.get(pk=request["id"]).customerrequestrelationship_set.filter(customer_type=CustomerType.objects.get(name="Primary Contact")).first().customer
-                data["customer_name"] = poc_customer.name 
-                data["customer_email"] = poc_customer.email 
-                data["customer_state_abbreviation"] = poc_customer.state.abbreviation 
+                poc_rel = Request.objects.get(pk=request["id"]).customerrequestrelationship_set.filter(is_poc=True).first()
+                poc_customer = poc_rel.customer if poc_rel else None
+                data["customer_name"] = poc_customer.name if poc_customer else None
+                data["customer_email"] = poc_customer.email if poc_customer else None
                 requests_data.append(data)
             
             response_data[key] = requests_data

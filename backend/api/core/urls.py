@@ -8,6 +8,8 @@ urlpatterns = [
     path('requests/<int:request_id>', RequestDetailView.as_view(), name="request-detail"),
 
     path('requests/<int:request_id>/assign/', AssignmentView.as_view(), name="assignment"),
+    path('requests/<int:request_id>/transfer-customer/', CustomerTransferView.as_view(), name="transfer-customer"),
+    path('requests/<int:request_id>/transfer-organization/', OrganizationTransferView.as_view(), name="transfer-organization"),
     path('requests/<int:request_id>/owners/', OwnerListView.as_view(), name="owners-list"),
     path('requests/<int:request_id>/audit-history/', AuditHistoryListView.as_view(), name="list-audit-history"),
     path('requests/<int:request_id>/cancel/', RequestCancelView.as_view(), name="cancel"),
@@ -33,13 +35,17 @@ urlpatterns = [
     path('experts/', ExpertsListView.as_view(), name="experts-list"),
     path('depths/', DepthListView.as_view(), name="depth-list"),
     path('states/', StateListView.as_view(), name="state-list"),
+
     path('organizations/', OrganizationListView.as_view(), name="organization-list"),
-    
+    path('organizations/create/', OrganizationCreateView.as_view(), name="organization-create"),
+    path('organizations/<int:organization_id>', OrganizationDetailView.as_view(), name="organization-detail"),
     path('organization-types/', OrganizationTypeListView.as_view(), name="organization-type-list"),
     path('transmission-planning-regions/', TransmissionPlanningRegionListView.as_view(), name="transmission-planning-regions-list"),
+
     path('customer-request-relationships/', CustomerRequestRelationshipListView.as_view(), name="customer-request-relationships-list"),
-    
-    path('customers/<int:customer_id>', CustomerEditView.as_view(), name="customer-edit"),
+    path('customers/', CustomerListView.as_view(), name="customer-list"),
+    path('customers/create/', CustomerCreateView.as_view(), name="customer-create"),
+    path('customers/<int:customer_id>', CustomerDetailView.as_view(), name="customer-edit"),
     path('customer-request-relationships/', CustomerRequestRelationshipListView.as_view(), name="customer-request-relationship-create"),
 
     path('topics/', TopicListView.as_view(), name="topic-list"),

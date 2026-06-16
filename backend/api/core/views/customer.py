@@ -1,5 +1,6 @@
 from rest_framework import views, authentication, permissions, status
 from rest_framework.response import Response
+from rest_framework.generics import ListAPIView
 
 from core.views.request import BaseUserAwareRequest
 from core.models import * 
@@ -10,7 +11,23 @@ from allauth.headless.contrib.rest_framework.authentication import (
     XSessionTokenAuthentication,
 )
 
-class CustomerEditView(views.APIView):
+
+class CustomerListView(ListAPIView):
+    queryset = Customer.objects.all()
+    serializer_class = CustomerSerializer
+
+    authentication_classes = [
+        authentication.SessionAuthentication,
+        XSessionTokenAuthentication,
+    ]
+
+    permission_classes = [
+        permissions.IsAuthenticated,
+        IsAdmin|IsProgramLead|IsCoordinator|IsLabLead
+    ]
+
+
+class CustomerDetailView(views.APIView):
     queryset = Customer.objects.all()
     serializer_class = CustomerSerializer
 
@@ -29,11 +46,18 @@ class CustomerEditView(views.APIView):
             customer_obj = Customer.objects.get(pk=customer_id)
         except Customer.DoesNotExist:
             return Response(data={"message":"Customer with given ID does not exist"})
+        
+        # Make sure the customer that is being edited is associated with at least
+        # one request that the user has a role on. i.e. preventing user from editing arbitrary customers in system.
+        customer_relationships = CustomerRequestRelationship.objects.filter(customer=customer_obj)
+        has_permission = False
+        for relationship in customer_relationships:
+            ta_request = relationship.request
+            if CanEditCustomerInfo().has_object_permission(request, self, ta_request):
+                has_permission = True
+                break
 
-        # Making sure the customer that is being edited is associated with a request that is actionable for the user
-        # i.e. preventing user from editing arbitrary customers in system.
-        # Admins can edit any customer
-        if not IsAdmin().has_permission(request) and not CustomerRequestRelationship.objects.filter(customer=customer_obj).filter(request__in=BaseUserAwareRequest(request=request).get_actionable()):
+        if not has_permission:
             return Response(data={"message": "Insufficient authorization to edit given customer's information"}, status=status.HTTP_400_BAD_REQUEST)
 
         customer_patch_data = dict() 
@@ -91,3 +115,88 @@ class CustomerEditView(views.APIView):
             
 
         return Response(data=CustomerSerializer(Customer.objects.get(pk=customer_id)).data,status=status.HTTP_200_OK)
+    
+    def delete(self, request, customer_id):
+        try:
+            customer_obj = Customer.objects.get(pk=customer_id)
+        except Customer.DoesNotExist:
+            return Response(data={"message":"Customer with given ID does not exist"})
+
+        if not CanDeleteCustomer().has_permission(request, self):
+            return Response(data={"message": "Insufficient authorization to delete given customer"}, status=status.HTTP_403_FORBIDDEN)
+        
+        customer_relationships = CustomerRequestRelationship.objects.filter(customer=customer_obj)
+        customer_relationships.delete()
+        customer_obj.delete()
+
+        return Response(status=status.HTTP_204_NO_CONTENT)
+    
+
+class CustomerCreateView(views.APIView):
+    authentication_classes = [
+        authentication.SessionAuthentication,
+        XSessionTokenAuthentication,
+    ]
+
+    permission_classes = [
+        permissions.IsAuthenticated,
+        IsAdmin|IsProgramLead|IsCoordinator|IsLabLead|IsExpert
+    ]
+
+    def post(self, request):
+        if not request.data:
+            return Response(data={"message": "Missing request body"}, status=status.HTTP_400_BAD_REQUEST)
+        
+        if not CanCreateCustomer().has_permission(request, self):
+            return Response(data={"message": "Insufficient authorization to create customer"}, status=status.HTTP_401_UNAUTHORIZED)
+
+        serializer = CustomerEditSerializer(data=request.data)
+        if serializer.is_valid():
+            customer = serializer.save()
+            return Response(data=CustomerSerializer(customer).data, status=status.HTTP_201_CREATED)
+        return Response(data=serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class CustomerTransferView(BaseUserAwareRequest):
+    permission_classes = [
+        permissions.IsAuthenticated,
+        IsAdmin|IsProgramLead|IsCoordinator|IsLabLead|IsExpert
+    ]
+
+    def post(self, request, request_id=None):
+        if not request_id:
+            return Response(data={"message": "Please provide a request ID for transfer."}, status=status.HTTP_400_BAD_REQUEST)
+
+        if not request.data:
+            return Response(data={"message": "Missing request body with customer_id"}, status=status.HTTP_400_BAD_REQUEST)
+        
+        if "customer_id" in request.data and (request.data.get("customer_id") is not None):
+            customer_id = request.data.get("customer_id")
+        else:
+            return Response(data={"message": "Missing customer_id in request body"}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            customer_obj = Customer.objects.get(pk=customer_id)
+        except Customer.DoesNotExist:
+            return Response(data={"message":"Customer with given ID does not exist"}, status=status.HTTP_400_BAD_REQUEST)
+
+        ta_request, err = self.get_request_or_error(Request.objects.all(), request_id)
+        if err:
+            return err
+        
+        if not CanTransferCustomer().has_object_permission(request, self, ta_request):
+            return Response(data={"message": "Insufficient authorization to transfer customer for given request"}, status=status.HTTP_400_BAD_REQUEST)
+        
+        existing_relationship = CustomerRequestRelationship.objects.filter(request=ta_request).first()
+
+        if existing_relationship:
+            existing_relationship.delete()
+
+        CustomerRequestRelationship.objects.get_or_create(
+            request=ta_request,
+            customer=customer_obj,
+            is_poc=True
+        )
+        ta_request.save()
+
+        return Response(data=CustomerSerializer(customer_obj).data,status=status.HTTP_200_OK)

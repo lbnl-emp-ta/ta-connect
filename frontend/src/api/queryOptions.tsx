@@ -1,18 +1,19 @@
-import CheckCircleIcon from '@mui/icons-material/CheckCircle';
-import ErrorIcon from '@mui/icons-material/Error';
-import { queryOptions, useMutation, UseMutationOptions } from '@tanstack/react-query';
 import { loginMutation } from '@/api/accounts/login';
 import { logoutMutation } from '@/api/accounts/logout';
 import { deleteData, fetchData, patchData, postData, postForm } from '@/api/dashboard';
 import {
-  CustomerRequestRelationship,
+  TACustomer,
   ExpertiseMutation,
   TAAssignment,
   TACloseoutForm,
   TACustomerMutation,
+  TACustomerTransferMutation,
   TAExpert,
   TAIdentity,
   TANote,
+  TAOrganization,
+  TAOrganizationMutation,
+  TAOrganizationTransferMutation,
   TAOwner,
   TARequestDetail,
   TARequestDetailMutation,
@@ -24,7 +25,6 @@ import {
 import { submitIntakeMutation } from '@/api/forms';
 import {
   IntakeFormData,
-  Organization,
   OrganizationType,
   State,
   TransmissionPlanningRegion,
@@ -33,6 +33,9 @@ import { sessionsApi } from '@/api/sessions';
 import { queryClient } from '@/App';
 import { useToastContext } from '@/features/toasts/ToastContext';
 import { ToastMessage } from '@/features/toasts/ToastMessage';
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import ErrorIcon from '@mui/icons-material/Error';
+import { queryOptions, useMutation, UseMutationOptions } from '@tanstack/react-query';
 
 export const apiUrl = import.meta.env.VITE_API_URL as string;
 
@@ -43,12 +46,11 @@ export const authSessionQueryOptions = () =>
     queryFn: () => sessionsApi.getSession(),
   });
 
-export const customerRequestRelationshipOptions = () =>
+export const customersQueryOptions = () =>
   queryOptions({
     staleTime: 120_000, // stale after 2 minutes
-    queryKey: ['customerRequestRelationships'],
-    queryFn: () =>
-      fetchData<CustomerRequestRelationship[]>(`${apiUrl}/customer-request-relationships/`),
+    queryKey: ['customers'],
+    queryFn: () => fetchData<TACustomer[]>(`${apiUrl}/customers/`),
   });
 
 export const identitiesQueryOptions = () =>
@@ -125,11 +127,11 @@ export const statesQueryOptions = () =>
     queryFn: () => fetchData<State[]>(`${apiUrl}/states/`),
   });
 
-export const organizationQueryOptions = () =>
+export const organizationsQueryOptions = () =>
   queryOptions({
     staleTime: 120_000, // stale after 2 minutes
-    queryKey: ['organization'],
-    queryFn: () => fetchData<Organization[]>(`${apiUrl}/organizations/`),
+    queryKey: ['organizations'],
+    queryFn: () => fetchData<TAOrganization[]>(`${apiUrl}/organizations/`),
   });
 
 export const organizationTypesQueryOptions = () =>
@@ -190,6 +192,19 @@ export const useExpertiseMutation = (labRoleAssignmentId: string) => {
   });
 };
 
+export const useCustomerTransferMutation = (requestId: string, isAdminMode?: boolean) => {
+  return useMutation({
+    mutationKey: ['customer', 'transfer', requestId, isAdminMode],
+    mutationFn: (data: TACustomerTransferMutation) =>
+      postData(
+        `${import.meta.env.VITE_API_URL}/requests/${requestId}/transfer-customer/`,
+        data,
+        isAdminMode
+      ),
+    onSuccess: () => queryClient.invalidateQueries(),
+  });
+};
+
 export const useCustomerMutation = (customerId: string, isAdminMode?: boolean) => {
   return useMutation({
     mutationKey: ['customers', 'update', customerId, isAdminMode],
@@ -199,6 +214,69 @@ export const useCustomerMutation = (customerId: string, isAdminMode?: boolean) =
         data,
         isAdminMode
       ),
+    onSuccess: () => queryClient.invalidateQueries(),
+  });
+};
+
+export const useCreateCustomerMutation = () => {
+  return useMutation({
+    mutationKey: ['customers', 'create'],
+    mutationFn: (data: Partial<TACustomerMutation>) =>
+      postData<TACustomerMutation>(`${import.meta.env.VITE_API_URL}/customers/create/`, data),
+    onSuccess: () => queryClient.invalidateQueries(),
+  });
+};
+
+export const useDeleteCustomerMutation = (customerId: string) => {
+  return useMutation({
+    mutationKey: ['customers', 'delete', customerId],
+    // isAdminMode is turned on by default for simplicity. Only admins can see the delete button.
+    mutationFn: () => deleteData(`${import.meta.env.VITE_API_URL}/customers/${customerId}`, true),
+    onSuccess: () => queryClient.invalidateQueries(),
+  });
+};
+
+export const useOrganizationTransferMutation = (requestId: string, isAdminMode?: boolean) => {
+  return useMutation({
+    mutationKey: ['organization', 'transfer', requestId, isAdminMode],
+    mutationFn: (data: TAOrganizationTransferMutation) =>
+      postData(
+        `${import.meta.env.VITE_API_URL}/requests/${requestId}/transfer-organization/`,
+        data,
+        isAdminMode
+      ),
+    onSuccess: () => queryClient.invalidateQueries(),
+  });
+};
+
+export const useOrganizationMutation = (organizationId: string, isAdminMode?: boolean) => {
+  return useMutation({
+    mutationKey: ['organizations', 'update', organizationId, isAdminMode],
+    mutationFn: (data: Partial<TAOrganizationMutation>) =>
+      patchData<TACustomerMutation>(
+        `${import.meta.env.VITE_API_URL}/organizations/${organizationId}`,
+        data,
+        isAdminMode
+      ),
+    onSuccess: () => queryClient.invalidateQueries(),
+  });
+};
+
+export const useDeleteOrganizationMutation = (organizationId: string) => {
+  return useMutation({
+    mutationKey: ['organizations', 'delete', organizationId],
+    // isAdminMode is turned on by default for simplicity. Only admins can see the delete button.
+    mutationFn: () =>
+      deleteData(`${import.meta.env.VITE_API_URL}/organizations/${organizationId}`, true),
+    onSuccess: () => queryClient.invalidateQueries(),
+  });
+};
+
+export const useCreateOrganizationMutation = () => {
+  return useMutation({
+    mutationKey: ['organizations', 'create'],
+    mutationFn: (data: Partial<TAOrganizationMutation>) =>
+      postData<TACustomerMutation>(`${import.meta.env.VITE_API_URL}/organizations/create/`, data),
     onSuccess: () => queryClient.invalidateQueries(),
   });
 };

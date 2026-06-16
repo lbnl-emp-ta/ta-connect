@@ -27,13 +27,19 @@ export interface IntakeFormData {
   email: string;
   phone: string;
   title: string;
-  tpr: string;
-  state: string;
-  organization: string;
-  organizationAddress: string;
-  organizationType: string;
+  tpr?: string;
+  state?: string;
+  organization_id?: number;
+  organization_name?: string;
+  organization_address?: string;
+  organization_type?: string;
   description: string;
   challenges?: string;
   goals?: string;
   effort: string;
+}
+
+export interface AutocompleteOption {
+  label: string;
+  id: number;
 }

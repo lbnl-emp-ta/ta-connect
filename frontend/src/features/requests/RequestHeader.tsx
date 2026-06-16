@@ -39,7 +39,8 @@ export const RequestHeader: React.FC<RequestHeaderProps> = ({ request }) => {
             fontWeight: 'bold',
           }}
         >
-          {request.customers[0].name} ({request.customers[0].state.abbreviation})
+          {request.customers[0]?.name || 'Missing customer contact'} (
+          {request.organization?.state.abbreviation})
         </Typography>
         <Stack direction="row" alignItems="center">
           {previousId !== null && (

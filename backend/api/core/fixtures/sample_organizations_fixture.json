@@ -5,6 +5,8 @@
     "fields": {
       "name": "New York Energy Office",
       "address": "123 Main Street, Albany, NY 12207",
+      "state": 47,
+      "transmission_planning_region": 5,
       "type": 2
     }
   },
@@ -14,6 +16,8 @@
     "fields": {
       "name": "California Energy Commission",
       "address": "1516 Ninth Street, Sacramento, CA 95814",
+      "state": 5,
+      "transmission_planning_region": 1,
       "type": 2
     }
   },
@@ -23,6 +27,8 @@
     "fields": {
       "name": "Texas Public Utility Commission",
       "address": "1701 N. Congress Ave, Austin, TX 78701",
+      "state": 44,
+      "transmission_planning_region": 7,
       "type": 1
     }
   }

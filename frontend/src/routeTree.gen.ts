@@ -18,7 +18,9 @@ import { Route as WithNavPublicOnlyRouteImport } from './routes/_with-nav/_publi
 import { Route as WithNavPrivateRouteImport } from './routes/_with-nav/_private/route'
 import { Route as WithNavPublicOnlyLoginImport } from './routes/_with-nav/_public-only/login'
 import { Route as WithNavPrivateProfileImport } from './routes/_with-nav/_private/profile'
+import { Route as WithNavPrivateOrganizationsImport } from './routes/_with-nav/_private/organizations'
 import { Route as WithNavPrivateExpertsImport } from './routes/_with-nav/_private/experts'
+import { Route as WithNavPrivateCustomersImport } from './routes/_with-nav/_private/customers'
 import { Route as WithNavPrivateRequestsRouteImport } from './routes/_with-nav/_private/requests/route'
 import { Route as WithNavPrivateRequestsIndexImport } from './routes/_with-nav/_private/requests/index'
 import { Route as publicAccountProviderCallbackImport } from './routes/(public)/account.provider.callback'
@@ -70,9 +72,22 @@ const WithNavPrivateProfileRoute = WithNavPrivateProfileImport.update({
   getParentRoute: () => WithNavPrivateRouteRoute,
 } as any)
 
+const WithNavPrivateOrganizationsRoute =
+  WithNavPrivateOrganizationsImport.update({
+    id: '/organizations',
+    path: '/organizations',
+    getParentRoute: () => WithNavPrivateRouteRoute,
+  } as any)
+
 const WithNavPrivateExpertsRoute = WithNavPrivateExpertsImport.update({
   id: '/experts',
   path: '/experts',
+  getParentRoute: () => WithNavPrivateRouteRoute,
+} as any)
+
+const WithNavPrivateCustomersRoute = WithNavPrivateCustomersImport.update({
+  id: '/customers',
+  path: '/customers',
   getParentRoute: () => WithNavPrivateRouteRoute,
 } as any)
 
@@ -185,11 +200,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof WithNavPrivateRequestsRouteImport
       parentRoute: typeof WithNavPrivateRouteImport
     }
+    '/_with-nav/_private/customers': {
+      id: '/_with-nav/_private/customers'
+      path: '/customers'
+      fullPath: '/customers'
+      preLoaderRoute: typeof WithNavPrivateCustomersImport
+      parentRoute: typeof WithNavPrivateRouteImport
+    }
     '/_with-nav/_private/experts': {
       id: '/_with-nav/_private/experts'
       path: '/experts'
       fullPath: '/experts'
       preLoaderRoute: typeof WithNavPrivateExpertsImport
+      parentRoute: typeof WithNavPrivateRouteImport
+    }
+    '/_with-nav/_private/organizations': {
+      id: '/_with-nav/_private/organizations'
+      path: '/organizations'
+      fullPath: '/organizations'
+      preLoaderRoute: typeof WithNavPrivateOrganizationsImport
       parentRoute: typeof WithNavPrivateRouteImport
     }
     '/_with-nav/_private/profile': {
@@ -325,14 +354,18 @@ const WithNavPrivateRequestsRouteRouteWithChildren =
 
 interface WithNavPrivateRouteRouteChildren {
   WithNavPrivateRequestsRouteRoute: typeof WithNavPrivateRequestsRouteRouteWithChildren
+  WithNavPrivateCustomersRoute: typeof WithNavPrivateCustomersRoute
   WithNavPrivateExpertsRoute: typeof WithNavPrivateExpertsRoute
+  WithNavPrivateOrganizationsRoute: typeof WithNavPrivateOrganizationsRoute
   WithNavPrivateProfileRoute: typeof WithNavPrivateProfileRoute
 }
 
 const WithNavPrivateRouteRouteChildren: WithNavPrivateRouteRouteChildren = {
   WithNavPrivateRequestsRouteRoute:
     WithNavPrivateRequestsRouteRouteWithChildren,
+  WithNavPrivateCustomersRoute: WithNavPrivateCustomersRoute,
   WithNavPrivateExpertsRoute: WithNavPrivateExpertsRoute,
+  WithNavPrivateOrganizationsRoute: WithNavPrivateOrganizationsRoute,
   WithNavPrivateProfileRoute: WithNavPrivateProfileRoute,
 }
 
@@ -372,7 +405,9 @@ export interface FileRoutesByFullPath {
   '': typeof WithNavPublicOnlyRouteRouteWithChildren
   '/intake': typeof publicIntakeRoute
   '/requests': typeof WithNavPrivateRequestsRouteRouteWithChildren
+  '/customers': typeof WithNavPrivateCustomersRoute
   '/experts': typeof WithNavPrivateExpertsRoute
+  '/organizations': typeof WithNavPrivateOrganizationsRoute
   '/profile': typeof WithNavPrivateProfileRoute
   '/login': typeof WithNavPublicOnlyLoginRoute
   '/requests/active': typeof WithNavPrivateRequestsActiveRouteRouteWithChildren
@@ -389,7 +424,9 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '': typeof WithNavPublicOnlyRouteRouteWithChildren
   '/intake': typeof publicIntakeRoute
+  '/customers': typeof WithNavPrivateCustomersRoute
   '/experts': typeof WithNavPrivateExpertsRoute
+  '/organizations': typeof WithNavPrivateOrganizationsRoute
   '/profile': typeof WithNavPrivateProfileRoute
   '/login': typeof WithNavPublicOnlyLoginRoute
   '/account/provider/callback': typeof publicAccountProviderCallbackRoute
@@ -408,7 +445,9 @@ export interface FileRoutesById {
   '/_with-nav/_public-only': typeof WithNavPublicOnlyRouteRouteWithChildren
   '/(public)/intake': typeof publicIntakeRoute
   '/_with-nav/_private/requests': typeof WithNavPrivateRequestsRouteRouteWithChildren
+  '/_with-nav/_private/customers': typeof WithNavPrivateCustomersRoute
   '/_with-nav/_private/experts': typeof WithNavPrivateExpertsRoute
+  '/_with-nav/_private/organizations': typeof WithNavPrivateOrganizationsRoute
   '/_with-nav/_private/profile': typeof WithNavPrivateProfileRoute
   '/_with-nav/_public-only/login': typeof WithNavPublicOnlyLoginRoute
   '/_with-nav/_private/requests/active': typeof WithNavPrivateRequestsActiveRouteRouteWithChildren
@@ -428,7 +467,9 @@ export interface FileRouteTypes {
     | ''
     | '/intake'
     | '/requests'
+    | '/customers'
     | '/experts'
+    | '/organizations'
     | '/profile'
     | '/login'
     | '/requests/active'
@@ -444,7 +485,9 @@ export interface FileRouteTypes {
     | '/'
     | ''
     | '/intake'
+    | '/customers'
     | '/experts'
+    | '/organizations'
     | '/profile'
     | '/login'
     | '/account/provider/callback'
@@ -461,7 +504,9 @@ export interface FileRouteTypes {
     | '/_with-nav/_public-only'
     | '/(public)/intake'
     | '/_with-nav/_private/requests'
+    | '/_with-nav/_private/customers'
     | '/_with-nav/_private/experts'
+    | '/_with-nav/_private/organizations'
     | '/_with-nav/_private/profile'
     | '/_with-nav/_public-only/login'
     | '/_with-nav/_private/requests/active'
@@ -520,7 +565,9 @@ export const routeTree = rootRoute
       "parent": "/_with-nav",
       "children": [
         "/_with-nav/_private/requests",
+        "/_with-nav/_private/customers",
         "/_with-nav/_private/experts",
+        "/_with-nav/_private/organizations",
         "/_with-nav/_private/profile"
       ]
     },
@@ -543,8 +590,16 @@ export const routeTree = rootRoute
         "/_with-nav/_private/requests/"
       ]
     },
+    "/_with-nav/_private/customers": {
+      "filePath": "_with-nav/_private/customers.tsx",
+      "parent": "/_with-nav/_private"
+    },
     "/_with-nav/_private/experts": {
       "filePath": "_with-nav/_private/experts.tsx",
+      "parent": "/_with-nav/_private"
+    },
+    "/_with-nav/_private/organizations": {
+      "filePath": "_with-nav/_private/organizations.tsx",
       "parent": "/_with-nav/_private"
     },
     "/_with-nav/_private/profile": {

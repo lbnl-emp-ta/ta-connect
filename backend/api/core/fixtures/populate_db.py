@@ -6,7 +6,6 @@ fixture_list = [
     "transmission_planning_regions_fixture.json",
     "organization_type_fixture.json",
     "depth_fixture.json",
-    "customer_type_fixture.json",
     "topics_fixture.json",
     "status_role_fixture.json",
 

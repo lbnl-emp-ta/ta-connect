@@ -121,10 +121,10 @@ export const RequestsList: React.FC<RequestsListProps> = ({
             <Stack direction="row">
               <Stack direction="row" spacing={1} alignItems="center" sx={{ flexGrow: 1 }}>
                 <Typography component="h4" fontWeight="bold">
-                  {request.customer_name}
+                  {request.customer_name || 'Missing customer contact'}
                 </Typography>
                 <Typography component="h4" fontWeight="bold">
-                  ({request.customer_state_abbreviation})
+                  ({request.organization?.state.name})
                 </Typography>
               </Stack>
               <Typography>#{request.id}</Typography>

@@ -1,9 +1,9 @@
 from django.conf import settings
-from core.models import Customer, Request
+from core.models import Customer, Request, Organization
 from core.constants import DOMAINTYPE, REQUEST_STATUS
 
 
-def assignment_email(receipient_name: str, request: Request, customer: Customer) -> tuple[str, str]:
+def assignment_email(receipient_name: str, request: Request, customer: Customer, organization: Organization) -> tuple[str, str]:
     request_id = request.id
     domain_type = request.owner.domain_type
     program_name = "-"
@@ -45,7 +45,7 @@ def assignment_email(receipient_name: str, request: Request, customer: Customer)
             <li><strong>Request ID:</strong> {request_id}</li>
             <li><strong>Request Status:</strong> {request.status}</li>
             <li><strong>Customer:</strong> {customer.name}</li>
-            <li><strong>Customer Organization:</strong> {customer.org}</li>
+            <li><strong>Customer Organization:</strong> {organization.name}</li>
             <li><strong>Program Name:</strong> {program_name}</li>
             <li><strong>Lab Name:</strong> {lab_name}</li>
             <li><strong>Assigned Expert:</strong> {request.expert.name if request.expert else "-"}</li>
@@ -61,7 +61,7 @@ def assignment_email(receipient_name: str, request: Request, customer: Customer)
     return plain_text_message, html_message
 
 
-def new_request_email(receipient_name: str, request: Request, customer: Customer) -> tuple[str, str]:
+def new_request_email(receipient_name: str, request: Request, customer: Customer, organization: Organization) -> tuple[str, str]:
     program_name = "-"
     lab_name = "-"
     if request.program:
@@ -87,7 +87,7 @@ def new_request_email(receipient_name: str, request: Request, customer: Customer
             <li><strong>Request ID:</strong> {request.id}</li>
             <li><strong>Request Status:</strong> {request.status}</li>
             <li><strong>Customer:</strong> {customer.name}</li>
-            <li><strong>Customer Organization:</strong> {customer.org}</li>
+            <li><strong>Customer Organization:</strong> {organization.name}</li>
             <li><strong>Program Name:</strong> {program_name}</li>
             <li><strong>Lab Name:</strong> {lab_name}</li>
             <li><strong>Assigned Expert:</strong> {request.expert.name if request.expert else "-"}</li>

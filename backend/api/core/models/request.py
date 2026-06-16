@@ -16,6 +16,7 @@ class Request(models.Model):
     program = models.ForeignKey(Program, on_delete=models.PROTECT, blank=True, null=True)
     lab = models.ForeignKey(Lab, on_delete=models.PROTECT, blank=True, null=True)
     expert = models.ForeignKey(User, on_delete=models.PROTECT, blank=True, null=True)
+    organization = models.ForeignKey(Organization, on_delete=models.SET_NULL, null=True, blank=True, related_name="requests")
     status = models.ForeignKey(RequestStatus, on_delete=models.PROTECT, default=RequestStatus.get_default_pk)
     depth = models.ForeignKey(Depth, on_delete=models.PROTECT, blank=True, null=True, default=Depth.get_default_pk)
     description = models.TextField(blank=True, null=True)
