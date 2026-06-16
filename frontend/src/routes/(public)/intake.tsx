@@ -1,8 +1,8 @@
 import '../../styles.css';
 
 import {
+  Alert,
   Autocomplete,
-  Box,
   Button,
   Container,
   Divider,
@@ -10,7 +10,6 @@ import {
   FormControlLabel,
   FormLabel,
   InputLabel,
-  Link,
   MenuItem,
   OutlinedInput,
   Paper,
@@ -23,15 +22,13 @@ import {
 } from '@mui/material';
 import { createFileRoute } from '@tanstack/react-router';
 
-import { useSuspenseQuery } from '@tanstack/react-query';
-import { ChangeEventHandler, useEffect, useMemo, useState } from 'react';
+import { TAOrganization } from '@/api/dashboard/types';
 import {
   IntakeFormData,
   OrganizationType,
   State,
   TransmissionPlanningRegion,
 } from '@/api/forms/types';
-import { AppLink } from '@/components/AppLink';
 import {
   organizationsQueryOptions,
   organizationTypesQueryOptions,
@@ -39,9 +36,12 @@ import {
   transmissionPlanningRegionsQueryOptions,
   useSubmitIntakeMutation,
 } from '@/api/queryOptions';
-import { effortOptions, isValidEmail, isValidUSTelephone } from '@/utils/utils';
+import { AppLink } from '@/components/AppLink';
+import { Footer } from '@/components/Footer';
 import { PhoneInput } from '@/components/PhoneInput';
-import { TAOrganization } from '@/api/dashboard/types';
+import { effortOptions, isValidEmail, isValidUSTelephone } from '@/utils/utils';
+import { useSuspenseQuery } from '@tanstack/react-query';
+import { ChangeEventHandler, useEffect, useMemo, useState } from 'react';
 
 export const Route = createFileRoute('/(public)/intake')({
   loader: async ({ context }) => {
@@ -132,15 +132,26 @@ function IntakeForm() {
       <Container maxWidth="md" sx={{ paddingTop: 4, paddingBottom: 4 }}>
         <Paper sx={{ padding: 8, textAlign: 'center' }}>
           <Stack spacing={2} alignItems="center">
-            <Typography>Form submitted!</Typography>
-            <Typography>
-              Look out for emails from taconnect@lbl.gov on the status of your request.
-            </Typography>
+            {submitIntakeMutation.status === 'error' && (
+              <Alert severity="error">
+                An error occurred while submitting your request. Please try again or contact
+                taconnect@lbl.gov.
+              </Alert>
+            )}
+            {submitIntakeMutation.status === 'success' && (
+              <>
+                <Typography>Form submitted!</Typography>
+                <Typography>
+                  Look out for emails from taconnect@lbl.gov on the status of your request.
+                </Typography>
+              </>
+            )}
             <AppLink to="/intake" reloadDocument>
               Submit another TA request
             </AppLink>
           </Stack>
         </Paper>
+        <Footer />
       </Container>
     );
   } else {
@@ -399,27 +410,7 @@ function IntakeForm() {
             </Stack>
           </form>
         </Paper>
-        <Box component="footer" sx={{ mt: 4 }}>
-          <Typography variant="body2" color="text.secondary" align="center">
-            TA Connect
-          </Typography>
-          <Stack direction="row" justifyContent="center" alignItems="center">
-            <AppLink to="/">
-              <Typography variant="body2" align="center">
-                Dashboard
-              </Typography>
-            </AppLink>
-            <Box>|</Box>
-            <Link href="https://emp.lbl.gov/projects/state-TA-program" target="_blank">
-              <Typography variant="body2" align="center">
-                State Technical Assistance Program
-              </Typography>
-            </Link>
-          </Stack>
-          <Typography variant="body2" color="text.secondary" align="center">
-            Supported by Lawrence Berkeley National Laboratory
-          </Typography>
-        </Box>
+        <Footer />
       </Container>
     );
   }
