@@ -19,6 +19,7 @@ from .audit_history import AuditHistoryListView
 from .user import UserEditView
 from .closeout_form import CloseoutFormView
 from .expertise import ExpertiseUpdateView
+from .manageable_role import ManageableRoleListView
 
 __all__ = [
     "AssignmentView",
@@ -59,4 +60,5 @@ __all__ = [
     "UserEditView",
     "CloseoutFormView",
     "ExpertiseUpdateView",
+    "ManageableRoleListView",
 ]

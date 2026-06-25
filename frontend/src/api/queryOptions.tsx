@@ -10,6 +10,8 @@ import {
   TACustomerTransferMutation,
   TAExpert,
   TAIdentity,
+  TAManageableRoleMutation,
+  TAManageableRolesResponse,
   TANote,
   TAOrganization,
   TAOrganizationMutation,
@@ -33,6 +35,7 @@ import { sessionsApi } from '@/api/sessions';
 import { queryClient } from '@/App';
 import { useToastContext } from '@/features/toasts/ToastContext';
 import { ToastMessage } from '@/features/toasts/ToastMessage';
+import { getCSRFToken } from '@/utils/cookies';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import ErrorIcon from '@mui/icons-material/Error';
 import { queryOptions, useMutation, UseMutationOptions } from '@tanstack/react-query';
@@ -58,6 +61,13 @@ export const identitiesQueryOptions = () =>
     staleTime: 120_000, // stale after 2 minutes
     queryKey: ['identities'],
     queryFn: () => fetchData<TAIdentity[]>(`${apiUrl}/identities/`),
+  });
+
+export const manageableRolesQueryOptions = () =>
+  queryOptions({
+    staleTime: 120_000,
+    queryKey: ['manageableRoles'],
+    queryFn: () => fetchData<TAManageableRolesResponse>(`${apiUrl}/manageable-roles/`),
   });
 
 export const requestsQueryOptions = (isAdminMode?: boolean) =>
@@ -189,6 +199,45 @@ export const useExpertiseMutation = (labRoleAssignmentId: string) => {
         data
       ),
     onSuccess: () => queryClient.invalidateQueries(),
+  });
+};
+
+export const useManageableRoleCreateMutation = () => {
+  return useMutation({
+    mutationKey: ['manageableRoles', 'create'],
+    mutationFn: (data: TAManageableRoleMutation) =>
+      postData<TAManageableRoleMutation>(`${apiUrl}/manageable-roles/`, data),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['manageableRoles'] }),
+  });
+};
+
+export const useManageableRoleUpdateMutation = () => {
+  return useMutation({
+    mutationKey: ['manageableRoles', 'update'],
+    mutationFn: (data: TAManageableRoleMutation) =>
+      patchData<TAManageableRoleMutation>(`${apiUrl}/manageable-roles/`, data),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['manageableRoles'] }),
+  });
+};
+
+export const useManageableRoleDeleteMutation = () => {
+  return useMutation({
+    mutationKey: ['manageableRoles', 'delete'],
+    mutationFn: async (data: Pick<TAManageableRoleMutation, 'assignment_id' | 'location'>) => {
+      const response = await fetch(`${apiUrl}/manageable-roles/`, {
+        method: 'DELETE',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRFToken': getCSRFToken() || '',
+        },
+        body: JSON.stringify(data),
+      });
+      if (!response.ok) {
+        throw Error(`Request status: ${response.status}`);
+      }
+    },
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['manageableRoles'] }),
   });
 };
 

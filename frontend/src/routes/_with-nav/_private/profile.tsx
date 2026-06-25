@@ -1,5 +1,10 @@
-import { identitiesQueryOptions, topicsQueryOptions } from '@/api/queryOptions';
+import {
+  identitiesQueryOptions,
+  manageableRolesQueryOptions,
+  topicsQueryOptions,
+} from '@/api/queryOptions';
 import { RolesGrid } from '@/features/profile/RolesGrid';
+import { RolesManager } from '@/features/profile/RolesManager';
 import { UserInfoDialog } from '@/features/profile/UserInfoDialog';
 import { useUser } from '@/hooks/useUser';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
@@ -22,6 +27,7 @@ import { useEffect, useState } from 'react';
 export const Route = createFileRoute('/_with-nav/_private/profile')({
   loader: async ({ context }) => {
     await context.queryClient.ensureQueryData(topicsQueryOptions());
+    await context.queryClient.ensureQueryData(manageableRolesQueryOptions());
   },
   component: ProfilePage,
 });
@@ -104,6 +110,7 @@ function ProfilePage() {
           </Alert>
         )}
         <RolesGrid identities={identities || []} />
+        <RolesManager />
       </Stack>
     </Container>
   );

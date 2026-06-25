@@ -306,6 +306,43 @@ export interface TAIdentity {
   expertises?: TAExpertise[];
 }
 
+export interface TAManageableRoleAssignment extends TAIdentity {
+  date_assigned: string;
+  user: {
+    id: number;
+    email: string;
+    name?: string;
+  };
+}
+
+export interface TAManageableRoleUser {
+  id: number;
+  email: string;
+  name?: string;
+}
+
+export interface TAManageableRolesResponse {
+  assignments: TAManageableRoleAssignment[];
+  users: TAManageableRoleUser[];
+  programs: TAProgram[];
+  labs: TALab[];
+  roles: {
+    id: number;
+    name: TARole;
+    description: string;
+  }[];
+  is_admin: boolean;
+}
+
+export interface TAManageableRoleMutation {
+  assignment_id?: number;
+  location: 'program' | 'lab';
+  user: number;
+  role: number;
+  program?: number;
+  lab?: number;
+}
+
 export interface TAUser {
   display: string;
   has_usable_password: boolean;
