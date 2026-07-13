@@ -118,16 +118,16 @@ export const RolesManager: React.FC = () => {
       valueGetter: (_, row) => row.user.name || row.user.email,
     },
     {
-      field: 'role',
-      headerName: 'Role',
-      width: 140,
-      valueGetter: (_, row) => row.role.name,
-    },
-    {
       field: 'location',
       headerName: 'Level',
       width: 120,
       valueGetter: (_, row) => (row.location === 'program' ? 'Program' : 'Lab'),
+    },
+    {
+      field: 'role',
+      headerName: 'Role',
+      width: 140,
+      valueGetter: (_, row) => row.role.name,
     },
     {
       field: 'program',
