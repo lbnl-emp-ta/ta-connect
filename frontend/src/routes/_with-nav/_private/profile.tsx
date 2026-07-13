@@ -13,7 +13,6 @@ import {
   Alert,
   AlertTitle,
   Box,
-  Button,
   Container,
   IconButton,
   Link,
@@ -84,17 +83,7 @@ function ProfilePage() {
           </Stack>
         </Box>
       </Stack>
-      <Stack spacing={2}>
-        <Stack direction="row" spacing={2} alignItems="center">
-          <Typography variant="h4" component="h2" fontWeight="bold" sx={{ flexGrow: 1 }}>
-            My Roles
-          </Typography>
-          <Box>
-            <Link href="https://forms.gle/etALWnsaZd7ZyFCeA" target="_blank">
-              <Button variant="contained">Request a new role</Button>
-            </Link>
-          </Box>
-        </Stack>
+      <Stack spacing={4}>
         {(!identities || identities.length === 0) && (
           <Alert severity="warning">
             <AlertTitle>You don't have any roles assigned yet.</AlertTitle>

@@ -27,9 +27,9 @@ export const RolePanel: React.FC<RolePanelProps> = ({
 
   return (
     <Paper sx={{ height: '100%', padding: 2 }}>
-      <Stack>
+      <Stack spacing={1}>
         <Stack spacing={0}>
-          <Typography variant="h5" fontWeight="bold" color="primary">
+          <Typography fontWeight="bold" color="primary">
             {identity.role.name}
           </Typography>
           <Typography variant="body2" color="text.secondary">
@@ -37,27 +37,36 @@ export const RolePanel: React.FC<RolePanelProps> = ({
           </Typography>
         </Stack>
         {identity.program && (
-          <Stack spacing={0}>
-            <Typography fontWeight="bold">Program: {identity.program.name}</Typography>
+          <Stack
+            direction="row"
+            spacing={1}
+            alignItems="center"
+            sx={{ paddingTop: 1, borderTop: '1px solid', borderTopColor: 'divider' }}
+          >
+            <Typography variant="body2" fontWeight="bold">
+              Program:
+            </Typography>
             <Typography variant="body2" color="text.secondary">
-              {identity.program.description}
+              {identity.program.name} ({identity.program.description})
             </Typography>
           </Stack>
         )}
         {identity.instance && (
-          <Stack spacing={0}>
-            <Typography fontWeight="bold">
-              {capitalize(identity.location)}: {identity.instance.name}
+          <Stack direction="row" spacing={1} alignItems="center">
+            <Typography variant="body2" fontWeight="bold">
+              {capitalize(identity.location)}:
             </Typography>
             <Typography variant="body2" color="text.secondary">
-              {identity.instance.description}
+              {identity.instance.name} ({identity.instance.description})
             </Typography>
           </Stack>
         )}
         {identity.expertises && (
           <Stack spacing={1}>
             <Stack direction="row" spacing={1} alignItems="center">
-              <Typography fontWeight="bold">Expertises</Typography>
+              <Typography variant="body2" fontWeight="bold">
+                Expertises
+              </Typography>
               <IconButton size="small" onClick={handleEditExpertises}>
                 <EditIcon />
               </IconButton>
@@ -68,7 +77,7 @@ export const RolePanel: React.FC<RolePanelProps> = ({
                   <Grid key={expertise.id}>
                     <Tooltip
                       title={`${expertise.topic.name} (${expertise.depth.name})`}
-                      placement="left"
+                      placement="top"
                     >
                       <Chip label={expertise.topic.name} sx={{ maxWidth: 175 }} />
                     </Tooltip>

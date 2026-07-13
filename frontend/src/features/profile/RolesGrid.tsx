@@ -34,13 +34,13 @@ export const RolesGrid: React.FC<RolesGridProps> = ({ identities }) => {
   return (
     <Stack spacing={4}>
       <Stack>
-        <Typography variant="h5" component="h3">
-          System Roles
+        <Typography variant="h4" component="h2" fontWeight="bold">
+          My System Roles
         </Typography>
         {systemIdentities.length > 0 && (
           <Grid container spacing={2}>
             {systemIdentities.map((identity) => (
-              <Grid size={{ lg: 4, md: 6, xs: 12 }} key={getIdentityKey(identity)}>
+              <Grid size={{ lg: 12, md: 12, xs: 12 }} key={getIdentityKey(identity)}>
                 <RolePanel
                   identity={identity}
                   setExpertisesDialogOpen={setExpertisesDialogOpen}
@@ -50,15 +50,20 @@ export const RolesGrid: React.FC<RolesGridProps> = ({ identities }) => {
             ))}
           </Grid>
         )}
+        {systemIdentities.length === 0 && (
+          <Typography variant="body1" color="text.secondary">
+            You don't have any system roles assigned yet.
+          </Typography>
+        )}
       </Stack>
       <Stack>
-        <Typography variant="h5" component="h3">
-          Organizational Roles
+        <Typography variant="h4" component="h2" fontWeight="bold">
+          My Organizational Roles
         </Typography>
         {organizationalIdentities.length > 0 && (
           <Grid container spacing={2}>
             {organizationalIdentities.map((identity) => (
-              <Grid size={{ lg: 4, md: 6, xs: 12 }} key={getIdentityKey(identity)}>
+              <Grid size={{ lg: 12, md: 12, xs: 12 }} key={getIdentityKey(identity)}>
                 <RolePanel
                   identity={identity}
                   setExpertisesDialogOpen={setExpertisesDialogOpen}
@@ -69,6 +74,11 @@ export const RolesGrid: React.FC<RolesGridProps> = ({ identities }) => {
               </Grid>
             ))}
           </Grid>
+        )}
+        {organizationalIdentities.length === 0 && (
+          <Typography variant="body1" color="text.secondary">
+            You don't have any organizational roles assigned yet.
+          </Typography>
         )}
       </Stack>
       {editingLabRoleAssignmentId && (
