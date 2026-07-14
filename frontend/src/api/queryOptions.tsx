@@ -10,6 +10,8 @@ import {
   TACustomerTransferMutation,
   TAExpert,
   TAIdentity,
+  TAManageableRoleMutation,
+  TAManageableRolesResponse,
   TANote,
   TAOrganization,
   TAOrganizationMutation,
@@ -58,6 +60,13 @@ export const identitiesQueryOptions = () =>
     staleTime: 120_000, // stale after 2 minutes
     queryKey: ['identities'],
     queryFn: () => fetchData<TAIdentity[]>(`${apiUrl}/identities/`),
+  });
+
+export const manageableRolesQueryOptions = () =>
+  queryOptions({
+    staleTime: 120_000,
+    queryKey: ['manageableRoles'],
+    queryFn: () => fetchData<TAManageableRolesResponse>(`${apiUrl}/manageable-roles/`),
   });
 
 export const requestsQueryOptions = (isAdminMode?: boolean) =>
@@ -188,6 +197,33 @@ export const useExpertiseMutation = (labRoleAssignmentId: string) => {
         `${import.meta.env.VITE_API_URL}/lab-role-assignments/${labRoleAssignmentId}/expertises/`,
         data
       ),
+    onSuccess: () => queryClient.invalidateQueries(),
+  });
+};
+
+export const useManageableRoleCreateMutation = () => {
+  return useMutation({
+    mutationKey: ['manageableRoles', 'create'],
+    mutationFn: (data: TAManageableRoleMutation) =>
+      postData<TAManageableRoleMutation>(`${apiUrl}/manageable-roles/`, data),
+    onSuccess: () => queryClient.invalidateQueries(),
+  });
+};
+
+export const useManageableRoleUpdateMutation = () => {
+  return useMutation({
+    mutationKey: ['manageableRoles', 'update'],
+    mutationFn: (data: TAManageableRoleMutation) =>
+      patchData<TAManageableRoleMutation>(`${apiUrl}/manageable-roles/`, data),
+    onSuccess: () => queryClient.invalidateQueries(),
+  });
+};
+
+export const useManageableRoleDeleteMutation = () => {
+  return useMutation({
+    mutationKey: ['manageableRoles', 'delete'],
+    mutationFn: (data: Pick<TAManageableRoleMutation, 'assignment_id' | 'location'>) =>
+      deleteData(`${apiUrl}/manageable-roles/`, false, data),
     onSuccess: () => queryClient.invalidateQueries(),
   });
 };

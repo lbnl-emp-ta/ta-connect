@@ -31,6 +31,7 @@ urlpatterns = [
 
     path('users/<int:user_id>', UserEditView.as_view(), name="user-edit"),
     path('identities/', IdentityListView.as_view(), name="identities-list"),
+    path('manageable-roles/', ManageableRoleListView.as_view(), name="manageable-roles-list"),
     path('statuses/', StatusListView.as_view(), name="statuses-list"),
     path('experts/', ExpertsListView.as_view(), name="experts-list"),
     path('depths/', DepthListView.as_view(), name="depth-list"),

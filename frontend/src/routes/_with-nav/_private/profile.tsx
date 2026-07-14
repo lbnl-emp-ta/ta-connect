@@ -1,5 +1,10 @@
-import { identitiesQueryOptions, topicsQueryOptions } from '@/api/queryOptions';
+import {
+  identitiesQueryOptions,
+  manageableRolesQueryOptions,
+  topicsQueryOptions,
+} from '@/api/queryOptions';
 import { RolesGrid } from '@/features/profile/RolesGrid';
+import { RolesManager } from '@/features/profile/RolesManager';
 import { UserInfoDialog } from '@/features/profile/UserInfoDialog';
 import { useUser } from '@/hooks/useUser';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
@@ -8,7 +13,6 @@ import {
   Alert,
   AlertTitle,
   Box,
-  Button,
   Container,
   IconButton,
   Link,
@@ -22,6 +26,7 @@ import { useEffect, useState } from 'react';
 export const Route = createFileRoute('/_with-nav/_private/profile')({
   loader: async ({ context }) => {
     await context.queryClient.ensureQueryData(topicsQueryOptions());
+    await context.queryClient.ensureQueryData(manageableRolesQueryOptions());
   },
   component: ProfilePage,
 });
@@ -78,17 +83,7 @@ function ProfilePage() {
           </Stack>
         </Box>
       </Stack>
-      <Stack spacing={2}>
-        <Stack direction="row" spacing={2} alignItems="center">
-          <Typography variant="h4" component="h2" fontWeight="bold" sx={{ flexGrow: 1 }}>
-            My Roles
-          </Typography>
-          <Box>
-            <Link href="https://forms.gle/etALWnsaZd7ZyFCeA" target="_blank">
-              <Button variant="contained">Request a new role</Button>
-            </Link>
-          </Box>
-        </Stack>
+      <Stack spacing={4}>
         {(!identities || identities.length === 0) && (
           <Alert severity="warning">
             <AlertTitle>You don't have any roles assigned yet.</AlertTitle>
@@ -104,6 +99,7 @@ function ProfilePage() {
           </Alert>
         )}
         <RolesGrid identities={identities || []} />
+        <RolesManager />
       </Stack>
     </Container>
   );
