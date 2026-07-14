@@ -1,7 +1,6 @@
 import {
   manageableRolesQueryOptions,
   useManageableRoleCreateMutation,
-  useManageableRoleDeleteMutation,
   useManageableRoleUpdateMutation,
 } from '@/api/queryOptions';
 import {
@@ -33,6 +32,7 @@ import {
 import { DataGrid, GridColDef } from '@mui/x-data-grid';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { useMemo, useState } from 'react';
+import { RoleDeleteDialog } from './RoleDeleteDialog';
 
 const emptyForm: TAManageableRoleMutation = {
   location: 'lab',
@@ -55,11 +55,14 @@ export const RolesManager: React.FC = () => {
   const { data } = useSuspenseQuery(manageableRolesQueryOptions());
   const manageableRoles = data as TAManageableRolesResponse | null;
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [roleDeleteDialogOpen, setRoleDeleteDialogOpen] = useState(false);
+  const [selectedAssignment, setSelectedAssignment] = useState<TAManageableRoleAssignment | null>(
+    null
+  );
   const [form, setForm] = useState<TAManageableRoleMutation>(emptyForm);
 
   const createMutation = useManageableRoleCreateMutation();
   const updateMutation = useManageableRoleUpdateMutation();
-  const deleteMutation = useManageableRoleDeleteMutation();
 
   const rows = manageableRoles?.assignments || [];
   const labsByProgram = useMemo(() => {
@@ -109,6 +112,15 @@ export const RolesManager: React.FC = () => {
     setDialogOpen(false);
   };
 
+  const handleOpenRoleDeleteDialog = (assignment: TAManageableRoleAssignment) => {
+    setSelectedAssignment(assignment);
+    setRoleDeleteDialogOpen(true);
+  };
+
+  const handleCloseRoleDeleteDialog = () => {
+    setRoleDeleteDialogOpen(false);
+  };
+
   const columns: GridColDef<TAManageableRoleAssignment>[] = [
     {
       field: 'user',
@@ -150,22 +162,20 @@ export const RolesManager: React.FC = () => {
       filterable: false,
       width: 104,
       renderCell: ({ row }) => (
-        <Stack direction="row" spacing={0.5}>
+        <Stack
+          direction="row"
+          spacing={0.5}
+          alignItems="center"
+          justifyContent="center"
+          sx={{ height: '100%' }}
+        >
           <Tooltip title="Edit role">
             <IconButton size="small" onClick={() => handleEdit(row)}>
               <EditIcon fontSize="small" />
             </IconButton>
           </Tooltip>
           <Tooltip title="Revoke role">
-            <IconButton
-              size="small"
-              onClick={() =>
-                deleteMutation.mutate({
-                  assignment_id: row.assignment_id,
-                  location: row.location as 'program' | 'lab',
-                })
-              }
-            >
+            <IconButton size="small" onClick={() => handleOpenRoleDeleteDialog(row)}>
               <DeleteIcon fontSize="small" />
             </IconButton>
           </Tooltip>
@@ -307,6 +317,11 @@ export const RolesManager: React.FC = () => {
           </Button>
         </DialogActions>
       </Dialog>
+      <RoleDeleteDialog
+        open={roleDeleteDialogOpen}
+        onClose={handleCloseRoleDeleteDialog}
+        roleAssignment={selectedAssignment}
+      />
     </Stack>
   );
 };

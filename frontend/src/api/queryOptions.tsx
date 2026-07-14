@@ -207,7 +207,7 @@ export const useManageableRoleCreateMutation = () => {
     mutationKey: ['manageableRoles', 'create'],
     mutationFn: (data: TAManageableRoleMutation) =>
       postData<TAManageableRoleMutation>(`${apiUrl}/manageable-roles/`, data),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['manageableRoles'] }),
+    onSuccess: () => queryClient.invalidateQueries(),
   });
 };
 
@@ -216,7 +216,7 @@ export const useManageableRoleUpdateMutation = () => {
     mutationKey: ['manageableRoles', 'update'],
     mutationFn: (data: TAManageableRoleMutation) =>
       patchData<TAManageableRoleMutation>(`${apiUrl}/manageable-roles/`, data),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['manageableRoles'] }),
+    onSuccess: () => queryClient.invalidateQueries(),
   });
 };
 
@@ -237,7 +237,7 @@ export const useManageableRoleDeleteMutation = () => {
         throw Error(`Request status: ${response.status}`);
       }
     },
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['manageableRoles'] }),
+    onSuccess: () => queryClient.invalidateQueries(),
   });
 };
 
