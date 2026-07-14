@@ -35,7 +35,6 @@ import { sessionsApi } from '@/api/sessions';
 import { queryClient } from '@/App';
 import { useToastContext } from '@/features/toasts/ToastContext';
 import { ToastMessage } from '@/features/toasts/ToastMessage';
-import { getCSRFToken } from '@/utils/cookies';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import ErrorIcon from '@mui/icons-material/Error';
 import { queryOptions, useMutation, UseMutationOptions } from '@tanstack/react-query';
@@ -223,20 +222,8 @@ export const useManageableRoleUpdateMutation = () => {
 export const useManageableRoleDeleteMutation = () => {
   return useMutation({
     mutationKey: ['manageableRoles', 'delete'],
-    mutationFn: async (data: Pick<TAManageableRoleMutation, 'assignment_id' | 'location'>) => {
-      const response = await fetch(`${apiUrl}/manageable-roles/`, {
-        method: 'DELETE',
-        credentials: 'include',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-CSRFToken': getCSRFToken() || '',
-        },
-        body: JSON.stringify(data),
-      });
-      if (!response.ok) {
-        throw Error(`Request status: ${response.status}`);
-      }
-    },
+    mutationFn: (data: Pick<TAManageableRoleMutation, 'assignment_id' | 'location'>) =>
+      deleteData(`${apiUrl}/manageable-roles/`, false, data),
     onSuccess: () => queryClient.invalidateQueries(),
   });
 };

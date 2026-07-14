@@ -148,15 +148,17 @@ export async function postForm(
   }
 }
 
-export async function deleteData(url: string, isAdminMode?: boolean): Promise<void> {
+export async function deleteData<T>(url: string, isAdminMode?: boolean, data?: T): Promise<void> {
   try {
     const response = await fetch(url, {
       method: 'DELETE',
       credentials: 'include',
       headers: {
+        'Content-Type': 'application/json',
         'X-CSRFToken': getCSRFToken() || '',
         'X-Admin-Mode': isAdminMode ? 'true' : 'false',
       },
+      body: data != null ? JSON.stringify(data) : undefined,
     });
 
     if (!response.ok) {
