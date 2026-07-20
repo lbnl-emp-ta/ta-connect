@@ -12,6 +12,7 @@ import { useSuspenseQuery } from '@tanstack/react-query';
 import { useRequestsContext } from './RequestsContext';
 import { RequestDatesDialog } from '@/features/requests/RequestDatesDialog';
 import { RequestCloseoutForm } from '@/features/requests/RequestCloseoutForm';
+import { RequestCancelButton } from '@/features/requests/RequestCancelButton';
 
 interface RequestHeaderProps {
   request: TARequestDetail;
@@ -82,6 +83,7 @@ export const RequestHeader: React.FC<RequestHeaderProps> = ({ request }) => {
         </Stack>
       </Stack>
       <Stack direction="row">
+        <RequestCancelButton request={request} />
         <RequestAssignBackwardButton request={request} />
         <RequestAssignForwardButton request={request} />
       </Stack>
