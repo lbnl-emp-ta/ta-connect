@@ -239,7 +239,6 @@ class RequestDetailView(BaseUserAwareRequest):
             ('transfer-organization-type', CanTransferOrganizationType),
             ('edit-closeout-responses', CanEditCloseoutResponses),
             ('assign-forward-to-reception', CanAssignForwardToReception),
-            ('reopen-request', CanReopen),
             ('add-note', CanAddNote),
             ('delete-note', CanDeleteNote),
             ('add-attachment', CanAddAttachment),

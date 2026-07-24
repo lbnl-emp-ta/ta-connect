@@ -9,7 +9,13 @@ import CancelIcon from '@mui/icons-material/Cancel';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import ErrorIcon from '@mui/icons-material/Error';
 import { Button, CircularProgress, Stack } from '@mui/material';
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogContentText from '@mui/material/DialogContentText';
+import DialogTitle from '@mui/material/DialogTitle';
 import { useNavigate } from '@tanstack/react-router';
+import { useState } from 'react';
 
 interface RequestCancelButtonProps {
   request: TARequestDetail;
@@ -25,6 +31,7 @@ export const RequestCancelButton: React.FC<RequestCancelButtonProps> = ({ reques
   const { isAdminMode } = useAdminModeContext();
   const { tab, nextId, previousId } = useRequestsContext();
   const { setShowToast, setToastMessage } = useToastContext();
+  const [dialogOpen, setDialogOpen] = useState(false);
   const onMutate = (message: string) => {
     return () => {
       setShowToast(true);
@@ -75,13 +82,49 @@ export const RequestCancelButton: React.FC<RequestCancelButtonProps> = ({ reques
   }
 
   return (
-    <Button
-      variant="contained"
-      color="error"
-      startIcon={<CancelIcon />}
-      onClick={() => handleCancel()}
-    >
-      Cancel request
-    </Button>
+    <>
+      <Button
+        variant="contained"
+        color="error"
+        startIcon={<CancelIcon />}
+        onClick={() => setDialogOpen(true)}
+      >
+        Cancel request
+      </Button>
+      <Dialog
+        open={dialogOpen}
+        maxWidth="sm"
+        fullWidth
+        onClose={() => setDialogOpen(false)}
+        disableRestoreFocus
+      >
+        <DialogTitle>Cancel Request</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            Are you sure you want to cancel request <strong>#{request.id}</strong> from{' '}
+            <strong>{request.organization?.name}</strong>?
+          </DialogContentText>
+          <DialogContentText sx={{ mt: 2 }}>
+            Only admins and coordinators can reopen requests after they have been canceled.
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions sx={{ justifyContent: 'space-between' }}>
+          <span></span>
+          <Stack direction="row">
+            <Button onClick={() => setDialogOpen(false)}>Keep request</Button>
+            <Button
+              variant="contained"
+              color="error"
+              onClick={() => {
+                handleCancel();
+                setDialogOpen(false);
+              }}
+            >
+              Cancel request
+            </Button>
+          </Stack>
+        </DialogActions>
+      </Dialog>
+    </>
   );
 };
