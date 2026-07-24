@@ -4,6 +4,7 @@ import {
   Dialog,
   DialogActions,
   DialogContent,
+  DialogContentText,
   DialogTitle,
   IconButton,
   Stack,
@@ -18,6 +19,7 @@ import { useAdminModeContext } from '@/features/admin-mode/AdminModeContext';
 import { formatDatetime } from '../../utils/utils';
 import { useEffect, useState } from 'react';
 import { useUser } from '@/hooks/useUser';
+import { Blockquote } from '@/components/Blockquote';
 
 interface RequestNotesProps {
   requestId: TARequestDetail['id'];
@@ -30,7 +32,7 @@ export const RequestNotes: React.FC<RequestNotesProps> = ({ requestId, permissio
   const user = useUser();
   const [showAddDialog, setShowAddDialog] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
-  const [noteToDelete, setNoteToDelete] = useState<number>();
+  const [noteToDelete, setNoteToDelete] = useState<TANote>();
   const createNoteMutation = useCreateNoteMutation(requestId.toString(), isAdminMode);
   const deleteNoteMutation = useDeleteNoteMutation(requestId.toString(), isAdminMode);
   const [noteDescription, setNoteDescription] = useState('');
@@ -55,14 +57,14 @@ export const RequestNotes: React.FC<RequestNotesProps> = ({ requestId, permissio
     });
   };
 
-  const handleInitiateDelete = (noteId: number) => {
-    setNoteToDelete(noteId);
+  const handleInitiateDelete = (note: TANote) => {
+    setNoteToDelete(note);
     setShowDeleteDialog(true);
   };
 
   const handleDelete = () => {
     if (noteToDelete) {
-      deleteNoteMutation.mutate(noteToDelete.toString());
+      deleteNoteMutation.mutate(noteToDelete.id.toString());
       setShowDeleteDialog(false);
     }
   };
@@ -106,7 +108,7 @@ export const RequestNotes: React.FC<RequestNotesProps> = ({ requestId, permissio
                 {formatDatetime(note.timestamp)}
               </Typography>
               {permissions.includes('delete-note') && (
-                <IconButton onClick={() => handleInitiateDelete(note.id)} size="small">
+                <IconButton onClick={() => handleInitiateDelete(note)} size="small">
                   <DeleteIcon fontSize="small" />
                 </IconButton>
               )}
@@ -155,8 +157,14 @@ export const RequestNotes: React.FC<RequestNotesProps> = ({ requestId, permissio
       <Dialog open={showDeleteDialog} onClose={() => setShowDeleteDialog(false)}>
         {!deleteNoteMutation.isPending && (
           <>
+            <DialogTitle>Delete Note</DialogTitle>
             <DialogContent>
-              <Typography>Are you sure you want to delete this note?</Typography>
+              <Stack>
+                <DialogContentText>Are you sure you want to delete this note?</DialogContentText>
+                <DialogContentText>
+                  <Blockquote clamp>{noteToDelete?.content}</Blockquote>
+                </DialogContentText>
+              </Stack>
             </DialogContent>
             <DialogActions>
               <Button variant="outlined" onClick={() => setShowDeleteDialog(false)}>

@@ -100,13 +100,15 @@ export const RequestCancelButton: React.FC<RequestCancelButtonProps> = ({ reques
       >
         <DialogTitle>Cancel Request</DialogTitle>
         <DialogContent>
-          <DialogContentText>
-            Are you sure you want to cancel request <strong>#{request.id}</strong> from{' '}
-            <strong>{request.organization?.name}</strong>?
-          </DialogContentText>
-          <DialogContentText sx={{ mt: 2 }}>
-            Only admins and coordinators can reopen requests after they have been canceled.
-          </DialogContentText>
+          <Stack>
+            <DialogContentText>
+              Are you sure you want to cancel request <strong>#{request.id}</strong> from{' '}
+              <strong>{request.organization?.name}</strong>?
+            </DialogContentText>
+            <DialogContentText>
+              Only admins and coordinators can reopen requests after they have been canceled.
+            </DialogContentText>
+          </Stack>
         </DialogContent>
         <DialogActions sx={{ justifyContent: 'space-between' }}>
           <span></span>
