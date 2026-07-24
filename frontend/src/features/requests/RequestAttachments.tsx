@@ -4,6 +4,7 @@ import {
   Dialog,
   DialogActions,
   DialogContent,
+  DialogContentText,
   DialogTitle,
   IconButton,
   Stack,
@@ -35,7 +36,7 @@ export const RequestAttachments: React.FC<RequestAttachmentsProps> = ({
   const { isAdminMode } = useAdminModeContext();
   const [showUploadDialog, setShowUploadDialog] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
-  const [attachmentToDelete, setAttachmentToDelete] = useState<number>();
+  const [attachmentToDelete, setAttachmentToDelete] = useState<TAAttachment>();
   const uploadAttachmentMutation = useAttachmentMutation(requestId.toString(), isAdminMode);
   const deleteAttachmentMutation = useDeleteAttachmentMutation(requestId.toString(), isAdminMode);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -93,14 +94,14 @@ export const RequestAttachments: React.FC<RequestAttachmentsProps> = ({
       .then((blob) => downloadBlob(blob, `${attachmentTitle}`));
   };
 
-  const handleInitiateDelete = (attachmentId: number) => {
-    setAttachmentToDelete(attachmentId);
+  const handleInitiateDelete = (attachment: TAAttachment) => {
+    setAttachmentToDelete(attachment);
     setShowDeleteDialog(true);
   };
 
   const handleDelete = () => {
     if (attachmentToDelete) {
-      deleteAttachmentMutation.mutate(attachmentToDelete.toString());
+      deleteAttachmentMutation.mutate(attachmentToDelete.id.toString());
       setShowDeleteDialog(false);
     }
   };
@@ -155,7 +156,7 @@ export const RequestAttachments: React.FC<RequestAttachmentsProps> = ({
               </Typography>
             </Stack>
             {permissions.includes('delete-attachment') && (
-              <IconButton onClick={() => handleInitiateDelete(attachment.id)}>
+              <IconButton onClick={() => handleInitiateDelete(attachment)}>
                 <DeleteIcon />
               </IconButton>
             )}
@@ -217,8 +218,12 @@ export const RequestAttachments: React.FC<RequestAttachmentsProps> = ({
       <Dialog open={showDeleteDialog} onClose={() => setShowDeleteDialog(false)}>
         {!deleteAttachmentMutation.isPending && (
           <>
+            <DialogTitle>Delete Attachment</DialogTitle>
             <DialogContent>
-              <Typography>Are you sure you want to delete this attachment?</Typography>
+              <DialogContentText>
+                Are you sure you want to delete the attachment,{' '}
+                <strong>{attachmentToDelete?.title}</strong>?
+              </DialogContentText>
             </DialogContent>
             <DialogActions>
               <Button variant="outlined" onClick={() => setShowDeleteDialog(false)}>
