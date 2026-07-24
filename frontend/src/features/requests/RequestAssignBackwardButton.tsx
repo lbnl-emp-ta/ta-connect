@@ -129,7 +129,8 @@ export const RequestAssignBackwardButton: React.FC<RequestAssignBackwardButtonPr
 
   if (
     !currentStep.backwardPermission ||
-    !request.permissions.includes(currentStep.backwardPermission)
+    !request.permissions.includes(currentStep.backwardPermission) ||
+    currentStep.backwardPermission === 'cancel-request'
   ) {
     return null;
   }
