@@ -584,6 +584,7 @@ class RequestApproveCloseoutFormByProgramView(BaseUserAwareRequest):
                 closeout_form.save()
 
                 ta_request.status = get_status(REQUEST_STATUS.COMPLETED)
+                ta_request.actual_completion_date = timezone.now()
                 ta_request.owner = None
                 ta_request.save()
 
@@ -611,6 +612,7 @@ class RequestReopenView(BaseUserAwareRequest):
 
         try:
             ta_request.status = RequestStatus.objects.get(name=REQUEST_STATUS.SCOPING)
+            ta_request.actual_completion_date = None
             ta_request.owner = Owner.objects.get(pk=Owner.get_default_pk())
             ta_request.program = None
             ta_request.lab = None

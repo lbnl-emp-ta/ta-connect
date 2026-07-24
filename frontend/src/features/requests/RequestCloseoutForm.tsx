@@ -222,7 +222,11 @@ export const RequestCloseoutForm: React.FC<RequestCloseoutFormProps> = ({
     } else if (!closeoutForm.approved_by_program) {
       return 'Approve and mark completed';
     }
-  }, [closeoutForm?.submitted_date, closeoutForm?.approved_by_program]);
+  }, [
+    closeoutForm?.submitted_date,
+    closeoutForm?.approved_by_lab,
+    closeoutForm?.approved_by_program,
+  ]);
 
   const labRejectButtonText = useMemo(() => {
     if (!closeoutForm?.submitted_date || closeoutForm.approved_by_lab) {
