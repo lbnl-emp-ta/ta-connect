@@ -7,6 +7,7 @@ import { RequestAssignForwardButton } from '@/features/requests/RequestAssignFor
 import { expertsQueryOptions } from '@/api/queryOptions';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
+import CircleIcon from '@mui/icons-material/Circle';
 import { Box, Drawer, IconButton, Stack, Typography } from '@mui/material';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { useRequestsContext } from './RequestsContext';
@@ -40,45 +41,50 @@ export const RequestHeader: React.FC<RequestHeaderProps> = ({ request }) => {
             fontWeight: 'bold',
           }}
         >
-          {request.customers[0]?.name || 'Missing customer contact'} (
-          {request.organization?.state.abbreviation})
+          {request.customers[0]?.name || 'Missing customer contact'} (#{request.id})
         </Typography>
-        <Stack direction="row" alignItems="center">
-          {previousId !== null && (
-            <AppLink
-              to={`/requests/${tab}/$requestId`}
-              params={{
-                requestId: previousId.toString(),
-              }}
-            >
-              <IconButton size="small">
-                <ChevronLeftIcon />
-              </IconButton>
-            </AppLink>
-          )}
-          {previousId === null && (
-            <span>
-              <IconButton size="small" disabled>
-                <ChevronLeftIcon />
-              </IconButton>
-            </span>
-          )}
-          {nextId !== null && (
-            <AppLink to={`/requests/${tab}/$requestId`} params={{ requestId: nextId.toString() }}>
-              <IconButton size="small">
-                <ChevronRightIcon />
-              </IconButton>
-            </AppLink>
-          )}
-          {nextId === null && (
-            <span>
-              <IconButton size="small" disabled>
-                <ChevronRightIcon />
-              </IconButton>
-            </span>
-          )}
-          <Typography variant="h6" component="h2" color="grey.600">
-            Request #{request.id}
+        <Stack direction="row" spacing={2} alignItems="center">
+          <Stack direction="row" alignItems="center">
+            {previousId !== null && (
+              <AppLink
+                to={`/requests/${tab}/$requestId`}
+                params={{
+                  requestId: previousId.toString(),
+                }}
+              >
+                <IconButton size="small">
+                  <ChevronLeftIcon />
+                </IconButton>
+              </AppLink>
+            )}
+            {previousId === null && (
+              <span>
+                <IconButton size="small" disabled>
+                  <ChevronLeftIcon />
+                </IconButton>
+              </span>
+            )}
+            {nextId !== null && (
+              <AppLink to={`/requests/${tab}/$requestId`} params={{ requestId: nextId.toString() }}>
+                <IconButton size="small">
+                  <ChevronRightIcon />
+                </IconButton>
+              </AppLink>
+            )}
+            {nextId === null && (
+              <span>
+                <IconButton size="small" disabled>
+                  <ChevronRightIcon />
+                </IconButton>
+              </span>
+            )}
+          </Stack>
+          <Typography variant="subtitle1" color="grey.600">
+            {request.organization?.state.name || 'Missing state'}
+          </Typography>
+          <CircleIcon sx={{ fontSize: 8, color: 'grey.600' }} />
+          <Typography variant="subtitle1" color="grey.600">
+            {request.organization?.name || 'Missing organization'}
           </Typography>
         </Stack>
       </Stack>
