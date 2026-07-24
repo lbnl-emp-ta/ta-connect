@@ -82,7 +82,7 @@ export const RequestHeader: React.FC<RequestHeaderProps> = ({ request }) => {
           <Typography variant="subtitle1" color="grey.600">
             {request.organization?.state.name || 'Missing state'}
           </Typography>
-          <CircleIcon sx={{ fontSize: 8, color: 'grey.600' }} />
+          <CircleIcon sx={{ fontSize: 6, color: 'grey.600' }} />
           <Typography variant="subtitle1" color="grey.600">
             {request.organization?.name || 'Missing organization'}
           </Typography>
