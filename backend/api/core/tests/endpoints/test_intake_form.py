@@ -1,7 +1,6 @@
 import pytest
 from rest_framework import status
 
-from core.models import Customer, Request
 
 @pytest.mark.django_db
 class TestProcessIntakeFormEndpoint:
@@ -13,7 +12,7 @@ class TestProcessIntakeFormEndpoint:
             "phone": test_customer.phone,
             "title": test_customer.title,
             "organization_id": org.id,
-            "taDepth": test_request.depth.name,
+            "effort": test_request.effort,
             "description": test_request.description
         }
         response = api_client.post("/api/process-intake-form/", data=data)
@@ -31,7 +30,7 @@ class TestProcessIntakeFormEndpoint:
             "organization_name": "New Test Organization",
             "organization_address": "123 New Test St, Springfield, IL 62701",
             "organization_type": org.type.name,
-            "taDepth": test_request.depth.name,
+            "effort": test_request.effort,
             "description": "A brand new request from a brand new organization"
         }
         response = api_client.post("/api/process-intake-form/", data=data)

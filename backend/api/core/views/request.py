@@ -213,7 +213,6 @@ class RequestDetailView(BaseUserAwareRequest):
         for audit in ta_request.audithistory_set.all().order_by('-date'):
             audit_data = dict()
             audit_data["user"] = audit.user.name
-            audit_data["role"] = audit.role.name
             audit_data["action_type"] = audit.action_type
             audit_data["description"] = audit.description
             audit_data["date"] = audit.date
@@ -487,6 +486,7 @@ class RequestCancelView(BaseUserAwareRequest):
                 ta_request.expert = None
 
                 ta_request.save()
+
                 create_audit_history(request, ta_request, ActionType.StatusChange, f"Status changed to Unable to Address")
                 create_audit_history(request, ta_request, ActionType.Assignment, f"Removed all assignments")
 
