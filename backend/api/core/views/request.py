@@ -486,7 +486,7 @@ class RequestCancelView(BaseUserAwareRequest):
                 ta_request.expert = None
 
                 ta_request.save()
-                print("Request cancelled successfully, creating audit history")
+
                 create_audit_history(request, ta_request, ActionType.StatusChange, f"Status changed to Unable to Address")
                 create_audit_history(request, ta_request, ActionType.Assignment, f"Removed all assignments")
 
