@@ -17,7 +17,7 @@ class ActionType(models.TextChoices):
 class AuditHistory(models.Model):
     request = models.ForeignKey(Request, on_delete=models.PROTECT) 
     user = models.ForeignKey(User, on_delete=models.PROTECT)
-    role = models.ForeignKey(Role, on_delete=models.PROTECT)
+    role = models.ForeignKey(Role, on_delete=models.SET_NULL, null=True, blank=True)
     action_type = models.CharField(max_length=64, choices=ActionType)
     description = models.TextField()
     date = models.DateTimeField(auto_now_add=True)

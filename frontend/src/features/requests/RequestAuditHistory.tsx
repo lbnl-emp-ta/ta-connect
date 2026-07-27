@@ -35,7 +35,6 @@ export const RequestAuditHistory: React.FC<RequestAuditHistoryProps> = ({ auditH
             valueFormatter: (value) => formatDatetime(value),
           },
           { field: 'user', headerName: 'User', flex: 1, minWidth: 150 },
-          { field: 'role', headerName: 'Role', flex: 1, minWidth: 150 },
         ]}
         getRowId={(row) => `${row.date}-${row.user}-${row.action_type}`}
         disableRowSelectionOnClick

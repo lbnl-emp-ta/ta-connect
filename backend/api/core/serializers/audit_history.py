@@ -5,7 +5,6 @@ from core.serializers import *
 
 class AuditHistorySerializer(serializers.ModelSerializer):
     user = UserLeanSerializer()
-    role = RoleSerializer()
 
     class Meta:
         model = AuditHistory

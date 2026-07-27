@@ -69,7 +69,6 @@ export interface TAAuditHistoryItem {
   action_type: string;
   date: string;
   description: string;
-  role: string;
   user: string;
 }
 
