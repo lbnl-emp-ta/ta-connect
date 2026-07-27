@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { TARequest } from '../../api/dashboard/types';
 import { formatDatetime, sortAndFilterRequests, statusMap } from '../../utils/utils';
 import { useRequestsContext } from './RequestsContext';
+import CircleIcon from '@mui/icons-material/Circle';
 import HourglassBottomIcon from '@mui/icons-material/HourglassBottom';
 import TaskAltIcon from '@mui/icons-material/TaskAlt';
 
@@ -123,8 +124,9 @@ export const RequestsList: React.FC<RequestsListProps> = ({
                 <Typography component="h4" fontWeight="bold">
                   {request.customer_name || 'Missing customer contact'}
                 </Typography>
+                <CircleIcon sx={{ fontSize: 6 }} />
                 <Typography component="h4" fontWeight="bold">
-                  ({request.organization?.state.name})
+                  {request.organization?.state.name}
                 </Typography>
               </Stack>
               <Typography>#{request.id}</Typography>

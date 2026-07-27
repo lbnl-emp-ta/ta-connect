@@ -94,7 +94,7 @@ export const statusesQueryOptions = (isAdminMode?: boolean) =>
 export const ownersQueryOptions = (requestId: string, isAdminMode?: boolean) =>
   queryOptions({
     staleTime: 120_000, // stale after 2 minutes
-    queryKey: ['owners', isAdminMode],
+    queryKey: ['owners', requestId, isAdminMode],
     queryFn: () => fetchData<TAOwner[]>(`${apiUrl}/requests/${requestId}/owners/`, isAdminMode),
   });
 

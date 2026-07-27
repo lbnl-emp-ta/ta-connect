@@ -33,17 +33,24 @@ class OwnerListView(BaseUserAwareRequest):
             return owners_set.filter(domain_type=DOMAINTYPE.PROGRAM)
         
         if ta_request.status.name in [REQUEST_STATUS.ASSIGNED_TO_PROGRAM, REQUEST_STATUS.REJECTED_BY_LAB] and IsProgramLead().has_object_permission(self.request, self, ta_request):
+            # Backwards
+            reception_owners = owners_set.filter(domain_type=DOMAINTYPE.RECEPTION)
+            allowed_owners = allowed_owners | reception_owners
+            # Forwards
             for lab in ta_request.program.labs.all():
                 allowed_owners = allowed_owners | Owner.objects.filter(pk=lab.owner.pk)
 
         if ta_request.status.name in [REQUEST_STATUS.ASSIGNED_TO_LAB, REQUEST_STATUS.REJECTED_BY_EXPERT] and IsLabLead().has_object_permission(self.request, self, ta_request):
+            # Backwards
+            program_owners = owners_set.filter(domain_type=DOMAINTYPE.PROGRAM, program=ta_request.program)
+            # Forwards
             experts_in_lab = LabRoleAssignment.objects.filter(
                 role=Role.objects.get(name=ROLE.EXPERT),
                 instance=ta_request.lab,
                 program=ta_request.program,
             ).values_list('user', flat=True)
             expert_owners = owners_set.filter(domain_type=DOMAINTYPE.EXPERT, expert__in=experts_in_lab)
-            allowed_owners = allowed_owners | expert_owners
+            allowed_owners = allowed_owners | program_owners | expert_owners
 
         return allowed_owners.distinct()
         # if ta_request.status.name in [REQUEST_STATUS.ASSIGNED_TO_LAB, REQUEST_STATUS.REJECTED_BY_EXPERT]:
