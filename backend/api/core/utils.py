@@ -9,7 +9,7 @@ def create_audit_history(request, request_obj, action_type, description):
     """
     AuditHistory.objects.create(
         request=request_obj,
-        user=request.user,
+        user=request.user if request.user.is_authenticated else None,
         action_type=action_type,
         description=description
     )
