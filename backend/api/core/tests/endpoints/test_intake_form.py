@@ -1,7 +1,6 @@
 import pytest
 from rest_framework import status
 
-from core.models import Customer, Request
 
 @pytest.mark.django_db
 class TestProcessIntakeFormEndpoint:
