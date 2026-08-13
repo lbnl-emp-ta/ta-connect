@@ -78,6 +78,59 @@ class RequestAdmin(ImportExportModelAdmin):
     resource_classes = [RequestResource]
 
 
+class CustomerResource(resources.ModelResource):
+    class Meta:
+        model = Customer
+        fields = (
+            'id',
+            'email',
+            'name',
+            'phone',
+            'title',
+        )
+
+
+class CustomerAdmin(ImportExportModelAdmin):
+    resource_classes = [CustomerResource]
+
+
+class UserResource(resources.ModelResource):
+    class Meta:
+        model = get_user_model()
+        fields = (
+            'id',
+            'email',
+            'name',
+            'phone',
+            'is_staff',
+            'is_superuser',
+            'is_active',
+            'last_login',
+            'date_joined',
+        )
+
+
+class UserAdmin(ImportExportModelAdmin):
+    resource_classes = [UserResource]
+
+
+class OrganizationResource(resources.ModelResource):
+    class Meta:
+        model = Organization
+        fields = (
+            'id',
+            'name',
+            'address',
+            'state',
+            'transmission_planning_region',
+            'type',
+        )
+
+
+class OrganizationAdmin(ImportExportModelAdmin):
+    resource_classes = [OrganizationResource]
+
+
 class AttachmentResource(resources.ModelResource):
     class Meta:
         model = Attachment
@@ -126,11 +179,11 @@ class AttachmentAdmin(ImportExportModelAdmin):
         )
 
 
-admin.site.register(get_user_model())
+admin.site.register(get_user_model(), UserAdmin)
 admin.site.register(Request, RequestAdmin)
-admin.site.register(Customer)
+admin.site.register(Customer, CustomerAdmin)
 admin.site.register(CustomerRequestRelationship)
-admin.site.register(Organization)
+admin.site.register(Organization, OrganizationAdmin)
 admin.site.register(OrganizationType)
 admin.site.register(Program)
 admin.site.register(Lab)
