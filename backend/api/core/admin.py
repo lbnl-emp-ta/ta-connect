@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Group
-from import_export import resources
+from import_export import fields, resources
 from import_export.admin import ImportExportModelAdmin
 from core.models import *
 
@@ -9,10 +9,15 @@ admin.site.unregister(Group)
 
 
 class RequestResource(resources.ModelResource):
+    customer_name = fields.Field(column_name='Customer Name', readonly=True)
+    customer_email = fields.Field(column_name='Customer Email', readonly=True)
+
     class Meta:
         model = Request
         fields = (
             'id',
+            'customer_name',
+            'customer_email',
             'owner',
             'program',
             'lab',
@@ -33,6 +38,12 @@ class RequestResource(resources.ModelResource):
 
     def dehydrate_owner(self, obj):
         return str(obj.owner) if obj.owner else ''
+
+    def dehydrate_customer_name(self, obj):
+        return ', '.join(obj.customers.order_by('pk').values_list('name', flat=True))
+
+    def dehydrate_customer_email(self, obj):
+        return ', '.join(obj.customers.order_by('pk').values_list('email', flat=True))
 
     def dehydrate_program(self, obj):
         return obj.program.name if obj.program else ''
