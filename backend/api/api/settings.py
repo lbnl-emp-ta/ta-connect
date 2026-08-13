@@ -54,6 +54,7 @@ INSTALLED_APPS = [
     'allauth.socialaccount.providers.orcid',
     'rest_framework',
     'core',
+    'import_export',
 ]
 
 
