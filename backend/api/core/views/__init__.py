@@ -20,6 +20,7 @@ from .user import UserEditView
 from .closeout_form import CloseoutFormView
 from .expertise import ExpertiseUpdateView
 from .manageable_role import ManageableRoleListView
+from .program import ProgramListView
 
 __all__ = [
     "AssignmentView",
@@ -36,6 +37,7 @@ __all__ = [
     "RequestReopenView",
     "DepthListView",
     "StateListView",
+    "ProgramListView",
     "OrganizationTypeListView",
     "OrganizationListView",
     "OrganizationDetailView",

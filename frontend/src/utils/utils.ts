@@ -3,15 +3,23 @@ import { PermissionAction, TARequest, TARequestDetail, TAStatusName } from '../a
 export const sortAndFilterRequests = (
   requests: TARequest[],
   sortField: string,
-  searchTerm: string
+  searchTerm: string,
+  programFilter?: number
 ): TARequest[] => {
   const sortDirection = sortField.startsWith('-') ? 'desc' : 'asc';
   const sortFieldName = sortField.replace('-', '') as keyof TARequest;
-  const filtered = searchTerm
-    ? requests.filter((r) =>
-        `${JSON.stringify(r)}`.toLowerCase().includes(searchTerm.toLowerCase())
-      )
-    : requests;
+  const filtered = requests.filter((request) => {
+    const matchesSearchTerm = searchTerm
+      ? `${JSON.stringify(request)}`.toLowerCase().includes(searchTerm.toLowerCase())
+      : true;
+    const matchesProgramFilter = programFilter ? request.organization?.id === programFilter : true;
+    return matchesSearchTerm && matchesProgramFilter;
+  });
+  // const filtered = searchTerm
+  //   ? requests.filter((r) =>
+  //       `${JSON.stringify(r)}`.toLowerCase().includes(searchTerm.toLowerCase())
+  //     )
+  //   : requests;
   return [...filtered].sort((a, b) => {
     if (a[sortFieldName]! < b[sortFieldName]!) return sortDirection === 'asc' ? -1 : 1;
     if (a[sortFieldName]! > b[sortFieldName]!) return sortDirection === 'asc' ? 1 : -1;

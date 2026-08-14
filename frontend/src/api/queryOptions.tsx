@@ -23,6 +23,7 @@ import {
   TAStatus,
   TATopic,
   TAUserMutation,
+  TAProgram,
 } from '@/api/dashboard/types';
 import { submitIntakeMutation } from '@/api/forms';
 import {
@@ -134,6 +135,13 @@ export const statesQueryOptions = () =>
     staleTime: 120_000, // stale after 2 minutes
     queryKey: ['states'],
     queryFn: () => fetchData<State[]>(`${apiUrl}/states/`),
+  });
+
+export const programsQueryOptions = () =>
+  queryOptions({
+    staleTime: 120_000, // stale after 2 minutes
+    queryKey: ['programs'],
+    queryFn: () => fetchData<TAProgram[]>(`${apiUrl}/programs/`),
   });
 
 export const organizationsQueryOptions = () =>

@@ -1,10 +1,14 @@
 import { TARequest } from '@/api/dashboard/types';
+import { programsQueryOptions } from '@/api/queryOptions';
 import { useRequestsContext } from '@/features/requests/RequestsContext';
 import { RequestsList } from '@/features/requests/RequestsList';
 import { a11yProps } from '@/utils/utils';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import SearchIcon from '@mui/icons-material/Search';
 import SortIcon from '@mui/icons-material/Sort';
 import {
   Box,
+  Button,
   Container,
   InputAdornment,
   MenuItem,
@@ -15,7 +19,9 @@ import {
   TextField,
   Typography,
 } from '@mui/material';
+import { useSuspenseQuery } from '@tanstack/react-query';
 import { Outlet, useNavigate } from '@tanstack/react-router';
+import { useState } from 'react';
 
 export interface RequestListConfig {
   id: string;
@@ -29,7 +35,21 @@ interface RequestsLayoutProps {
 
 export const RequestsLayout: React.FC<RequestsLayoutProps> = ({ requestLists }) => {
   const navigate = useNavigate();
-  const { tab, sortField, setSortField, searchTerm, setSearchTerm } = useRequestsContext();
+  const { data: allPrograms } = useSuspenseQuery(programsQueryOptions());
+  const {
+    tab,
+    sortField,
+    setSortField,
+    searchTerm,
+    setSearchTerm,
+    programFilter,
+    setProgramFilter,
+  } = useRequestsContext();
+  const [showSearchBox, setShowSearchBox] = useState(false);
+
+  const handleToggleSearchBox = () => {
+    setShowSearchBox(!showSearchBox);
+  };
 
   const handleChangeSearchTerm = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(event.target.value);
@@ -92,31 +112,64 @@ export const RequestsLayout: React.FC<RequestsLayoutProps> = ({ requestLists }) 
             </Tabs>
           </Box>
           <Stack sx={{ padding: 2 }}>
-            <Stack direction="row" spacing={2} alignItems="center">
-              <TextField
-                value={searchTerm}
-                label="Search"
-                type="search"
+            <Stack direction="row" spacing={1} alignItems="center">
+              <Button
                 variant="outlined"
-                size="small"
-                fullWidth
-                onChange={handleChangeSearchTerm}
-              />
-              <Select
-                value={sortField}
-                size="small"
-                startAdornment={
-                  <InputAdornment position="start">
-                    <SortIcon />
-                  </InputAdornment>
-                }
-                onChange={(e) => setSortField(e.target.value)}
-                sx={{ width: 163, flexShrink: 0, flexGrow: 0 }}
+                onClick={handleToggleSearchBox}
+                sx={{
+                  height: 40,
+                  width: 40,
+                  minWidth: 40,
+                  borderRadius: 10,
+                  backgroundColor: searchTerm ? 'primary.light' : 'transparent',
+                }}
               >
-                <MenuItem value="-date_created">Newest first</MenuItem>
-                <MenuItem value="date_created">Oldest first</MenuItem>
-                <MenuItem value="status">Status</MenuItem>
-              </Select>
+                {showSearchBox ? <ArrowBackIcon /> : <SearchIcon />}
+              </Button>
+              {showSearchBox && (
+                <TextField
+                  value={searchTerm}
+                  label="Search"
+                  type="search"
+                  variant="outlined"
+                  size="small"
+                  fullWidth
+                  onChange={handleChangeSearchTerm}
+                />
+              )}
+              {!showSearchBox && (
+                <>
+                  <Select
+                    value={programFilter || ''}
+                    size="small"
+                    startAdornment={<InputAdornment position="start">Program</InputAdornment>}
+                    onChange={(e) => setProgramFilter(e.target.value)}
+                    sx={{ flexGrow: 1 }}
+                  >
+                    <MenuItem value="">All Programs</MenuItem>
+                    {allPrograms?.map((program) => (
+                      <MenuItem key={program.id} value={program.id}>
+                        {program.name}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                  <Select
+                    value={sortField}
+                    size="small"
+                    startAdornment={
+                      <InputAdornment position="start">
+                        <SortIcon />
+                      </InputAdornment>
+                    }
+                    onChange={(e) => setSortField(e.target.value)}
+                    sx={{ width: 163, flexShrink: 0, flexGrow: 0 }}
+                  >
+                    <MenuItem value="-date_created">Newest first</MenuItem>
+                    <MenuItem value="date_created">Oldest first</MenuItem>
+                    <MenuItem value="status">Status</MenuItem>
+                  </Select>
+                </>
+              )}
             </Stack>
             {requestLists.map((list) => {
               if (list.requests) {

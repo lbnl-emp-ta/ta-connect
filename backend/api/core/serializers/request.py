@@ -35,22 +35,19 @@ class RequestDetailSerializer(serializers.Serializer):
 class RequestListSerializer(serializers.Serializer):
     id = serializers.IntegerField()
     date_created = serializers.DateTimeField()
-
     status = serializers.SlugRelatedField(
         slug_field="name", 
         required=False, 
         queryset=RequestStatus.objects.all()
     )
-
     depth = serializers.SlugRelatedField(
         slug_field="name",
         required=False,
         queryset=Depth.objects.all()
     )
-
     organization = OrganizationSerializer(read_only=True)
-    
-    expert = UserLeanSerializer(required=False) 
+    expert = UserLeanSerializer(required=False)
+    program = ProgramLeanSerializer(read_only=True)
 
 class RequestExpertListSerializer(serializers.ModelSerializer):
     status = serializers.SlugRelatedField(

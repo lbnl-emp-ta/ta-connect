@@ -30,6 +30,7 @@ export const RequestsList: React.FC<RequestsListProps> = ({
     setCurrentIndex,
     setSelectedListId,
     searchTerm,
+    programFilter,
   } = useRequestsContext();
   const params = useParams({ strict: false });
   const sortedRequests = sortedRequestsMap[listId] ?? [];
@@ -47,9 +48,9 @@ export const RequestsList: React.FC<RequestsListProps> = ({
   };
 
   const sortRequests = useCallback(() => {
-    const sorted = sortAndFilterRequests(requests, sortField, searchTerm);
+    const sorted = sortAndFilterRequests(requests, sortField, searchTerm, programFilter);
     setSortedRequestsForList(listId, sorted);
-  }, [sortField, searchTerm, requests, listId, setSortedRequestsForList]);
+  }, [sortField, searchTerm, programFilter, requests, listId, setSortedRequestsForList]);
 
   const handleItemClick = (request: TARequest) => {
     navigate({
