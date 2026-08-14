@@ -4,7 +4,7 @@ import { authSessionQueryOptions } from '../../api/queryOptions';
 
 export const Route = createFileRoute('/(public)/account/provider/callback')({
   loader: async ({ context }) => {
-    // Force a fresh auth session fetch — the OAuth redirect is a full page
+    // Force a fresh auth session fetch - the OAuth redirect is a full page
     // navigation, so the stale cache still shows unauthenticated even though
     // the backend just logged us in.
     await context.queryClient.invalidateQueries({ queryKey: ['authSession'] });
@@ -24,7 +24,7 @@ function CallbackComponent() {
     data: { meta },
   } = useSuspenseQuery(authSessionQueryOptions());
 
-  // Check for OAuth errors BEFORE checking auth status — a provider error
+  // Check for OAuth errors BEFORE checking auth status - a provider error
   // means the login was rejected, so the user will never be authenticated here.
   if (error) {
     return (
