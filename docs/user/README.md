@@ -12,7 +12,7 @@ TA Connect users are National Laboratory employees who monitor, manage, or provi
 
 Customers are employees of state public utility commissions (PUCs), state energy offices (SEOs), and their associates. Customers submit requests through the public [TA Request Form](https://taconnect.lbl.gov/intake). They do not need a TA Connect account. Updates about a request are sent to the email address entered on the form.
 
-## User guide
+## Table of Contents
 
 1. [Basic Workflow](basic-workflow.md)
 2. [Getting Started](getting-started.md)
