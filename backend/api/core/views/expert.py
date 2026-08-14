@@ -87,7 +87,7 @@ class ExpertsListView(views.APIView):
         Raises PermissionError when the caller lacks access.
         """
         if lab_id and program_id:
-            # Specific lab + program lookup — Admin or Lab Lead only
+            # Specific lab + program lookup - Admin or Lab Lead only
             if not (IsAdmin().has_permission(request) or IsLabLead().has_permission(request)):
                 raise PermissionError
             return LabRoleAssignment.objects.filter(

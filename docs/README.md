@@ -1,16 +1,9 @@
-# TA Connect - Docs
+# TA Connect documentation
 
-### For Users
+## For users
 
-Go to the [User Guide](user/README.md).
+Go to the [User guide](user/README.md) to learn the basic workflow, roles and permissions, and how to submit a request.
 
-- Learn how to use the TA Connect web application
-- Understand the basic workflow, roles, and permissions
+## For developers
 
-### For Developers
-
-Go to the [Developer Guide](user/README.md).
-
-- Learn how to set up a local development environment
-- Learn about the TA Connect software architecture
-- Learn how to access and export TA Connect data
+Go to the [Developer guide](developer/README.md) to set up a local development environment and learn about the application architecture, data, testing, and deployment.

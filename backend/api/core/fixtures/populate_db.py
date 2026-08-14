@@ -28,7 +28,7 @@ fixture_list = [
     # Customers (depend on organizations, states, TPRs)
     "sample_customers_fixture.json",
 
-    # Lab role assignments — Expert assignments trigger Owner auto-creation (pk=7,8)
+    # Lab role assignments - Expert assignments trigger Owner auto-creation (pk=7,8)
     # Must be loaded before requests so expert owner FKs exist
     "sample_lab_role_assignment_fixture.json",
 

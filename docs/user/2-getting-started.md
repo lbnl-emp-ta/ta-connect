@@ -4,9 +4,9 @@ National Laboratory users sign in to TA Connect with ORCiD. Customers do not sig
 
 ## ORCiD Account
 
-To create an account on TA Connect, you must first have or create an [ORCiD](https://orcid.org/) account. Per the ORCiD website:
+To create an account on TA Connect, you must first have or create an [ORCiD](https://orcid.org/) account.
 
-> ORCID is a free, unique, persistent identifier (PID) for individuals to use as they engage in research, scholarship, and innovation activities.
+ORCiD provides a free, unique, persistent identifier (PID) for people engaged in research, scholarship, and innovation.
 
 ## Log in
 

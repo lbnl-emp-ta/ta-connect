@@ -29,12 +29,12 @@ def _send_customer_status_emails(request, customers):
 @receiver(pre_save, sender=User)
 def sync_allauth_email_on_change(sender, instance, **kwargs):
     """
-    When a User's email is changed (from any path — admin, API, shell, etc.),
+    When a User's email is changed (from any path - admin, API, shell, etc.),
     keep the corresponding allauth account_emailaddress row in sync.
     Marks the new email as unverified since it hasn't been confirmed yet.
     """
     if not instance.pk:
-        # New user — allauth will create the EmailAddress row itself
+        # New user - allauth will create the EmailAddress row itself
         return
     
     # Import here to avoid circular imports at module load time
