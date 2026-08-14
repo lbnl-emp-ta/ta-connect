@@ -37,6 +37,8 @@ urlpatterns = [
     path('depths/', DepthListView.as_view(), name="depth-list"),
     path('states/', StateListView.as_view(), name="state-list"),
 
+    path('programs/', ProgramListView.as_view(), name="program-list"),
+
     path('organizations/', OrganizationListView.as_view(), name="organization-list"),
     path('organizations/create/', OrganizationCreateView.as_view(), name="organization-create"),
     path('organizations/<int:organization_id>', OrganizationDetailView.as_view(), name="organization-detail"),

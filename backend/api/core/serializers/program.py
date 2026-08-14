@@ -16,3 +16,9 @@ class ProgramSerializer(serializers.ModelSerializer):
     class Meta:
         model = Program
         fields = "__all__"
+
+
+class ProgramLeanSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Program
+        fields = ['id', 'name', 'description']

@@ -6,7 +6,7 @@ from .organization import OrganizationSerializer, OrganizationEditSerializer
 from .customer import CustomerSerializer, CustomerEditSerializer
 from .depth import DepthSerializer
 from .lab import LabSerializer
-from .program import ProgramSerializer
+from .program import ProgramSerializer, ProgramLeanSerializer
 from .reception import ReceptionSerializer
 from .expert import ExpertSerializer
 from .expertise import ExpertiseSerializer, ExpertiseWriteSerializer
@@ -28,6 +28,7 @@ __all__ = [
     "RoleSerializer",
     "LabSerializer",
     "ProgramSerializer",
+    "ProgramLeanSerializer",
     "ReceptionSerializer",
     "ExpertSerializer",
     "ExpertiseSerializer",

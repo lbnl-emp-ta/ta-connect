@@ -21,6 +21,8 @@ interface RequestsContextType {
   setDatesDialogOpen: React.Dispatch<React.SetStateAction<boolean>>;
   closeoutDialogOpen: boolean;
   setCloseoutDialogOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  programFilter?: number;
+  setProgramFilter: (value?: number) => void;
 }
 
 const RequestsContext = createContext<RequestsContextType | undefined>(undefined);
@@ -35,6 +37,12 @@ export const RequestsProvider: React.FC<RequestsProviderProps> = ({ tab, childre
     tab === 'active' ? 'activeRequestsSortField' : 'inactiveRequestsSortField';
   const localStorageSearchKey =
     tab === 'active' ? 'activeRequestsSearchTerm' : 'inactiveRequestsSearchTerm';
+  const localStorageProgramFilterKey =
+    tab === 'active' ? 'activeRequestsProgramFilter' : 'inactiveRequestsProgramFilter';
+  const [programFilter, setProgramFilter] = useState<number | undefined>(() => {
+    const storedValue = localStorage.getItem(localStorageProgramFilterKey);
+    return storedValue ? parseInt(storedValue) : undefined;
+  });
   const [sortField, setSortField] = useState(() => {
     return localStorage.getItem(localStorageSortKey) ?? '-date_created';
   });
@@ -55,6 +63,15 @@ export const RequestsProvider: React.FC<RequestsProviderProps> = ({ tab, childre
   const handleSetSearchTerm = useCallback((value: string) => {
     localStorage.setItem(localStorageSearchKey, value);
     setSearchTerm(value);
+  }, []);
+
+  const handleSetProgramFilter = useCallback((value?: number) => {
+    if (value !== undefined) {
+      localStorage.setItem(localStorageProgramFilterKey, value.toString());
+    } else {
+      localStorage.removeItem(localStorageProgramFilterKey);
+    }
+    setProgramFilter(value);
   }, []);
 
   /**
@@ -100,6 +117,8 @@ export const RequestsProvider: React.FC<RequestsProviderProps> = ({ tab, childre
       setDatesDialogOpen,
       closeoutDialogOpen,
       setCloseoutDialogOpen,
+      programFilter,
+      setProgramFilter: handleSetProgramFilter,
     };
   }, [
     currentIndex,
@@ -117,6 +136,8 @@ export const RequestsProvider: React.FC<RequestsProviderProps> = ({ tab, childre
     setDatesDialogOpen,
     closeoutDialogOpen,
     setCloseoutDialogOpen,
+    programFilter,
+    setProgramFilter,
   ]);
 
   return <RequestsContext value={value}>{children}</RequestsContext>;
