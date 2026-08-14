@@ -1,23 +1,24 @@
-# TA Connect - User Guide
+# TA Connect User Guide
 
-Welcome to the TA Connect User Guide. The docs in this section are intended for end-users of the TA Connect system at https://taconnect.lbl.gov.
+TA Connect is a web application for receiving, assigning, tracking, and closing out technical assistance requests for the State Technical Assistance Program. The production application is available at [https://taconnect.lbl.gov](https://taconnect.lbl.gov).
 
 ## Who is TA Connect for?
 
 ### Users
 
-The primary users of TA Connect are National Lab employees who are involved in monitoring, managing, or administering technical assistance to state-level entities (customers) through the State TA Program. Users can have any of 5 different roles: Admin, Coordinator, Program Lead, Lab Lead, and Expert. See the [Roles and Permissions]() page for more information about each role.
+TA Connect users are National Laboratory employees who monitor, manage, or provide technical assistance. Each user has one or more roles: Admin, Coordinator, Program Lead, Lab Lead, or Expert. A role determines which requests the user can see and which actions they can take. See [Roles and Permissions](roles-and-permissions.md) for details.
 
 ### Customers
 
-The customers are the state employees and their associates. They interact with the system by submitting intake forms via https://taconnect.lbl.gov/intake. They do not need to create an account in TA Connect. Instead, they receive all their notifications about their requests via the email they used in their intake form.
+Customers are employees of state public utility commissions (PUCs), state energy offices (SEOs), and their associates. Customers submit requests through the public [TA Request Form](https://taconnect.lbl.gov/intake). They do not need a TA Connect account. Updates about a request are sent to the email address entered on the form.
 
-## Table of Contents
+## User guide
 
-1. README.md
-2. basic-workflow.md
-3. getting-started.md
-4. roles-and-permissions.md
-5. submitting-a-request.md
-6. reports-and-dashboards.md
-7. faq.md
+1. [Basic Workflow](basic-workflow.md)
+2. [Getting Started](getting-started.md)
+3. [Roles and Permissions](roles-and-permissions.md)
+4. [Submitting a Request](submitting-a-request.md)
+5. [Reports and Dashboards](reports-and-dashboards.md)
+6. [Frequently Asked Questions](faq.md)
+
+This guide describes the current user interface. An action or field may not appear if your role does not have permission to use it.
