@@ -14,10 +14,10 @@ Customers are employees of state public utility commissions (PUCs), state energy
 
 ## Table of Contents
 
-1. [Basic Workflow](basic-workflow.md)
-2. [Getting Started](getting-started.md)
-3. [Roles and Permissions](roles-and-permissions.md)
-4. [Submitting a Request](submitting-a-request.md)
-5. [Frequently Asked Questions](faq.md)
+1. [Basic Workflow](1-basic-workflow.md)
+2. [Getting Started](2-getting-started.md)
+3. [Roles and Permissions](3-roles-and-permissions.md)
+4. [Submitting a Request](4-submitting-a-request.md)
+5. [Frequently Asked Questions](5-faq.md)
 
 This guide describes the current user interface. An action or field may not appear if your role does not have permission to use it.
