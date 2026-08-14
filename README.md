@@ -2,7 +2,7 @@
 
 ## What is TA Connect?
 
-**TA Connect** is a technical assistance tracking and reporting platform that will enable partnered National Laboratories (e.g. ANL, LBNL, NLR, PNNL), each hosting various TA programs, to coordinate their efforts. TA Connect will also enable funders and partners to view TA efforts through various reports and dashboards.
+**TA Connect** is a technical assistance (TA) tracking and reporting platform that will enable partnered National Laboratories (e.g. ANL, LBNL, NLR, PNNL), each hosting various TA programs, to coordinate their efforts. TA Connect will also enable funders and partners to view TA efforts through various reports and dashboards.
 
 ## Development
 
