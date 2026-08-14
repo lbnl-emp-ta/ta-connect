@@ -1,13 +1,13 @@
 # TA Connect - Docs
 
-## I am a TA Connect user
+### I am a TA Connect user
 
 Go to the [User Guide](user/README.md).
 
 - Learn how to use the TA Connect web application
 - Understand the basic workflow, roles, and permissions
 
-## I am a TA Connect Developer
+### I am a TA Connect Developer
 
 Go to the [Developer Guide](user/README.md).
 
