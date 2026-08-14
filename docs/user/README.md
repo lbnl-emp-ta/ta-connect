@@ -18,7 +18,6 @@ Customers are employees of state public utility commissions (PUCs), state energy
 2. [Getting Started](getting-started.md)
 3. [Roles and Permissions](roles-and-permissions.md)
 4. [Submitting a Request](submitting-a-request.md)
-5. [Reports and Dashboards](reports-and-dashboards.md)
-6. [Frequently Asked Questions](faq.md)
+5. [Frequently Asked Questions](faq.md)
 
 This guide describes the current user interface. An action or field may not appear if your role does not have permission to use it.
