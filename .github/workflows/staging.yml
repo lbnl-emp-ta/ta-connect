@@ -55,14 +55,17 @@ jobs:
           source: "./frontend/dist"
           target: "/home/${{ secrets.SSH_USER }}/taconnect-staging/"
 
-      - name: Run migrations and restart application server
+      - name: Sync backend, run migrations, and restart application server
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
-            source /home/${{ secrets.SSH_USER }}/taconnect-staging/ta-staging-env/bin/activate
-            python /home/${{ secrets.SSH_USER }}/taconnect-staging/backend/api/manage.py migrate
+            set -e
+            export PATH="$HOME/.local/bin:$PATH"
+            cd /home/${{ secrets.SSH_USER }}/taconnect-staging/backend/api
+            uv sync --locked --no-dev
+            uv run --no-sync python manage.py migrate
             sudo systemctl restart gunicorn-staging
             sudo systemctl restart nginx
