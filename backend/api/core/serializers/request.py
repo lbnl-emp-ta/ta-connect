@@ -1,8 +1,9 @@
-from rest_framework import serializers
 from django.utils import timezone
+from rest_framework import serializers
 
-from core.serializers import * 
-from core.models import * 
+from core.models import *
+from core.serializers import *
+
 
 class RequestDetailSerializer(serializers.Serializer):
     id = serializers.IntegerField()

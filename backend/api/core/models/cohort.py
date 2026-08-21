@@ -1,6 +1,7 @@
 from django.db import models
 
-from core.models import Request, Customer
+from core.models import Customer, Request
+
 
 class Cohort(models.Model):
     request = models.ForeignKey(Request, on_delete=models.PROTECT, unique=True)

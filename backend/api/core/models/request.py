@@ -1,6 +1,8 @@
 from django.db import models
-from django.db.models import CheckConstraint, Q, F
-from core.models import * 
+from django.db.models import CheckConstraint, F, Q
+
+from core.models import *
+
 
 class Request(models.Model):
     """

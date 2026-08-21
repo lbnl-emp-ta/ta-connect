@@ -1,12 +1,11 @@
 import pytest
-
-from rest_framework.reverse import reverse
 from rest_framework import status
 
 from core.models import *
 
+
 @pytest.mark.django_db
-class TestRequestDetailViewEndpoint():
+class TestRequestDetailViewEndpoint:
 
     def test_request_detail_get_view_should_fail_when_missing_admin_header(self, api_client):
         # User with pk=1 should be an Admin

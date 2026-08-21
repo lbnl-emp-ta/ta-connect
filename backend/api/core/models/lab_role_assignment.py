@@ -1,6 +1,8 @@
 from django.db import models
-from core.models import *
+
 from core.constants import ROLE
+from core.models import *
+
 
 class LabRoleAssignment(models.Model):
     user = models.ForeignKey(User, on_delete=models.PROTECT)

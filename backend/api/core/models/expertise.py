@@ -1,6 +1,8 @@
 from django.core.exceptions import ValidationError
 from django.db import models
+
 from core.models import *
+
 
 # After a user is assigned an Expert role, they must also have various
 # expertises identified via this model to be properly filtered in expert views.

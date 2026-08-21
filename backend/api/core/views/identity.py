@@ -1,11 +1,13 @@
-from rest_framework import views, status, authentication, permissions
+from allauth.headless.contrib.rest_framework.authentication import (
+    XSessionTokenAuthentication,
+)
+from rest_framework import authentication, permissions, status, views
 from rest_framework.response import Response
-
-from allauth.headless.contrib.rest_framework.authentication import XSessionTokenAuthentication
 
 from core.constants import ROLE
 from core.models import *
 from core.serializers import *
+
 
 # role, location, instance
 class IdentityListView(views.APIView):

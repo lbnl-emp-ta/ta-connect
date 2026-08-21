@@ -1,11 +1,13 @@
 import datetime
+
 import pytest
-
-from rest_framework import serializers
-from core.serializers import RequestSerializer
 from django.utils import timezone
+from rest_framework import serializers
 
-class TestRequestSerializer():
+from core.serializers import RequestSerializer
+
+
+class TestRequestSerializer:
     def test_date_in_past_is_true_with_past_date(self):
         """
         Given a date in the past, date_in_past should return True.

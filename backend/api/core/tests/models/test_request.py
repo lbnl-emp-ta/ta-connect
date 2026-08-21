@@ -1,12 +1,14 @@
 import datetime
 
-from core.models import Request, Organization
+import pytest
 from django.db.utils import IntegrityError
 from django.utils import timezone
-import pytest
+
+from core.models import Organization, Request
+
 
 @pytest.mark.django_db
-class TestRequestModel():            
+class TestRequestModel:            
     def test_request_model_raises_integrity_error_when_proj_start_date_after_proj_completion_date(self):
         """
         The projected start date should be before the projected 

@@ -1,16 +1,12 @@
-from django.db.models import Q
-from rest_framework import views, status, permissions, authentication
+from rest_framework import status
 from rest_framework.response import Response
 
-from allauth.headless.contrib.rest_framework.authentication import (
-    XSessionTokenAuthentication,
-)
-
-from core.views.request import BaseUserAwareRequest
-from core.serializers import *
-from core.permissions import *
-from core.models import *
 from core.constants import DOMAINTYPE, REQUEST_STATUS, ROLE
+from core.models import *
+from core.permissions import *
+from core.serializers import *
+from core.views.request import BaseUserAwareRequest
+
 
 class OwnerListView(BaseUserAwareRequest):
     def get_queryset(self, request_id):

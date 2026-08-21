@@ -1,5 +1,7 @@
 from django.db import models
-from core.models import * 
+
+from core.models import *
+
 
 class CloseoutForm(models.Model):
     """

@@ -1,5 +1,7 @@
 from django.db import models
+
 from core.models import *
+
 
 class ReceptionRoleAssignment(models.Model):
     user = models.ForeignKey(User, on_delete=models.PROTECT)

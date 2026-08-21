@@ -1,6 +1,7 @@
 from django.conf import settings
-from core.models import Customer, Request, Organization
+
 from core.constants import DOMAINTYPE, REQUEST_STATUS
+from core.models import Customer, Organization, Request
 
 
 def assignment_email(receipient_name: str, request: Request, customer: Customer, organization: Organization) -> tuple[str, str]:
@@ -25,7 +26,7 @@ def assignment_email(receipient_name: str, request: Request, customer: Customer,
             location_str = f"Lab | {lab_name} under Program | {program_name}"
     
     if request.expert:
-        expert_str = f"you as an expert in "
+        expert_str = "you as an expert in "
     
     plain_text_message = f"""
     Hello {receipient_name},

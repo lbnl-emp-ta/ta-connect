@@ -1,9 +1,7 @@
-import os
-from django.conf import settings 
 from django.db import models
-from django.dispatch import receiver
-from django.db.models.signals import post_delete
+
 from core.models import Request, User
+
 
 # Need to ensure unique filepath name to ensure arbitrary search
 def generate_upload_filepath(instance, filename):

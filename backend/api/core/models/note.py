@@ -1,6 +1,7 @@
-from django.db import models 
+from django.db import models
 
 from core.models import *
+
 
 class Note(models.Model):
     author = models.ForeignKey(User, on_delete=models.DO_NOTHING)

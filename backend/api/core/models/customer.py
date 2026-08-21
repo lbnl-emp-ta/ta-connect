@@ -2,6 +2,7 @@ from django.db import models
 
 from core.models import Request
 
+
 class Customer(models.Model):
     email = models.EmailField(max_length=256, unique=True)
     name = models.CharField(max_length=256)

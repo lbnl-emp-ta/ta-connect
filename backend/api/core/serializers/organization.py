@@ -3,6 +3,7 @@ from rest_framework import serializers
 from core.models import Organization, State, TransmissionPlanningRegion
 from core.serializers import *
 
+
 class OrganizationSerializer(serializers.ModelSerializer):
     state = StateSerializer()
     transmission_planning_region = TransmissionPlanningRegionSerializer()

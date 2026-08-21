@@ -1,25 +1,21 @@
-from django.db import transaction, IntegrityError
-
-from rest_framework import views, status, permissions, authentication
-from rest_framework.response import Response
-
-from django.utils import timezone
-
-from core.utils import create_audit_history, get_status
-from core.serializers import * 
-from core.models import * 
-from core.models.audit_history import ActionType
-from core.permissions import *
-from core.constants import ROLE, REQUEST_STATUS
-
 from allauth.headless.contrib.rest_framework.authentication import (
     XSessionTokenAuthentication,
 )
+from django.db import IntegrityError, transaction
+from django.utils import timezone
+from rest_framework import authentication, permissions, status, views
+from rest_framework.response import Response
+
+from core.constants import REQUEST_STATUS, ROLE
+from core.models import *
+from core.models.audit_history import ActionType
+from core.permissions import *
+from core.serializers import *
+from core.utils import create_audit_history, get_status
 
 
 class ContextError(Exception):
     """Raised when the Context header is missing, unparseable, or contains a mismatched user."""
-    pass
 
 
 """
@@ -419,7 +415,7 @@ class RequestDetailView(BaseUserAwareRequest):
                         error_msg = constraint.violation_error_message
                         break
                 return Response(data={"message": error_msg}, status=status.HTTP_400_BAD_REQUEST)
-            create_audit_history(request, ta_request, ActionType.EditRequestDetails, f"Edited: {str(updated_fields)}")
+            create_audit_history(request, ta_request, ActionType.EditRequestDetails, f"Edited: {updated_fields!s}")
         else:
             return Response(data={"message": patch_serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -487,8 +483,8 @@ class RequestCancelView(BaseUserAwareRequest):
 
                 ta_request.save()
 
-                create_audit_history(request, ta_request, ActionType.StatusChange, f"Status changed to Unable to Address")
-                create_audit_history(request, ta_request, ActionType.Assignment, f"Removed all assignments")
+                create_audit_history(request, ta_request, ActionType.StatusChange, "Status changed to Unable to Address")
+                create_audit_history(request, ta_request, ActionType.Assignment, "Removed all assignments")
 
         except Exception as e:
             return Response(data={"message": f"{e}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
@@ -618,8 +614,8 @@ class RequestReopenView(BaseUserAwareRequest):
             ta_request.lab = None
             ta_request.expert = None
             ta_request.save()
-            create_audit_history(request, ta_request, ActionType.StatusChange, f"Request reopened, status changed to Scoping")
-            create_audit_history(request, ta_request, ActionType.Assignment, f"Assigned to Reception")
+            create_audit_history(request, ta_request, ActionType.StatusChange, "Request reopened, status changed to Scoping")
+            create_audit_history(request, ta_request, ActionType.Assignment, "Assigned to Reception")
 
         except Exception as e:
             return Response(data={"message": f"{e}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

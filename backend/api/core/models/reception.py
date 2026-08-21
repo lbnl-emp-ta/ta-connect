@@ -1,8 +1,8 @@
 from django.db import models
 from django.utils.functional import classproperty
-from django.db.models import CheckConstraint, Q
 
-from core.models import * 
+from core.models import *
+
 
 class Reception(models.Model):
     name = models.CharField(max_length=256, unique=True)

@@ -1,7 +1,8 @@
 from rest_framework import serializers
 
-from core.serializers.depth import DepthSerializer
 from core.models import *
+from core.serializers.depth import DepthSerializer
+
 
 class ProgramSerializer(serializers.ModelSerializer):
     owner_id = serializers.SerializerMethodField()

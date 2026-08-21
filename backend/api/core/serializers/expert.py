@@ -2,6 +2,7 @@ from rest_framework import serializers
 
 from core.models import *
 
+
 class ExpertSerializer(serializers.ModelSerializer):
     owner_id = serializers.SerializerMethodField()
 

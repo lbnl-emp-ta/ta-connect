@@ -1,5 +1,6 @@
 from enum import Enum
 
+
 class DOMAINTYPE(str, Enum):
     RECEPTION = "reception"
     PROGRAM = "program" 

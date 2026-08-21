@@ -1,7 +1,8 @@
 from rest_framework import serializers
 
 from core.models import *
-from core.serializers import * 
+from core.serializers import *
+
 
 class CustomerSerializer(serializers.ModelSerializer):
     active_requests_count = serializers.SerializerMethodField()

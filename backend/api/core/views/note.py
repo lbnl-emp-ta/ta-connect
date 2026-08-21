@@ -1,12 +1,13 @@
 from rest_framework import permissions, status
 from rest_framework.response import Response
 
-from core.models.audit_history import ActionType
-from core.utils import create_audit_history
-from core.permissions import CanAddNote, CanDeleteNote
 from core.models import Note, Request
-from core.serializers import NoteSerializer, NoteCreateSerializer
+from core.models.audit_history import ActionType
+from core.permissions import CanAddNote, CanDeleteNote
+from core.serializers import NoteCreateSerializer, NoteSerializer
+from core.utils import create_audit_history
 from core.views.request import BaseUserAwareRequest
+
 
 class NoteListView(BaseUserAwareRequest):
     permission_classes = [

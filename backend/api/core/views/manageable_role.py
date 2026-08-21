@@ -1,11 +1,21 @@
+from allauth.headless.contrib.rest_framework.authentication import (
+    XSessionTokenAuthentication,
+)
 from django.db.models import Q
 from rest_framework import authentication, permissions, status, views
 from rest_framework.response import Response
 
-from allauth.headless.contrib.rest_framework.authentication import XSessionTokenAuthentication
-
 from core.constants import ROLE
-from core.models import Expertise, Lab, LabRoleAssignment, Program, ProgramRoleAssignment, Role, SystemRoleAssignment, User
+from core.models import (
+    Expertise,
+    Lab,
+    LabRoleAssignment,
+    Program,
+    ProgramRoleAssignment,
+    Role,
+    SystemRoleAssignment,
+    User,
+)
 from core.serializers import LabSerializer, ProgramSerializer, RoleSerializer
 
 

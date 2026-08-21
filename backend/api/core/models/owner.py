@@ -1,9 +1,9 @@
 from django.db import IntegrityError, models
 from django.db.models import CheckConstraint, Q
 
-
-from core.models import * 
 from core.constants import DOMAINTYPE
+from core.models import *
+
 
 class Owner(models.Model):
     """

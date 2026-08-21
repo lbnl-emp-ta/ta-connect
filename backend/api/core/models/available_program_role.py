@@ -1,5 +1,7 @@
 from django.db import models
+
 from core.models import Role
+
 
 # Currently unused, supposed to narrow down roles available to only Programs.
 # Ex. Should not be able to assign Lab Lead role in Program since that doesn't

@@ -1,6 +1,8 @@
 from django.db import models
 from django.utils.functional import classproperty
+
 from core.constants import REQUEST_STATUS
+
 
 class RequestStatus(models.Model):
     name = models.CharField(max_length=255, unique=True)

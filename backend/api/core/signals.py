@@ -1,14 +1,31 @@
 import os
+
 from django.db import transaction
-from django.db.models.signals import pre_save, post_save, post_delete
+from django.db.models.signals import post_delete, post_save, pre_save
 from django.dispatch import receiver
 
-from core.models import Attachment, User, ReceptionRoleAssignment, Role, Request, Owner, ReceptionRoleAssignment, ProgramRoleAssignment, LabRoleAssignment, Lab, Program, SystemRoleAssignment
+from core.models import (
+    Attachment,
+    Lab,
+    LabRoleAssignment,
+    Owner,
+    Program,
+    ProgramRoleAssignment,
+    ReceptionRoleAssignment,
+    Request,
+    Role,
+    SystemRoleAssignment,
+    User,
+)
 
 _UNSET = object()
 from core.constants import DOMAINTYPE, ROLE
+from core.util.email_prompts import (
+    assignment_email,
+    customer_status_email,
+    new_request_email,
+)
 from core.util.notifications import send_email_notification
-from core.util.email_prompts import new_request_email, assignment_email, customer_status_email
 
 
 def _send_customer_status_emails(request, customers):

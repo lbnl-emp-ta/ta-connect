@@ -2,6 +2,7 @@ from django.db import models
 
 from core.models import *
 
+
 class CustomerRequestRelationship(models.Model):
     request = models.ForeignKey(Request, on_delete=models.PROTECT)
     customer = models.ForeignKey(Customer, on_delete=models.PROTECT)

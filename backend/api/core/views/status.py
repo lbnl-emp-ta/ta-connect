@@ -1,16 +1,15 @@
 import json
 
-from rest_framework import views, status, permissions, authentication
-from rest_framework.response import Response
-
-from core.permissions import *
-from core.serializers import *
-
 from allauth.headless.contrib.rest_framework.authentication import (
     XSessionTokenAuthentication,
 )
+from rest_framework import authentication, permissions, status, views
+from rest_framework.response import Response
 
 from core.models import *
+from core.permissions import *
+from core.serializers import *
+
 
 class StatusListView(views.APIView):
     authentication_classes = [

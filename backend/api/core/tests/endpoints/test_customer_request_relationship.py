@@ -1,10 +1,11 @@
 import pytest
-
 from rest_framework import status
+
 from core.models import *
 
+
 @pytest.mark.django_db
-class TestCustomerRequestRelationshipEndpoint():
+class TestCustomerRequestRelationshipEndpoint:
     def test_customer_request_relationship_endpoint_exists_at_desired_location(self, api_client):
         # need to be authenticated to access endpoint
         api_client.force_login(User.objects.get(pk=3)) 

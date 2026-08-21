@@ -1,6 +1,6 @@
+from core.constants import REQUEST_STATUS
 from core.models.audit_history import AuditHistory
 from core.models.request_status import RequestStatus
-from core.constants import REQUEST_STATUS
 
 
 def create_audit_history(request, request_obj, action_type, description):

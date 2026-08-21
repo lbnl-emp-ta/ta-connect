@@ -1,8 +1,10 @@
-from allauth.socialaccount.adapter import DefaultSocialAccountAdapter
 from allauth.account.adapter import DefaultAccountAdapter
 from allauth.headless.adapter import DefaultHeadlessAdapter
+from allauth.socialaccount.adapter import DefaultSocialAccountAdapter
 from allauth.socialaccount.models import EmailAddress
+
 from core.models import User
+
 
 class CustomSocialAccountAdapter(DefaultSocialAccountAdapter):
     def populate_user(self, request, sociallogin, data):

@@ -1,12 +1,12 @@
 from django.db import transaction
-
-from rest_framework.generics import CreateAPIView
 from rest_framework import status
+from rest_framework.generics import CreateAPIView
 from rest_framework.response import Response
 
-from core.utils import create_audit_history
-from core.models.audit_history import ActionType
 from core.models import *
+from core.models.audit_history import ActionType
+from core.utils import create_audit_history
+
 
 class ProcessIntakeForm(CreateAPIView):
     def post(self, request):
@@ -72,8 +72,8 @@ class ProcessIntakeForm(CreateAPIView):
                     is_poc=True
                 )
 
-                create_audit_history(request, _request, ActionType.StatusChange, f"Request created")
-                create_audit_history(request, _request, ActionType.Assignment, f"Assigned to Reception")
+                create_audit_history(request, _request, ActionType.StatusChange, "Request created")
+                create_audit_history(request, _request, ActionType.Assignment, "Assigned to Reception")
                 
                 response_data = {
                     "name": _customer.name,

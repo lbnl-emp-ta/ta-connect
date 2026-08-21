@@ -1,13 +1,13 @@
-from rest_framework import views, authentication, permissions, status
-from rest_framework.response import Response
-
-from core.models import * 
-from core.serializers import UserLeanSerializer
-from core.permissions import *
-
 from allauth.headless.contrib.rest_framework.authentication import (
     XSessionTokenAuthentication,
 )
+from rest_framework import authentication, permissions, status, views
+from rest_framework.response import Response
+
+from core.models import *
+from core.permissions import *
+from core.serializers import UserLeanSerializer
+
 
 class UserEditView(views.APIView):
     queryset = User.objects.all()

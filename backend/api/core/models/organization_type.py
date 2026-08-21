@@ -1,5 +1,6 @@
 from django.db import models
 
+
 class OrganizationType(models.Model):
     name = models.CharField(max_length=512, unique=True)
     description = models.TextField()

@@ -2,6 +2,7 @@ from django.db import models
 
 from core.models import *
 
+
 class SharedFundingGroup(models.Model):
     name = models.CharField(max_length=256, unique=True)
     description = models.TextField()

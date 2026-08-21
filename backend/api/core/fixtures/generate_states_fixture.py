@@ -1,5 +1,6 @@
 import json
 
+
 def main():
     raw_data = "core/fixtures/raw_states_data.txt"
     

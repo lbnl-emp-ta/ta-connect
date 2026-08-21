@@ -1,7 +1,8 @@
-from rest_framework import views, authentication, permissions, status
+from allauth.headless.contrib.rest_framework.authentication import (
+    XSessionTokenAuthentication,
+)
+from rest_framework import authentication, permissions, status, views
 from rest_framework.response import Response
-
-from allauth.headless.contrib.rest_framework.authentication import XSessionTokenAuthentication
 
 from core.constants import ROLE
 from core.models import Expertise, LabRoleAssignment

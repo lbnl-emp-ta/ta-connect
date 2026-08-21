@@ -2,6 +2,7 @@ from rest_framework import serializers
 
 from core.models import *
 
+
 class NoteSerializer(serializers.ModelSerializer):
     author_name = serializers.CharField(source='author.name', read_only=True)
 

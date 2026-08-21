@@ -1,15 +1,14 @@
-from rest_framework import views, authentication, permissions, status
-from rest_framework.response import Response
-from rest_framework.generics import ListAPIView
-
-from core.views.request import BaseUserAwareRequest
-from core.models import * 
-from core.serializers import OrganizationSerializer, OrganizationEditSerializer
-from core.permissions import *
-
 from allauth.headless.contrib.rest_framework.authentication import (
     XSessionTokenAuthentication,
 )
+from rest_framework import authentication, permissions, status, views
+from rest_framework.generics import ListAPIView
+from rest_framework.response import Response
+
+from core.models import *
+from core.permissions import *
+from core.serializers import OrganizationEditSerializer, OrganizationSerializer
+from core.views.request import BaseUserAwareRequest
 
 
 class OrganizationListView(ListAPIView):

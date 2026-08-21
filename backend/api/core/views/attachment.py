@@ -1,16 +1,21 @@
 import json
-from django.http import FileResponse
-    
-from rest_framework import views, permissions, status
-from rest_framework.response import Response
-from rest_framework.parsers import MultiPartParser, FormParser
 
-from core.utils import create_audit_history
-from core.views.request import BaseUserAwareRequest
-from core.serializers import AttachmentUploadSerializer, AttachmentEditSerializer, AttachmentSerializer
+from django.http import FileResponse
+from rest_framework import permissions, status
+from rest_framework.parsers import FormParser, MultiPartParser
+from rest_framework.response import Response
+
 from core.models import Attachment, Request
 from core.models.audit_history import ActionType
 from core.permissions import *
+from core.serializers import (
+    AttachmentEditSerializer,
+    AttachmentSerializer,
+    AttachmentUploadSerializer,
+)
+from core.utils import create_audit_history
+from core.views.request import BaseUserAwareRequest
+
 
 class UploadAttachmentView(BaseUserAwareRequest):
     serializer_class = AttachmentUploadSerializer 

@@ -1,14 +1,14 @@
+from django.db import transaction
 from rest_framework import status
 from rest_framework.response import Response
-from django.db import transaction
 
-from core.utils import create_audit_history, get_status
-from core.permissions import *
-from core.views.owner import OwnerListView
+from core.constants import DOMAINTYPE, REQUEST_STATUS
 from core.models import *
 from core.models.audit_history import ActionType
-from core.constants import DOMAINTYPE, REQUEST_STATUS
+from core.permissions import *
+from core.utils import create_audit_history, get_status
 from core.views.request import BaseUserAwareRequest
+
 
 class AssignmentView(BaseUserAwareRequest):
 
@@ -130,7 +130,7 @@ class AssignmentView(BaseUserAwareRequest):
                     if closeout_form:
                         closeout_form.save()
                     ta_request.save()
-                    create_audit_history(request, ta_request, ActionType.Assignment, f"Assigned to {str(new_owner)} as {new_owner.domain_type}")
+                    create_audit_history(request, ta_request, ActionType.Assignment, f"Assigned to {new_owner!s} as {new_owner.domain_type}")
 
             except Exception as e:
                 return Response(data={"message": f"{e}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

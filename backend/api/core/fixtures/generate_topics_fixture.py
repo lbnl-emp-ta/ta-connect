@@ -1,5 +1,6 @@
 import json
 
+
 def main():
     raw_data = "core/fixtures/raw_topic_data.txt"
     

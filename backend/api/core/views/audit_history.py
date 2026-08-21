@@ -1,13 +1,13 @@
-from rest_framework import views, status, permissions, authentication
-from rest_framework.response import Response
-
-from core.views.request import BaseUserAwareRequest
-from core.models import *
-from core.serializers import *
-
 from allauth.headless.contrib.rest_framework.authentication import (
     XSessionTokenAuthentication,
 )
+from rest_framework import authentication, permissions, status, views
+from rest_framework.response import Response
+
+from core.models import *
+from core.serializers import *
+from core.views.request import BaseUserAwareRequest
+
 
 class AuditHistoryListView(views.APIView):
     authentication_classes = [

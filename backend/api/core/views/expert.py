@@ -1,17 +1,15 @@
-import json
-
-from django.db.models import Q
-from rest_framework import views, status, authentication, permissions
-from rest_framework.response import Response
-
-from core.models import *
-from core.serializers import *
-from core.permissions import *
-from core.constants import ROLE
 
 from allauth.headless.contrib.rest_framework.authentication import (
     XSessionTokenAuthentication,
 )
+from django.db.models import Q
+from rest_framework import authentication, permissions, status, views
+from rest_framework.response import Response
+
+from core.constants import ROLE
+from core.models import *
+from core.permissions import *
+from core.serializers import *
 
 
 class ExpertsListView(views.APIView):

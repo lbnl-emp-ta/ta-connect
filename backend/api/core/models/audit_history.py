@@ -2,6 +2,7 @@ from django.db import models
 
 from core.models import *
 
+
 # Example audit history actions
 class ActionType(models.TextChoices):
     Assignment="Assignment change"
