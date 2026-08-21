@@ -5,6 +5,7 @@ TA Connect runs as two local services: a Django REST API and a Vite development 
 ## Prerequisites
 
 - [Python 3.12.9 or newer](https://www.python.org/downloads/)
+- [uv](https://docs.astral.sh/uv/getting-started/installation/)
 - [Node.js 24.9.0 or newer](https://nodejs.org/en/download)
 - Git
 
@@ -24,13 +25,11 @@ This should create your top-level repository root `ta-connect/`:
 cd ta-connect
 ```
 
-Create and activate a virtual environment, then install the Python dependencies:
+Create the virtual environment and install the locked Python dependencies:
 
 ```sh
 cd backend/api
-python3 -m venv .venv
-source .venv/bin/activate
-pip install -r requirements.txt
+uv sync
 ```
 
 Obtain the development environment configuration from a teammate and save it as `backend/api/.env`. This file contains sensitive information and must not be committed.
@@ -38,7 +37,7 @@ Obtain the development environment configuration from a teammate and save it as 
 At minimum, local settings need a Django `SECRET_KEY`. Generate a unique value with:
 
 ```sh
-python -c 'from django.core.management.utils import get_random_secret_key; print(get_random_secret_key())'
+uv run python -c 'from django.core.management.utils import get_random_secret_key; print(get_random_secret_key())'
 ```
 
 Replace the `SECRET_KEY` in `.env` with the generated value. See [Authentication](5-authentication.md) for the ORCiD settings and [Data management](7-data-management.md) for database options.
@@ -46,8 +45,8 @@ Replace the `SECRET_KEY` in `.env` with the generated value. See [Authentication
 Prepare the database and create an administrator account:
 
 ```sh
-python manage.py migrate
-python manage.py createsuperuser
+uv run python manage.py migrate
+uv run python manage.py createsuperuser
 ```
 
 The superuser command asks for an email and password. Password characters are not displayed while you type.
@@ -55,7 +54,7 @@ The superuser command asks for an email and password. Password characters are no
 Start the API:
 
 ```sh
-python manage.py runserver
+uv run python manage.py runserver
 ```
 
 The API is available at <http://127.0.0.1:8000/api/> and Django admin at <http://127.0.0.1:8000/admin/>.

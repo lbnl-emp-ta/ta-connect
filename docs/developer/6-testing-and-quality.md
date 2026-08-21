@@ -2,22 +2,22 @@
 
 ## Backend tests
 
-Backend tests use pytest and pytest-django. From `backend/api`, activate the virtual environment and run the full suite:
+Backend tests use pytest and pytest-django. From `backend/api`, run the full suite:
 
 ```sh
-pytest
+uv run pytest
 ```
 
 Run one file:
 
 ```sh
-pytest core/tests/endpoints/test_request.py
+uv run pytest core/tests/endpoints/test_request.py
 ```
 
 Run one test method:
 
 ```sh
-pytest core/tests/endpoints/test_request.py::TestRequestDetailViewEndpoint::test_request_detail_get_view_should_succeed
+uv run pytest core/tests/endpoints/test_request.py::TestRequestDetailViewEndpoint::test_request_detail_get_view_should_succeed
 ```
 
 Tests are organized by concern under `core/tests/endpoints`, `core/tests/models`, and `core/tests/serializers`. Add coverage at the layer where behavior changes; endpoint tests should cover relevant authentication and permission cases.
