@@ -33,15 +33,15 @@ npm run lint
 npm run build
 ```
 
-Linting uses ESLint. The build runs the TypeScript compiler and Vite, catching type errors and production bundling failures.
+Linting uses Oxlint. The build runs the TypeScript compiler and Vite, catching type errors and production bundling failures.
 
 Format frontend files with:
 
 ```sh
-npm run prettier
+npm run format
 ```
 
-Installing frontend dependencies runs Husky's setup through the `prepare` script. The pre-commit hook uses lint-staged for staged JavaScript and TypeScript files.
+Use `npm run format:check` to check formatting without changing files.
 
 ## Before opening a pull request
 

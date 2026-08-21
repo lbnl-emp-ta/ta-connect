@@ -41,7 +41,7 @@ Run these from `frontend/`:
 ```sh
 npm run dev
 npm run lint
-npm run prettier
+npm run format
 npm run build
 npm run preview
 ```
