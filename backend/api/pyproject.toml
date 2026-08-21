@@ -1,0 +1,33 @@
+[project]
+name = "ta-connect-api"
+version = "0.1.0"
+description = "TA Connect Django API"
+requires-python = ">=3.12,<3.14"
+dependencies = [
+    "django==5.1.6",
+    "django-allauth[socialaccount]==65.7.0",
+    "django-cors-headers==4.7.0",
+    "django-import-export==4.4.1",
+    "djangorestframework==3.15.2",
+    "gunicorn>=26.1.0",
+    "python-dateutil==2.9.0.post0",
+    "python-dotenv==1.0.1",
+]
+
+[dependency-groups]
+dev = [
+    "pytest==8.3.5",
+    "pytest-django==4.10.0",
+    "ruff==0.16.4",
+]
+
+[tool.ruff.lint]
+# Django and Django REST Framework intentionally use mutable class attributes
+# for declarative configuration (for example, `fields` and `permission_classes`).
+# RUF012 cannot distinguish those framework declarations from accidental state.
+ignore = ["RUF012"]
+
+[tool.ruff.lint.per-file-ignores]
+# API views translate unexpected application failures into HTTP responses at
+# the request boundary, so their broad exception handlers are intentional.
+"core/views/*.py" = ["BLE001"]

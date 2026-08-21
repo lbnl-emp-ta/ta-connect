@@ -12,22 +12,21 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
+      - name: Set up uv
+        uses: astral-sh/setup-uv@v6
         with:
           python-version: "3.12.9"
+          enable-cache: true
+          cache-dependency-glob: "backend/api/uv.lock"
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: "20"
 
-      - name: Install backend dependencies
-        run: pip install -r backend/api/requirements.txt
-
       - name: Collect static files
-        run: |
-          python backend/api/manage.py collectstatic --noinput
+        working-directory: backend/api
+        run: uv run --isolated --locked --no-dev python manage.py collectstatic --noinput
 
       - name: Deploy backend with SCP
         uses: appleboy/scp-action@master

@@ -1,6 +1,6 @@
 # Backend development
 
-The backend lives in `backend/api`. Run Django and pytest commands from that directory with the virtual environment active.
+The backend lives in `backend/api`. Run Django and pytest commands from that directory with `uv run`.
 
 ## Project structure
 
@@ -32,8 +32,8 @@ Keep authorization in view or permission logic on the backend. Hiding a frontend
 After changing a model, create and apply a migration:
 
 ```sh
-python manage.py makemigrations
-python manage.py migrate
+uv run python manage.py makemigrations
+uv run python manage.py migrate
 ```
 
 Review generated migration files before committing them. Commit model changes and their migrations together. Run the backend test suite after applying the migration.
@@ -41,7 +41,7 @@ Review generated migration files before committing them. Commit model changes an
 To inspect migration state:
 
 ```sh
-python manage.py showmigrations
+uv run python manage.py showmigrations
 ```
 
 Do not edit an already-shared migration to represent a new schema change; create another migration instead.

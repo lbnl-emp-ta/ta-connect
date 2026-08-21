@@ -10,24 +10,24 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
+      - name: Set up uv
+        uses: astral-sh/setup-uv@v6
         with:
           python-version: "3.13"
+          enable-cache: true
+          cache-dependency-glob: "backend/api/uv.lock"
 
-      - name: Install lint dependencies
+      - name: Install dependencies
         working-directory: backend/api
-        run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements-dev.txt
+        run: uv sync --locked
 
       - name: Run Ruff check
         working-directory: backend/api
-        run: ruff check .
+        run: uv run --locked ruff check .
 
       - name: Run Ruff format check
         working-directory: backend/api
-        run: ruff format --check .
+        run: uv run --locked ruff format --check .
 
   test:
     runs-on: ubuntu-latest
@@ -40,23 +40,21 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
+      - name: Set up uv
+        uses: astral-sh/setup-uv@v6
         with:
           python-version: "3.13"
+          enable-cache: true
+          cache-dependency-glob: "backend/api/uv.lock"
 
       - name: Install dependencies
         working-directory: backend/api
-        run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt
+        run: uv sync --locked
 
       - name: Run migrations
         working-directory: backend/api
-        run: |
-          python manage.py migrate
+        run: uv run --locked python manage.py migrate
 
       - name: Run tests with pytest
         working-directory: backend/api
-        run: |
-          pytest
+        run: uv run --locked pytest
