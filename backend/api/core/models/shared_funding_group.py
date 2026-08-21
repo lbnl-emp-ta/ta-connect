@@ -1,6 +1,6 @@
 from django.db import models
 
-from core.models import *
+from .program import Program
 
 
 class SharedFundingGroup(models.Model):

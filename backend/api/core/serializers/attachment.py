@@ -1,7 +1,8 @@
 from rest_framework import serializers
 
 from core.models import Attachment
-from core.serializers import UserLeanSerializer
+
+from .user import UserLeanSerializer
 
 
 class AttachmentSerializer(serializers.ModelSerializer):

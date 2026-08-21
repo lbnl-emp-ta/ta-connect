@@ -5,17 +5,17 @@ def main():
     raw_data = "core/fixtures/raw_topic_data.txt"
     
     with open(raw_data, "r") as file:
-        fixture = list()
+        fixture = []
         for i, line in enumerate(file):
             topic = line.strip()
 
             if not topic:
                 continue
 
-            entry = dict()
+            entry = {}
             entry["model"] = "core.Topic"
             entry["pk"] = i + 1
-            entry["fields"] = dict()
+            entry["fields"] = {}
             entry["fields"]["name"] = topic 
             entry["fields"]["description"] = "no description for now" 
             fixture.append(entry)

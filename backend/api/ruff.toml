@@ -1,0 +1,10 @@
+# Django and Django REST Framework intentionally use mutable class attributes
+# for declarative configuration (for example, `fields` and `permission_classes`).
+# RUF012 cannot distinguish those framework declarations from accidental state.
+[lint]
+ignore = ["RUF012"]
+
+[lint.per-file-ignores]
+# API views translate unexpected application failures into HTTP responses at
+# the request boundary, so their broad exception handlers are intentional.
+"core/views/*.py" = ["BLE001"]

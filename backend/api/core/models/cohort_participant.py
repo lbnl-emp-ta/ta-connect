@@ -1,6 +1,7 @@
 from django.db import models
 
-from core.models import Cohort, State
+from .cohort import Cohort
+from .state import State
 
 
 # Used during the intake form. A request is associated with one main customer, 

@@ -1,6 +1,6 @@
 from django.db import models
 
-from core.models import *
+from .request_status import RequestStatus
 
 
 class Role(models.Model):

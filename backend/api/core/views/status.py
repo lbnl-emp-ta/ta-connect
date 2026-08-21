@@ -28,7 +28,7 @@ class StatusListView(views.APIView):
 
         context = json.loads(maybe_context)
 
-        if not (request.user.id == context.get("user")):
+        if request.user.id != context.get("user"):
             return Response(data={"message": "User mismatch. Given user does not match logged in user."}, status=status.HTTP_400_BAD_REQUEST)
 
         if context.get("role") is None:
@@ -37,7 +37,7 @@ class StatusListView(views.APIView):
         role = None
         try:
             role = Role.objects.get(pk=context.get("role"))
-        except:
+        except Role.DoesNotExist:
             return Response(data={"message": "Given role does not exist"}, status=status.HTTP_400_BAD_REQUEST)
 
         if not has_role(request, role.name):

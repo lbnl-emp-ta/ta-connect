@@ -1,6 +1,6 @@
 from django.db import models
 
-from core.models import *
+from .request import Request
 
 
 class CloseoutForm(models.Model):

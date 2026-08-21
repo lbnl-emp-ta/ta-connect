@@ -1,7 +1,10 @@
 from rest_framework import serializers
 
 from core.models import Organization, State, TransmissionPlanningRegion
-from core.serializers import *
+
+from .organization_type import OrganizationTypeSerializer
+from .state import StateSerializer
+from .transmission_planning_region import TransmissionPlanningRegionSerializer
 
 
 class OrganizationSerializer(serializers.ModelSerializer):

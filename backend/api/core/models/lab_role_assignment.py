@@ -1,7 +1,11 @@
 from django.db import models
 
 from core.constants import ROLE
-from core.models import *
+
+from .lab import Lab
+from .program import Program
+from .role import Role
+from .user import User
 
 
 class LabRoleAssignment(models.Model):

@@ -1,8 +1,6 @@
 from django.db import models
 from django.utils.functional import classproperty
 
-from core.models import *
-
 
 class Reception(models.Model):
     name = models.CharField(max_length=256, unique=True)

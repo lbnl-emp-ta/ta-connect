@@ -23,7 +23,7 @@ class NoteListView(BaseUserAwareRequest):
         queryset = Note.objects.all().filter(request=ta_request)
         
         if not queryset.exists():
-            return Response(data=list(), status=status.HTTP_204_NO_CONTENT)
+            return Response(data=[], status=status.HTTP_204_NO_CONTENT)
 
         serializer = NoteSerializer(queryset, many=True)
 
@@ -53,7 +53,7 @@ class NoteCreateView(BaseUserAwareRequest):
         if not "content" in self.request.data:
             return Response(data={"message":"Missing required content field"}, status=status.HTTP_400_BAD_REQUEST)
 
-        note_data = dict()
+        note_data = {}
         note_data["author"] = self.request.data.get("author")
         note_data["request"] = self.request.data.get("request")
         note_data["content"] = self.request.data.get("content")

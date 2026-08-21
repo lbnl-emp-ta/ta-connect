@@ -1,7 +1,14 @@
 from django.db import models
 from django.db.models import CheckConstraint, F, Q
 
-from core.models import *
+from .depth import Depth
+from .lab import Lab
+from .organization import Organization
+from .owner import Owner
+from .program import Program
+from .request_status import RequestStatus
+from .topic import Topic
+from .user import User
 
 
 class Request(models.Model):

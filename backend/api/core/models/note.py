@@ -1,6 +1,7 @@
 from django.db import models
 
-from core.models import *
+from .request import Request
+from .user import User
 
 
 class Note(models.Model):

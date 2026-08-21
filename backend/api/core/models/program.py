@@ -1,6 +1,9 @@
 from django.db import models
 
-from core.models import *
+from .depth import Depth
+from .lab import Lab
+from .organization_type import OrganizationType
+from .topic import Topic
 
 
 class Program(models.Model):

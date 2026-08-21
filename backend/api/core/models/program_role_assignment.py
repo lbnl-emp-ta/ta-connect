@@ -1,6 +1,8 @@
 from django.db import models
 
-from core.models import *
+from .program import Program
+from .role import Role
+from .user import User
 
 
 class ProgramRoleAssignment(models.Model):

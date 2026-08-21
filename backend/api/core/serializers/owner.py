@@ -2,7 +2,8 @@ from rest_framework import serializers
 
 from core.constants import DOMAINTYPE
 from core.models import Owner
-from core.serializers import *
+
+from .organization_type import OrganizationTypeSerializer
 
 
 class OwnerSerializer(serializers.ModelSerializer):
@@ -14,7 +15,7 @@ class OwnerSerializer(serializers.ModelSerializer):
     def format_owner(self, owner):
         if not owner:
             return None
-        data = dict()
+        data = {}
         data["id"] = owner.pk
         data["domain_type"] = owner.domain_type
         

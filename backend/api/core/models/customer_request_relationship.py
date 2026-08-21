@@ -1,6 +1,7 @@
 from django.db import models
 
-from core.models import *
+from .customer import Customer
+from .request import Request
 
 
 class CustomerRequestRelationship(models.Model):
@@ -13,9 +14,7 @@ class CustomerRequestRelationship(models.Model):
     
     class Meta:
         db_table = "customer_request_relationship"
-        
+
         constraints = [
             models.UniqueConstraint(fields=['customer', 'request'], name='unique_customer_request')
         ]
-
-        

@@ -2,7 +2,11 @@ from django.db import IntegrityError, models
 from django.db.models import CheckConstraint, Q
 
 from core.constants import DOMAINTYPE
-from core.models import *
+
+from .lab import Lab
+from .program import Program
+from .reception import Reception
+from .user import User
 
 
 class Owner(models.Model):
@@ -82,5 +86,4 @@ class Owner(models.Model):
             )
         ]
         db_table = "owner"
-
 

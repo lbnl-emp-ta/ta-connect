@@ -59,7 +59,7 @@ class CustomerDetailView(views.APIView):
         if not has_permission:
             return Response(data={"message": "Insufficient authorization to edit given customer's information"}, status=status.HTTP_400_BAD_REQUEST)
 
-        customer_patch_data = dict() 
+        customer_patch_data = {}
         
         if not request.data:
             return Response(data={"message": "Missing request body"}, status=status.HTTP_204_NO_CONTENT)

@@ -4,7 +4,9 @@ from allauth.headless.contrib.rest_framework.authentication import (
 from rest_framework import authentication, permissions, serializers
 
 from core.models import CustomerRequestRelationship
-from core.serializers import *
+
+from .customer import CustomerSerializer
+from .request import RequestSerializer
 
 
 class CustomerRequestRelationshipSerializer(serializers.ModelSerializer):

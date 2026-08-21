@@ -2,7 +2,15 @@ from django.utils import timezone
 from rest_framework import serializers
 
 from core.models import *
-from core.serializers import *
+
+from .customer import CustomerSerializer
+from .expert import ExpertSerializer
+from .lab import LabSerializer
+from .organization import OrganizationSerializer
+from .owner import OwnerSerializer
+from .program import ProgramLeanSerializer, ProgramSerializer
+from .topic import TopicSerializer
+from .user import UserLeanSerializer
 
 
 class RequestDetailSerializer(serializers.Serializer):
@@ -103,10 +111,7 @@ class RequestSerializer(serializers.Serializer):
     
     @classmethod
     def date_in_past(cls, date):
-        if date < timezone.now().date():
-            return True
-        
-        return False
+        return date < timezone.now().date()
             
     
     def validate_proj_completion_date(self, value):
@@ -122,9 +127,11 @@ class RequestSerializer(serializers.Serializer):
         if not (data.get("proj_start_date") and data.get("proj_completion_date")):
             return data
             
-        if data["proj_start_date"] is not None:
-            if data["proj_completion_date"] < data["proj_start_date"]:
-                raise serializers.ValidationError("Projected completion date must not be before projected start date")
+        if (
+            data["proj_start_date"] is not None
+            and data["proj_completion_date"] < data["proj_start_date"]
+        ):
+            raise serializers.ValidationError("Projected completion date must not be before projected start date")
         
         return data
     

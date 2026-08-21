@@ -33,7 +33,7 @@ def send_email_notification(subject: str, plain_text_message: str, html_message:
                     recipient_list,
                 )
         else:
-            email = dict()
+            email = {}
             email["to"] = recipient_list
             email["from"] = os.getenv("TACONNECT_EMAIL_HOST_FROM_USER")
             email["subject"] = subject

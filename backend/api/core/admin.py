@@ -151,7 +151,8 @@ class AttachmentAdmin(ImportExportModelAdmin):
     @admin.action(description='Download selected attachment files as ZIP')
     def export_attachment_files(self, request, queryset):
         """Return the selected files in a ZIP without assuming local storage."""
-        archive = tempfile.SpooledTemporaryFile(max_size=10 * 1024 * 1024)
+        # FileResponse takes ownership of this stream and closes it after sending.
+        archive = tempfile.SpooledTemporaryFile(max_size=10 * 1024 * 1024)  # noqa: SIM115
 
         with zipfile.ZipFile(archive, mode='w', compression=zipfile.ZIP_DEFLATED) as zip_file:
             for attachment in queryset.select_related('request').iterator():
@@ -167,9 +168,11 @@ class AttachmentAdmin(ImportExportModelAdmin):
                 zip_info.compress_type = zipfile.ZIP_DEFLATED
 
                 # FileField.open() works for local and remote Django storage backends.
-                with attachment.file.open('rb') as source:
-                    with zip_file.open(zip_info, mode='w') as destination:
-                        shutil.copyfileobj(source, destination)
+                with (
+                    attachment.file.open('rb') as source,
+                    zip_file.open(zip_info, mode='w') as destination,
+                ):
+                    shutil.copyfileobj(source, destination)
 
         archive.seek(0)
         return FileResponse(

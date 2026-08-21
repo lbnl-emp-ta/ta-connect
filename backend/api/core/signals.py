@@ -247,7 +247,7 @@ def create_owner_on_lab_save(sender, instance, created, **kwargs):
     """
     Ensure each Lab automatically gets an associated Owner on creation.
     """
-    if created:
+    if created and not kwargs.get("raw"):
         Owner.objects.create(domain_type=DOMAINTYPE.LAB, lab=instance)
 
 
@@ -256,7 +256,7 @@ def create_owner_on_program_save(sender, instance, created, **kwargs):
     """
     Ensure each Program automatically gets an associated Owner on creation.
     """
-    if created:
+    if created and not kwargs.get("raw"):
         Owner.objects.create(domain_type=DOMAINTYPE.PROGRAM, program=instance)
 
 
@@ -266,7 +266,7 @@ def create_owner_on_lab_role_assignment(sender, instance, created, **kwargs):
     When a LabRoleAssignment is created that assigns a user to the Expert role for a given Lab and Program,
     create an associated Owner if one doesn't already exist so that the user can be assigned requests.
     """
-    if created and instance.role.name == ROLE.EXPERT:
+    if created and not kwargs.get("raw") and instance.role.name == ROLE.EXPERT:
         user = instance.user
 
         Owner.objects.get_or_create(
@@ -307,6 +307,5 @@ def clean_up_after_attachment_deletion(sender, instance, **kwargs):
     After an attachment model is deleted in the database, the underlying file
     needs to be cleaned up as well.
     """
-    if hasattr(instance, "file"):
-        if os.path.isfile(instance.file.path):
-            os.remove(instance.file.path)
+    if hasattr(instance, "file") and os.path.isfile(instance.file.path):
+        os.remove(instance.file.path)

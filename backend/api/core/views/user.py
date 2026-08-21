@@ -35,7 +35,7 @@ class UserEditView(views.APIView):
                 status=status.HTTP_403_FORBIDDEN
             )
 
-        user_patch_data = dict() 
+        user_patch_data = {}
         
         if not request.data:
             return Response(data={"message": "Missing request body"}, status=status.HTTP_204_NO_CONTENT)

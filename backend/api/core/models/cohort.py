@@ -1,6 +1,7 @@
 from django.db import models
 
-from core.models import Customer, Request
+from .customer import Customer
+from .request import Request
 
 
 class Cohort(models.Model):

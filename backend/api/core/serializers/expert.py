@@ -1,3 +1,4 @@
+from django.core.exceptions import ObjectDoesNotExist
 from rest_framework import serializers
 
 from core.models import *
@@ -9,7 +10,7 @@ class ExpertSerializer(serializers.ModelSerializer):
     def get_owner_id(self, obj):
         try:
             return obj.owner.id
-        except Exception:
+        except ObjectDoesNotExist:
             return None
 
     class Meta:

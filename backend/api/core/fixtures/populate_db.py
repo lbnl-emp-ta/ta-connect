@@ -16,20 +16,19 @@ fixture_list = [
     "sample_users_fixture.json",
 
     # Core entities
-    # NOTE: Reception owner must be loaded manually before labs/programs,
-    # because signals auto-create Owner rows for Lab and Program on post_save.
-    # Expert owners are auto-created by the LabRoleAssignment signal below.
     "reception_fixture.json",
-    "reception_owner_fixture.json",       # Owner pk=1 (reception)
     "sample_organizations_fixture.json",
-    "sample_labs_fixture.json",            # signals auto-create Owner pk=2,3,4 (labs)
-    "sample_programs_fixture.json",        # signals auto-create Owner pk=5,6 (programs)
+    "sample_labs_fixture.json",
+    "sample_programs_fixture.json",
 
     # Customers (depend on organizations, states, TPRs)
     "sample_customers_fixture.json",
 
-    # Lab role assignments - Expert assignments trigger Owner auto-creation (pk=7,8)
-    # Must be loaded before requests so expert owner FKs exist
+    # Explicit owner fixtures keep primary keys deterministic. Signals do not
+    # synthesize related rows while Django is deserializing raw fixture data.
+    "sample_owners_fixture.json",
+
+    # Lab role assignments (depend on users, roles, labs, and programs)
     "sample_lab_role_assignment_fixture.json",
 
     # Requests (depend on owners, statuses, depths, programs, labs, users)
@@ -50,7 +49,7 @@ fixture_list = [
 def main():
     for fixture in fixture_list:
         command = f"python manage.py loaddata core/fixtures/{fixture}"
-        subprocess.run(command, shell=True, text=True)
+        subprocess.run(command, shell=True, text=True, check=True)
 
 
 if __name__ == "__main__":

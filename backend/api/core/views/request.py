@@ -196,18 +196,18 @@ class RequestDetailView(BaseUserAwareRequest):
         
         response_data["depth_options"] = depth_options
 
-        response_data["attachments"] = list() 
+        response_data["attachments"] = []
         for attachment in ta_request.attachment_set.all():
-            attachment_data = dict()
+            attachment_data = {}
             attachment_data["id"] = attachment.pk
             attachment_data["title"] = attachment.title
             attachment_data["uploaded_at"] = attachment.uploaded_at
             attachment_data["description"] = attachment.description
             response_data["attachments"].append(attachment_data)
 
-        response_data["audit_history"] = list() 
+        response_data["audit_history"] = []
         for audit in ta_request.audithistory_set.all().order_by('-date'):
-            audit_data = dict()
+            audit_data = {}
             audit_data["user"] = audit.user.name
             audit_data["action_type"] = audit.action_type
             audit_data["description"] = audit.description
@@ -290,8 +290,8 @@ class RequestDetailView(BaseUserAwareRequest):
 
         body = request.data
 
-        patch_data = dict()
-        updated_fields = list()
+        patch_data = {}
+        updated_fields = []
 
         if not body:
             return Response(data={"message": "Missing request body"}, status=status.HTTP_204_NO_CONTENT)
@@ -391,7 +391,7 @@ class RequestDetailView(BaseUserAwareRequest):
             current_topics = ta_request.topics.all()
             ta_request.topics.clear()
             
-            topics = body.get("topics", list())
+            topics = body.get("topics", [])
             for topic_name in topics:
                 try:
                     topic = Topic.objects.get(name=topic_name)
@@ -431,7 +431,7 @@ class RequestListView(BaseUserAwareRequest):
         downstream = self.get_downstream()
         inactive = self.get_inactive()
         
-        response_data = {"actionable": list(), "downstream": list(), "inactive": list()}
+        response_data = {"actionable": [], "downstream": [], "inactive": []}
 
         for key in response_data:
             queryset = None 
@@ -446,10 +446,10 @@ class RequestListView(BaseUserAwareRequest):
                 continue 
                 
             serializer = RequestListSerializer(queryset, many=True)
-            requests_data = list() 
-            for request in serializer.data:
-                data = request
-                poc_rel = Request.objects.get(pk=request["id"]).customerrequestrelationship_set.filter(is_poc=True).first()
+            requests_data = []
+            for serialized_request in serializer.data:
+                data = serialized_request
+                poc_rel = Request.objects.get(pk=serialized_request["id"]).customerrequestrelationship_set.filter(is_poc=True).first()
                 poc_customer = poc_rel.customer if poc_rel else None
                 data["customer_name"] = poc_customer.name if poc_customer else None
                 data["customer_email"] = poc_customer.email if poc_customer else None

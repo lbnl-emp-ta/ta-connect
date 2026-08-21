@@ -39,7 +39,7 @@ class UploadAttachmentView(BaseUserAwareRequest):
             return Response(data={"message": "File to upload missing"}, status=status.HTTP_400_BAD_REQUEST)
 
         
-        attachment_data = dict()
+        attachment_data = {}
         attachment_data["file"] = request.data.get("file")
         attachment_data["request"] = request_id
         attachment_data["user_who_uploaded"] = request.user.id
@@ -129,7 +129,7 @@ class EditAttachmentView(BaseUserAwareRequest):
          
         body = json.loads(request.body)
 
-        patch_data = dict()
+        patch_data = {}
 
         if not body:
             return Response(data={"message": "Missing request body"}, status=status.HTTP_204_NO_CONTENT)

@@ -1,6 +1,7 @@
 from django.db import models
 
-from core.models import Request, User
+from .request import Request
+from .user import User
 
 
 # Need to ensure unique filepath name to ensure arbitrary search

@@ -1,6 +1,8 @@
 from django.db import models
 
-from core.models import OrganizationType, State, TransmissionPlanningRegion
+from .organization_type import OrganizationType
+from .state import State
+from .transmission_planning_region import TransmissionPlanningRegion
 
 
 class Organization(models.Model):

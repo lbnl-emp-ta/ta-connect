@@ -31,7 +31,7 @@ class AuditHistoryListView(views.APIView):
         
         audit_histories = AuditHistory.objects.filter(request=request_obj) 
         if not audit_histories.exists():
-            return Response(data=list(), status=status.HTTP_204_NO_CONTENT)
+            return Response(data=[], status=status.HTTP_204_NO_CONTENT)
 
         serializer = AuditHistorySerializer(audit_histories, many=True)
 

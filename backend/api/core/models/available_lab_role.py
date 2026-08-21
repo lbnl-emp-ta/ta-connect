@@ -1,6 +1,6 @@
 from django.db import models
 
-from core.models import Role
+from .role import Role
 
 
 # Currently unused, supposed to narrow down roles available to only labs.

@@ -1,7 +1,10 @@
 from django.core.exceptions import ValidationError
 from django.db import models
 
-from core.models import *
+from .depth import Depth
+from .lab_role_assignment import LabRoleAssignment
+from .topic import Topic
+from .user import User
 
 
 # After a user is assigned an Expert role, they must also have various

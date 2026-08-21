@@ -1,6 +1,7 @@
 from django.db import models
 
-from core.models import *
+from .role import Role
+from .user import User
 
 
 class SystemRoleAssignment(models.Model):

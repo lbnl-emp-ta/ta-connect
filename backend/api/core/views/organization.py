@@ -48,7 +48,7 @@ class OrganizationDetailView(views.APIView):
         if not has_permission:
             return Response(data={"message": "Insufficient authorization to edit given organization's information"}, status=status.HTTP_400_BAD_REQUEST)
 
-        organization_patch_data = dict() 
+        organization_patch_data = {}
         
         if not request.data:
             return Response(data={"message": "Missing request body"}, status=status.HTTP_204_NO_CONTENT)

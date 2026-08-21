@@ -28,10 +28,10 @@ class IdentityListView(views.APIView):
         program_assignments = ProgramRoleAssignment.objects.filter(user=user)
         lab_assignments = LabRoleAssignment.objects.filter(user=user)
 
-        identities = list()
+        identities = []
 
         for assignment in system_role_assignments:
-            identity = dict()
+            identity = {}
             identity["assignment_id"] = assignment.id
             identity["user"] = {"id": user.pk, "email": user.email}
             identity["location"] = "system"
@@ -39,7 +39,7 @@ class IdentityListView(views.APIView):
             identities.append(identity)
 
         for assignment in reception_assignments:
-            identity = dict()
+            identity = {}
             identity["assignment_id"] = assignment.id
             identity["user"] = {"id": user.pk, "email": user.email}
             identity["location"] = "reception"
@@ -47,7 +47,7 @@ class IdentityListView(views.APIView):
             identities.append(identity)
             
         for assignment in program_assignments:
-            identity = dict()
+            identity = {}
             identity["assignment_id"] = assignment.id
             identity["user"] = {"id": user.pk, "email": user.email}
             identity["location"] = "program"
@@ -56,7 +56,7 @@ class IdentityListView(views.APIView):
             identities.append(identity)
             
         for assignment in lab_assignments:
-            identity = dict()
+            identity = {}
             identity["assignment_id"] = assignment.id
             identity["user"] = {"id": user.pk, "email": user.email}
             identity["location"] = "lab"

@@ -101,7 +101,7 @@ class OwnerListView(BaseUserAwareRequest):
 
         # Need to format owners one at a time to include domain-specific information
         # This could potentially be refactored at the serializer level to avoid the loop here
-        owners_data = list()
+        owners_data = []
         for owner in queryset.all():
             owners_data.append(OwnerSerializer().format_owner(owner))
 
