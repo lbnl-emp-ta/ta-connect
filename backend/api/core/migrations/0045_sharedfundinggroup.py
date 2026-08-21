@@ -4,22 +4,36 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('core', '0044_alter_audithistory_request'),
+        ("core", "0044_alter_audithistory_request"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='SharedFundingGroup',
+            name="SharedFundingGroup",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(max_length=256, unique=True)),
-                ('description', models.TextField()),
-                ('programs', models.ManyToManyField(blank=True, related_name='shared_funding_groups', to='core.program')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("name", models.CharField(max_length=256, unique=True)),
+                ("description", models.TextField()),
+                (
+                    "programs",
+                    models.ManyToManyField(
+                        blank=True,
+                        related_name="shared_funding_groups",
+                        to="core.program",
+                    ),
+                ),
             ],
             options={
-                'db_table': 'shared_funding_group',
+                "db_table": "shared_funding_group",
             },
         ),
     ]

@@ -4,7 +4,12 @@ from core.constants import DOMAINTYPE, REQUEST_STATUS
 from core.models import Customer, Organization, Request
 
 
-def assignment_email(receipient_name: str, request: Request, customer: Customer, organization: Organization) -> tuple[str, str]:
+def assignment_email(
+    receipient_name: str,
+    request: Request,
+    customer: Customer,
+    organization: Organization,
+) -> tuple[str, str]:
     request_id = request.id
     domain_type = request.owner.domain_type
     program_name = "-"
@@ -24,10 +29,10 @@ def assignment_email(receipient_name: str, request: Request, customer: Customer,
             location_str = f"Program | {program_name}"
         case DOMAINTYPE.LAB | DOMAINTYPE.EXPERT:
             location_str = f"Lab | {lab_name} under Program | {program_name}"
-    
+
     if request.expert:
         expert_str = "you as an expert in "
-    
+
     plain_text_message = f"""
     Hello {receipient_name},
     
@@ -36,7 +41,7 @@ def assignment_email(receipient_name: str, request: Request, customer: Customer,
     Thank you,
     TA Connect
     """
-    
+
     html_message = f"""
     <div>Hello {receipient_name},</div>
     <p>You are receiving this email from TA Connect because <a href="{settings.FRONTEND_URL}/requests/active/{request_id}" target="_blank">Request #{request_id}</a> has been assigned to {expert_str}{location_str}.</p>
@@ -58,11 +63,16 @@ def assignment_email(receipient_name: str, request: Request, customer: Customer,
     <div>Thank you,</div>
     <div>TA Connect</div>
     """
-    
+
     return plain_text_message, html_message
 
 
-def new_request_email(receipient_name: str, request: Request, customer: Customer, organization: Organization) -> tuple[str, str]:
+def new_request_email(
+    receipient_name: str,
+    request: Request,
+    customer: Customer,
+    organization: Organization,
+) -> tuple[str, str]:
     program_name = "-"
     lab_name = "-"
     if request.program:
@@ -147,7 +157,9 @@ def customer_completed_email(receipient_name: str, request: Request) -> tuple[st
     return plain_text_message, html_message
 
 
-def customer_unable_to_address_email(receipient_name: str, request: Request) -> tuple[str, str]:
+def customer_unable_to_address_email(
+    receipient_name: str, request: Request
+) -> tuple[str, str]:
     program_name = "-"
     lab_name = "-"
     if request.program:
@@ -196,7 +208,7 @@ def customer_unable_to_address_email(receipient_name: str, request: Request) -> 
 def customer_status_email(receipient_name: str, request: Request) -> tuple[str, str]:
     if request.status.name == REQUEST_STATUS.COMPLETED.value:
         return customer_completed_email(receipient_name, request)
-    
+
     if request.status.name == REQUEST_STATUS.UNABLE_TO_ADDRESS.value:
         return customer_unable_to_address_email(receipient_name, request)
 

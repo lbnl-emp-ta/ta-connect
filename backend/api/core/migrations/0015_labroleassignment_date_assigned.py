@@ -5,16 +5,17 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('core', '0014_programroleassignment'),
+        ("core", "0014_programroleassignment"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='labroleassignment',
-            name='date_assigned',
-            field=models.DateTimeField(auto_now_add=True, default=django.utils.timezone.now),
+            model_name="labroleassignment",
+            name="date_assigned",
+            field=models.DateTimeField(
+                auto_now_add=True, default=django.utils.timezone.now
+            ),
             preserve_default=False,
         ),
     ]

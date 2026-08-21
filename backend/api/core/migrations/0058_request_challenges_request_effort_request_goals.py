@@ -4,25 +4,34 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('core', '0057_alter_expertise_lab_role_assignment'),
+        ("core", "0057_alter_expertise_lab_role_assignment"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='request',
-            name='challenges',
+            model_name="request",
+            name="challenges",
             field=models.TextField(blank=True, null=True),
         ),
         migrations.AddField(
-            model_name='request',
-            name='effort',
-            field=models.CharField(blank=True, choices=[('1 day or less', '1 day or less'), ('Up to 3 weeks (15 days)', 'Up to 3 weeks (15 days)'), ('More than 3 weeks', 'More than 3 weeks'), ('Unsure', 'Unsure')], max_length=25, null=True),
+            model_name="request",
+            name="effort",
+            field=models.CharField(
+                blank=True,
+                choices=[
+                    ("1 day or less", "1 day or less"),
+                    ("Up to 3 weeks (15 days)", "Up to 3 weeks (15 days)"),
+                    ("More than 3 weeks", "More than 3 weeks"),
+                    ("Unsure", "Unsure"),
+                ],
+                max_length=25,
+                null=True,
+            ),
         ),
         migrations.AddField(
-            model_name='request',
-            name='goals',
+            model_name="request",
+            name="goals",
             field=models.TextField(blank=True, null=True),
         ),
     ]

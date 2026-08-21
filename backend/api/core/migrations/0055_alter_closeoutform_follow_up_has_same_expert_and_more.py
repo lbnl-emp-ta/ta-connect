@@ -4,20 +4,22 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('core', '0054_closeoutform'),
+        ("core", "0054_closeoutform"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='closeoutform',
-            name='follow_up_has_same_expert',
-            field=models.BooleanField(default=False, verbose_name='Do you want to be a subject matter expert (SME) for any follow-up?'),
+            model_name="closeoutform",
+            name="follow_up_has_same_expert",
+            field=models.BooleanField(
+                default=False,
+                verbose_name="Do you want to be a subject matter expert (SME) for any follow-up?",
+            ),
         ),
         migrations.AlterField(
-            model_name='closeoutform',
-            name='submitted_date',
+            model_name="closeoutform",
+            name="submitted_date",
             field=models.DateTimeField(blank=True, null=True),
         ),
     ]

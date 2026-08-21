@@ -4,25 +4,24 @@ from django.db import migrations
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('core', '0023_remove_owner_expert_request_expert_and_more'),
+        ("core", "0023_remove_owner_expert_request_expert_and_more"),
     ]
 
     operations = [
         migrations.RenameField(
-            model_name='labroleassignment',
-            old_name='Lab',
-            new_name='instance',
+            model_name="labroleassignment",
+            old_name="Lab",
+            new_name="instance",
         ),
         migrations.RenameField(
-            model_name='programroleassignment',
-            old_name='program',
-            new_name='instance',
+            model_name="programroleassignment",
+            old_name="program",
+            new_name="instance",
         ),
         migrations.RenameField(
-            model_name='receptionroleassignment',
-            old_name='reception',
-            new_name='instance',
+            model_name="receptionroleassignment",
+            old_name="reception",
+            new_name="instance",
         ),
     ]

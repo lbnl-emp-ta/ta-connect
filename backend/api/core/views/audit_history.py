@@ -23,13 +23,24 @@ class AuditHistoryListView(views.APIView):
         try:
             request_obj = Request.objects.get(pk=request_id)
         except Request.DoesNotExist:
-            return Response(data={"message":"Request with given ID does not exist"}, status=status.HTTP_400_BAD_REQUEST)
-        
+            return Response(
+                data={"message": "Request with given ID does not exist"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
         user_aware_request_view = BaseUserAwareRequest(request=request)
-        if not (user_aware_request_view.get_actionable() | user_aware_request_view.get_downstream()).contains(request_obj):
-            return Response(data={"message": "Insufficient authorization to view audit history for given request"}, status=status.HTTP_400_BAD_REQUEST)
-        
-        audit_histories = AuditHistory.objects.filter(request=request_obj) 
+        if not (
+            user_aware_request_view.get_actionable()
+            | user_aware_request_view.get_downstream()
+        ).contains(request_obj):
+            return Response(
+                data={
+                    "message": "Insufficient authorization to view audit history for given request"
+                },
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        audit_histories = AuditHistory.objects.filter(request=request_obj)
         if not audit_histories.exists():
             return Response(data=[], status=status.HTTP_204_NO_CONTENT)
 

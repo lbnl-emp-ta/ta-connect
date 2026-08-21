@@ -12,12 +12,10 @@ class TestRequestStatusModel:
         it is returned.
         """
 
-        existing_default_status_pk = RequestStatus.objects.get(name=RequestStatus.default_name).pk
-        
+        existing_default_status_pk = RequestStatus.objects.get(
+            name=RequestStatus.default_name
+        ).pk
+
         found_default_status_pk = RequestStatus.get_default_pk()
-        
+
         assert existing_default_status_pk == found_default_status_pk
-        
-        
-        
-       

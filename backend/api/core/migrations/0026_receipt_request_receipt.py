@@ -6,27 +6,63 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('core', '0025_role_statuses'),
+        ("core", "0025_role_statuses"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='Receipt',
+            name="Receipt",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('expert', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.PROTECT, to=settings.AUTH_USER_MODEL)),
-                ('lab', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.PROTECT, to='core.lab')),
-                ('program', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.PROTECT, to='core.program')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "expert",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.PROTECT,
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
+                (
+                    "lab",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.PROTECT,
+                        to="core.lab",
+                    ),
+                ),
+                (
+                    "program",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.PROTECT,
+                        to="core.program",
+                    ),
+                ),
             ],
             options={
-                'db_table': 'receipt',
+                "db_table": "receipt",
             },
         ),
         migrations.AddField(
-            model_name='request',
-            name='receipt',
-            field=models.OneToOneField(blank=True, null=True, on_delete=django.db.models.deletion.PROTECT, to='core.receipt'),
+            model_name="request",
+            name="receipt",
+            field=models.OneToOneField(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.PROTECT,
+                to="core.receipt",
+            ),
         ),
     ]

@@ -43,18 +43,18 @@ class IdentityListView(views.APIView):
             identity["assignment_id"] = assignment.id
             identity["user"] = {"id": user.pk, "email": user.email}
             identity["location"] = "reception"
-            identity["role"] = RoleSerializer(assignment.role).data 
+            identity["role"] = RoleSerializer(assignment.role).data
             identities.append(identity)
-            
+
         for assignment in program_assignments:
             identity = {}
             identity["assignment_id"] = assignment.id
             identity["user"] = {"id": user.pk, "email": user.email}
             identity["location"] = "program"
             identity["instance"] = ProgramSerializer(assignment.instance).data
-            identity["role"] = RoleSerializer(assignment.role).data 
+            identity["role"] = RoleSerializer(assignment.role).data
             identities.append(identity)
-            
+
         for assignment in lab_assignments:
             identity = {}
             identity["assignment_id"] = assignment.id
@@ -62,12 +62,18 @@ class IdentityListView(views.APIView):
             identity["location"] = "lab"
             identity["instance"] = LabSerializer(assignment.instance).data
             identity["program"] = ProgramSerializer(assignment.program).data
-            identity["role"] = RoleSerializer(assignment.role).data 
+            identity["role"] = RoleSerializer(assignment.role).data
             if assignment.role.name == ROLE.EXPERT:
-                identity["expertises"] = [ExpertiseSerializer(expertise).data for expertise in assignment.expertises.all()]
+                identity["expertises"] = [
+                    ExpertiseSerializer(expertise).data
+                    for expertise in assignment.expertises.all()
+                ]
             identities.append(identity)
-        
-        if not identities:
-            return Response(data={"message", "No identities for logged in user found."}, status=status.HTTP_204_NO_CONTENT)
 
-        return Response(data=identities, status=status.HTTP_200_OK) 
+        if not identities:
+            return Response(
+                data={"message", "No identities for logged in user found."},
+                status=status.HTTP_204_NO_CONTENT,
+            )
+
+        return Response(data=identities, status=status.HTTP_200_OK)

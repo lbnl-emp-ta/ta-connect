@@ -7,15 +7,20 @@ import core.models.depth
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('core', '0050_alter_audithistory_action_type_alter_user_phone'),
+        ("core", "0050_alter_audithistory_action_type_alter_user_phone"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='request',
-            name='depth',
-            field=models.ForeignKey(blank=True, default=core.models.depth.Depth.get_default_pk, null=True, on_delete=django.db.models.deletion.PROTECT, to='core.depth'),
+            model_name="request",
+            name="depth",
+            field=models.ForeignKey(
+                blank=True,
+                default=core.models.depth.Depth.get_default_pk,
+                null=True,
+                on_delete=django.db.models.deletion.PROTECT,
+                to="core.depth",
+            ),
         ),
     ]

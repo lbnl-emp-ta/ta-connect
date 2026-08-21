@@ -4,21 +4,28 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('core', '0020_availablereceptionrole'),
+        ("core", "0020_availablereceptionrole"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='Topic',
+            name="Topic",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(max_length=255)),
-                ('description', models.TextField()),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("name", models.CharField(max_length=255)),
+                ("description", models.TextField()),
             ],
             options={
-                'db_table': 'topic',
+                "db_table": "topic",
             },
         ),
     ]

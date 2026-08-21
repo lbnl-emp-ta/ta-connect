@@ -7,15 +7,20 @@ import core.models.owner
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('core', '0007_remove_owner_request_request_owner'),
+        ("core", "0007_remove_owner_request_request_owner"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='request',
-            name='owner',
-            field=models.ForeignKey(blank=True, default=core.models.owner.Owner.get_default_pk, null=True, on_delete=django.db.models.deletion.PROTECT, to='core.owner'),
+            model_name="request",
+            name="owner",
+            field=models.ForeignKey(
+                blank=True,
+                default=core.models.owner.Owner.get_default_pk,
+                null=True,
+                on_delete=django.db.models.deletion.PROTECT,
+                to="core.owner",
+            ),
         ),
     ]

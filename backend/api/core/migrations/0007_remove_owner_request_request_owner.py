@@ -7,19 +7,23 @@ import core.models.reception
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('core', '0006_delete_team'),
+        ("core", "0006_delete_team"),
     ]
 
     operations = [
         migrations.RemoveField(
-            model_name='owner',
-            name='request',
+            model_name="owner",
+            name="request",
         ),
         migrations.AddField(
-            model_name='request',
-            name='owner',
-            field=models.ForeignKey(default=core.models.reception.Reception.get_default_pk, null=True, on_delete=django.db.models.deletion.PROTECT, to='core.owner'),
+            model_name="request",
+            name="owner",
+            field=models.ForeignKey(
+                default=core.models.reception.Reception.get_default_pk,
+                null=True,
+                on_delete=django.db.models.deletion.PROTECT,
+                to="core.owner",
+            ),
         ),
     ]

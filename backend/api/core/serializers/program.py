@@ -23,4 +23,4 @@ class ProgramSerializer(serializers.ModelSerializer):
 class ProgramLeanSerializer(serializers.ModelSerializer):
     class Meta:
         model = Program
-        fields = ['id', 'name', 'description']
+        fields = ["id", "name", "description"]

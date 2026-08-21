@@ -6,23 +6,41 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('core', '0043_merge_20250815_2023'),
+        ("core", "0043_merge_20250815_2023"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='Note',
+            name="Note",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('content', models.TextField()),
-                ('timestamp', models.DateTimeField(auto_now_add=True)),
-                ('author', models.ForeignKey(on_delete=django.db.models.deletion.DO_NOTHING, to=settings.AUTH_USER_MODEL)),
-                ('request', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='core.request')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("content", models.TextField()),
+                ("timestamp", models.DateTimeField(auto_now_add=True)),
+                (
+                    "author",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.DO_NOTHING,
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
+                (
+                    "request",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE, to="core.request"
+                    ),
+                ),
             ],
             options={
-                'db_table': 'note',
+                "db_table": "note",
             },
         ),
     ]

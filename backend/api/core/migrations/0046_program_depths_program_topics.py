@@ -4,20 +4,23 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('core', '0045_sharedfundinggroup'),
+        ("core", "0045_sharedfundinggroup"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='program',
-            name='depths',
-            field=models.ManyToManyField(blank=True, related_name='programs', to='core.depth'),
+            model_name="program",
+            name="depths",
+            field=models.ManyToManyField(
+                blank=True, related_name="programs", to="core.depth"
+            ),
         ),
         migrations.AddField(
-            model_name='program',
-            name='topics',
-            field=models.ManyToManyField(blank=True, related_name='programs', to='core.topic'),
+            model_name="program",
+            name="topics",
+            field=models.ManyToManyField(
+                blank=True, related_name="programs", to="core.topic"
+            ),
         ),
     ]

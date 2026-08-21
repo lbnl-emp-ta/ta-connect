@@ -17,6 +17,7 @@ class CustomerSerializer(serializers.ModelSerializer):
         model = Customer
         fields = "__all__"
 
+
 class CustomerEditSerializer(serializers.ModelSerializer):
     email = serializers.EmailField(max_length=256, required=False, allow_null=True)
     name = serializers.CharField(max_length=256, required=False, allow_null=True)

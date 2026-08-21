@@ -9,8 +9,10 @@ class Customer(models.Model):
     phone = models.CharField(max_length=64, verbose_name="phone number", default=None)
     title = models.CharField(max_length=256, verbose_name="job title")
 
-    requests = models.ManyToManyField(Request, through='CustomerRequestRelationship', related_name="customers")
-    
+    requests = models.ManyToManyField(
+        Request, through="CustomerRequestRelationship", related_name="customers"
+    )
+
     def __str__(self):
         return self.email
 

@@ -10,9 +10,9 @@ class Cohort(models.Model):
     description = models.TextField()
 
     customer_poc = models.ForeignKey(Customer, on_delete=models.PROTECT)
-    
+
     def __str__(self):
         return self.name
-    
+
     class Meta:
         db_table = "cohort"

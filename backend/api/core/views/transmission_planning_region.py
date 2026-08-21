@@ -7,4 +7,3 @@ from core.serializers import TransmissionPlanningRegionSerializer
 class TransmissionPlanningRegionListView(generics.ListAPIView):
     queryset = TransmissionPlanningRegion.objects.all()
     serializer_class = TransmissionPlanningRegionSerializer
-    

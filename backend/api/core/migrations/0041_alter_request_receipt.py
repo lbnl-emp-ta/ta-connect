@@ -6,15 +6,21 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('core', '0040_alter_attachment_file_name_and_more'),
+        ("core", "0040_alter_attachment_file_name_and_more"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='request',
-            name='receipt',
-            field=models.OneToOneField(blank=True, default=django.db.models.query.QuerySet.create, null=True, on_delete=django.db.models.deletion.PROTECT, related_name='request', to='core.receipt'),
+            model_name="request",
+            name="receipt",
+            field=models.OneToOneField(
+                blank=True,
+                default=django.db.models.query.QuerySet.create,
+                null=True,
+                on_delete=django.db.models.deletion.PROTECT,
+                related_name="request",
+                to="core.receipt",
+            ),
         ),
     ]

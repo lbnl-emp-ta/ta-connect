@@ -12,6 +12,6 @@ class Note(models.Model):
 
     def __str__(self):
         return f"Notes #{self.pk} for Request #{self.request.pk}"
-    
+
     class Meta:
-        db_table="note"
+        db_table = "note"

@@ -13,11 +13,10 @@ class TopicListView(ListAPIView):
         authentication.SessionAuthentication,
         XSessionTokenAuthentication,
     ]
-    
+
     permission_classes = [
         permissions.IsAuthenticated,
     ]
-    
+
     queryset = Topic.objects.all()
     serializer_class = TopicSerializer
-    

@@ -4,15 +4,16 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('core', '0046_program_depths_program_topics'),
+        ("core", "0046_program_depths_program_topics"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='program',
-            name='filtered_orgs',
-            field=models.ManyToManyField(blank=True, related_name='filtered_programs', to='core.organization'),
+            model_name="program",
+            name="filtered_orgs",
+            field=models.ManyToManyField(
+                blank=True, related_name="filtered_programs", to="core.organization"
+            ),
         ),
     ]

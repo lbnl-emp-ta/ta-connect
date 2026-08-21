@@ -4,22 +4,24 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('core', '0058_request_challenges_request_effort_request_goals'),
+        ("core", "0058_request_challenges_request_effort_request_goals"),
     ]
 
     operations = [
         migrations.RemoveField(
-            model_name='customerrequestrelationship',
-            name='customer_type',
+            model_name="customerrequestrelationship",
+            name="customer_type",
         ),
         migrations.AddField(
-            model_name='customerrequestrelationship',
-            name='is_poc',
-            field=models.BooleanField(default=True, help_text='Whether the customer is the point of contact for the request'),
+            model_name="customerrequestrelationship",
+            name="is_poc",
+            field=models.BooleanField(
+                default=True,
+                help_text="Whether the customer is the point of contact for the request",
+            ),
         ),
         migrations.DeleteModel(
-            name='CustomerType',
+            name="CustomerType",
         ),
     ]

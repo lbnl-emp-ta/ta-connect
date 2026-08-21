@@ -8,18 +8,16 @@ class Reception(models.Model):
     @classproperty
     def default_name(cls):
         return "Reception"
-    
+
     @classmethod
     def get_default_pk(cls):
-        reception, _  = cls.objects.get_or_create(
-            name=cls.default_name
-        )
+        reception, _ = cls.objects.get_or_create(name=cls.default_name)
 
         return reception.pk
-    
+
     def __str__(self):
         return "Reception"
-        
+
 
 class Meta:
     db_table = "reception"

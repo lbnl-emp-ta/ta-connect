@@ -8,20 +8,28 @@ import core.models.attachment
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('core', '0036_alter_attachment_file_alter_request_receipt'),
+        ("core", "0036_alter_attachment_file_alter_request_receipt"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='attachment',
-            name='file',
-            field=models.FileField(upload_to=core.models.attachment.generate_upload_filepath),
+            model_name="attachment",
+            name="file",
+            field=models.FileField(
+                upload_to=core.models.attachment.generate_upload_filepath
+            ),
         ),
         migrations.AlterField(
-            model_name='request',
-            name='receipt',
-            field=models.OneToOneField(blank=True, default=django.db.models.query.QuerySet.create, null=True, on_delete=django.db.models.deletion.PROTECT, related_name='request', to='core.receipt'),
+            model_name="request",
+            name="receipt",
+            field=models.OneToOneField(
+                blank=True,
+                default=django.db.models.query.QuerySet.create,
+                null=True,
+                on_delete=django.db.models.deletion.PROTECT,
+                related_name="request",
+                to="core.receipt",
+            ),
         ),
     ]

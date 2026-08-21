@@ -5,15 +5,20 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('core', '0048_merge_20250915_2113'),
+        ("core", "0048_merge_20250915_2113"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='request',
-            name='receipt',
-            field=models.OneToOneField(blank=True, null=True, on_delete=django.db.models.deletion.PROTECT, related_name='request', to='core.receipt'),
+            model_name="request",
+            name="receipt",
+            field=models.OneToOneField(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.PROTECT,
+                related_name="request",
+                to="core.receipt",
+            ),
         ),
     ]

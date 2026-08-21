@@ -7,15 +7,18 @@ import core.models.depth
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('core', '0003_owner_request'),
+        ("core", "0003_owner_request"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='request',
-            name='depth',
-            field=models.ForeignKey(default=core.models.depth.Depth.get_default_pk, on_delete=django.db.models.deletion.PROTECT, to='core.depth'),
+            model_name="request",
+            name="depth",
+            field=models.ForeignKey(
+                default=core.models.depth.Depth.get_default_pk,
+                on_delete=django.db.models.deletion.PROTECT,
+                to="core.depth",
+            ),
         ),
     ]

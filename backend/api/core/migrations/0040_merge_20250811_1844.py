@@ -4,11 +4,9 @@ from django.db import migrations
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('core', '0034_request_topics_alter_request_receipt'),
-        ('core', '0039_attachment_user_who_uploaded_alter_request_receipt'),
+        ("core", "0034_request_topics_alter_request_receipt"),
+        ("core", "0039_attachment_user_who_uploaded_alter_request_receipt"),
     ]
 
-    operations = [
-    ]
+    operations = []
