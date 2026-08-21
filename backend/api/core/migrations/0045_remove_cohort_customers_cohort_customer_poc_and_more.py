@@ -5,35 +5,42 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('core', '0044_rename_file_name_attachment_title_note'),
+        ("core", "0044_rename_file_name_attachment_title_note"),
     ]
 
     operations = [
         migrations.RemoveField(
-            model_name='cohort',
-            name='customers',
+            model_name="cohort",
+            name="customers",
         ),
         migrations.AddField(
-            model_name='cohort',
-            name='customer_poc',
-            field=models.ForeignKey(default=1, on_delete=django.db.models.deletion.PROTECT, to='core.customer'),
+            model_name="cohort",
+            name="customer_poc",
+            field=models.ForeignKey(
+                default=1,
+                on_delete=django.db.models.deletion.PROTECT,
+                to="core.customer",
+            ),
             preserve_default=False,
         ),
         migrations.AlterField(
-            model_name='cohort',
-            name='name',
+            model_name="cohort",
+            name="name",
             field=models.CharField(blank=True, max_length=256, null=True),
         ),
         migrations.AlterField(
-            model_name='cohort',
-            name='request',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, to='core.request', unique=True),
+            model_name="cohort",
+            name="request",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.PROTECT,
+                to="core.request",
+                unique=True,
+            ),
         ),
         migrations.AlterField(
-            model_name='transmissionplanningregion',
-            name='name',
+            model_name="transmissionplanningregion",
+            name="name",
             field=models.CharField(max_length=256, unique=True),
         ),
     ]

@@ -1,7 +1,8 @@
-from rest_framework import views, authentication, permissions, status
+from allauth.headless.contrib.rest_framework.authentication import (
+    XSessionTokenAuthentication,
+)
+from rest_framework import authentication, permissions, status, views
 from rest_framework.response import Response
-
-from allauth.headless.contrib.rest_framework.authentication import XSessionTokenAuthentication
 
 from core.constants import ROLE
 from core.models import Expertise, LabRoleAssignment
@@ -20,7 +21,9 @@ class ExpertiseUpdateView(views.APIView):
 
     def post(self, request, lab_role_assignment_id, format=None):
         try:
-            assignment = LabRoleAssignment.objects.select_related("role").get(pk=lab_role_assignment_id)
+            assignment = LabRoleAssignment.objects.select_related("role").get(
+                pk=lab_role_assignment_id
+            )
         except LabRoleAssignment.DoesNotExist:
             return Response(
                 data={"message": "Lab role assignment with given ID does not exist."},
@@ -29,13 +32,17 @@ class ExpertiseUpdateView(views.APIView):
 
         if assignment.user_id != request.user.pk:
             return Response(
-                data={"message": "You do not have permission to edit expertises for this assignment."},
+                data={
+                    "message": "You do not have permission to edit expertises for this assignment."
+                },
                 status=status.HTTP_403_FORBIDDEN,
             )
 
         if assignment.role.name != ROLE.EXPERT:
             return Response(
-                data={"message": "Expertises can only be set on Expert role assignments."},
+                data={
+                    "message": "Expertises can only be set on Expert role assignments."
+                },
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
@@ -63,7 +70,9 @@ class ExpertiseUpdateView(views.APIView):
         ]
         Expertise.objects.bulk_create(new_expertises)
 
-        updated = Expertise.objects.filter(lab_role_assignment=assignment).select_related("topic", "depth")
+        updated = Expertise.objects.filter(
+            lab_role_assignment=assignment
+        ).select_related("topic", "depth")
         return Response(
             data=ExpertiseSerializer(updated, many=True).data,
             status=status.HTTP_200_OK,

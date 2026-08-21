@@ -1,6 +1,8 @@
 from django.db import models
 
-from core.models import Request, Customer
+from .customer import Customer
+from .request import Request
+
 
 class Cohort(models.Model):
     request = models.ForeignKey(Request, on_delete=models.PROTECT, unique=True)
@@ -8,9 +10,9 @@ class Cohort(models.Model):
     description = models.TextField()
 
     customer_poc = models.ForeignKey(Customer, on_delete=models.PROTECT)
-    
+
     def __str__(self):
         return self.name
-    
+
     class Meta:
         db_table = "cohort"

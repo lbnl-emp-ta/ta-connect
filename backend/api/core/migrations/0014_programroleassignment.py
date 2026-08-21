@@ -6,23 +6,46 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('core', '0013_labroleassignment'),
+        ("core", "0013_labroleassignment"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='ProgramRoleAssignment',
+            name="ProgramRoleAssignment",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('date_assigned', models.DateTimeField(auto_now_add=True)),
-                ('program', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, to='core.program')),
-                ('role', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, to='core.role')),
-                ('user', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, to=settings.AUTH_USER_MODEL)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("date_assigned", models.DateTimeField(auto_now_add=True)),
+                (
+                    "program",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.PROTECT, to="core.program"
+                    ),
+                ),
+                (
+                    "role",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.PROTECT, to="core.role"
+                    ),
+                ),
+                (
+                    "user",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.PROTECT,
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
             ],
             options={
-                'db_table': 'program_role_assignment',
+                "db_table": "program_role_assignment",
             },
         ),
     ]

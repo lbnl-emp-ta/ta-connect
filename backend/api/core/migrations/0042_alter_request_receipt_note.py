@@ -2,20 +2,25 @@
 
 import django.db.models.deletion
 import django.db.models.query
-from django.conf import settings
 from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('core', '0041_alter_request_receipt'),
+        ("core", "0041_alter_request_receipt"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='request',
-            name='receipt',
-            field=models.OneToOneField(blank=True, default=django.db.models.query.QuerySet.create, null=True, on_delete=django.db.models.deletion.PROTECT, related_name='request', to='core.receipt'),
+            model_name="request",
+            name="receipt",
+            field=models.OneToOneField(
+                blank=True,
+                default=django.db.models.query.QuerySet.create,
+                null=True,
+                on_delete=django.db.models.deletion.PROTECT,
+                related_name="request",
+                to="core.receipt",
+            ),
         ),
     ]

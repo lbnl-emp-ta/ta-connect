@@ -4,15 +4,16 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('core', '0026_receipt_request_receipt'),
+        ("core", "0026_receipt_request_receipt"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='program',
-            name='labs',
-            field=models.ManyToManyField(blank=True, related_name='programs', to='core.lab'),
+            model_name="program",
+            name="labs",
+            field=models.ManyToManyField(
+                blank=True, related_name="programs", to="core.lab"
+            ),
         ),
     ]

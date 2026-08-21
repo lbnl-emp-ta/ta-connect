@@ -4,20 +4,31 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('core', '0049_alter_request_receipt'),
+        ("core", "0049_alter_request_receipt"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='audithistory',
-            name='action_type',
-            field=models.CharField(choices=[('Assignment change', 'Assignment'), ('Add attachment', 'Addattachment'), ('Remove attachment', 'Removeattachment'), ('Add note', 'Addnote'), ('Remove note', 'Removenote'), ('Edit request details', 'Editrequestdetails'), ('Edit customer details', 'Editcustomerdetails'), ('Status change', 'Statuschange')], max_length=64),
+            model_name="audithistory",
+            name="action_type",
+            field=models.CharField(
+                choices=[
+                    ("Assignment change", "Assignment"),
+                    ("Add attachment", "Addattachment"),
+                    ("Remove attachment", "Removeattachment"),
+                    ("Add note", "Addnote"),
+                    ("Remove note", "Removenote"),
+                    ("Edit request details", "Editrequestdetails"),
+                    ("Edit customer details", "Editcustomerdetails"),
+                    ("Status change", "Statuschange"),
+                ],
+                max_length=64,
+            ),
         ),
         migrations.AlterField(
-            model_name='user',
-            name='phone',
+            model_name="user",
+            name="phone",
             field=models.CharField(blank=True, max_length=64, null=True),
         ),
     ]

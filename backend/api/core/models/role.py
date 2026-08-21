@@ -1,6 +1,7 @@
 from django.db import models
 
-from core.models import *
+from .request_status import RequestStatus
+
 
 class Role(models.Model):
     name = models.CharField(max_length=255)
@@ -8,7 +9,7 @@ class Role(models.Model):
     statuses = models.ManyToManyField(RequestStatus, related_name="roles")
 
     class Meta:
-        db_table="role"
-    
+        db_table = "role"
+
     def __str__(self):
         return f"{self.name}"

@@ -1,15 +1,17 @@
 from django.db import models
 from django.utils.functional import classproperty
+
 from core.constants import REQUEST_STATUS
+
 
 class RequestStatus(models.Model):
     name = models.CharField(max_length=255, unique=True)
     description = models.TextField()
-    
+
     @classproperty
     def default_name(cls):
         return REQUEST_STATUS.SCOPING.value
-    
+
     @classproperty
     def default_description(cls):
         return "The default status of a new Request"
@@ -23,15 +25,14 @@ class RequestStatus(models.Model):
         Request that is created.
         """
         status, _ = cls.objects.get_or_create(
-            name=cls.default_name,
-            defaults={"description": cls.default_description}
+            name=cls.default_name, defaults={"description": cls.default_description}
         )
 
         return status.pk
 
     def __str__(self):
         return self.name
-    
+
     class Meta:
         db_table = "request_status"
         verbose_name = "request status"

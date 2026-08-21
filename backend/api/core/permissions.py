@@ -1,6 +1,14 @@
 from rest_framework import permissions
+
 from core.constants import REQUEST_STATUS
-from core.models import Role, ReceptionRoleAssignment, SystemRoleAssignment, ProgramRoleAssignment, LabRoleAssignment, Owner
+from core.models import (
+    LabRoleAssignment,
+    Owner,
+    ProgramRoleAssignment,
+    ReceptionRoleAssignment,
+    Role,
+    SystemRoleAssignment,
+)
 
 
 def is_admin(request) -> bool:
@@ -67,11 +75,15 @@ class IsCoordinator(permissions.BasePermission):
     Object-level: True if the user is a coordinator AND the request is currently owned by reception.
     Unless the request is in a closed state, in which case any coordinator has object-level permission (for reopening).
     """
+
     def has_permission(self, request, view=None):
         return is_coordinator(request.user)
-    
+
     def has_object_permission(self, request, view, obj):
-        if obj.status.name in [REQUEST_STATUS.COMPLETED, REQUEST_STATUS.UNABLE_TO_ADDRESS]:
+        if obj.status.name in [
+            REQUEST_STATUS.COMPLETED,
+            REQUEST_STATUS.UNABLE_TO_ADDRESS,
+        ]:
             return is_coordinator(request.user)
         return is_coordinator(request.user) and obj.owner_id == Owner.get_default_pk()
 
@@ -81,11 +93,14 @@ class IsProgramLead(permissions.BasePermission):
     View-level: True if the user has any Program Lead assignment.
     Object-level: True if the user is the Program Lead for that specific request.
     """
+
     def has_permission(self, request, view=None):
         role = Role.objects.filter(name="Program Lead").first()
         if not role:
             return False
-        return ProgramRoleAssignment.objects.filter(user=request.user, role=role).exists()
+        return ProgramRoleAssignment.objects.filter(
+            user=request.user, role=role
+        ).exists()
 
     def has_object_permission(self, request, view, obj):
         return is_program_lead_for_request(request.user, obj)
@@ -96,6 +111,7 @@ class IsLabLead(permissions.BasePermission):
     View-level: True if the user has any Lab Lead assignment.
     Object-level: True if the user is the Lab Lead for that specific request.
     """
+
     def has_permission(self, request, view=None):
         role = Role.objects.filter(name="Lab Lead").first()
         if not role:
@@ -111,6 +127,7 @@ class IsExpert(permissions.BasePermission):
     View-level: True if the user has any Expert lab assignment.
     Object-level: True if the user is the assigned expert on that specific request.
     """
+
     def has_permission(self, request, view=None):
         role = Role.objects.filter(name="Expert").first()
         if not role:
@@ -124,20 +141,20 @@ class IsExpert(permissions.BasePermission):
 class IsAnyRoleOnRequest(permissions.BasePermission):
     def has_permission(self, request, view=None):
         return (
-            is_admin(request) or
-            is_coordinator(request.user) or
-            IsLabLead().has_permission(request, view) or
-            IsProgramLead().has_permission(request, view) or
-            IsExpert().has_permission(request, view)
+            is_admin(request)
+            or is_coordinator(request.user)
+            or IsLabLead().has_permission(request, view)
+            or IsProgramLead().has_permission(request, view)
+            or IsExpert().has_permission(request, view)
         )
 
     def has_object_permission(self, request, view, obj):
         return (
-            is_admin(request) or
-            is_coordinator(request.user) or
-            is_program_lead_for_request(request.user, obj) or
-            is_lab_lead_for_request(request.user, obj) or
-            is_expert_for_request(request.user, obj)
+            is_admin(request)
+            or is_coordinator(request.user)
+            or is_program_lead_for_request(request.user, obj)
+            or is_lab_lead_for_request(request.user, obj)
+            or is_expert_for_request(request.user, obj)
         )
 
 
@@ -149,6 +166,7 @@ def compose(*classes):
         ComposedClass().has_permission(request)
         ComposedClass().has_object_permission(request, view, obj)
     """
+
     class Composed(permissions.BasePermission):
         def has_permission(self, request, view=None):
             return any(cls().has_permission(request, view) for cls in classes)
@@ -159,7 +177,8 @@ def compose(*classes):
             Make sure the user has permission for the role AND object for at least one of the classes.
             """
             return any(
-                cls().has_permission(request, view) and cls().has_object_permission(request, view, obj)
+                cls().has_permission(request, view)
+                and cls().has_object_permission(request, view, obj)
                 for cls in classes
             )
 
@@ -183,16 +202,26 @@ CanEditGoals = compose(IsAdmin, IsCoordinator, IsProgramLead)
 CanEditEffort = compose(IsAdmin, IsCoordinator, IsProgramLead)
 CanEditDepth = compose(IsAdmin, IsCoordinator, IsProgramLead, IsLabLead)
 CanEditTopics = compose(IsAdmin, IsCoordinator, IsProgramLead, IsLabLead)
-CanEditProjectedStartDate = compose(IsAdmin, IsCoordinator, IsProgramLead, IsLabLead, IsExpert)
-CanEditProjectedCompletionDate = compose(IsAdmin, IsCoordinator, IsProgramLead, IsLabLead, IsExpert)
-CanEditActualCompletionDate = compose(IsAdmin, IsCoordinator, IsProgramLead, IsLabLead, IsExpert)
+CanEditProjectedStartDate = compose(
+    IsAdmin, IsCoordinator, IsProgramLead, IsLabLead, IsExpert
+)
+CanEditProjectedCompletionDate = compose(
+    IsAdmin, IsCoordinator, IsProgramLead, IsLabLead, IsExpert
+)
+CanEditActualCompletionDate = compose(
+    IsAdmin, IsCoordinator, IsProgramLead, IsLabLead, IsExpert
+)
 # Customer Edits
 CanCreateCustomer = compose(IsAdmin, IsCoordinator, IsProgramLead, IsLabLead, IsExpert)
 CanEditCustomerInfo = compose(IsAdmin, IsCoordinator, IsProgramLead, IsLabLead)
-CanTransferCustomer = compose(IsAdmin, IsCoordinator, IsProgramLead, IsLabLead, IsExpert)
+CanTransferCustomer = compose(
+    IsAdmin, IsCoordinator, IsProgramLead, IsLabLead, IsExpert
+)
 CanDeleteCustomer = compose(IsAdmin)
 # Organization Edits
-CanCreateOrganization = compose(IsAdmin, IsCoordinator, IsProgramLead, IsLabLead, IsExpert)
+CanCreateOrganization = compose(
+    IsAdmin, IsCoordinator, IsProgramLead, IsLabLead, IsExpert
+)
 CanEditOrganizationInfo = compose(IsAdmin, IsCoordinator)
 CanTransferOrganization = compose(IsAdmin, IsCoordinator, IsProgramLead)
 CanTransferOrganizationType = compose(IsAdmin)
@@ -202,7 +231,9 @@ CanAddNote = compose(IsAdmin, IsCoordinator, IsProgramLead, IsLabLead, IsExpert)
 CanDeleteNote = compose(IsAdmin, IsCoordinator, IsProgramLead, IsLabLead, IsExpert)
 CanAddAttachment = compose(IsAdmin, IsCoordinator, IsProgramLead, IsLabLead, IsExpert)
 CanEditAttachment = compose(IsAdmin, IsCoordinator, IsProgramLead, IsLabLead, IsExpert)
-CanDeleteAttachment = compose(IsAdmin, IsCoordinator, IsProgramLead, IsLabLead, IsExpert)
+CanDeleteAttachment = compose(
+    IsAdmin, IsCoordinator, IsProgramLead, IsLabLead, IsExpert
+)
 # Closeout
 CanStartCloseout = compose(IsAdmin, IsProgramLead, IsLabLead, IsExpert)
 CanEditCloseoutResponses = compose(IsAdmin, IsProgramLead, IsLabLead, IsExpert)
@@ -214,6 +245,3 @@ CanRejectCloseoutByProgram = compose(IsAdmin, IsProgramLead)
 # Other
 CanCancel = compose(IsAdmin, IsCoordinator, IsProgramLead)
 CanReopen = compose(IsAdmin, IsCoordinator, IsProgramLead)
-
-    
-        

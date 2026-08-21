@@ -1,6 +1,8 @@
-from django.db import models 
+from django.db import models
 
-from core.models import *
+from .request import Request
+from .user import User
+
 
 class Note(models.Model):
     author = models.ForeignKey(User, on_delete=models.DO_NOTHING)
@@ -10,6 +12,6 @@ class Note(models.Model):
 
     def __str__(self):
         return f"Notes #{self.pk} for Request #{self.request.pk}"
-    
+
     class Meta:
-        db_table="note"
+        db_table = "note"

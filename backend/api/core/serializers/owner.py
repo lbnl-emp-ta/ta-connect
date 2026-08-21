@@ -2,21 +2,23 @@ from rest_framework import serializers
 
 from core.constants import DOMAINTYPE
 from core.models import Owner
-from core.serializers import * 
+
+from .organization_type import OrganizationTypeSerializer
+
 
 class OwnerSerializer(serializers.ModelSerializer):
     class Meta:
         model = Owner
         fields = "__all__"
-    
+
     # Expects a valid Owner objects
     def format_owner(self, owner):
         if not owner:
             return None
-        data = dict()
+        data = {}
         data["id"] = owner.pk
         data["domain_type"] = owner.domain_type
-        
+
         domain_name = None
         domain_description = None
         domain_id = None
@@ -30,7 +32,9 @@ class OwnerSerializer(serializers.ModelSerializer):
                 domain_id = owner.program.pk
                 domain_name = owner.program.name
                 domain_description = owner.program.description
-                domain_organization_types = OrganizationTypeSerializer(owner.program.organization_types.all(), many=True).data
+                domain_organization_types = OrganizationTypeSerializer(
+                    owner.program.organization_types.all(), many=True
+                ).data
             case DOMAINTYPE.LAB:
                 domain_id = owner.lab.pk
                 domain_name = owner.lab.name
@@ -39,10 +43,10 @@ class OwnerSerializer(serializers.ModelSerializer):
                 domain_id = owner.expert.pk
                 domain_name = owner.expert.name
                 domain_description = owner.expert.email
-        
+
         data["domain_name"] = domain_name
-        data["domain_description"] = domain_description 
-        data["domain_id"] = domain_id 
-        data["domain_organization_types"] = domain_organization_types 
+        data["domain_description"] = domain_description
+        data["domain_id"] = domain_id
+        data["domain_organization_types"] = domain_organization_types
 
         return data

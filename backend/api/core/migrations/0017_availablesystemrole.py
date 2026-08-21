@@ -5,20 +5,32 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('core', '0016_receptionroleassignment'),
+        ("core", "0016_receptionroleassignment"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='AvailableSystemRole',
+            name="AvailableSystemRole",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('role', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, to='core.role')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "role",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.PROTECT, to="core.role"
+                    ),
+                ),
             ],
             options={
-                'db_table': 'available_system_role',
+                "db_table": "available_system_role",
             },
         ),
     ]

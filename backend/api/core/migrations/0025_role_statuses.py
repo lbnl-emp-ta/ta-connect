@@ -4,15 +4,14 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('core', '0024_rename_lab_labroleassignment_instance_and_more'),
+        ("core", "0024_rename_lab_labroleassignment_instance_and_more"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='role',
-            name='statuses',
-            field=models.ManyToManyField(related_name='roles', to='core.requeststatus'),
+            model_name="role",
+            name="statuses",
+            field=models.ManyToManyField(related_name="roles", to="core.requeststatus"),
         ),
     ]

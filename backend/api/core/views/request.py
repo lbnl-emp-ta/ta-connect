@@ -1,25 +1,21 @@
-from django.db import transaction, IntegrityError
-
-from rest_framework import views, status, permissions, authentication
-from rest_framework.response import Response
-
-from django.utils import timezone
-
-from core.utils import create_audit_history, get_status
-from core.serializers import * 
-from core.models import * 
-from core.models.audit_history import ActionType
-from core.permissions import *
-from core.constants import ROLE, REQUEST_STATUS
-
 from allauth.headless.contrib.rest_framework.authentication import (
     XSessionTokenAuthentication,
 )
+from django.db import IntegrityError, transaction
+from django.utils import timezone
+from rest_framework import authentication, permissions, status, views
+from rest_framework.response import Response
+
+from core.constants import REQUEST_STATUS, ROLE
+from core.models import *
+from core.models.audit_history import ActionType
+from core.permissions import *
+from core.serializers import *
+from core.utils import create_audit_history, get_status
 
 
 class ContextError(Exception):
     """Raised when the Context header is missing, unparseable, or contains a mismatched user."""
-    pass
 
 
 """
@@ -27,6 +23,8 @@ Provides common functionality across all Request views. Like
 differentiating between requests that are actionable vs.
 downstream vs. not visible.
 """
+
+
 class BaseUserAwareRequest(views.APIView):
     authentication_classes = [
         authentication.SessionAuthentication,
@@ -51,7 +49,9 @@ class BaseUserAwareRequest(views.APIView):
             return queryset.get(pk=request_id), None
         except Request.DoesNotExist:
             return None, Response(
-                data={"message": "Request with given ID does not exist or is not visible to this user."},
+                data={
+                    "message": "Request with given ID does not exist or is not visible to this user."
+                },
                 status=status.HTTP_404_NOT_FOUND,
             )
 
@@ -59,9 +59,9 @@ class BaseUserAwareRequest(views.APIView):
         """
         Returns requests that the user can currently act on (i.e. ones they own).
         """
-        if hasattr(self, '_actionable_cache'):
+        if hasattr(self, "_actionable_cache"):
             return self._actionable_cache
-    
+
         queryset = Request.objects.exclude(owner=None)
 
         # Admins can act on all active requests
@@ -75,21 +75,29 @@ class BaseUserAwareRequest(views.APIView):
         lab_assignments = LabRoleAssignment.objects.filter(user=user)
 
         for assignment in reception_assignments:
-            actionable_requests = actionable_requests | assignment.instance.owner.request_set.all()
+            actionable_requests = (
+                actionable_requests | assignment.instance.owner.request_set.all()
+            )
 
         for assignment in program_assignments:
-            actionable_requests = actionable_requests | assignment.instance.owner.request_set.all()
+            actionable_requests = (
+                actionable_requests | assignment.instance.owner.request_set.all()
+            )
 
         for assignment in lab_assignments:
-            if assignment.role.name == ROLE.LAB_LEAD:    
-                actionable_requests = actionable_requests | assignment.instance.owner.request_set.all()
+            if assignment.role.name == ROLE.LAB_LEAD:
+                actionable_requests = (
+                    actionable_requests | assignment.instance.owner.request_set.all()
+                )
             elif assignment.role.name == ROLE.EXPERT:
-                actionable_requests = actionable_requests | assignment.user.owner.request_set.all()
+                actionable_requests = (
+                    actionable_requests | assignment.user.owner.request_set.all()
+                )
 
         actionable_requests = actionable_requests.distinct()
         self._actionable_cache = actionable_requests
         return actionable_requests
-    
+
     def get_downstream(self):
         """
         Returns requests that the user has visibility into but cannot currently act on
@@ -101,7 +109,7 @@ class BaseUserAwareRequest(views.APIView):
         if IsAdmin().has_permission(self.request):
             return queryset.none()
 
-        actionable_pks = self.get_actionable().values('pk')
+        actionable_pks = self.get_actionable().values("pk")
 
         # Coordinators' downstream requests include all that are owned,
         # except for those that are currently owned/actionable by Reception.
@@ -115,17 +123,23 @@ class BaseUserAwareRequest(views.APIView):
 
         for assignment in program_assignments:
             program = assignment.instance
-            downstream_requests = downstream_requests | queryset.filter(program=program).exclude(pk__in=actionable_pks)
+            downstream_requests = downstream_requests | queryset.filter(
+                program=program
+            ).exclude(pk__in=actionable_pks)
 
         for assignment in lab_assignments:
             lab = assignment.instance
             if assignment.role.name == ROLE.LAB_LEAD:
-                downstream_requests = downstream_requests | queryset.filter(lab=lab).exclude(pk__in=actionable_pks)
+                downstream_requests = downstream_requests | queryset.filter(
+                    lab=lab
+                ).exclude(pk__in=actionable_pks)
             elif assignment.role.name == ROLE.EXPERT:
-                downstream_requests = downstream_requests | queryset.filter(lab=lab, expert=user).exclude(pk__in=actionable_pks)
-        
+                downstream_requests = downstream_requests | queryset.filter(
+                    lab=lab, expert=user
+                ).exclude(pk__in=actionable_pks)
+
         return downstream_requests.distinct()
-        
+
     def get_inactive(self):
         """
         Returns requests that are unowned (Completed or Unable to Address) and
@@ -134,9 +148,11 @@ class BaseUserAwareRequest(views.APIView):
         queryset = Request.objects.filter(owner=None)
 
         # Admins and coordinators can see all inactive requests by convention.
-        if IsAdmin().has_permission(self.request) or IsCoordinator().has_permission(self.request, self):
+        if IsAdmin().has_permission(self.request) or IsCoordinator().has_permission(
+            self.request, self
+        ):
             return queryset.distinct()
-        
+
         inactive_requests = queryset.none()
         user = User.objects.get(pk=self.request.user.id)
         program_assignments = ProgramRoleAssignment.objects.filter(user=user)
@@ -151,7 +167,9 @@ class BaseUserAwareRequest(views.APIView):
             if assignment.role.name == ROLE.LAB_LEAD:
                 inactive_requests = inactive_requests | queryset.filter(lab=lab)
             elif assignment.role.name == ROLE.EXPERT:
-                inactive_requests = inactive_requests | queryset.filter(lab=lab, expert=user)
+                inactive_requests = inactive_requests | queryset.filter(
+                    lab=lab, expert=user
+                )
 
         return inactive_requests.distinct()
 
@@ -166,19 +184,24 @@ class RequestDetailView(BaseUserAwareRequest):
         queryset = self.get_actionable() | self.get_downstream() | self.get_inactive()
 
         if request_id is None:
-            return Response(data={"message": "Please provide a Request ID"}, status=status.HTTP_400_BAD_REQUEST)
+            return Response(
+                data={"message": "Please provide a Request ID"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
 
         # Ensure the request is visible to the user
         ta_request, err = self.get_request_or_error(queryset, request_id)
         if err:
             return err
 
-        customers = ta_request.customers 
+        customers = ta_request.customers
         customer_serializer = CustomerSerializer(customers, many=True)
         customers_response_data = customer_serializer.data
         for customer in customers_response_data:
             try:
-                customer_relationship = CustomerRequestRelationship.objects.get(request=ta_request, customer=Customer.objects.get(pk=customer["id"]))
+                customer_relationship = CustomerRequestRelationship.objects.get(
+                    request=ta_request, customer=Customer.objects.get(pk=customer["id"])
+                )
                 customer["is_poc"] = customer_relationship.is_poc
 
             except CustomerRequestRelationship.DoesNotExist:
@@ -194,24 +217,26 @@ class RequestDetailView(BaseUserAwareRequest):
         # Only Program Leads, Lab Leads, Coordinators, and Admins should be able to see depth options,
         # and only if a program is currently assigned to the request.
         depth_options = []
-        if ta_request.program and CanEditDepth().has_object_permission(request, self, ta_request):
+        if ta_request.program and CanEditDepth().has_object_permission(
+            request, self, ta_request
+        ):
             program = ta_request.program
-            depth_options = list(program.depths.values_list('name', flat=True))
-        
+            depth_options = list(program.depths.values_list("name", flat=True))
+
         response_data["depth_options"] = depth_options
 
-        response_data["attachments"] = list() 
+        response_data["attachments"] = []
         for attachment in ta_request.attachment_set.all():
-            attachment_data = dict()
+            attachment_data = {}
             attachment_data["id"] = attachment.pk
             attachment_data["title"] = attachment.title
             attachment_data["uploaded_at"] = attachment.uploaded_at
             attachment_data["description"] = attachment.description
             response_data["attachments"].append(attachment_data)
 
-        response_data["audit_history"] = list() 
-        for audit in ta_request.audithistory_set.all().order_by('-date'):
-            audit_data = dict()
+        response_data["audit_history"] = []
+        for audit in ta_request.audithistory_set.all().order_by("-date"):
+            audit_data = {}
             audit_data["user"] = audit.user.name
             audit_data["action_type"] = audit.action_type
             audit_data["description"] = audit.description
@@ -223,57 +248,88 @@ class RequestDetailView(BaseUserAwareRequest):
 
         # All status-agnostic permissions
         permission_map = [
-            ('edit-depth', CanEditDepth),
-            ('edit-effort', CanEditEffort),
-            ('edit-topics', CanEditTopics),
-            ('edit-description', CanEditDescription),
-            ('edit-challenges', CanEditChallenges),
-            ('edit-goals', CanEditGoals),
-            ('edit-projected-start-date', CanEditProjectedStartDate),
-            ('edit-actual-completion-date', CanEditActualCompletionDate),
-            ('edit-customer-info', CanEditCustomerInfo),
-            ('transfer-customer', CanTransferCustomer),
-            ('edit-organization-info', CanEditOrganizationInfo),
-            ('transfer-organization', CanTransferOrganization),
-            ('transfer-organization-type', CanTransferOrganizationType),
-            ('edit-closeout-responses', CanEditCloseoutResponses),
-            ('assign-forward-to-reception', CanAssignForwardToReception),
-            ('add-note', CanAddNote),
-            ('delete-note', CanDeleteNote),
-            ('add-attachment', CanAddAttachment),
-            ('delete-attachment', CanDeleteAttachment),
+            ("edit-depth", CanEditDepth),
+            ("edit-effort", CanEditEffort),
+            ("edit-topics", CanEditTopics),
+            ("edit-description", CanEditDescription),
+            ("edit-challenges", CanEditChallenges),
+            ("edit-goals", CanEditGoals),
+            ("edit-projected-start-date", CanEditProjectedStartDate),
+            ("edit-actual-completion-date", CanEditActualCompletionDate),
+            ("edit-customer-info", CanEditCustomerInfo),
+            ("transfer-customer", CanTransferCustomer),
+            ("edit-organization-info", CanEditOrganizationInfo),
+            ("transfer-organization", CanTransferOrganization),
+            ("transfer-organization-type", CanTransferOrganizationType),
+            ("edit-closeout-responses", CanEditCloseoutResponses),
+            ("assign-forward-to-reception", CanAssignForwardToReception),
+            ("add-note", CanAddNote),
+            ("delete-note", CanDeleteNote),
+            ("add-attachment", CanAddAttachment),
+            ("delete-attachment", CanDeleteAttachment),
         ]
 
         # All status-dependent permissions
         if ta_request.status.name in [REQUEST_STATUS.SCOPING]:
-            permission_map.append(('assign-forward-to-program', CanAssignForwardToProgram))
-        if ta_request.status.name in [REQUEST_STATUS.ASSIGNED_TO_PROGRAM, REQUEST_STATUS.REJECTED_BY_LAB]:
-            permission_map.append(('assign-forward-to-lab', CanAssignForwardToLab))
-            permission_map.append(('assign-back-to-reception', CanAssignBackToReception))
-        if ta_request.status.name in [REQUEST_STATUS.ASSIGNED_TO_LAB, REQUEST_STATUS.REJECTED_BY_EXPERT]:
-            permission_map.append(('assign-forward-to-expert', CanAssignForwardToExpert))
-            permission_map.append(('assign-back-to-program', CanAssignBackToProgram))
-        if ta_request.status.name in [REQUEST_STATUS.ASSIGNED_TO_EXPERT, REQUEST_STATUS.PROVIDING_TA]:
-            permission_map.append(('edit-projected-completion-date', CanEditProjectedCompletionDate))
-            permission_map.append(('assign-back-to-lab', CanAssignBackToLab))
+            permission_map.append(
+                ("assign-forward-to-program", CanAssignForwardToProgram)
+            )
+        if ta_request.status.name in [
+            REQUEST_STATUS.ASSIGNED_TO_PROGRAM,
+            REQUEST_STATUS.REJECTED_BY_LAB,
+        ]:
+            permission_map.append(("assign-forward-to-lab", CanAssignForwardToLab))
+            permission_map.append(
+                ("assign-back-to-reception", CanAssignBackToReception)
+            )
+        if ta_request.status.name in [
+            REQUEST_STATUS.ASSIGNED_TO_LAB,
+            REQUEST_STATUS.REJECTED_BY_EXPERT,
+        ]:
+            permission_map.append(
+                ("assign-forward-to-expert", CanAssignForwardToExpert)
+            )
+            permission_map.append(("assign-back-to-program", CanAssignBackToProgram))
+        if ta_request.status.name in [
+            REQUEST_STATUS.ASSIGNED_TO_EXPERT,
+            REQUEST_STATUS.PROVIDING_TA,
+        ]:
+            permission_map.append(
+                ("edit-projected-completion-date", CanEditProjectedCompletionDate)
+            )
+            permission_map.append(("assign-back-to-lab", CanAssignBackToLab))
         if ta_request.status.name in [REQUEST_STATUS.PROVIDING_TA]:
-            permission_map.append(('start-closeout', CanStartCloseout))
-        if ta_request.status.name in [REQUEST_STATUS.CLOSEOUT_STARTED, REQUEST_STATUS.CLOSEOUT_MORE_INFO]:
-            permission_map.append(('submit-closeout', CanSubmitCloseout))
+            permission_map.append(("start-closeout", CanStartCloseout))
+        if ta_request.status.name in [
+            REQUEST_STATUS.CLOSEOUT_STARTED,
+            REQUEST_STATUS.CLOSEOUT_MORE_INFO,
+        ]:
+            permission_map.append(("submit-closeout", CanSubmitCloseout))
         if ta_request.status.name == REQUEST_STATUS.CLOSEOUT_REVIEW_BY_LAB:
-            permission_map.append(('approve-closeout-by-lab', CanApproveCloseoutByLab))
-            permission_map.append(('reject-closeout-by-lab', CanRejectCloseoutByLab))
+            permission_map.append(("approve-closeout-by-lab", CanApproveCloseoutByLab))
+            permission_map.append(("reject-closeout-by-lab", CanRejectCloseoutByLab))
         if ta_request.status.name == REQUEST_STATUS.CLOSEOUT_REVIEW_BY_PROGRAM:
-            permission_map.append(('approve-closeout-by-program', CanApproveCloseoutByProgram))
-            permission_map.append(('reject-closeout-by-program', CanRejectCloseoutByProgram))
-        if ta_request.status.name not in [REQUEST_STATUS.COMPLETED, REQUEST_STATUS.UNABLE_TO_ADDRESS]:
-            permission_map.append(('cancel-request', CanCancel))
-        if ta_request.status.name in [REQUEST_STATUS.COMPLETED, REQUEST_STATUS.UNABLE_TO_ADDRESS]:
-            permission_map.append(('reopen-request', CanReopen))
+            permission_map.append(
+                ("approve-closeout-by-program", CanApproveCloseoutByProgram)
+            )
+            permission_map.append(
+                ("reject-closeout-by-program", CanRejectCloseoutByProgram)
+            )
+        if ta_request.status.name not in [
+            REQUEST_STATUS.COMPLETED,
+            REQUEST_STATUS.UNABLE_TO_ADDRESS,
+        ]:
+            permission_map.append(("cancel-request", CanCancel))
+        if ta_request.status.name in [
+            REQUEST_STATUS.COMPLETED,
+            REQUEST_STATUS.UNABLE_TO_ADDRESS,
+        ]:
+            permission_map.append(("reopen-request", CanReopen))
 
         # Compute which of the above actions the user is permitted to perform on this request.
         response_data["permissions"] = [
-            action for action, perm_cls in permission_map
+            action
+            for action, perm_cls in permission_map
             if perm_cls().has_object_permission(request, self, ta_request)
         ]
 
@@ -282,10 +338,14 @@ class RequestDetailView(BaseUserAwareRequest):
     """
     Used for Edit action.
     """
+
     def patch(self, request, request_id=None):
         if request_id is None:
-            return Response(data={"message": "Please provide a Request ID"}, status=status.HTTP_400_BAD_REQUEST)
-        
+            return Response(
+                data={"message": "Please provide a Request ID"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
         queryset = self.get_actionable() | self.get_downstream()
 
         ta_request, err = self.get_request_or_error(queryset, request_id)
@@ -294,36 +354,54 @@ class RequestDetailView(BaseUserAwareRequest):
 
         body = request.data
 
-        patch_data = dict()
-        updated_fields = list()
+        patch_data = {}
+        updated_fields = []
 
         if not body:
-            return Response(data={"message": "Missing request body"}, status=status.HTTP_204_NO_CONTENT)
-        
+            return Response(
+                data={"message": "Missing request body"},
+                status=status.HTTP_204_NO_CONTENT,
+            )
+
         if "description" in body:
-            if not CanEditDescription().has_object_permission(request, self, ta_request):
-                return Response(data={"message": "Insufficient privillege to update 'description' field"}, status=status.HTTP_401_UNAUTHORIZED)
-            
+            if not CanEditDescription().has_object_permission(
+                request, self, ta_request
+            ):
+                return Response(
+                    data={
+                        "message": "Insufficient privillege to update 'description' field"
+                    },
+                    status=status.HTTP_401_UNAUTHORIZED,
+                )
+
             new_description_data = body.get("description")
             if new_description_data is None:
                 new_description_data = ""
 
-            patch_data["description"] = new_description_data 
+            patch_data["description"] = new_description_data
             updated_fields.append("description")
 
         if "challenges" in body:
             if not CanEditChallenges().has_object_permission(request, self, ta_request):
-                return Response(data={"message": "Insufficient privillege to update 'challenges' field"}, status=status.HTTP_401_UNAUTHORIZED)
-            
+                return Response(
+                    data={
+                        "message": "Insufficient privillege to update 'challenges' field"
+                    },
+                    status=status.HTTP_401_UNAUTHORIZED,
+                )
+
             new_challenges_data = body.get("challenges")
 
-            patch_data["challenges"] = new_challenges_data 
+            patch_data["challenges"] = new_challenges_data
             updated_fields.append("challenges")
 
         if "goals" in body:
             if not CanEditGoals().has_object_permission(request, self, ta_request):
-                return Response(data={"message": "Insufficient privillege to update 'goals' field"}, status=status.HTTP_401_UNAUTHORIZED)
-            
+                return Response(
+                    data={"message": "Insufficient privillege to update 'goals' field"},
+                    status=status.HTTP_401_UNAUTHORIZED,
+                )
+
             new_goals_data = body.get("goals")
 
             patch_data["goals"] = new_goals_data
@@ -331,8 +409,13 @@ class RequestDetailView(BaseUserAwareRequest):
 
         if "effort" in body:
             if not CanEditEffort().has_object_permission(request, self, ta_request):
-                return Response(data={"message": "Insufficient privillege to update 'effort' field"}, status=status.HTTP_401_UNAUTHORIZED)
-            
+                return Response(
+                    data={
+                        "message": "Insufficient privillege to update 'effort' field"
+                    },
+                    status=status.HTTP_401_UNAUTHORIZED,
+                )
+
             new_effort_data = body.get("effort")
 
             patch_data["effort"] = new_effort_data
@@ -340,76 +423,135 @@ class RequestDetailView(BaseUserAwareRequest):
 
         if "depth" in body:
             if not CanEditDepth().has_object_permission(request, self, ta_request):
-                return Response(data={"message": "Insufficient privillege to update 'depth' field"}, status=status.HTTP_401_UNAUTHORIZED)
-            
+                return Response(
+                    data={"message": "Insufficient privillege to update 'depth' field"},
+                    status=status.HTTP_401_UNAUTHORIZED,
+                )
+
             if body.get("depth") is None:
-                return Response(data={"message": "Cannot clear depth field on a request. Need to provide a valid replacement value."}, status=status.HTTP_401_UNAUTHORIZED)
-            
+                return Response(
+                    data={
+                        "message": "Cannot clear depth field on a request. Need to provide a valid replacement value."
+                    },
+                    status=status.HTTP_401_UNAUTHORIZED,
+                )
+
             maybe_depth = None
             try:
                 maybe_depth = Depth.objects.get(name=body.get("depth"))
             except Depth.DoesNotExist:
-                return Response(data={"message": "Provided depth does not exist."}, status=status.HTTP_400_BAD_REQUEST)
+                return Response(
+                    data={"message": "Provided depth does not exist."},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
 
             patch_data["depth"] = maybe_depth.name
             updated_fields.append("depth")
 
         if "actual_completion_date" in body:
-            if not (CanEditActualCompletionDate().has_object_permission(request, self, ta_request)):
-                return Response(data={"message": "Insufficient privillege to update 'actual completion date' field"}, status=status.HTTP_401_UNAUTHORIZED)
+            if not (
+                CanEditActualCompletionDate().has_object_permission(
+                    request, self, ta_request
+                )
+            ):
+                return Response(
+                    data={
+                        "message": "Insufficient privillege to update 'actual completion date' field"
+                    },
+                    status=status.HTTP_401_UNAUTHORIZED,
+                )
 
             patch_data["actual_completion_date"] = body.get("actual_completion_date")
             updated_fields.append("actual completion date")
-        
+
         if "proj_start_date" in body:
-            if not(CanEditProjectedStartDate().has_object_permission(request, self, ta_request)):
-                return Response(data={"message": "Insufficient privillege to update 'projected start date' field"}, status=status.HTTP_401_UNAUTHORIZED)
+            if not (
+                CanEditProjectedStartDate().has_object_permission(
+                    request, self, ta_request
+                )
+            ):
+                return Response(
+                    data={
+                        "message": "Insufficient privillege to update 'projected start date' field"
+                    },
+                    status=status.HTTP_401_UNAUTHORIZED,
+                )
 
             patch_data["proj_start_date"] = body.get("proj_start_date")
             updated_fields.append("projected start date")
 
         if "proj_completion_date" in body:
-            if not(CanEditProjectedCompletionDate().has_object_permission(request, self, ta_request)):
-                return Response(data={"message": "Insufficient privillege to update 'projected completion date' field"}, status=status.HTTP_401_UNAUTHORIZED)
+            if not (
+                CanEditProjectedCompletionDate().has_object_permission(
+                    request, self, ta_request
+                )
+            ):
+                return Response(
+                    data={
+                        "message": "Insufficient privillege to update 'projected completion date' field"
+                    },
+                    status=status.HTTP_401_UNAUTHORIZED,
+                )
 
             # Projected completion date can only be set if request is currently ASSIGNED_TO_EXPERT
             # or is already PROVIDING_TA (in which case we're just updating the projected completion date).
             # Setting it implies status should be updated to PROVIDING_TA.
-            if ta_request.status.name in [REQUEST_STATUS.ASSIGNED_TO_EXPERT, REQUEST_STATUS.PROVIDING_TA]:
+            if ta_request.status.name in [
+                REQUEST_STATUS.ASSIGNED_TO_EXPERT,
+                REQUEST_STATUS.PROVIDING_TA,
+            ]:
                 patch_data["proj_completion_date"] = body.get("proj_completion_date")
                 patch_data["status"] = get_status(REQUEST_STATUS.PROVIDING_TA)
             else:
-                return Response(data={"message": "Projected completion date can only be set if request is currently assigned to an expert."}, status=status.HTTP_400_BAD_REQUEST)
+                return Response(
+                    data={
+                        "message": "Projected completion date can only be set if request is currently assigned to an expert."
+                    },
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
             # If projected completion date is being removed while PROVIDING_TA, revert status back to ASSIGNED_TO_EXPERT
-            if body.get("proj_completion_date") == None and ta_request.status.name == REQUEST_STATUS.PROVIDING_TA:
+            if (
+                body.get("proj_completion_date") == None
+                and ta_request.status.name == REQUEST_STATUS.PROVIDING_TA
+            ):
                 patch_data["status"] = get_status(REQUEST_STATUS.ASSIGNED_TO_EXPERT)
 
             updated_fields.append("projected completion date")
             updated_fields.append("status")
-        
-        # Topics are done a special way (not using patch serializer) because they are 
+
+        # Topics are done a special way (not using patch serializer) because they are
         # stored as a Many-to-Many relationship in the database.
         if "topics" in body:
             if not CanEditTopics().has_object_permission(request, self, ta_request):
-                return Response(data={"message": "Insufficient privillege to update 'topics' field"}, status=status.HTTP_401_UNAUTHORIZED)
+                return Response(
+                    data={
+                        "message": "Insufficient privillege to update 'topics' field"
+                    },
+                    status=status.HTTP_401_UNAUTHORIZED,
+                )
             current_topics = ta_request.topics.all()
             ta_request.topics.clear()
-            
-            topics = body.get("topics", list())
+
+            topics = body.get("topics", [])
             for topic_name in topics:
                 try:
                     topic = Topic.objects.get(name=topic_name)
                 except Topic.DoesNotExist:
                     ta_request.topics.set(current_topics)
-                    return Response(data={"message": "One of the provided topics does not exist."}, status=status.HTTP_400_BAD_REQUEST)
+                    return Response(
+                        data={"message": "One of the provided topics does not exist."},
+                        status=status.HTTP_400_BAD_REQUEST,
+                    )
 
                 ta_request.topics.add(topic)
 
             updated_fields.append("topics")
-        
-        # Do partial save with accumulated patch 
-        patch_serializer = RequestSerializer(instance=ta_request, data=patch_data, partial=True)
-        if(patch_serializer.is_valid()):
+
+        # Do partial save with accumulated patch
+        patch_serializer = RequestSerializer(
+            instance=ta_request, data=patch_data, partial=True
+        )
+        if patch_serializer.is_valid():
             try:
                 patch_serializer.save()
             except IntegrityError as e:
@@ -418,10 +560,20 @@ class RequestDetailView(BaseUserAwareRequest):
                     if constraint.name in error_msg:
                         error_msg = constraint.violation_error_message
                         break
-                return Response(data={"message": error_msg}, status=status.HTTP_400_BAD_REQUEST)
-            create_audit_history(request, ta_request, ActionType.EditRequestDetails, f"Edited: {str(updated_fields)}")
+                return Response(
+                    data={"message": error_msg}, status=status.HTTP_400_BAD_REQUEST
+                )
+            create_audit_history(
+                request,
+                ta_request,
+                ActionType.EditRequestDetails,
+                f"Edited: {updated_fields!s}",
+            )
         else:
-            return Response(data={"message": patch_serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
+            return Response(
+                data={"message": patch_serializer.errors},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
 
         return self.get(request, None, request_id)
 
@@ -429,40 +581,47 @@ class RequestDetailView(BaseUserAwareRequest):
 """
 Used to populate the request table. 
 """
+
+
 class RequestListView(BaseUserAwareRequest):
     def get(self, request, format=None):
         actionable = self.get_actionable()
         downstream = self.get_downstream()
         inactive = self.get_inactive()
-        
-        response_data = {"actionable": list(), "downstream": list(), "inactive": list()}
+
+        response_data = {"actionable": [], "downstream": [], "inactive": []}
 
         for key in response_data:
-            queryset = None 
+            queryset = None
             if key == "actionable":
                 queryset = actionable
             elif key == "downstream":
                 queryset = downstream
             elif key == "inactive":
                 queryset = inactive
-            
+
             if not queryset or not queryset.exists():
-                continue 
-                
+                continue
+
             serializer = RequestListSerializer(queryset, many=True)
-            requests_data = list() 
-            for request in serializer.data:
-                data = request
-                poc_rel = Request.objects.get(pk=request["id"]).customerrequestrelationship_set.filter(is_poc=True).first()
+            requests_data = []
+            for serialized_request in serializer.data:
+                data = serialized_request
+                poc_rel = (
+                    Request.objects.get(pk=serialized_request["id"])
+                    .customerrequestrelationship_set.filter(is_poc=True)
+                    .first()
+                )
                 poc_customer = poc_rel.customer if poc_rel else None
                 data["customer_name"] = poc_customer.name if poc_customer else None
                 data["customer_email"] = poc_customer.email if poc_customer else None
                 requests_data.append(data)
-            
+
             response_data[key] = requests_data
 
         return Response(data=response_data, status=status.HTTP_200_OK)
-      
+
+
 class RequestCancelView(BaseUserAwareRequest):
     permission_classes = [permissions.IsAuthenticated, CanCancel]
 
@@ -471,13 +630,18 @@ class RequestCancelView(BaseUserAwareRequest):
         ta_request, err = self.get_request_or_error(queryset, request_id)
         if err:
             return err
-        
+
         if not CanCancel().has_object_permission(request, self, ta_request):
-            return Response(data={"message": "Insufficient privilege to cancel this request"}, status=status.HTTP_403_FORBIDDEN)
+            return Response(
+                data={"message": "Insufficient privilege to cancel this request"},
+                status=status.HTTP_403_FORBIDDEN,
+            )
 
         try:
             with transaction.atomic():
-                ta_request.status = RequestStatus.objects.get(name=REQUEST_STATUS.UNABLE_TO_ADDRESS)
+                ta_request.status = RequestStatus.objects.get(
+                    name=REQUEST_STATUS.UNABLE_TO_ADDRESS
+                )
                 ta_request.owner = None
                 ta_request.expert = None
 
@@ -487,13 +651,26 @@ class RequestCancelView(BaseUserAwareRequest):
 
                 ta_request.save()
 
-                create_audit_history(request, ta_request, ActionType.StatusChange, f"Status changed to Unable to Address")
-                create_audit_history(request, ta_request, ActionType.Assignment, f"Removed all assignments")
+                create_audit_history(
+                    request,
+                    ta_request,
+                    ActionType.StatusChange,
+                    "Status changed to Unable to Address",
+                )
+                create_audit_history(
+                    request,
+                    ta_request,
+                    ActionType.Assignment,
+                    "Removed all assignments",
+                )
 
         except Exception as e:
-            return Response(data={"message": f"{e}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            return Response(
+                data={"message": f"{e}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
 
         return Response(status=status.HTTP_200_OK)
+
 
 class RequestSubmitCloseoutFormView(BaseUserAwareRequest):
     permission_classes = [permissions.IsAuthenticated, CanSubmitCloseout]
@@ -503,12 +680,20 @@ class RequestSubmitCloseoutFormView(BaseUserAwareRequest):
         ta_request, err = self.get_request_or_error(queryset, request_id)
         if err:
             return err
-        
+
         if not CanSubmitCloseout().has_object_permission(request, self, ta_request):
-            return Response(data={"message": "Insufficient privilege to submit closeout form for this request"}, status=status.HTTP_403_FORBIDDEN)
+            return Response(
+                data={
+                    "message": "Insufficient privilege to submit closeout form for this request"
+                },
+                status=status.HTTP_403_FORBIDDEN,
+            )
 
         if not hasattr(ta_request, "closeout_form"):
-            return Response(data={"message": "Closeout form does not exist for this request"}, status=status.HTTP_400_BAD_REQUEST)
+            return Response(
+                data={"message": "Closeout form does not exist for this request"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
 
         try:
             with transaction.atomic():
@@ -520,9 +705,16 @@ class RequestSubmitCloseoutFormView(BaseUserAwareRequest):
                 ta_request.owner = ta_request.lab.owner if ta_request.lab else None
                 ta_request.save()
 
-                create_audit_history(request, ta_request, ActionType.StatusChange, "Closeout form submitted, status changed to Closeout Review by Lab")
+                create_audit_history(
+                    request,
+                    ta_request,
+                    ActionType.StatusChange,
+                    "Closeout form submitted, status changed to Closeout Review by Lab",
+                )
         except Exception as e:
-            return Response(data={"message": f"{e}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            return Response(
+                data={"message": f"{e}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
 
         return Response(status=status.HTTP_200_OK)
 
@@ -535,12 +727,22 @@ class RequestApproveCloseoutFormByLabView(BaseUserAwareRequest):
         ta_request, err = self.get_request_or_error(queryset, request_id)
         if err:
             return err
-        
-        if not CanApproveCloseoutByLab().has_object_permission(request, self, ta_request):
-            return Response(data={"message": "Insufficient privilege to approve closeout form for this request"}, status=status.HTTP_403_FORBIDDEN)
+
+        if not CanApproveCloseoutByLab().has_object_permission(
+            request, self, ta_request
+        ):
+            return Response(
+                data={
+                    "message": "Insufficient privilege to approve closeout form for this request"
+                },
+                status=status.HTTP_403_FORBIDDEN,
+            )
 
         if not hasattr(ta_request, "closeout_form"):
-            return Response(data={"message": "Closeout form does not exist for this request"}, status=status.HTTP_400_BAD_REQUEST)
+            return Response(
+                data={"message": "Closeout form does not exist for this request"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
 
         try:
             with transaction.atomic():
@@ -548,13 +750,24 @@ class RequestApproveCloseoutFormByLabView(BaseUserAwareRequest):
                 closeout_form.approved_by_lab = True
                 closeout_form.save()
 
-                ta_request.status = get_status(REQUEST_STATUS.CLOSEOUT_REVIEW_BY_PROGRAM)
-                ta_request.owner = ta_request.program.owner if ta_request.program else None
+                ta_request.status = get_status(
+                    REQUEST_STATUS.CLOSEOUT_REVIEW_BY_PROGRAM
+                )
+                ta_request.owner = (
+                    ta_request.program.owner if ta_request.program else None
+                )
                 ta_request.save()
 
-                create_audit_history(request, ta_request, ActionType.StatusChange, "Closeout form approved by lab, status changed to Closeout Review by Program")
+                create_audit_history(
+                    request,
+                    ta_request,
+                    ActionType.StatusChange,
+                    "Closeout form approved by lab, status changed to Closeout Review by Program",
+                )
         except Exception as e:
-            return Response(data={"message": f"{e}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            return Response(
+                data={"message": f"{e}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
 
         return Response(status=status.HTTP_200_OK)
 
@@ -568,14 +781,29 @@ class RequestApproveCloseoutFormByProgramView(BaseUserAwareRequest):
         if err:
             return err
 
-        if not CanApproveCloseoutByProgram().has_object_permission(request, self, ta_request):
-            return Response(data={"message": "Insufficient privilege to approve closeout form for this request"}, status=status.HTTP_403_FORBIDDEN)
-        
+        if not CanApproveCloseoutByProgram().has_object_permission(
+            request, self, ta_request
+        ):
+            return Response(
+                data={
+                    "message": "Insufficient privilege to approve closeout form for this request"
+                },
+                status=status.HTTP_403_FORBIDDEN,
+            )
+
         if not hasattr(ta_request, "closeout_form"):
-            return Response(data={"message": "Closeout form does not exist for this request"}, status=status.HTTP_400_BAD_REQUEST)
+            return Response(
+                data={"message": "Closeout form does not exist for this request"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
 
         if not ta_request.closeout_form.approved_by_lab:
-            return Response(data={"message": "Closeout form must be approved by lab before program can approve"}, status=status.HTTP_400_BAD_REQUEST)
+            return Response(
+                data={
+                    "message": "Closeout form must be approved by lab before program can approve"
+                },
+                status=status.HTTP_400_BAD_REQUEST,
+            )
 
         try:
             with transaction.atomic():
@@ -588,9 +816,16 @@ class RequestApproveCloseoutFormByProgramView(BaseUserAwareRequest):
                 ta_request.owner = None
                 ta_request.save()
 
-                create_audit_history(request, ta_request, ActionType.StatusChange, "Closeout form approved by program, status changed to Completed")
+                create_audit_history(
+                    request,
+                    ta_request,
+                    ActionType.StatusChange,
+                    "Closeout form approved by program, status changed to Completed",
+                )
         except Exception as e:
-            return Response(data={"message": f"{e}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            return Response(
+                data={"message": f"{e}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
 
         return Response(status=status.HTTP_200_OK)
 
@@ -603,12 +838,23 @@ class RequestReopenView(BaseUserAwareRequest):
         ta_request, err = self.get_request_or_error(queryset, request_id)
         if err:
             return err
-        
+
         if not CanReopen().has_object_permission(request, self, ta_request):
-            return Response(data={"message": "Insufficient privilege to reopen this request"}, status=status.HTTP_403_FORBIDDEN)
-        
-        if not ta_request.status.name in [REQUEST_STATUS.COMPLETED, REQUEST_STATUS.UNABLE_TO_ADDRESS]:
-            return Response(data={"message": "Only requests with status Completed or Unable to Address can be reopened."}, status=status.HTTP_400_BAD_REQUEST)
+            return Response(
+                data={"message": "Insufficient privilege to reopen this request"},
+                status=status.HTTP_403_FORBIDDEN,
+            )
+
+        if not ta_request.status.name in [
+            REQUEST_STATUS.COMPLETED,
+            REQUEST_STATUS.UNABLE_TO_ADDRESS,
+        ]:
+            return Response(
+                data={
+                    "message": "Only requests with status Completed or Unable to Address can be reopened."
+                },
+                status=status.HTTP_400_BAD_REQUEST,
+            )
 
         try:
             ta_request.status = RequestStatus.objects.get(name=REQUEST_STATUS.SCOPING)
@@ -618,10 +864,19 @@ class RequestReopenView(BaseUserAwareRequest):
             ta_request.lab = None
             ta_request.expert = None
             ta_request.save()
-            create_audit_history(request, ta_request, ActionType.StatusChange, f"Request reopened, status changed to Scoping")
-            create_audit_history(request, ta_request, ActionType.Assignment, f"Assigned to Reception")
+            create_audit_history(
+                request,
+                ta_request,
+                ActionType.StatusChange,
+                "Request reopened, status changed to Scoping",
+            )
+            create_audit_history(
+                request, ta_request, ActionType.Assignment, "Assigned to Reception"
+            )
 
         except Exception as e:
-            return Response(data={"message": f"{e}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            return Response(
+                data={"message": f"{e}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
 
         return Response(status=status.HTTP_200_OK)

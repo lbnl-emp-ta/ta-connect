@@ -5,55 +5,168 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('core', '0001_initial'),
+        ("core", "0001_initial"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='Lab',
+            name="Lab",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(max_length=256, unique=True)),
-                ('description', models.TextField()),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("name", models.CharField(max_length=256, unique=True)),
+                ("description", models.TextField()),
             ],
         ),
         migrations.CreateModel(
-            name='Program',
+            name="Program",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(max_length=256, unique=True)),
-                ('description', models.TextField()),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("name", models.CharField(max_length=256, unique=True)),
+                ("description", models.TextField()),
             ],
         ),
         migrations.CreateModel(
-            name='Reception',
+            name="Reception",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(max_length=256, unique=True)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("name", models.CharField(max_length=256, unique=True)),
             ],
         ),
         migrations.CreateModel(
-            name='Team',
+            name="Team",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(max_length=256, unique=True)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("name", models.CharField(max_length=256, unique=True)),
             ],
         ),
         migrations.CreateModel(
-            name='Owner',
+            name="Owner",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('domain_type', models.CharField(choices=[('reception', 'Reception'), ('program', 'Program'), ('lab', 'Lab'), ('team', 'Team')], max_length=16)),
-                ('lab', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.PROTECT, to='core.lab')),
-                ('program', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.PROTECT, to='core.program')),
-                ('reception', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.PROTECT, to='core.reception')),
-                ('team', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.PROTECT, to='core.team')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "domain_type",
+                    models.CharField(
+                        choices=[
+                            ("reception", "Reception"),
+                            ("program", "Program"),
+                            ("lab", "Lab"),
+                            ("team", "Team"),
+                        ],
+                        max_length=16,
+                    ),
+                ),
+                (
+                    "lab",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.PROTECT,
+                        to="core.lab",
+                    ),
+                ),
+                (
+                    "program",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.PROTECT,
+                        to="core.program",
+                    ),
+                ),
+                (
+                    "reception",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.PROTECT,
+                        to="core.reception",
+                    ),
+                ),
+                (
+                    "team",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.PROTECT,
+                        to="core.team",
+                    ),
+                ),
             ],
             options={
-                'db_table': 'owner',
-                'constraints': [models.CheckConstraint(condition=models.Q(models.Q(('reception__isnull', False), ('program__isnull', True), ('lab__isnull', True), ('team__isnull', True)), models.Q(('reception__isnull', True), ('program__isnull', False), ('lab__isnull', True), ('team__isnull', True)), models.Q(('reception__isnull', True), ('program__isnull', True), ('lab__isnull', False), ('team__isnull', True)), models.Q(('reception__isnull', True), ('program__isnull', True), ('lab__isnull', True), ('team__isnull', False)), _connector='OR'), name='only_one_fk_non_null')],
+                "db_table": "owner",
+                "constraints": [
+                    models.CheckConstraint(
+                        condition=models.Q(
+                            models.Q(
+                                ("reception__isnull", False),
+                                ("program__isnull", True),
+                                ("lab__isnull", True),
+                                ("team__isnull", True),
+                            ),
+                            models.Q(
+                                ("reception__isnull", True),
+                                ("program__isnull", False),
+                                ("lab__isnull", True),
+                                ("team__isnull", True),
+                            ),
+                            models.Q(
+                                ("reception__isnull", True),
+                                ("program__isnull", True),
+                                ("lab__isnull", False),
+                                ("team__isnull", True),
+                            ),
+                            models.Q(
+                                ("reception__isnull", True),
+                                ("program__isnull", True),
+                                ("lab__isnull", True),
+                                ("team__isnull", False),
+                            ),
+                            _connector="OR",
+                        ),
+                        name="only_one_fk_non_null",
+                    )
+                ],
             },
         ),
     ]

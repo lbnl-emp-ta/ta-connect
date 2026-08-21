@@ -5,15 +5,16 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('core', '0042_alter_attachment_user_who_uploaded_audithistory'),
+        ("core", "0042_alter_attachment_user_who_uploaded_audithistory"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='audithistory',
-            name='request',
-            field=models.OneToOneField(on_delete=django.db.models.deletion.PROTECT, to='core.request'),
+            model_name="audithistory",
+            name="request",
+            field=models.OneToOneField(
+                on_delete=django.db.models.deletion.PROTECT, to="core.request"
+            ),
         ),
     ]

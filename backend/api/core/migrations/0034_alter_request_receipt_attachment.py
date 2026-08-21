@@ -6,24 +6,43 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('core', '0033_alter_request_receipt'),
+        ("core", "0033_alter_request_receipt"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='request',
-            name='receipt',
-            field=models.OneToOneField(blank=True, default=django.db.models.query.QuerySet.create, null=True, on_delete=django.db.models.deletion.PROTECT, related_name='request', to='core.receipt'),
+            model_name="request",
+            name="receipt",
+            field=models.OneToOneField(
+                blank=True,
+                default=django.db.models.query.QuerySet.create,
+                null=True,
+                on_delete=django.db.models.deletion.PROTECT,
+                related_name="request",
+                to="core.receipt",
+            ),
         ),
         migrations.CreateModel(
-            name='Attachment',
+            name="Attachment",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('file', models.FileField(upload_to='attachments/')),
-                ('uploaded_at', models.DateTimeField(auto_now_add=True)),
-                ('request', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, to='core.request')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("file", models.FileField(upload_to="attachments/")),
+                ("uploaded_at", models.DateTimeField(auto_now_add=True)),
+                (
+                    "request",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.PROTECT, to="core.request"
+                    ),
+                ),
             ],
         ),
     ]

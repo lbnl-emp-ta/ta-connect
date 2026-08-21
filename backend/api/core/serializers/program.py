@@ -1,7 +1,9 @@
+from django.core.exceptions import ObjectDoesNotExist
 from rest_framework import serializers
 
-from core.serializers.depth import DepthSerializer
 from core.models import *
+from core.serializers.depth import DepthSerializer
+
 
 class ProgramSerializer(serializers.ModelSerializer):
     owner_id = serializers.SerializerMethodField()
@@ -10,7 +12,7 @@ class ProgramSerializer(serializers.ModelSerializer):
     def get_owner_id(self, obj):
         try:
             return obj.owner.id
-        except Exception:
+        except ObjectDoesNotExist:
             return None
 
     class Meta:
@@ -21,4 +23,4 @@ class ProgramSerializer(serializers.ModelSerializer):
 class ProgramLeanSerializer(serializers.ModelSerializer):
     class Meta:
         model = Program
-        fields = ['id', 'name', 'description']
+        fields = ["id", "name", "description"]

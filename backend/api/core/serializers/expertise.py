@@ -1,8 +1,9 @@
 from rest_framework import serializers
 
-from core.models import Expertise, Topic, Depth
-from .topic import TopicSerializer
+from core.models import Depth, Expertise, Topic
+
 from .depth import DepthSerializer
+from .topic import TopicSerializer
 
 
 class ExpertiseSerializer(serializers.ModelSerializer):

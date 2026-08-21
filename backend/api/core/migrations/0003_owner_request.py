@@ -5,15 +5,19 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('core', '0002_lab_program_reception_team_owner'),
+        ("core", "0002_lab_program_reception_team_owner"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='owner',
-            name='request',
-            field=models.ForeignKey(null=True, on_delete=django.db.models.deletion.PROTECT, to='core.request', unique=True),
+            model_name="owner",
+            name="request",
+            field=models.ForeignKey(
+                null=True,
+                on_delete=django.db.models.deletion.PROTECT,
+                to="core.request",
+                unique=True,
+            ),
         ),
     ]

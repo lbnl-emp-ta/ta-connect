@@ -6,22 +6,40 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('core', '0011_role'),
+        ("core", "0011_role"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='SystemRoleAssignment',
+            name="SystemRoleAssignment",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('date_assigned', models.DateTimeField(auto_now_add=True)),
-                ('role', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, to='core.role')),
-                ('user', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, to=settings.AUTH_USER_MODEL)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("date_assigned", models.DateTimeField(auto_now_add=True)),
+                (
+                    "role",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.PROTECT, to="core.role"
+                    ),
+                ),
+                (
+                    "user",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.PROTECT,
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
             ],
             options={
-                'db_table': 'system_role_assignment',
+                "db_table": "system_role_assignment",
             },
         ),
     ]

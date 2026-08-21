@@ -1,19 +1,23 @@
 import logging
 import os
 import threading
-from django.core.mail import send_mail
+
 from django.conf import settings
+from django.core.mail import send_mail
 
 logger = logging.getLogger(__name__)
 
 
-def send_email_notification(subject: str, plain_text_message: str, html_message: str, recipient_list: list[str]) -> None:
+def send_email_notification(
+    subject: str, plain_text_message: str, html_message: str, recipient_list: list[str]
+) -> None:
     """
     Send email with given information to a list of recipients.
     Dispatches the email in a background thread so the caller is not blocked
     by SMTP latency.
     Built in DEV mode by changing setting appropriate variable in settings.py
     """
+
     def _send():
         if settings.ENABLE_EMAIL_SENDING:
             try:
@@ -32,7 +36,7 @@ def send_email_notification(subject: str, plain_text_message: str, html_message:
                     recipient_list,
                 )
         else:
-            email = dict()
+            email = {}
             email["to"] = recipient_list
             email["from"] = os.getenv("TACONNECT_EMAIL_HOST_FROM_USER")
             email["subject"] = subject

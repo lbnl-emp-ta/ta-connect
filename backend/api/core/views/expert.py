@@ -1,17 +1,14 @@
-import json
-
-from django.db.models import Q
-from rest_framework import views, status, authentication, permissions
-from rest_framework.response import Response
-
-from core.models import *
-from core.serializers import *
-from core.permissions import *
-from core.constants import ROLE
-
 from allauth.headless.contrib.rest_framework.authentication import (
     XSessionTokenAuthentication,
 )
+from django.db.models import Q
+from rest_framework import authentication, permissions, status, views
+from rest_framework.response import Response
+
+from core.constants import ROLE
+from core.models import *
+from core.permissions import *
+from core.serializers import *
 
 
 class ExpertsListView(views.APIView):
@@ -47,7 +44,10 @@ class ExpertsListView(views.APIView):
 
         expert_role = Role.objects.filter(name=ROLE.EXPERT).first()
         if not expert_role:
-            return Response(data={"message": "Expert role not configured"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            return Response(
+                data={"message": "Expert role not configured"},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            )
 
         try:
             expert_assignments = self._resolve_assignments(
@@ -57,9 +57,13 @@ class ExpertsListView(views.APIView):
             # If the caller lacks permission to view any experts, return an empty list.
             return Response(data=[], status=status.HTTP_200_OK)
         except ValueError as e:
-            return Response(data={"message": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+            return Response(
+                data={"message": str(e)}, status=status.HTTP_400_BAD_REQUEST
+            )
         except Exception as e:
-            return Response(data={"message": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            return Response(
+                data={"message": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
 
         if expert_assignments is None:
             return Response(data=[], status=status.HTTP_200_OK)
@@ -88,7 +92,9 @@ class ExpertsListView(views.APIView):
         """
         if lab_id and program_id:
             # Specific lab + program lookup - Admin or Lab Lead only
-            if not (IsAdmin().has_permission(request) or IsLabLead().has_permission(request)):
+            if not (
+                IsAdmin().has_permission(request) or IsLabLead().has_permission(request)
+            ):
                 raise PermissionError
             return LabRoleAssignment.objects.filter(
                 role=expert_role,
@@ -100,10 +106,14 @@ class ExpertsListView(views.APIView):
             return LabRoleAssignment.objects.filter(role=expert_role)
 
         if IsProgramLead().has_permission(request):
-            return LabRoleAssignment.objects.filter(role=expert_role, program_id=program_id)
+            return LabRoleAssignment.objects.filter(
+                role=expert_role, program_id=program_id
+            )
 
         if IsLabLead().has_permission(request) or IsExpert().has_permission(request):
-            role_name = ROLE.LAB_LEAD if IsLabLead().has_permission(request) else ROLE.EXPERT
+            role_name = (
+                ROLE.LAB_LEAD if IsLabLead().has_permission(request) else ROLE.EXPERT
+            )
             caller_role = Role.objects.filter(name=role_name).first()
             if not caller_role:
                 raise PermissionError
@@ -125,4 +135,6 @@ class ExpertsListView(views.APIView):
 
     @staticmethod
     def _build_expertise_list(assignment):
-        return ExpertiseSerializer(Expertise.objects.filter(lab_role_assignment=assignment), many=True).data
+        return ExpertiseSerializer(
+            Expertise.objects.filter(lab_role_assignment=assignment), many=True
+        ).data

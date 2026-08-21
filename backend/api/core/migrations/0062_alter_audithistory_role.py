@@ -5,15 +5,19 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('core', '0061_alter_request_organization'),
+        ("core", "0061_alter_request_organization"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='audithistory',
-            name='role',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, to='core.role'),
+            model_name="audithistory",
+            name="role",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.SET_NULL,
+                to="core.role",
+            ),
         ),
     ]

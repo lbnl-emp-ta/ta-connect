@@ -1,14 +1,31 @@
 import os
+
 from django.db import transaction
-from django.db.models.signals import pre_save, post_save, post_delete
+from django.db.models.signals import post_delete, post_save, pre_save
 from django.dispatch import receiver
 
-from core.models import Attachment, User, ReceptionRoleAssignment, Role, Request, Owner, ReceptionRoleAssignment, ProgramRoleAssignment, LabRoleAssignment, Lab, Program, SystemRoleAssignment
+from core.models import (
+    Attachment,
+    Lab,
+    LabRoleAssignment,
+    Owner,
+    Program,
+    ProgramRoleAssignment,
+    ReceptionRoleAssignment,
+    Request,
+    Role,
+    SystemRoleAssignment,
+    User,
+)
 
 _UNSET = object()
 from core.constants import DOMAINTYPE, ROLE
+from core.util.email_prompts import (
+    assignment_email,
+    customer_status_email,
+    new_request_email,
+)
 from core.util.notifications import send_email_notification
-from core.util.email_prompts import new_request_email, assignment_email, customer_status_email
 
 
 def _send_customer_status_emails(request, customers):
@@ -36,13 +53,19 @@ def sync_allauth_email_on_change(sender, instance, **kwargs):
     if not instance.pk:
         # New user - allauth will create the EmailAddress row itself
         return
-    
+
     # Import here to avoid circular imports at module load time
     from allauth.account.models import EmailAddress
 
     try:
-        old_email_user = User.objects.values_list("email", flat=True).get(pk=instance.pk)
-        old_email_social = EmailAddress.objects.values_list("email", flat=True).filter(user_id=instance.pk).first()
+        old_email_user = User.objects.values_list("email", flat=True).get(
+            pk=instance.pk
+        )
+        old_email_social = (
+            EmailAddress.objects.values_list("email", flat=True)
+            .filter(user_id=instance.pk)
+            .first()
+        )
     except User.DoesNotExist:
         return
 
@@ -77,7 +100,9 @@ def snapshot_request_assignment_fields(sender, instance, **kwargs):
         return
 
     try:
-        old = Request.objects.values("status", "owner_id", "expert_id").get(pk=instance.pk)
+        old = Request.objects.values("status", "owner_id", "expert_id").get(
+            pk=instance.pk
+        )
         instance._pre_save_status = old["status"]
         instance._pre_save_owner_id = old["owner_id"]
         instance._pre_save_expert_id = old["expert_id"]
@@ -104,12 +129,12 @@ def notify_reception_on_new_request(sender, instance, created, **kwargs):
         if not coordinator_role:
             return
 
-        assignments = ReceptionRoleAssignment.objects.filter(role=coordinator_role).select_related("user")
+        assignments = ReceptionRoleAssignment.objects.filter(
+            role=coordinator_role
+        ).select_related("user")
         recipients = [
-            {
-                "name": assignment.user.name,
-                "email": assignment.user.email
-            } for assignment in assignments
+            {"name": assignment.user.name, "email": assignment.user.email}
+            for assignment in assignments
         ]
 
         if not recipients:
@@ -124,7 +149,7 @@ def notify_reception_on_new_request(sender, instance, created, **kwargs):
                 receipient_name=recipient["name"],
                 request=instance,
                 customer=primary_customer,
-                organization=instance.organization
+                organization=instance.organization,
             )
             send_email_notification(
                 subject="TA Connect - New Request Submitted",
@@ -150,7 +175,9 @@ def notify_owners_on_assignment(sender, instance, created, **kwargs):
         return
 
     owner_changed = getattr(instance, "_pre_save_owner_id", _UNSET) != instance.owner_id
-    expert_changed = getattr(instance, "_pre_save_expert_id", _UNSET) != instance.expert_id
+    expert_changed = (
+        getattr(instance, "_pre_save_expert_id", _UNSET) != instance.expert_id
+    )
     if not (owner_changed or expert_changed):
         return
 
@@ -159,34 +186,37 @@ def notify_owners_on_assignment(sender, instance, created, **kwargs):
 
     match instance.owner.domain_type:
         case DOMAINTYPE.RECEPTION:
-            reception_assignments = ReceptionRoleAssignment.objects.filter(role=Role.objects.get(name=ROLE.COORDINATOR))
+            reception_assignments = ReceptionRoleAssignment.objects.filter(
+                role=Role.objects.get(name=ROLE.COORDINATOR)
+            )
             recipients = [
-                {
-                    "name": assignment.user.name,
-                    "email": assignment.user.email
-                } for assignment in reception_assignments
+                {"name": assignment.user.name, "email": assignment.user.email}
+                for assignment in reception_assignments
             ]
         case DOMAINTYPE.PROGRAM:
-            program_assignments = ProgramRoleAssignment.objects.filter(role=Role.objects.get(name=ROLE.PROGRAM_LEAD), instance=instance.owner.program)
+            program_assignments = ProgramRoleAssignment.objects.filter(
+                role=Role.objects.get(name=ROLE.PROGRAM_LEAD),
+                instance=instance.owner.program,
+            )
             recipients = [
-                {
-                    "name": assignment.user.name,
-                    "email": assignment.user.email
-                } for assignment in program_assignments
+                {"name": assignment.user.name, "email": assignment.user.email}
+                for assignment in program_assignments
             ]
         case DOMAINTYPE.LAB:
-            lab_assignments = LabRoleAssignment.objects.filter(role=Role.objects.get(name=ROLE.LAB_LEAD), instance=instance.owner.lab, program=instance.program)
+            lab_assignments = LabRoleAssignment.objects.filter(
+                role=Role.objects.get(name=ROLE.LAB_LEAD),
+                instance=instance.owner.lab,
+                program=instance.program,
+            )
             recipients = [
-                {
-                    "name": assignment.user.name,
-                    "email": assignment.user.email
-                } for assignment in lab_assignments
+                {"name": assignment.user.name, "email": assignment.user.email}
+                for assignment in lab_assignments
             ]
         case DOMAINTYPE.EXPERT:
             recipients = [
                 {
                     "name": instance.owner.expert.name,
-                    "email": instance.owner.expert.email
+                    "email": instance.owner.expert.email,
                 }
             ]
         case _:
@@ -201,7 +231,7 @@ def notify_owners_on_assignment(sender, instance, created, **kwargs):
             receipient_name=recipient["name"],
             request=instance,
             customer=primary_customer,
-            organization=instance.organization
+            organization=instance.organization,
         )
         send_email_notification(
             subject="TA Connect - Request Assigned to You",
@@ -215,22 +245,22 @@ def notify_owners_on_assignment(sender, instance, created, **kwargs):
 def notify_customer_on_status_change(sender, instance, created, **kwargs):
     if created:
         return
-    
+
     status_changed = getattr(instance, "_pre_save_status", _UNSET) != instance.status
 
     if not status_changed:
         return
-    
+
     _send_customer_status_emails(instance, instance.customers.all())
 
 
-# These 
+# These
 @receiver(post_save, sender=Lab)
 def create_owner_on_lab_save(sender, instance, created, **kwargs):
     """
     Ensure each Lab automatically gets an associated Owner on creation.
     """
-    if created:
+    if created and not kwargs.get("raw"):
         Owner.objects.create(domain_type=DOMAINTYPE.LAB, lab=instance)
 
 
@@ -239,7 +269,7 @@ def create_owner_on_program_save(sender, instance, created, **kwargs):
     """
     Ensure each Program automatically gets an associated Owner on creation.
     """
-    if created:
+    if created and not kwargs.get("raw"):
         Owner.objects.create(domain_type=DOMAINTYPE.PROGRAM, program=instance)
 
 
@@ -249,7 +279,7 @@ def create_owner_on_lab_role_assignment(sender, instance, created, **kwargs):
     When a LabRoleAssignment is created that assigns a user to the Expert role for a given Lab and Program,
     create an associated Owner if one doesn't already exist so that the user can be assigned requests.
     """
-    if created and instance.role.name == ROLE.EXPERT:
+    if created and not kwargs.get("raw") and instance.role.name == ROLE.EXPERT:
         user = instance.user
 
         Owner.objects.get_or_create(
@@ -279,7 +309,9 @@ def clear_staff_on_admin_assignment_delete(sender, instance, **kwargs):
     """
     if instance.role.name == ROLE.ADMIN:
         user = instance.user
-        if not SystemRoleAssignment.objects.filter(user=user, role__name=ROLE.ADMIN).exists():
+        if not SystemRoleAssignment.objects.filter(
+            user=user, role__name=ROLE.ADMIN
+        ).exists():
             user.is_staff = False
             user.save()
 
@@ -290,6 +322,5 @@ def clean_up_after_attachment_deletion(sender, instance, **kwargs):
     After an attachment model is deleted in the database, the underlying file
     needs to be cleaned up as well.
     """
-    if hasattr(instance, "file"):
-        if os.path.isfile(instance.file.path):
-            os.remove(instance.file.path)
+    if hasattr(instance, "file") and os.path.isfile(instance.file.path):
+        os.remove(instance.file.path)

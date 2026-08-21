@@ -1,6 +1,6 @@
 from rest_framework.generics import ListAPIView
 
-from core.models import * 
+from core.models import *
 from core.serializers import ProgramSerializer
 
 

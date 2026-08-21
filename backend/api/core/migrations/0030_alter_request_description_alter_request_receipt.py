@@ -6,20 +6,24 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('core', '0029_merge_0027_program_labs_0028_alter_request_receipt'),
+        ("core", "0029_merge_0027_program_labs_0028_alter_request_receipt"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='request',
-            name='description',
+            model_name="request",
+            name="description",
             field=models.TextField(blank=True, null=True),
         ),
         migrations.AlterField(
-            model_name='request',
-            name='receipt',
-            field=models.OneToOneField(default=django.db.models.query.QuerySet.create, on_delete=django.db.models.deletion.PROTECT, related_name='request', to='core.receipt'),
+            model_name="request",
+            name="receipt",
+            field=models.OneToOneField(
+                default=django.db.models.query.QuerySet.create,
+                on_delete=django.db.models.deletion.PROTECT,
+                related_name="request",
+                to="core.receipt",
+            ),
         ),
     ]

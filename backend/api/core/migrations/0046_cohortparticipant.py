@@ -5,23 +5,40 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('core', '0045_remove_cohort_customers_cohort_customer_poc_and_more'),
+        ("core", "0045_remove_cohort_customers_cohort_customer_poc_and_more"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='CohortParticipant',
+            name="CohortParticipant",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(max_length=256)),
-                ('email', models.EmailField(max_length=254)),
-                ('cohort', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='core.cohort')),
-                ('state', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, to='core.state')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("name", models.CharField(max_length=256)),
+                ("email", models.EmailField(max_length=254)),
+                (
+                    "cohort",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE, to="core.cohort"
+                    ),
+                ),
+                (
+                    "state",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.PROTECT, to="core.state"
+                    ),
+                ),
             ],
             options={
-                'db_table': 'cohort_participant',
+                "db_table": "cohort_participant",
             },
         ),
     ]

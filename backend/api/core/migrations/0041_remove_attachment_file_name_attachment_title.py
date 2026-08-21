@@ -4,20 +4,19 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('core', '0040_merge_20250811_1844'),
+        ("core", "0040_merge_20250811_1844"),
     ]
 
     operations = [
         migrations.RemoveField(
-            model_name='attachment',
-            name='file_name',
+            model_name="attachment",
+            name="file_name",
         ),
         migrations.AddField(
-            model_name='attachment',
-            name='title',
-            field=models.CharField(default='temp', max_length=255),
+            model_name="attachment",
+            name="title",
+            field=models.CharField(default="temp", max_length=255),
             preserve_default=False,
         ),
     ]

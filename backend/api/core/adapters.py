@@ -1,8 +1,10 @@
-from allauth.socialaccount.adapter import DefaultSocialAccountAdapter
 from allauth.account.adapter import DefaultAccountAdapter
 from allauth.headless.adapter import DefaultHeadlessAdapter
+from allauth.socialaccount.adapter import DefaultSocialAccountAdapter
 from allauth.socialaccount.models import EmailAddress
+
 from core.models import User
+
 
 class CustomSocialAccountAdapter(DefaultSocialAccountAdapter):
     def populate_user(self, request, sociallogin, data):
@@ -10,27 +12,27 @@ class CustomSocialAccountAdapter(DefaultSocialAccountAdapter):
         Populates user information from social provider info.
         """
         user = super().populate_user(request, sociallogin, data)
-        
+
         # Get the name from ORCID's extra_data
-        if sociallogin.account.provider == 'orcid':
+        if sociallogin.account.provider == "orcid":
             extra_data = sociallogin.account.extra_data
-            name_data = (extra_data.get('person') or {}).get('name') or {}
-            given_names_obj = name_data.get('given-names') or {}
-            family_name_obj = name_data.get('family-name') or {}
-            given_names = given_names_obj.get('value', '') or ''
-            family_name = family_name_obj.get('value', '') or ''
+            name_data = (extra_data.get("person") or {}).get("name") or {}
+            given_names_obj = name_data.get("given-names") or {}
+            family_name_obj = name_data.get("family-name") or {}
+            given_names = given_names_obj.get("value", "") or ""
+            family_name = family_name_obj.get("value", "") or ""
             name = f"{given_names} {family_name}"
             if name:
                 user.name = name
 
         return user
-    
+
     def pre_social_login(self, request, sociallogin):
         """
         Invoked just after a user successfully authenticates via a
         social provider, but before the login is actually processed.
         """
-        if sociallogin.account.provider == 'orcid':
+        if sociallogin.account.provider == "orcid":
             # ORCID only returns an email if the user has made it public.
             # If no email is provided by ORCID and the user has not already
             # provided their email during a previous login, generate a placeholder from the ORCID
@@ -47,11 +49,11 @@ class CustomSocialAccountAdapter(DefaultSocialAccountAdapter):
             try:
                 user = User.objects.get(email=sociallogin.user.email)
                 extra_data = sociallogin.account.extra_data
-                name_data = (extra_data.get('person') or {}).get('name') or {}
-                given_names_obj = name_data.get('given-names') or {}
-                family_name_obj = name_data.get('family-name') or {}
-                given_names = given_names_obj.get('value', '') or ''
-                family_name = family_name_obj.get('value', '') or ''
+                name_data = (extra_data.get("person") or {}).get("name") or {}
+                given_names_obj = name_data.get("given-names") or {}
+                family_name_obj = name_data.get("family-name") or {}
+                given_names = given_names_obj.get("value", "") or ""
+                family_name = family_name_obj.get("value", "") or ""
                 name = f"{given_names} {family_name}"
                 if name and (not user.name or user.name != name):
                     user.name = name
@@ -68,24 +70,25 @@ class CustomAccountAdapter(DefaultAccountAdapter):
         This may not actually be needed.
         """
         user = super().save_user(request, user, form, commit=False)
-        
+
         # Handle any additional user fields here if needed
         if commit:
             user.save()
         return user
-    
-    
+
+
 class CustomHeadlessAdapter(DefaultHeadlessAdapter):
     """
     Custom adapter for headless mode.
     This is a placeholder function to ensure the adapter is recognized.
     """
+
     def serialize_user(self, user):
         """
         Serializes the user object for headless mode.
         """
         ret = super().serialize_user(user)
-        ret['name'] = user.name
-        ret['phone'] = user.phone
-        ret['is_staff'] = user.is_staff
+        ret["name"] = user.name
+        ret["phone"] = user.phone
+        ret["is_staff"] = user.is_staff
         return ret

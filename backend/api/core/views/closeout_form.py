@@ -1,19 +1,18 @@
-from rest_framework import views, authentication, permissions, status
-from rest_framework.response import Response
 from django.db import transaction
 from django.http import JsonResponse
+from rest_framework import status
+from rest_framework.response import Response
 
-from core.permissions import CanEditCloseoutResponses
 from core.constants import REQUEST_STATUS
-from core.utils import create_audit_history, get_status
 from core.models import CloseoutForm, Request
 from core.models.audit_history import ActionType
+from core.permissions import CanEditCloseoutResponses
 from core.serializers import CloseoutFormSerializer
+from core.utils import create_audit_history, get_status
 from core.views.request import BaseUserAwareRequest
 
 
 class CloseoutFormView(BaseUserAwareRequest):
-
     def _get_request_obj(self, request_id, request):
         """
         Resolves the Request instance and checks that the caller has at least
@@ -26,7 +25,9 @@ class CloseoutFormView(BaseUserAwareRequest):
         visible = self.get_actionable() | self.get_downstream() | self.get_inactive()
         if not visible.filter(pk=request_obj.pk).exists():
             return None, Response(
-                {"message": "Insufficient authorization to access closeout form for given request"},
+                {
+                    "message": "Insufficient authorization to access closeout form for given request"
+                },
                 status=status.HTTP_403_FORBIDDEN,
             )
 
@@ -61,7 +62,9 @@ class CloseoutFormView(BaseUserAwareRequest):
 
         if not self.get_actionable().filter(pk=request_obj.pk).exists():
             return Response(
-                {"message": "Insufficient authorization to create closeout form for given request"},
+                {
+                    "message": "Insufficient authorization to create closeout form for given request"
+                },
                 status=status.HTTP_403_FORBIDDEN,
             )
 
@@ -73,7 +76,12 @@ class CloseoutFormView(BaseUserAwareRequest):
             serializer.save(request=request_obj, submitted_date=None)
             request_obj.status = get_status(REQUEST_STATUS.CLOSEOUT_STARTED)
             request_obj.save()
-            create_audit_history(request, request_obj, ActionType.StatusChange, f"Status changed to Closeout Started")
+            create_audit_history(
+                request,
+                request_obj,
+                ActionType.StatusChange,
+                "Status changed to Closeout Started",
+            )
 
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
@@ -82,9 +90,13 @@ class CloseoutFormView(BaseUserAwareRequest):
         if err:
             return err
 
-        if not CanEditCloseoutResponses().has_object_permission(request, self, request_obj):
+        if not CanEditCloseoutResponses().has_object_permission(
+            request, self, request_obj
+        ):
             return Response(
-                {"message": "Insufficient authorization to update closeout form for given request"},
+                {
+                    "message": "Insufficient authorization to update closeout form for given request"
+                },
                 status=status.HTTP_403_FORBIDDEN,
             )
 
@@ -92,7 +104,9 @@ class CloseoutFormView(BaseUserAwareRequest):
         # This should only happen if somehow the form gets deleted.
         closeout_form, created = CloseoutForm.objects.get_or_create(request=request_obj)
 
-        serializer = CloseoutFormSerializer(closeout_form, data=request.data, partial=True)
+        serializer = CloseoutFormSerializer(
+            closeout_form, data=request.data, partial=True
+        )
         if not serializer.is_valid():
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -101,6 +115,11 @@ class CloseoutFormView(BaseUserAwareRequest):
             if created:
                 request_obj.status = get_status(REQUEST_STATUS.CLOSEOUT_STARTED)
                 request_obj.save()
-                create_audit_history(request, request_obj, ActionType.StatusChange, f"Status changed to Closeout Started")
+                create_audit_history(
+                    request,
+                    request_obj,
+                    ActionType.StatusChange,
+                    "Status changed to Closeout Started",
+                )
 
         return Response(serializer.data, status=status.HTTP_200_OK)

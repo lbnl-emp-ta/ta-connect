@@ -4,13 +4,12 @@ from django.db import migrations
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('core', '0005_remove_owner_only_one_fk_non_null_remove_owner_team_and_more'),
+        ("core", "0005_remove_owner_only_one_fk_non_null_remove_owner_team_and_more"),
     ]
 
     operations = [
         migrations.DeleteModel(
-            name='Team',
+            name="Team",
         ),
     ]

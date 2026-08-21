@@ -5,20 +5,27 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('core', '0033_alter_request_receipt'),
+        ("core", "0033_alter_request_receipt"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='request',
-            name='topics',
-            field=models.ManyToManyField(blank=True, related_name='requests', to='core.topic'),
+            model_name="request",
+            name="topics",
+            field=models.ManyToManyField(
+                blank=True, related_name="requests", to="core.topic"
+            ),
         ),
         migrations.AlterField(
-            model_name='request',
-            name='receipt',
-            field=models.OneToOneField(blank=True, null=True, on_delete=django.db.models.deletion.PROTECT, related_name='request', to='core.receipt'),
+            model_name="request",
+            name="receipt",
+            field=models.OneToOneField(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.PROTECT,
+                related_name="request",
+                to="core.receipt",
+            ),
         ),
     ]

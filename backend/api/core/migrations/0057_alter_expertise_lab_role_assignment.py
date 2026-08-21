@@ -5,15 +5,18 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('core', '0056_expertise_lab_role_assignment_and_more'),
+        ("core", "0056_expertise_lab_role_assignment_and_more"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='expertise',
-            name='lab_role_assignment',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, related_name='expertises', to='core.labroleassignment'),
+            model_name="expertise",
+            name="lab_role_assignment",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.PROTECT,
+                related_name="expertises",
+                to="core.labroleassignment",
+            ),
         ),
     ]

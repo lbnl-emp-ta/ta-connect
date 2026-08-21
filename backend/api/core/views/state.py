@@ -1,4 +1,5 @@
 from rest_framework.generics import ListAPIView
+
 from core.models import State
 from core.serializers import StateSerializer
 

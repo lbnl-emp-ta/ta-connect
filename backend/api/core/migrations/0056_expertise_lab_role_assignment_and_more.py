@@ -5,22 +5,29 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('core', '0055_alter_closeoutform_follow_up_has_same_expert_and_more'),
+        ("core", "0055_alter_closeoutform_follow_up_has_same_expert_and_more"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='expertise',
-            name='lab_role_assignment',
-            field=models.ForeignKey(default=6, on_delete=django.db.models.deletion.PROTECT, to='core.labroleassignment'),
+            model_name="expertise",
+            name="lab_role_assignment",
+            field=models.ForeignKey(
+                default=6,
+                on_delete=django.db.models.deletion.PROTECT,
+                to="core.labroleassignment",
+            ),
             preserve_default=False,
         ),
         migrations.AlterField(
-            model_name='labroleassignment',
-            name='program',
-            field=models.ForeignKey(default=1, on_delete=django.db.models.deletion.PROTECT, to='core.program'),
+            model_name="labroleassignment",
+            name="program",
+            field=models.ForeignKey(
+                default=1,
+                on_delete=django.db.models.deletion.PROTECT,
+                to="core.program",
+            ),
             preserve_default=False,
         ),
     ]

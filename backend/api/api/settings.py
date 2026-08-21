@@ -10,15 +10,17 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 
-from pathlib import Path
-from dotenv import load_dotenv
 import os
+from pathlib import Path
+
+from dotenv import load_dotenv
 
 
 def parse_bool(value: str | None, default: bool = False) -> bool:
     if value is None:
         return default
-    return value.lower() in ('true', '1', 'yes')
+    return value.lower() in ("true", "1", "yes")
+
 
 # use python-dotenv for .env
 load_dotenv()
@@ -40,21 +42,21 @@ DEBUG = parse_bool(os.getenv("DEBUG"))
 # Application definition
 
 INSTALLED_APPS = [
-    'django.contrib.admin',
-    'django.contrib.auth',
-    'django.contrib.contenttypes',
-    'django.contrib.sessions',
-    'django.contrib.messages',
-    'django.contrib.staticfiles',
-    'django.contrib.sites',
-    'corsheaders',
-    'allauth.account',
-    'allauth.headless',
-    'allauth.socialaccount',
-    'allauth.socialaccount.providers.orcid',
-    'rest_framework',
-    'core',
-    'import_export',
+    "django.contrib.admin",
+    "django.contrib.auth",
+    "django.contrib.contenttypes",
+    "django.contrib.sessions",
+    "django.contrib.messages",
+    "django.contrib.staticfiles",
+    "django.contrib.sites",
+    "corsheaders",
+    "allauth.account",
+    "allauth.headless",
+    "allauth.socialaccount",
+    "allauth.socialaccount.providers.orcid",
+    "rest_framework",
+    "core",
+    "import_export",
 ]
 
 
@@ -96,13 +98,13 @@ CSRF_TRUSTED_ORIGINS = [
     "http://127.0.0.1",
     "http://127.0.0.1:80",
     "http://localhost",
-    "http://localhost:5173", 
-    "http://127.0.0.1:5173", 
-    "http://localhost:8000", 
+    "http://localhost:5173",
+    "http://127.0.0.1:5173",
+    "http://localhost:8000",
     "http://127.0.0.1:8000",
 ]
 
-CSRF_COOKIE_DOMAIN = os.getenv('TACONNECT_FRONTEND_DOMAIN', '127.0.0.1')
+CSRF_COOKIE_DOMAIN = os.getenv("TACONNECT_FRONTEND_DOMAIN", "127.0.0.1")
 
 CORS_ALLOW_CREDENTIALS = True
 # CSRF_COOKIE_SECURE = False
@@ -115,10 +117,10 @@ CORS_ORIGIN_WHITELIST = [
     "http://127.0.0.1",
     "http://127.0.0.1:80",
     "http://localhost",
-    "http://localhost:5173", 
-    "http://127.0.0.1:5173", 
-    "http://localhost:8000", 
-    "http://127.0.0.1:8000", 
+    "http://localhost:5173",
+    "http://127.0.0.1:5173",
+    "http://localhost:8000",
+    "http://127.0.0.1:8000",
     "https://taconnect.lbl.gov",
     "https://taconnect.lbl.gov:1337",
     "https://staging.taconnect.lbl.gov",
@@ -130,14 +132,14 @@ CORS_ORIGIN_WHITELIST = [
 SITE_ID = 2
 
 ALLOWED_HOSTS = [
-    "localhost", 
-    "localhost:80", 
+    "localhost",
+    "localhost:80",
     "127.0.0.1",
-    "127.0.0.1:80", 
+    "127.0.0.1:80",
     "localhost:5173",
     "127.0.0.1:5173",
     "localhost:8000",
-    "127.0.0.1:8000", 
+    "127.0.0.1:8000",
     "taconnect-local.lbl.gov:1337",
     "taconnect-local.lbl.gov",
     "taconnect.lbl.gov:1337",
@@ -149,25 +151,24 @@ ALLOWED_HOSTS = [
     "api.staging.taconnect.lbl.gov:1337",
 ]
 
-ROOT_URLCONF = 'api.urls'
+ROOT_URLCONF = "api.urls"
 
-AUTH_USER_MODEL = 'core.User'
+AUTH_USER_MODEL = "core.User"
 
 AUTHENTICATION_BACKENDS = [
     # Needed to login by username in Django admin, regardless of `allauth`
-    'django.contrib.auth.backends.ModelBackend',
-
+    "django.contrib.auth.backends.ModelBackend",
     # `allauth` specific authentication methods, such as login by email
-    'allauth.account.auth_backends.AuthenticationBackend',
+    "allauth.account.auth_backends.AuthenticationBackend",
 ]
 
 # django-allauth settings
 ACCOUNT_USER_MODEL_USERNAME_FIELD = None
-ACCOUNT_SIGNUP_FIELDS = ['email*', 'password1*', 'password2*']
-ACCOUNT_LOGIN_METHODS= {'email'}
+ACCOUNT_SIGNUP_FIELDS = ["email*", "password1*", "password2*"]
+ACCOUNT_LOGIN_METHODS = {"email"}
 ACCOUNT_EMAIL_VERIFICATION = "none"
-ACCOUNT_ADAPTER = 'core.adapters.CustomAccountAdapter'
-SOCIALACCOUNT_ADAPTER = 'core.adapters.CustomSocialAccountAdapter'
+ACCOUNT_ADAPTER = "core.adapters.CustomAccountAdapter"
+SOCIALACCOUNT_ADAPTER = "core.adapters.CustomSocialAccountAdapter"
 SOCIALACCOUNT_AUTO_SIGNUP = True
 
 SOCIALACCOUNT_PROVIDERS = {
@@ -187,14 +188,14 @@ SOCIALACCOUNT_PROVIDERS = {
         "SCOPE": [
             "/authenticate",
         ],
-        "VERIFIED_EMAIL": True
+        "VERIFIED_EMAIL": True,
     }
 }
 
 HEADLESS_ONLY = True
 HEADLESS_SERVE_SPECIFICATION = True
 
-FRONTEND_URL = os.getenv('TACONNECT_FRONTEND_URL', 'http://127.0.0.1:5173')
+FRONTEND_URL = os.getenv("TACONNECT_FRONTEND_URL", "http://127.0.0.1:5173")
 
 HEADLESS_FRONTEND_URLS = {
     "account_confirm_email": f"{FRONTEND_URL}/account/verify-email/{{key}}",
@@ -203,34 +204,34 @@ HEADLESS_FRONTEND_URLS = {
     "account_signup": f"{FRONTEND_URL}/account/signup",
     "socialaccount_login_error": f"{FRONTEND_URL}/account/provider/callback",
 }
-HEADLESS_ADAPTER = 'core.adapters.CustomHeadlessAdapter'
+HEADLESS_ADAPTER = "core.adapters.CustomHeadlessAdapter"
 
 TEMPLATES = [
     {
-        'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
-        'APP_DIRS': True,
-        'OPTIONS': {
-            'context_processors': [
-                'django.template.context_processors.debug',
-                'django.template.context_processors.request',
-                'django.contrib.auth.context_processors.auth',
-                'django.contrib.messages.context_processors.messages',
+        "BACKEND": "django.template.backends.django.DjangoTemplates",
+        "DIRS": [],
+        "APP_DIRS": True,
+        "OPTIONS": {
+            "context_processors": [
+                "django.template.context_processors.debug",
+                "django.template.context_processors.request",
+                "django.contrib.auth.context_processors.auth",
+                "django.contrib.messages.context_processors.messages",
             ],
         },
     },
 ]
 
-WSGI_APPLICATION = 'api.wsgi.application'
+WSGI_APPLICATION = "api.wsgi.application"
 
 
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+    "default": {
+        "ENGINE": "django.db.backends.sqlite3",
+        "NAME": BASE_DIR / "db.sqlite3",
     }
 }
 
@@ -240,16 +241,16 @@ DATABASES = {
 
 AUTH_PASSWORD_VALIDATORS = [
     {
-        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
+        "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator",
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
+        "NAME": "django.contrib.auth.password_validation.MinimumLengthValidator",
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
+        "NAME": "django.contrib.auth.password_validation.CommonPasswordValidator",
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
+        "NAME": "django.contrib.auth.password_validation.NumericPasswordValidator",
     },
 ]
 
@@ -257,9 +258,9 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/4.2/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = "en-us"
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = "UTC"
 
 USE_I18N = True
 
@@ -268,25 +269,25 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
-STATIC_ROOT = BASE_DIR / 'static'
-STATIC_URL = 'static/'
+STATIC_ROOT = BASE_DIR / "static"
+STATIC_URL = "static/"
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
-DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
-MEDIA_ROOT = BASE_DIR / 'media'
-MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / "media"
+MEDIA_URL = "/media/"
 
-EMAIL_BACKEND = 'core.backends.email_backend.EmailBackend'
-EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_PORT = '587'
-EMAIL_HOST_USER = os.getenv('TACONNECT_EMAIL_HOST_AUTH_USER') 
-EMAIL_HOST_PASSWORD = os.getenv('TACONNECT_EMAIL_HOST_PASSWORD')
+EMAIL_BACKEND = "core.backends.email_backend.EmailBackend"
+EMAIL_HOST = "smtp.gmail.com"
+EMAIL_PORT = "587"
+EMAIL_HOST_USER = os.getenv("TACONNECT_EMAIL_HOST_AUTH_USER")
+EMAIL_HOST_PASSWORD = os.getenv("TACONNECT_EMAIL_HOST_PASSWORD")
 EMAIL_USE_TLS = True
 
 # Custom setting for development
-ENABLE_EMAIL_SENDING = parse_bool(os.getenv('TACONNECT_ENABLE_EMAIL_SENDING'))
+ENABLE_EMAIL_SENDING = parse_bool(os.getenv("TACONNECT_ENABLE_EMAIL_SENDING"))
 
-CUSTOMER_SURVEY_URL = os.getenv('TACONNECT_CUSTOMER_SURVEY_URL')
+CUSTOMER_SURVEY_URL = os.getenv("TACONNECT_CUSTOMER_SURVEY_URL")

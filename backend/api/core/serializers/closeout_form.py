@@ -5,7 +5,7 @@ from core.models import CloseoutForm
 
 class CloseoutFormSerializer(serializers.ModelSerializer):
     questions = serializers.SerializerMethodField()
-    
+
     class Meta:
         model = CloseoutForm
         fields = [
