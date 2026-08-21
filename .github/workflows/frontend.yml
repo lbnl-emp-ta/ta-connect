@@ -1,0 +1,30 @@
+name: Frontend CI
+
+on: [push]
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install dependencies
+        working-directory: frontend
+        run: npm ci
+
+      - name: Run Oxlint check
+        working-directory: frontend
+        run: npm run lint
+
+      - name: Run Oxfmt check
+        working-directory: frontend
+        run: npm run format:check
