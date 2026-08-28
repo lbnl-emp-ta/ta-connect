@@ -5,7 +5,7 @@ from .request import Request
 
 
 class Cohort(models.Model):
-    request = models.ForeignKey(Request, on_delete=models.PROTECT, unique=True)
+    request = models.OneToOneField(Request, on_delete=models.PROTECT, unique=True)
     name = models.CharField(max_length=256, null=True, blank=True)
     description = models.TextField()
 
