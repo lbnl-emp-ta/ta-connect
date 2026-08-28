@@ -50,6 +50,7 @@ def sync_allauth_email_on_change(sender, instance, **kwargs):
     keep the corresponding allauth account_emailaddress row in sync.
     Marks the new email as unverified since it hasn't been confirmed yet.
     """
+    print('sync_allauth_email_on_change called for user:', instance.email)
     if not instance.pk:
         # New user - allauth will create the EmailAddress row itself
         return
@@ -93,6 +94,7 @@ def snapshot_request_assignment_fields(sender, instance, **kwargs):
     Before saving a Request, snapshot the current status, owner_id, and expert_id so
     post_save handlers can detect whether those fields actually changed.
     """
+    print('PRE SAVE SIGNAL FOR core.Request')
     if not instance.pk:
         instance._pre_save_status = _UNSET
         instance._pre_save_owner_id = _UNSET
