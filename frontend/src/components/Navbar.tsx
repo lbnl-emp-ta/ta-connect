@@ -16,7 +16,9 @@ export const Navbar: React.FC = () => {
   const [userMenuAnchorEl, setUserMenuAnchorEl] = useState<null | HTMLElement>(null);
   const userMenuOpen = Boolean(userMenuAnchorEl);
   const pageHasAdminToggle =
-    location.pathname.startsWith('/requests') || location.pathname.startsWith('/experts');
+    location.pathname.startsWith('/requests') ||
+    location.pathname.startsWith('/experts') ||
+    location.pathname.startsWith('/customers');
 
   const activeLinkSx = {
     backgroundColor: 'primary.light',

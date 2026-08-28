@@ -26,7 +26,6 @@ class UserEditView(views.APIView):
         except User.DoesNotExist:
             return Response(data={"message": "User with given ID does not exist"})
 
-        print("Request user:", request.user.pk)
         if request.user.pk != user_id:
             return Response(
                 data={"message": "You do not have permission to edit this user"},

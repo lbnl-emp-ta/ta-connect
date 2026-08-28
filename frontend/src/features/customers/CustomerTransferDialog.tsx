@@ -34,9 +34,10 @@ export const CustomerTransferDialog: React.FC<CustomerTransferDialogProps> = ({
 }) => {
   const { isAdminMode } = useAdminModeContext();
   const transferCustomerMutation = useCustomerTransferMutation(requestId.toString(), isAdminMode);
-  const { data: customers } = useSuspenseQuery(customersQueryOptions());
+  const { data: customersResult } = useSuspenseQuery(customersQueryOptions(isAdminMode));
+  const customers = customersResult.status === 'success' ? customersResult.customers : [];
   const customerOptions: AutocompleteOption[] =
-    customers?.map((customer) => {
+    customers.map((customer) => {
       return {
         label: customer.name,
         id: customer.id,
