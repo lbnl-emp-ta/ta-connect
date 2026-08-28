@@ -1,12 +1,6 @@
-import { loginMutation } from "@/api/accounts/login";
-import { logoutMutation } from "@/api/accounts/logout";
-import {
-  deleteData,
-  fetchData,
-  patchData,
-  postData,
-  postForm,
-} from "@/api/dashboard";
+import { loginMutation } from '@/api/accounts/login';
+import { logoutMutation } from '@/api/accounts/logout';
+import { deleteData, fetchData, patchData, postData, postForm } from '@/api/dashboard';
 import {
   TACustomer,
   ExpertiseMutation,
@@ -30,56 +24,49 @@ import {
   TATopic,
   TAUserMutation,
   TAProgram,
-} from "@/api/dashboard/types";
-import { submitIntakeMutation } from "@/api/forms";
+} from '@/api/dashboard/types';
+import { submitIntakeMutation } from '@/api/forms';
 import {
   IntakeFormData,
   OrganizationType,
   State,
   TransmissionPlanningRegion,
-} from "@/api/forms/types";
-import { sessionsApi } from "@/api/sessions";
-import { queryClient } from "@/App";
-import { useToastContext } from "@/features/toasts/ToastContext";
-import { ToastMessage } from "@/features/toasts/ToastMessage";
-import CheckCircleIcon from "@mui/icons-material/CheckCircle";
-import ErrorIcon from "@mui/icons-material/Error";
-import {
-  queryOptions,
-  useMutation,
-  UseMutationOptions,
-} from "@tanstack/react-query";
+} from '@/api/forms/types';
+import { sessionsApi } from '@/api/sessions';
+import { queryClient } from '@/App';
+import { useToastContext } from '@/features/toasts/ToastContext';
+import { ToastMessage } from '@/features/toasts/ToastMessage';
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import ErrorIcon from '@mui/icons-material/Error';
+import { queryOptions, useMutation, UseMutationOptions } from '@tanstack/react-query';
 
 export const apiUrl = import.meta.env.VITE_API_URL as string;
 
 export type CustomerResult =
-  | { status: "success"; customers: TACustomer[] }
-  | { status: "forbidden"; message: string };
+  | { status: 'success'; customers: TACustomer[] }
+  | { status: 'forbidden'; message: string };
 
 export const authSessionQueryOptions = () =>
   queryOptions({
     staleTime: 300_000, // stale after 5 minutes
-    queryKey: ["authSession"],
+    queryKey: ['authSession'],
     queryFn: () => sessionsApi.getSession(),
   });
 
 export const customersQueryOptions = (isAdminMode?: boolean) =>
   queryOptions({
     staleTime: 120_000, // stale after 2 minutes
-    queryKey: ["customers", isAdminMode],
+    queryKey: ['customers', isAdminMode],
     queryFn: async (): Promise<CustomerResult> => {
       try {
-        const customers = await fetchData<TACustomer[]>(
-          `${apiUrl}/customers/`,
-          isAdminMode,
-        );
+        const customers = await fetchData<TACustomer[]>(`${apiUrl}/customers/`, isAdminMode);
 
-        return { status: "success", customers: customers ?? [] };
+        return { status: 'success', customers: customers ?? [] };
       } catch (error) {
-        if (error instanceof Error && error.message.includes("status: 403")) {
+        if (error instanceof Error && error.message.includes('status: 403')) {
           return {
-            status: "forbidden",
-            message: "You do not have permission to view customers.",
+            status: 'forbidden',
+            message: 'You do not have permission to view customers.',
           };
         }
 
@@ -91,70 +78,57 @@ export const customersQueryOptions = (isAdminMode?: boolean) =>
 export const identitiesQueryOptions = () =>
   queryOptions({
     staleTime: 120_000, // stale after 2 minutes
-    queryKey: ["identities"],
+    queryKey: ['identities'],
     queryFn: () => fetchData<TAIdentity[]>(`${apiUrl}/identities/`),
   });
 
 export const manageableRolesQueryOptions = () =>
   queryOptions({
     staleTime: 120_000,
-    queryKey: ["manageableRoles"],
-    queryFn: () =>
-      fetchData<TAManageableRolesResponse>(`${apiUrl}/manageable-roles/`),
+    queryKey: ['manageableRoles'],
+    queryFn: () => fetchData<TAManageableRolesResponse>(`${apiUrl}/manageable-roles/`),
   });
 
 export const requestsQueryOptions = (isAdminMode?: boolean) =>
   queryOptions({
     staleTime: 120_000, // stale after 2 minutes
-    queryKey: ["requests", isAdminMode],
-    queryFn: () =>
-      fetchData<TARequestsResponse>(`${apiUrl}/requests/`, isAdminMode),
+    queryKey: ['requests', isAdminMode],
+    queryFn: () => fetchData<TARequestsResponse>(`${apiUrl}/requests/`, isAdminMode),
   });
 
-export const requestDetailQueryOptions = (
-  requestId: string,
-  isAdminMode?: boolean,
-) =>
+export const requestDetailQueryOptions = (requestId: string, isAdminMode?: boolean) =>
   queryOptions({
     staleTime: 120_000, // stale after 2 minutes
     retry: false,
-    queryKey: ["requests", requestId, isAdminMode],
-    queryFn: () =>
-      fetchData<TARequestDetail>(
-        `${apiUrl}/requests/${requestId}`,
-        isAdminMode,
-      ),
+    queryKey: ['requests', requestId, isAdminMode],
+    queryFn: () => fetchData<TARequestDetail>(`${apiUrl}/requests/${requestId}`, isAdminMode),
   });
 
 export const statusesQueryOptions = (isAdminMode?: boolean) =>
   queryOptions({
     staleTime: 120_000, // stale after 2 minutes
-    queryKey: ["statuses", isAdminMode],
+    queryKey: ['statuses', isAdminMode],
     queryFn: () => fetchData<TAStatus[]>(`${apiUrl}/statuses/`, isAdminMode),
   });
 
 export const ownersQueryOptions = (requestId: string, isAdminMode?: boolean) =>
   queryOptions({
     staleTime: 120_000, // stale after 2 minutes
-    queryKey: ["owners", requestId, isAdminMode],
-    queryFn: () =>
-      fetchData<TAOwner[]>(
-        `${apiUrl}/requests/${requestId}/owners/`,
-        isAdminMode,
-      ),
+    queryKey: ['owners', requestId, isAdminMode],
+    queryFn: () => fetchData<TAOwner[]>(`${apiUrl}/requests/${requestId}/owners/`, isAdminMode),
   });
 
 export const expertsQueryOptions = (isAdminMode?: boolean) =>
   queryOptions({
     staleTime: 120_000, // stale after 2 minutes
-    queryKey: ["experts", isAdminMode],
+    queryKey: ['experts', isAdminMode],
     queryFn: () => fetchData<TAExpert[]>(`${apiUrl}/experts/`, isAdminMode),
   });
 
 export const topicsQueryOptions = () =>
   queryOptions({
     staleTime: 120_000, // stale after 2 minutes
-    queryKey: ["topics"],
+    queryKey: ['topics'],
     queryFn: () => fetchData<TATopic[]>(`${apiUrl}/topics/`),
   });
 
@@ -162,71 +136,58 @@ export const notesQueryOptions = (requestId: string, isAdminMode?: boolean) =>
   queryOptions({
     staleTime: 120_000, // stale after 2 minutes
     retry: false,
-    queryKey: ["requests", requestId, "notes", isAdminMode],
-    queryFn: () =>
-      fetchData<TANote[]>(
-        `${apiUrl}/requests/${requestId}/list-notes/`,
-        isAdminMode,
-      ),
+    queryKey: ['requests', requestId, 'notes', isAdminMode],
+    queryFn: () => fetchData<TANote[]>(`${apiUrl}/requests/${requestId}/list-notes/`, isAdminMode),
   });
 
-export const closeoutQueryOptions = (
-  requestId: string,
-  isAdminMode?: boolean,
-) =>
+export const closeoutQueryOptions = (requestId: string, isAdminMode?: boolean) =>
   queryOptions({
     staleTime: 120_000, // stale after 2 minutes
     retry: false,
-    queryKey: ["requests", requestId, "closeout-form", isAdminMode],
+    queryKey: ['requests', requestId, 'closeout-form', isAdminMode],
     queryFn: () =>
-      fetchData<TACloseoutForm>(
-        `${apiUrl}/requests/${requestId}/closeout-form/`,
-        isAdminMode,
-      ),
+      fetchData<TACloseoutForm>(`${apiUrl}/requests/${requestId}/closeout-form/`, isAdminMode),
   });
 
 export const statesQueryOptions = () =>
   queryOptions({
     staleTime: 120_000, // stale after 2 minutes
-    queryKey: ["states"],
+    queryKey: ['states'],
     queryFn: () => fetchData<State[]>(`${apiUrl}/states/`),
   });
 
 export const programsQueryOptions = () =>
   queryOptions({
     staleTime: 120_000, // stale after 2 minutes
-    queryKey: ["programs"],
+    queryKey: ['programs'],
     queryFn: () => fetchData<TAProgram[]>(`${apiUrl}/programs/`),
   });
 
 export const organizationsQueryOptions = () =>
   queryOptions({
     staleTime: 120_000, // stale after 2 minutes
-    queryKey: ["organizations"],
+    queryKey: ['organizations'],
     queryFn: () => fetchData<TAOrganization[]>(`${apiUrl}/organizations/`),
   });
 
 export const organizationTypesQueryOptions = () =>
   queryOptions({
     staleTime: 120_000, // stale after 2 minutes
-    queryKey: ["organizationTypes"],
-    queryFn: () =>
-      fetchData<OrganizationType[]>(`${apiUrl}/organization-types/`),
+    queryKey: ['organizationTypes'],
+    queryFn: () => fetchData<OrganizationType[]>(`${apiUrl}/organization-types/`),
   });
 
 export const transmissionPlanningRegionsQueryOptions = () =>
   queryOptions({
     staleTime: 120_000, // stale after 2 minutes
-    queryKey: ["transmissionPlanningRegions"],
+    queryKey: ['transmissionPlanningRegions'],
     queryFn: () =>
-      fetchData<TransmissionPlanningRegion[]>(
-        `${apiUrl}/transmission-planning-regions/`,
-      ),
+      fetchData<TransmissionPlanningRegion[]>(`${apiUrl}/transmission-planning-regions/`),
   });
 
 export const useSubmitIntakeMutation = () => {
   return useMutation({
-    mutationKey: ["intake"],
+    mutationKey: ['intake'],
     mutationFn: (formData: IntakeFormData) => submitIntakeMutation(formData),
     onSuccess: () => queryClient.invalidateQueries(),
   });
@@ -235,38 +196,33 @@ export const useSubmitIntakeMutation = () => {
 export const useLoginMutation = () => {
   return useMutation({
     mutationFn: loginMutation,
-    onSuccess: () =>
-      queryClient.invalidateQueries({ queryKey: ["authSession"] }),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['authSession'] }),
   });
 };
 
 export const useLogoutMutation = () => {
   return useMutation({
     mutationFn: logoutMutation,
-    onSettled: () =>
-      queryClient.invalidateQueries({ queryKey: ["authSession"] }),
+    onSettled: () => queryClient.invalidateQueries({ queryKey: ['authSession'] }),
   });
 };
 
 export const useUserMutation = (userId: string) => {
   return useMutation({
-    mutationKey: ["users", "update", userId],
+    mutationKey: ['users', 'update', userId],
     mutationFn: (data: Partial<TAUserMutation>) =>
-      patchData<TAUserMutation>(
-        `${import.meta.env.VITE_API_URL}/users/${userId}`,
-        data,
-      ),
+      patchData<TAUserMutation>(`${import.meta.env.VITE_API_URL}/users/${userId}`, data),
     onSuccess: () => queryClient.invalidateQueries(),
   });
 };
 
 export const useExpertiseMutation = (labRoleAssignmentId: string) => {
   return useMutation({
-    mutationKey: ["expertises", "update", labRoleAssignmentId],
+    mutationKey: ['expertises', 'update', labRoleAssignmentId],
     mutationFn: (data: ExpertiseMutation[]) =>
       postData(
         `${import.meta.env.VITE_API_URL}/lab-role-assignments/${labRoleAssignmentId}/expertises/`,
-        data,
+        data
       ),
     onSuccess: () => queryClient.invalidateQueries(),
   });
@@ -274,7 +230,7 @@ export const useExpertiseMutation = (labRoleAssignmentId: string) => {
 
 export const useManageableRoleCreateMutation = () => {
   return useMutation({
-    mutationKey: ["manageableRoles", "create"],
+    mutationKey: ['manageableRoles', 'create'],
     mutationFn: (data: TAManageableRoleMutation) =>
       postData<TAManageableRoleMutation>(`${apiUrl}/manageable-roles/`, data),
     onSuccess: () => queryClient.invalidateQueries(),
@@ -283,7 +239,7 @@ export const useManageableRoleCreateMutation = () => {
 
 export const useManageableRoleUpdateMutation = () => {
   return useMutation({
-    mutationKey: ["manageableRoles", "update"],
+    mutationKey: ['manageableRoles', 'update'],
     mutationFn: (data: TAManageableRoleMutation) =>
       patchData<TAManageableRoleMutation>(`${apiUrl}/manageable-roles/`, data),
     onSuccess: () => queryClient.invalidateQueries(),
@@ -292,41 +248,34 @@ export const useManageableRoleUpdateMutation = () => {
 
 export const useManageableRoleDeleteMutation = () => {
   return useMutation({
-    mutationKey: ["manageableRoles", "delete"],
-    mutationFn: (
-      data: Pick<TAManageableRoleMutation, "assignment_id" | "location">,
-    ) => deleteData(`${apiUrl}/manageable-roles/`, false, data),
+    mutationKey: ['manageableRoles', 'delete'],
+    mutationFn: (data: Pick<TAManageableRoleMutation, 'assignment_id' | 'location'>) =>
+      deleteData(`${apiUrl}/manageable-roles/`, false, data),
     onSuccess: () => queryClient.invalidateQueries(),
   });
 };
 
-export const useCustomerTransferMutation = (
-  requestId: string,
-  isAdminMode?: boolean,
-) => {
+export const useCustomerTransferMutation = (requestId: string, isAdminMode?: boolean) => {
   return useMutation({
-    mutationKey: ["customer", "transfer", requestId, isAdminMode],
+    mutationKey: ['customer', 'transfer', requestId, isAdminMode],
     mutationFn: (data: TACustomerTransferMutation) =>
       postData(
         `${import.meta.env.VITE_API_URL}/requests/${requestId}/transfer-customer/`,
         data,
-        isAdminMode,
+        isAdminMode
       ),
     onSuccess: () => queryClient.invalidateQueries(),
   });
 };
 
-export const useCustomerMutation = (
-  customerId: string,
-  isAdminMode?: boolean,
-) => {
+export const useCustomerMutation = (customerId: string, isAdminMode?: boolean) => {
   return useMutation({
-    mutationKey: ["customers", "update", customerId, isAdminMode],
+    mutationKey: ['customers', 'update', customerId, isAdminMode],
     mutationFn: (data: Partial<TACustomerMutation>) =>
       patchData<TACustomerMutation>(
         `${import.meta.env.VITE_API_URL}/customers/${customerId}`,
         data,
-        isAdminMode,
+        isAdminMode
       ),
     onSuccess: () => queryClient.invalidateQueries(),
   });
@@ -334,56 +283,43 @@ export const useCustomerMutation = (
 
 export const useCreateCustomerMutation = () => {
   return useMutation({
-    mutationKey: ["customers", "create"],
+    mutationKey: ['customers', 'create'],
     mutationFn: (data: Partial<TACustomerMutation>) =>
-      postData<TACustomerMutation>(
-        `${import.meta.env.VITE_API_URL}/customers/create/`,
-        data,
-      ),
+      postData<TACustomerMutation>(`${import.meta.env.VITE_API_URL}/customers/create/`, data),
     onSuccess: () => queryClient.invalidateQueries(),
   });
 };
 
 export const useDeleteCustomerMutation = (customerId: string) => {
   return useMutation({
-    mutationKey: ["customers", "delete", customerId],
+    mutationKey: ['customers', 'delete', customerId],
     // isAdminMode is turned on by default for simplicity. Only admins can see the delete button.
-    mutationFn: () =>
-      deleteData(
-        `${import.meta.env.VITE_API_URL}/customers/${customerId}`,
-        true,
-      ),
+    mutationFn: () => deleteData(`${import.meta.env.VITE_API_URL}/customers/${customerId}`, true),
     onSuccess: () => queryClient.invalidateQueries(),
   });
 };
 
-export const useOrganizationTransferMutation = (
-  requestId: string,
-  isAdminMode?: boolean,
-) => {
+export const useOrganizationTransferMutation = (requestId: string, isAdminMode?: boolean) => {
   return useMutation({
-    mutationKey: ["organization", "transfer", requestId, isAdminMode],
+    mutationKey: ['organization', 'transfer', requestId, isAdminMode],
     mutationFn: (data: TAOrganizationTransferMutation) =>
       postData(
         `${import.meta.env.VITE_API_URL}/requests/${requestId}/transfer-organization/`,
         data,
-        isAdminMode,
+        isAdminMode
       ),
     onSuccess: () => queryClient.invalidateQueries(),
   });
 };
 
-export const useOrganizationMutation = (
-  organizationId: string,
-  isAdminMode?: boolean,
-) => {
+export const useOrganizationMutation = (organizationId: string, isAdminMode?: boolean) => {
   return useMutation({
-    mutationKey: ["organizations", "update", organizationId, isAdminMode],
+    mutationKey: ['organizations', 'update', organizationId, isAdminMode],
     mutationFn: (data: Partial<TAOrganizationMutation>) =>
       patchData<TACustomerMutation>(
         `${import.meta.env.VITE_API_URL}/organizations/${organizationId}`,
         data,
-        isAdminMode,
+        isAdminMode
       ),
     onSuccess: () => queryClient.invalidateQueries(),
   });
@@ -391,40 +327,31 @@ export const useOrganizationMutation = (
 
 export const useDeleteOrganizationMutation = (organizationId: string) => {
   return useMutation({
-    mutationKey: ["organizations", "delete", organizationId],
+    mutationKey: ['organizations', 'delete', organizationId],
     // isAdminMode is turned on by default for simplicity. Only admins can see the delete button.
     mutationFn: () =>
-      deleteData(
-        `${import.meta.env.VITE_API_URL}/organizations/${organizationId}`,
-        true,
-      ),
+      deleteData(`${import.meta.env.VITE_API_URL}/organizations/${organizationId}`, true),
     onSuccess: () => queryClient.invalidateQueries(),
   });
 };
 
 export const useCreateOrganizationMutation = () => {
   return useMutation({
-    mutationKey: ["organizations", "create"],
+    mutationKey: ['organizations', 'create'],
     mutationFn: (data: Partial<TAOrganizationMutation>) =>
-      postData<TACustomerMutation>(
-        `${import.meta.env.VITE_API_URL}/organizations/create/`,
-        data,
-      ),
+      postData<TACustomerMutation>(`${import.meta.env.VITE_API_URL}/organizations/create/`, data),
     onSuccess: () => queryClient.invalidateQueries(),
   });
 };
 
-export const useRequestMutation = (
-  requestId: string,
-  isAdminMode?: boolean,
-) => {
+export const useRequestMutation = (requestId: string, isAdminMode?: boolean) => {
   return useMutation({
-    mutationKey: ["requests", "update", requestId, isAdminMode],
+    mutationKey: ['requests', 'update', requestId, isAdminMode],
     mutationFn: (data: Partial<TARequestDetailMutation>) =>
       patchData<TARequestDetailMutation>(
         `${import.meta.env.VITE_API_URL}/requests/${requestId}`,
         data,
-        isAdminMode,
+        isAdminMode
       ),
     onSuccess: () => queryClient.invalidateQueries(),
   });
@@ -433,16 +360,12 @@ export const useRequestMutation = (
 export const useAssignmentMutation = (
   requestId: string,
   isAdminMode?: boolean,
-  options?: UseMutationOptions<unknown, Error, TAAssignment, unknown>,
+  options?: UseMutationOptions<unknown, Error, TAAssignment, unknown>
 ) => {
   return useMutation({
-    mutationKey: ["requests", "assign", requestId, isAdminMode],
+    mutationKey: ['requests', 'assign', requestId, isAdminMode],
     mutationFn: (data: TAAssignment) =>
-      postData<TAAssignment>(
-        `${apiUrl}/requests/${requestId}/assign/`,
-        data,
-        isAdminMode,
-      ),
+      postData<TAAssignment>(`${apiUrl}/requests/${requestId}/assign/`, data, isAdminMode),
     ...options,
   });
 };
@@ -450,26 +373,15 @@ export const useAssignmentMutation = (
 export const useCloseoutMutation = (
   requestId: string,
   isAdminMode?: boolean,
-  options?: UseMutationOptions<
-    unknown,
-    Error,
-    Partial<TACloseoutForm>,
-    unknown
-  >,
+  options?: UseMutationOptions<unknown, Error, Partial<TACloseoutForm>, unknown>
 ) => {
   return useMutation({
-    mutationKey: [
-      "requests",
-      "update",
-      "closeout-form",
-      requestId,
-      isAdminMode,
-    ],
+    mutationKey: ['requests', 'update', 'closeout-form', requestId, isAdminMode],
     mutationFn: (data: Partial<TACloseoutForm>) =>
       patchData<TACloseoutForm>(
         `${import.meta.env.VITE_API_URL}/requests/${requestId}/closeout-form/`,
         data,
-        isAdminMode,
+        isAdminMode
       ),
     onSuccess: () => queryClient.invalidateQueries(),
     ...options,
@@ -479,21 +391,15 @@ export const useCloseoutMutation = (
 export const useCreateCloseoutMutation = (
   requestId: string,
   isAdminMode?: boolean,
-  options?: UseMutationOptions<unknown, Error, void, unknown>,
+  options?: UseMutationOptions<unknown, Error, void, unknown>
 ) => {
   return useMutation({
-    mutationKey: [
-      "requests",
-      "create",
-      "closeout-form",
-      requestId,
-      isAdminMode,
-    ],
+    mutationKey: ['requests', 'create', 'closeout-form', requestId, isAdminMode],
     mutationFn: () =>
       postData(
         `${import.meta.env.VITE_API_URL}/requests/${requestId}/closeout-form/`,
         null,
-        isAdminMode,
+        isAdminMode
       ),
     ...options,
   });
@@ -502,21 +408,15 @@ export const useCreateCloseoutMutation = (
 export const useSubmitCloseoutMutation = (
   requestId: string,
   isAdminMode?: boolean,
-  options?: UseMutationOptions<unknown, Error, void, unknown>,
+  options?: UseMutationOptions<unknown, Error, void, unknown>
 ) => {
   return useMutation({
-    mutationKey: [
-      "requests",
-      "submit",
-      "closeout-form",
-      requestId,
-      isAdminMode,
-    ],
+    mutationKey: ['requests', 'submit', 'closeout-form', requestId, isAdminMode],
     mutationFn: () =>
       postData(
         `${import.meta.env.VITE_API_URL}/requests/${requestId}/submit-closeout-form/`,
         null,
-        isAdminMode,
+        isAdminMode
       ),
     ...options,
   });
@@ -525,21 +425,15 @@ export const useSubmitCloseoutMutation = (
 export const useApproveCloseoutByLabMutation = (
   requestId: string,
   isAdminMode?: boolean,
-  options?: UseMutationOptions<unknown, Error, void, unknown>,
+  options?: UseMutationOptions<unknown, Error, void, unknown>
 ) => {
   return useMutation({
-    mutationKey: [
-      "requests",
-      "approve-by-lab",
-      "closeout-form",
-      requestId,
-      isAdminMode,
-    ],
+    mutationKey: ['requests', 'approve-by-lab', 'closeout-form', requestId, isAdminMode],
     mutationFn: () =>
       postData(
         `${import.meta.env.VITE_API_URL}/requests/${requestId}/approve-closeout-form-by-lab/`,
         null,
-        isAdminMode,
+        isAdminMode
       ),
     ...options,
   });
@@ -548,21 +442,15 @@ export const useApproveCloseoutByLabMutation = (
 export const useApproveCloseoutByProgramMutation = (
   requestId: string,
   isAdminMode?: boolean,
-  options?: UseMutationOptions<unknown, Error, void, unknown>,
+  options?: UseMutationOptions<unknown, Error, void, unknown>
 ) => {
   return useMutation({
-    mutationKey: [
-      "requests",
-      "approve-by-program",
-      "closeout-form",
-      requestId,
-      isAdminMode,
-    ],
+    mutationKey: ['requests', 'approve-by-program', 'closeout-form', requestId, isAdminMode],
     mutationFn: () =>
       postData(
         `${import.meta.env.VITE_API_URL}/requests/${requestId}/approve-closeout-form-by-program/`,
         null,
-        isAdminMode,
+        isAdminMode
       ),
     ...options,
   });
@@ -571,12 +459,11 @@ export const useApproveCloseoutByProgramMutation = (
 export const useCancelMutation = (
   requestId: string,
   isAdminMode?: boolean,
-  options?: UseMutationOptions<unknown, Error, void, unknown>,
+  options?: UseMutationOptions<unknown, Error, void, unknown>
 ) => {
   return useMutation({
-    mutationKey: ["requests", "cancel", requestId, isAdminMode],
-    mutationFn: () =>
-      postData(`${apiUrl}/requests/${requestId}/cancel/`, null, isAdminMode),
+    mutationKey: ['requests', 'cancel', requestId, isAdminMode],
+    mutationFn: () => postData(`${apiUrl}/requests/${requestId}/cancel/`, null, isAdminMode),
     ...options,
   });
 };
@@ -584,16 +471,12 @@ export const useCancelMutation = (
 export const useFinishCloseoutMutation = (
   requestId: string,
   isAdminMode?: boolean,
-  options?: UseMutationOptions<unknown, Error, void, unknown>,
+  options?: UseMutationOptions<unknown, Error, void, unknown>
 ) => {
   return useMutation({
-    mutationKey: ["requests", "finish-closeout", requestId, isAdminMode],
+    mutationKey: ['requests', 'finish-closeout', requestId, isAdminMode],
     mutationFn: () =>
-      postData(
-        `${apiUrl}/requests/${requestId}/closeout-complete/`,
-        null,
-        isAdminMode,
-      ),
+      postData(`${apiUrl}/requests/${requestId}/closeout-complete/`, null, isAdminMode),
     ...options,
   });
 };
@@ -601,12 +484,11 @@ export const useFinishCloseoutMutation = (
 export const useReopenMutation = (
   requestId: string,
   isAdminMode?: boolean,
-  options?: UseMutationOptions<unknown, Error, void, unknown>,
+  options?: UseMutationOptions<unknown, Error, void, unknown>
 ) => {
   return useMutation({
-    mutationKey: ["requests", "reopen", requestId, isAdminMode],
-    mutationFn: () =>
-      postData(`${apiUrl}/requests/${requestId}/reopen/`, null, isAdminMode),
+    mutationKey: ['requests', 'reopen', requestId, isAdminMode],
+    mutationFn: () => postData(`${apiUrl}/requests/${requestId}/reopen/`, null, isAdminMode),
     ...options,
   });
 };
@@ -614,31 +496,23 @@ export const useReopenMutation = (
 export const useAttachmentMutation = (
   requestId: string,
   isAdminMode?: boolean,
-  options?: UseMutationOptions<unknown, Error, FormData, unknown>,
+  options?: UseMutationOptions<unknown, Error, FormData, unknown>
 ) => {
   const { setShowToast, setToastMessage } = useToastContext();
   return useMutation({
-    mutationKey: ["requests", "upload-attachment", requestId, isAdminMode],
+    mutationKey: ['requests', 'upload-attachment', requestId, isAdminMode],
     mutationFn: (formData: FormData) =>
-      postForm(
-        `${apiUrl}/requests/${requestId}/upload-attachment/`,
-        formData,
-        isAdminMode,
-      ),
+      postForm(`${apiUrl}/requests/${requestId}/upload-attachment/`, formData, isAdminMode),
     onSuccess: () => {
       queryClient.invalidateQueries();
       setShowToast(true);
       setToastMessage(
-        <ToastMessage icon={<CheckCircleIcon />}>
-          Added attachment to request
-        </ToastMessage>,
+        <ToastMessage icon={<CheckCircleIcon />}>Added attachment to request</ToastMessage>
       );
     },
     onError: (error: Error) => {
       setShowToast(true);
-      setToastMessage(
-        <ToastMessage icon={<ErrorIcon />}>{error.message}</ToastMessage>,
-      );
+      setToastMessage(<ToastMessage icon={<ErrorIcon />}>{error.message}</ToastMessage>);
     },
     ...options,
   });
@@ -647,30 +521,23 @@ export const useAttachmentMutation = (
 export const useDeleteAttachmentMutation = (
   requestId: string,
   isAdminMode?: boolean,
-  options?: UseMutationOptions<unknown, Error, string, unknown>,
+  options?: UseMutationOptions<unknown, Error, string, unknown>
 ) => {
   const { setShowToast, setToastMessage } = useToastContext();
   return useMutation({
-    mutationKey: ["requests", "delete-attachment", requestId, isAdminMode],
+    mutationKey: ['requests', 'delete-attachment', requestId, isAdminMode],
     mutationFn: (attachmentId: string) =>
-      deleteData(
-        `${apiUrl}/requests/${requestId}/delete-attachment/${attachmentId}/`,
-        isAdminMode,
-      ),
+      deleteData(`${apiUrl}/requests/${requestId}/delete-attachment/${attachmentId}/`, isAdminMode),
     onSuccess: () => {
       queryClient.invalidateQueries();
       setShowToast(true);
       setToastMessage(
-        <ToastMessage icon={<CheckCircleIcon />}>
-          Deleted attachment from request
-        </ToastMessage>,
+        <ToastMessage icon={<CheckCircleIcon />}>Deleted attachment from request</ToastMessage>
       );
     },
     onError: (error: Error) => {
       setShowToast(true);
-      setToastMessage(
-        <ToastMessage icon={<ErrorIcon />}>{error.message}</ToastMessage>,
-      );
+      setToastMessage(<ToastMessage icon={<ErrorIcon />}>{error.message}</ToastMessage>);
     },
     ...options,
   });
@@ -679,27 +546,23 @@ export const useDeleteAttachmentMutation = (
 export const useCreateNoteMutation = (
   requestId: string,
   isAdminMode?: boolean,
-  options?: UseMutationOptions<unknown, Error, Partial<TANote>, unknown>,
+  options?: UseMutationOptions<unknown, Error, Partial<TANote>, unknown>
 ) => {
   const { setShowToast, setToastMessage } = useToastContext();
   return useMutation({
-    mutationKey: ["requests", "add-note", requestId, isAdminMode],
+    mutationKey: ['requests', 'add-note', requestId, isAdminMode],
     mutationFn: (data: Partial<TANote>) =>
       postData(`${apiUrl}/requests/${requestId}/add-note/`, data, isAdminMode),
     onSuccess: () => {
       queryClient.invalidateQueries();
       setShowToast(true);
       setToastMessage(
-        <ToastMessage icon={<CheckCircleIcon />}>
-          Added note to request
-        </ToastMessage>,
+        <ToastMessage icon={<CheckCircleIcon />}>Added note to request</ToastMessage>
       );
     },
     onError: (error: Error) => {
       setShowToast(true);
-      setToastMessage(
-        <ToastMessage icon={<ErrorIcon />}>{error.message}</ToastMessage>,
-      );
+      setToastMessage(<ToastMessage icon={<ErrorIcon />}>{error.message}</ToastMessage>);
     },
     ...options,
   });
@@ -708,30 +571,23 @@ export const useCreateNoteMutation = (
 export const useDeleteNoteMutation = (
   requestId: string,
   isAdminMode?: boolean,
-  options?: UseMutationOptions<unknown, Error, string, unknown>,
+  options?: UseMutationOptions<unknown, Error, string, unknown>
 ) => {
   const { setShowToast, setToastMessage } = useToastContext();
   return useMutation({
-    mutationKey: ["requests", "add-note", requestId, isAdminMode],
+    mutationKey: ['requests', 'add-note', requestId, isAdminMode],
     mutationFn: (noteId: string) =>
-      deleteData(
-        `${apiUrl}/requests/${requestId}/delete-note/${noteId}/`,
-        isAdminMode,
-      ),
+      deleteData(`${apiUrl}/requests/${requestId}/delete-note/${noteId}/`, isAdminMode),
     onSuccess: () => {
       queryClient.invalidateQueries();
       setShowToast(true);
       setToastMessage(
-        <ToastMessage icon={<CheckCircleIcon />}>
-          Deleted note from request
-        </ToastMessage>,
+        <ToastMessage icon={<CheckCircleIcon />}>Deleted note from request</ToastMessage>
       );
     },
     onError: (error: Error) => {
       setShowToast(true);
-      setToastMessage(
-        <ToastMessage icon={<ErrorIcon />}>{error.message}</ToastMessage>,
-      );
+      setToastMessage(<ToastMessage icon={<ErrorIcon />}>{error.message}</ToastMessage>);
     },
     ...options,
   });

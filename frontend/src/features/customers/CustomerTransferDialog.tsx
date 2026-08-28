@@ -1,26 +1,23 @@
-import { TACustomerTransferMutation } from "@/api/dashboard/types";
-import { AutocompleteOption } from "@/api/forms/types";
-import {
-  customersQueryOptions,
-  useCustomerTransferMutation,
-} from "@/api/queryOptions";
-import { AppLink } from "@/components/AppLink";
-import { useAdminModeContext } from "@/features/admin-mode/AdminModeContext";
-import { useToastContext } from "@/features/toasts/ToastContext";
-import { ToastMessage } from "@/features/toasts/ToastMessage";
-import CheckCircleIcon from "@mui/icons-material/CheckCircle";
-import ErrorIcon from "@mui/icons-material/Error";
-import { Autocomplete, CircularProgress, Stack } from "@mui/material";
-import Button from "@mui/material/Button";
-import Dialog from "@mui/material/Dialog";
-import DialogActions from "@mui/material/DialogActions";
-import DialogContent from "@mui/material/DialogContent";
-import DialogContentText from "@mui/material/DialogContentText";
-import DialogTitle from "@mui/material/DialogTitle";
-import TextField from "@mui/material/TextField";
-import { useSuspenseQuery } from "@tanstack/react-query";
-import * as React from "react";
-import { useEffect, useState } from "react";
+import { TACustomerTransferMutation } from '@/api/dashboard/types';
+import { AutocompleteOption } from '@/api/forms/types';
+import { customersQueryOptions, useCustomerTransferMutation } from '@/api/queryOptions';
+import { AppLink } from '@/components/AppLink';
+import { useAdminModeContext } from '@/features/admin-mode/AdminModeContext';
+import { useToastContext } from '@/features/toasts/ToastContext';
+import { ToastMessage } from '@/features/toasts/ToastMessage';
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import ErrorIcon from '@mui/icons-material/Error';
+import { Autocomplete, CircularProgress, Stack } from '@mui/material';
+import Button from '@mui/material/Button';
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogContentText from '@mui/material/DialogContentText';
+import DialogTitle from '@mui/material/DialogTitle';
+import TextField from '@mui/material/TextField';
+import { useSuspenseQuery } from '@tanstack/react-query';
+import * as React from 'react';
+import { useEffect, useState } from 'react';
 
 interface CustomerTransferDialogProps {
   open: boolean;
@@ -36,15 +33,9 @@ export const CustomerTransferDialog: React.FC<CustomerTransferDialogProps> = ({
   currentCustomerId,
 }) => {
   const { isAdminMode } = useAdminModeContext();
-  const transferCustomerMutation = useCustomerTransferMutation(
-    requestId.toString(),
-    isAdminMode,
-  );
-  const { data: customersResult } = useSuspenseQuery(
-    customersQueryOptions(isAdminMode),
-  );
-  const customers =
-    customersResult.status === "success" ? customersResult.customers : [];
+  const transferCustomerMutation = useCustomerTransferMutation(requestId.toString(), isAdminMode);
+  const { data: customersResult } = useSuspenseQuery(customersQueryOptions(isAdminMode));
+  const customers = customersResult.status === 'success' ? customersResult.customers : [];
   const customerOptions: AutocompleteOption[] =
     customers.map((customer) => {
       return {
@@ -52,21 +43,17 @@ export const CustomerTransferDialog: React.FC<CustomerTransferDialogProps> = ({
         id: customer.id,
       };
     }) || [];
-  const currentCustomerOption = customerOptions.find(
-    (option) => option.id === currentCustomerId,
+  const currentCustomerOption = customerOptions.find((option) => option.id === currentCustomerId);
+  const [newCustomerChoice, setNewCustomerChoice] = useState<AutocompleteOption>(
+    currentCustomerOption || customerOptions[0]
   );
-  const [newCustomerChoice, setNewCustomerChoice] =
-    useState<AutocompleteOption>(currentCustomerOption || customerOptions[0]);
-  const { setShowToast, setToastMessage, setToastAutoHideDuration } =
-    useToastContext();
+  const { setShowToast, setToastMessage, setToastAutoHideDuration } = useToastContext();
 
   const handleCustomerChange = (
     _event: React.SyntheticEvent<Element, Event>,
-    newValue: AutocompleteOption | null,
+    newValue: AutocompleteOption | null
   ) => {
-    setNewCustomerChoice(
-      newValue || currentCustomerOption || customerOptions[0],
-    );
+    setNewCustomerChoice(newValue || currentCustomerOption || customerOptions[0]);
   };
 
   /**
@@ -98,25 +85,19 @@ export const CustomerTransferDialog: React.FC<CustomerTransferDialogProps> = ({
       setShowToast(true);
       setToastAutoHideDuration(null);
       setToastMessage(
-        <ToastMessage icon={<CircularProgress />}>
-          Saving customer information
-        </ToastMessage>,
+        <ToastMessage icon={<CircularProgress />}>Saving customer information</ToastMessage>
       );
     } else if (transferCustomerMutation.isSuccess) {
       setShowToast(true);
       setToastAutoHideDuration(6000);
       setToastMessage(
-        <ToastMessage icon={<CheckCircleIcon />}>
-          Customer information saved
-        </ToastMessage>,
+        <ToastMessage icon={<CheckCircleIcon />}>Customer information saved</ToastMessage>
       );
     } else if (transferCustomerMutation.isError) {
       setShowToast(true);
       setToastAutoHideDuration(6000);
       setToastMessage(
-        <ToastMessage icon={<ErrorIcon />}>
-          {transferCustomerMutation.error.message}
-        </ToastMessage>,
+        <ToastMessage icon={<ErrorIcon />}>{transferCustomerMutation.error.message}</ToastMessage>
       );
     }
   }, [
@@ -127,44 +108,30 @@ export const CustomerTransferDialog: React.FC<CustomerTransferDialogProps> = ({
   ]);
 
   return (
-    <Dialog
-      open={open}
-      maxWidth="sm"
-      fullWidth
-      onClose={handleCancel}
-      disableRestoreFocus
-    >
+    <Dialog open={open} maxWidth="sm" fullWidth onClose={handleCancel} disableRestoreFocus>
       <DialogTitle>Transfer Customer</DialogTitle>
       <DialogContent>
         <Stack>
+          <DialogContentText>Transfer this request over to a different customer.</DialogContentText>
           <DialogContentText>
-            Transfer this request over to a different customer.
-          </DialogContentText>
-          <DialogContentText>
-            Need to create a new customer?{" "}
+            Need to create a new customer?{' '}
             <AppLink to="/customers">Head to the Customers page.</AppLink>
           </DialogContentText>
           <form onSubmit={handleSubmit} id="customer-transfer-form">
             <Autocomplete
               value={newCustomerChoice}
               options={customerOptions}
-              renderInput={(params) => (
-                <TextField {...params} label="Customer" />
-              )}
+              renderInput={(params) => <TextField {...params} label="Customer" />}
               onChange={handleCustomerChange}
             />
           </form>
         </Stack>
       </DialogContent>
-      <DialogActions sx={{ justifyContent: "space-between" }}>
+      <DialogActions sx={{ justifyContent: 'space-between' }}>
         <span></span>
         <Stack direction="row">
           <Button onClick={handleCancel}>Cancel</Button>
-          <Button
-            variant="contained"
-            type="submit"
-            form="customer-transfer-form"
-          >
+          <Button variant="contained" type="submit" form="customer-transfer-form">
             Save
           </Button>
         </Stack>
