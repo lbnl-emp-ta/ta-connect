@@ -19,6 +19,7 @@ import { TACustomer } from "@/api/dashboard/types";
 import { GridColDef } from "@mui/x-data-grid";
 import { CustomerDeleteDialog } from "@/features/customers/CustomerDeleteDialog";
 import { useUser } from "@/hooks/useUser";
+import { useAdminModeContext } from "@/features/admin-mode/AdminModeContext";
 
 export const Route = createFileRoute("/_with-nav/_private/customers")({
   loader: async ({ context }) => {
@@ -31,7 +32,10 @@ export const Route = createFileRoute("/_with-nav/_private/customers")({
 
 function CustomersPage() {
   const user = useUser();
-  const { data: customers } = useSuspenseQuery(customersQueryOptions());
+  const { isAdminMode } = useAdminModeContext();
+  const { data: customersResult } = useSuspenseQuery(
+    customersQueryOptions(isAdminMode),
+  );
   const [customerEditDialogOpen, setCustomerEditDialogOpen] = useState(false);
   const [customerDeleteDialogOpen, setCustomerDeleteDialogOpen] =
     useState(false);
@@ -133,7 +137,14 @@ function CustomersPage() {
             </Button>
           </Stack>
         </Stack>
-        <CustomersDataTable customers={customers} columns={customerColumns} />
+        {customersResult.status === "forbidden" ? (
+          <Typography>{customersResult.message}</Typography>
+        ) : (
+          <CustomersDataTable
+            customers={customersResult.customers}
+            columns={customerColumns}
+          />
+        )}
       </Stack>
       <CustomerEditDialog
         open={customerEditDialogOpen}

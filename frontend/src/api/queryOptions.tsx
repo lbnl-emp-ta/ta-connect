@@ -52,6 +52,10 @@ import {
 
 export const apiUrl = import.meta.env.VITE_API_URL as string;
 
+export type CustomerResult =
+  | { status: "success"; customers: TACustomer[] }
+  | { status: "forbidden"; message: string };
+
 export const authSessionQueryOptions = () =>
   queryOptions({
     staleTime: 300_000, // stale after 5 minutes
@@ -62,8 +66,26 @@ export const authSessionQueryOptions = () =>
 export const customersQueryOptions = (isAdminMode?: boolean) =>
   queryOptions({
     staleTime: 120_000, // stale after 2 minutes
-    queryKey: ["customers"],
-    queryFn: () => fetchData<TACustomer[]>(`${apiUrl}/customers/`, isAdminMode),
+    queryKey: ["customers", isAdminMode],
+    queryFn: async (): Promise<CustomerResult> => {
+      try {
+        const customers = await fetchData<TACustomer[]>(
+          `${apiUrl}/customers/`,
+          isAdminMode,
+        );
+
+        return { status: "success", customers: customers ?? [] };
+      } catch (error) {
+        if (error instanceof Error && error.message.includes("status: 403")) {
+          return {
+            status: "forbidden",
+            message: "You do not have permission to view customers.",
+          };
+        }
+
+        throw error;
+      }
+    },
   });
 
 export const identitiesQueryOptions = () =>

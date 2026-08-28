@@ -1,31 +1,43 @@
-import { useLogoutMutation } from '@/api/queryOptions';
-import { AppLink } from '@/components/AppLink';
-import { AdminModeToggle } from '@/features/admin-mode/AdminModeToggle';
-import { useUser } from '@/hooks/useUser';
-import AccountCircleIcon from '@mui/icons-material/AccountCircle';
-import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
-import { AppBar, Button, Menu, MenuItem, Stack, Toolbar, Typography } from '@mui/material';
-import { useLocation, useNavigate } from '@tanstack/react-router';
-import { useState } from 'react';
+import { useLogoutMutation } from "@/api/queryOptions";
+import { AppLink } from "@/components/AppLink";
+import { AdminModeToggle } from "@/features/admin-mode/AdminModeToggle";
+import { useUser } from "@/hooks/useUser";
+import AccountCircleIcon from "@mui/icons-material/AccountCircle";
+import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
+import {
+  AppBar,
+  Button,
+  Menu,
+  MenuItem,
+  Stack,
+  Toolbar,
+  Typography,
+} from "@mui/material";
+import { useLocation, useNavigate } from "@tanstack/react-router";
+import { useState } from "react";
 
 export const Navbar: React.FC = () => {
   const user = useUser();
   const navigate = useNavigate();
   const location = useLocation();
   const logoutMutation = useLogoutMutation();
-  const [userMenuAnchorEl, setUserMenuAnchorEl] = useState<null | HTMLElement>(null);
+  const [userMenuAnchorEl, setUserMenuAnchorEl] = useState<null | HTMLElement>(
+    null,
+  );
   const userMenuOpen = Boolean(userMenuAnchorEl);
   const pageHasAdminToggle =
-    location.pathname.startsWith('/requests') || location.pathname.startsWith('/experts');
+    location.pathname.startsWith("/requests") ||
+    location.pathname.startsWith("/experts") ||
+    location.pathname.startsWith("/customers");
 
   const activeLinkSx = {
-    backgroundColor: 'primary.light',
+    backgroundColor: "primary.light",
     borderRadius: 2,
-    color: 'primary.main',
-    fontWeight: 'bold',
+    color: "primary.main",
+    fontWeight: "bold",
     padding: 1,
   };
-  const linkSx = { fontWeight: 'bold' };
+  const linkSx = { fontWeight: "bold" };
 
   const handleUserMenuClick = (event: React.MouseEvent<HTMLButtonElement>) => {
     setUserMenuAnchorEl(event.currentTarget);
@@ -37,7 +49,7 @@ export const Navbar: React.FC = () => {
 
   const handleProfileClick = () => {
     handleUserMenuClose();
-    navigate({ to: '/profile' });
+    navigate({ to: "/profile" });
   };
 
   const handleLogout = () => {
@@ -55,17 +67,26 @@ export const Navbar: React.FC = () => {
       <Toolbar
         variant="dense"
         sx={{
-          display: 'flex',
-          alignItems: 'center',
+          display: "flex",
+          alignItems: "center",
           height: 64,
           gap: 2,
-          color: 'common.white',
-          bgcolor: 'primary.dark',
+          color: "common.white",
+          bgcolor: "primary.dark",
         }}
       >
-        <Stack direction="row" spacing={4} alignItems="center" sx={{ flexGrow: 1 }}>
+        <Stack
+          direction="row"
+          spacing={4}
+          alignItems="center"
+          sx={{ flexGrow: 1 }}
+        >
           <AppLink className="nav-link" to="/requests/active">
-            <Typography variant="h5" fontWeight="bold" sx={{ color: 'common.white' }}>
+            <Typography
+              variant="h5"
+              fontWeight="bold"
+              sx={{ color: "common.white" }}
+            >
               TA Connect
             </Typography>
           </AppLink>
@@ -73,7 +94,11 @@ export const Navbar: React.FC = () => {
             <AppLink
               className="nav-link"
               to="/requests/active"
-              sx={location.pathname.startsWith('/requests') ? activeLinkSx : linkSx}
+              sx={
+                location.pathname.startsWith("/requests")
+                  ? activeLinkSx
+                  : linkSx
+              }
               color="inherit"
             >
               Requests
@@ -105,7 +130,12 @@ export const Navbar: React.FC = () => {
             >
               Organizations
             </AppLink>
-            <AppLink className="nav-link" to="/intake" color="inherit" sx={linkSx}>
+            <AppLink
+              className="nav-link"
+              to="/intake"
+              color="inherit"
+              sx={linkSx}
+            >
               Intake
             </AppLink>
           </Stack>
@@ -120,7 +150,7 @@ export const Navbar: React.FC = () => {
                 startIcon={<AccountCircleIcon />}
                 endIcon={<KeyboardArrowDownIcon />}
                 sx={{
-                  color: 'common.white',
+                  color: "common.white",
                 }}
               >
                 {user.name || user.email}
@@ -130,8 +160,8 @@ export const Navbar: React.FC = () => {
                 open={userMenuOpen}
                 onClose={handleUserMenuClose}
                 anchorOrigin={{
-                  vertical: 'bottom',
-                  horizontal: 'right',
+                  vertical: "bottom",
+                  horizontal: "right",
                 }}
               >
                 <MenuItem onClick={handleProfileClick} sx={{ width: 200 }}>
@@ -142,7 +172,7 @@ export const Navbar: React.FC = () => {
             </div>
           </>
         ) : (
-          <AppLink className="nav-link" to="/login" search={{ redirect: '/' }}>
+          <AppLink className="nav-link" to="/login" search={{ redirect: "/" }}>
             <Typography color="primary">Login</Typography>
           </AppLink>
         )}
