@@ -1,0 +1,113 @@
+name: Prepare Production Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Package version without the v prefix (for example, 1.0.0)"
+        required: true
+        type: string
+
+permissions:
+  contents: write
+
+concurrency:
+  group: prepare-production-release
+  cancel-in-progress: false
+
+jobs:
+  prepare:
+    runs-on: ubuntu-latest
+    env:
+      RELEASE_VERSION: ${{ inputs.version }}
+      RELEASE_BRANCH: release/${{ inputs.version }}
+      DJANGO_SETTINGS_MODULE: api.settings
+      SECRET_KEY: release-preparation-check
+
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Validate release version
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          if [[ ! "$RELEASE_VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "Version must use stable semantic version format, such as 1.0.0."
+            exit 1
+          fi
+
+          if git show-ref --verify --quiet "refs/tags/$RELEASE_VERSION" || \
+             git show-ref --verify --quiet "refs/tags/v$RELEASE_VERSION"; then
+            echo "A tag already exists for version $RELEASE_VERSION."
+            exit 1
+          fi
+
+          if git ls-remote --exit-code --heads origin "$RELEASE_BRANCH" >/dev/null 2>&1; then
+            echo "Branch $RELEASE_BRANCH already exists."
+            exit 1
+          fi
+
+      - name: Set up uv
+        uses: astral-sh/setup-uv@v6
+        with:
+          python-version: "3.13"
+          enable-cache: true
+          cache-dependency-glob: "backend/api/uv.lock"
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Create release branch
+        run: git checkout -b "$RELEASE_BRANCH"
+
+      - name: Bump backend version
+        working-directory: backend/api
+        run: uv version "$RELEASE_VERSION" --no-sync
+
+      - name: Bump frontend version
+        working-directory: frontend
+        run: npm version "$RELEASE_VERSION" --no-git-tag-version --ignore-scripts
+
+      - name: Run backend checks
+        working-directory: backend/api
+        run: |
+          uv sync --locked
+          uv run --locked ruff check .
+          uv run --locked ruff format --check .
+          uv run --locked python manage.py migrate
+          uv run --locked pytest
+
+      - name: Run frontend checks
+        working-directory: frontend
+        run: |
+          npm ci
+          npm run lint
+          npm run format:check
+          npm run build
+
+      - name: Commit and push release branch
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add backend/api/pyproject.toml backend/api/uv.lock \
+            frontend/package.json frontend/package-lock.json
+          git commit -m "chore: prepare release $RELEASE_VERSION"
+          git push --set-upstream origin "$RELEASE_BRANCH"
+
+      - name: Add pull request link to summary
+        shell: bash
+        run: |
+          pull_request_url="$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/compare/main...release%2F$RELEASE_VERSION?expand=1"
+          echo "## Release $RELEASE_VERSION prepared" >> "$GITHUB_STEP_SUMMARY"
+          echo "[Open the release pull request]($pull_request_url)." >> "$GITHUB_STEP_SUMMARY"
