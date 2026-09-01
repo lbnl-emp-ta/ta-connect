@@ -335,11 +335,12 @@ export interface TAManageableRolesResponse {
 
 export interface TAManageableRoleMutation {
   assignment_id?: number;
-  location: 'program' | 'lab';
+  location: 'system' | 'reception' | 'program' | 'lab';
   user: number;
   role: number;
   program?: number;
   lab?: number;
+  reception?: number;
 }
 
 export interface TAUser {

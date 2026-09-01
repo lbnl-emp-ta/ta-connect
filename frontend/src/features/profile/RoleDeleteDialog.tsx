@@ -1,4 +1,4 @@
-import { TAManageableRoleAssignment } from '@/api/dashboard/types';
+import { TAManageableRoleAssignment, TAManageableRoleMutation } from '@/api/dashboard/types';
 import { useManageableRoleDeleteMutation } from '@/api/queryOptions';
 import { useToastContext } from '@/features/toasts/ToastContext';
 import { ToastMessage } from '@/features/toasts/ToastMessage';
@@ -38,7 +38,7 @@ export const RoleDeleteDialog: React.FC<RoleDeleteDialogProps> = ({
 
     deleteRoleMutation.mutate({
       assignment_id: roleAssignment.assignment_id,
-      location: roleAssignment.location as 'program' | 'lab',
+      location: roleAssignment.location as TAManageableRoleMutation['location'],
     });
     onClose();
   };

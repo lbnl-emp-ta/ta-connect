@@ -12,11 +12,18 @@ from core.models import (
     LabRoleAssignment,
     Program,
     ProgramRoleAssignment,
+    Reception,
+    ReceptionRoleAssignment,
     Role,
     SystemRoleAssignment,
     User,
 )
-from core.serializers import LabSerializer, ProgramSerializer, RoleSerializer
+from core.serializers import (
+    LabSerializer,
+    ProgramSerializer,
+    ReceptionSerializer,
+    RoleSerializer,
+)
 
 
 def _user_data(user):
@@ -36,6 +43,8 @@ def _assignment_data(assignment, location):
     if location == "lab":
         data["instance"] = LabSerializer(assignment.instance).data
         data["program"] = ProgramSerializer(assignment.program).data
+    if location == "reception":
+        data["instance"] = ReceptionSerializer(assignment.instance).data
     return data
 
 
@@ -72,10 +81,14 @@ class ManageableRoleListView(views.APIView):
     def _manageable_role_names(self, request):
         names = [ROLE.EXPERT, ROLE.LAB_LEAD]
         if self._is_admin(request):
-            names.append(ROLE.PROGRAM_LEAD)
+            names.extend([ROLE.ADMIN, ROLE.COORDINATOR, ROLE.PROGRAM_LEAD])
         return names
 
     def _role_is_manageable(self, request, role, location):
+        if location == "system":
+            return self._is_admin(request) and role.name == ROLE.ADMIN
+        if location == "reception":
+            return self._is_admin(request) and role.name == ROLE.COORDINATOR
         if location == "program":
             return self._is_admin(request) and role.name == ROLE.PROGRAM_LEAD
         return role.name in [ROLE.EXPERT, ROLE.LAB_LEAD]
@@ -91,11 +104,22 @@ class ManageableRoleListView(views.APIView):
 
     def get(self, request, format=None):
         program_ids = self._managed_program_ids(request)
-        if not program_ids:
+        is_admin = self._is_admin(request)
+        if not program_ids and not is_admin:
             return Response(status=status.HTTP_204_NO_CONTENT)
 
+        system_assignments = SystemRoleAssignment.objects.none()
+        reception_assignments = ReceptionRoleAssignment.objects.none()
+        if is_admin:
+            system_assignments = SystemRoleAssignment.objects.filter(
+                role__name=ROLE.ADMIN
+            ).select_related("user", "role")
+            reception_assignments = ReceptionRoleAssignment.objects.filter(
+                role__name=ROLE.COORDINATOR
+            ).select_related("user", "role", "instance")
+
         program_assignments = ProgramRoleAssignment.objects.none()
-        if self._is_admin(request):
+        if is_admin:
             program_assignments = ProgramRoleAssignment.objects.filter(
                 instance_id__in=program_ids,
                 role__name__in=[ROLE.PROGRAM_LEAD],
@@ -117,6 +141,14 @@ class ManageableRoleListView(views.APIView):
 
         assignments = [
             *[
+                _assignment_data(assignment, "system")
+                for assignment in system_assignments
+            ],
+            *[
+                _assignment_data(assignment, "reception")
+                for assignment in reception_assignments
+            ],
+            *[
                 _assignment_data(assignment, "program")
                 for assignment in program_assignments
             ],
@@ -137,7 +169,7 @@ class ManageableRoleListView(views.APIView):
                     ).order_by("name"),
                     many=True,
                 ).data,
-                "is_admin": self._is_admin(request),
+                "is_admin": is_admin,
             },
             status=status.HTTP_200_OK,
         )
@@ -178,6 +210,31 @@ class ManageableRoleListView(views.APIView):
             )
             return Response(
                 data=_assignment_data(assignment, "program"),
+                status=status.HTTP_201_CREATED,
+            )
+
+        if location == "system":
+            assignment, _ = SystemRoleAssignment.objects.get_or_create(
+                user=user, role=role
+            )
+            return Response(
+                data=_assignment_data(assignment, "system"),
+                status=status.HTTP_201_CREATED,
+            )
+
+        if location == "reception":
+            reception = Reception.objects.filter(
+                pk=request.data.get("reception")
+            ).first()
+            if not reception:
+                reception = Reception.objects.filter(
+                    pk=Reception.get_default_pk()
+                ).first()
+            assignment, _ = ReceptionRoleAssignment.objects.get_or_create(
+                user=user, role=role, instance=reception
+            )
+            return Response(
+                data=_assignment_data(assignment, "reception"),
                 status=status.HTTP_201_CREATED,
             )
 
@@ -245,6 +302,37 @@ class ManageableRoleListView(views.APIView):
                 data=_assignment_data(assignment, "program"), status=status.HTTP_200_OK
             )
 
+        if location == "system":
+            assignment = SystemRoleAssignment.objects.filter(pk=assignment_id).first()
+            if not assignment:
+                return Response(
+                    data={"message": "Invalid assignment."},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+            assignment.user = user
+            assignment.role = role
+            assignment.save()
+            return Response(
+                data=_assignment_data(assignment, "system"), status=status.HTTP_200_OK
+            )
+
+        if location == "reception":
+            assignment = ReceptionRoleAssignment.objects.filter(
+                pk=assignment_id
+            ).first()
+            if not assignment:
+                return Response(
+                    data={"message": "Invalid assignment."},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+            assignment.user = user
+            assignment.role = role
+            assignment.save()
+            return Response(
+                data=_assignment_data(assignment, "reception"),
+                status=status.HTTP_200_OK,
+            )
+
         if location == "lab":
             assignment = LabRoleAssignment.objects.filter(pk=assignment_id).first()
             lab = Lab.objects.filter(pk=request.data.get("lab")).first()
@@ -284,6 +372,32 @@ class ManageableRoleListView(views.APIView):
     def delete(self, request, format=None):
         assignment_id = request.data.get("assignment_id")
         location = request.data.get("location")
+        if location == "system":
+            assignment = SystemRoleAssignment.objects.filter(pk=assignment_id).first()
+            if not assignment:
+                return Response(
+                    data={"message": "Invalid assignment."},
+                    status=status.HTTP_404_NOT_FOUND,
+                )
+            if not self._is_admin(request):
+                return Response(status=status.HTTP_403_FORBIDDEN)
+            assignment.delete()
+            return Response(status=status.HTTP_204_NO_CONTENT)
+
+        if location == "reception":
+            assignment = ReceptionRoleAssignment.objects.filter(
+                pk=assignment_id
+            ).first()
+            if not assignment:
+                return Response(
+                    data={"message": "Invalid assignment."},
+                    status=status.HTTP_404_NOT_FOUND,
+                )
+            if not self._is_admin(request):
+                return Response(status=status.HTTP_403_FORBIDDEN)
+            assignment.delete()
+            return Response(status=status.HTTP_204_NO_CONTENT)
+
         if location == "program":
             assignment = ProgramRoleAssignment.objects.filter(pk=assignment_id).first()
             if not assignment:
