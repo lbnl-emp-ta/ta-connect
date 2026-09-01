@@ -1,16 +1,18 @@
-name: Deploy to Production
+name: Release and Deploy to Production
 
 on:
-  push:
-    branches:
-      - prod
+  release:
+    types: [published]
 
 jobs:
   deploy:
+    if: ${{ !github.event.release.prerelease }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.release.tag_name }}
 
       - name: Set up uv
         uses: astral-sh/setup-uv@v6
@@ -23,6 +25,32 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: "20"
+
+      - name: Verify release version
+        env:
+          RELEASE_TAG: ${{ github.event.release.tag_name }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          release_version="${RELEASE_TAG#v}"
+
+          if [[ ! "$RELEASE_TAG" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "Release tag must use semantic version format with a v prefix, such as v1.0.0."
+            exit 1
+          fi
+
+          backend_version="$(uv version --short --directory backend/api)"
+          frontend_version="$(node --print "require('./frontend/package.json').version")"
+
+          if [[ "$backend_version" != "$release_version" ]]; then
+            echo "Backend version $backend_version does not match release $release_version."
+            exit 1
+          fi
+
+          if [[ "$frontend_version" != "$release_version" ]]; then
+            echo "Frontend version $frontend_version does not match release $release_version."
+            exit 1
+          fi
 
       - name: Collect static files
         working-directory: backend/api
@@ -38,7 +66,8 @@ jobs:
           target: "/home/${{ secrets.SSH_USER }}/taconnect-prod/"
 
       - name: Install frontend dependencies
-        run: npm install --prefix ./frontend
+        working-directory: frontend
+        run: npm ci
 
       - name: Build React app
         env:
@@ -55,14 +84,17 @@ jobs:
           source: "./frontend/dist"
           target: "/home/${{ secrets.SSH_USER }}/taconnect-prod/"
 
-      - name: Run migrations and restart application server
+      - name: Sync backend, run migrations, and restart application server
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
-            source /home/${{ secrets.SSH_USER }}/taconnect-prod/ta-prod-env/bin/activate
-            python /home/${{ secrets.SSH_USER }}/taconnect-prod/backend/api/manage.py migrate
+            set -e
+            export PATH="$HOME/.local/bin:$PATH"
+            cd /home/${{ secrets.SSH_USER }}/taconnect-prod/backend/api
+            uv sync --locked --no-dev
+            uv run --no-sync python manage.py migrate
             sudo systemctl restart gunicorn-prod
             sudo systemctl restart nginx
