@@ -2,16 +2,17 @@ import {
   manageableRolesQueryOptions,
   useManageableRoleCreateMutation,
   useManageableRoleUpdateMutation,
-} from '@/api/queryOptions';
+} from "@/api/queryOptions";
 import {
   TAManageableRoleAssignment,
   TAManageableRoleMutation,
   TAManageableRolesResponse,
   TARole,
-} from '@/api/dashboard/types';
-import AddIcon from '@mui/icons-material/Add';
-import DeleteIcon from '@mui/icons-material/Delete';
-import EditIcon from '@mui/icons-material/Edit';
+} from "@/api/dashboard/types";
+import AddIcon from "@mui/icons-material/Add";
+import DeleteIcon from "@mui/icons-material/Delete";
+import EditIcon from "@mui/icons-material/Edit";
+import OpenInNewIcon from "@mui/icons-material/OpenInNew";
 import {
   Box,
   Button,
@@ -28,27 +29,34 @@ import {
   Stack,
   Tooltip,
   Typography,
-} from '@mui/material';
-import { DataGrid, GridColDef } from '@mui/x-data-grid';
-import { useSuspenseQuery } from '@tanstack/react-query';
-import { useMemo, useState } from 'react';
-import { RoleDeleteDialog } from './RoleDeleteDialog';
+} from "@mui/material";
+import { DataGrid, GridColDef } from "@mui/x-data-grid";
+import { useSuspenseQuery } from "@tanstack/react-query";
+import { useMemo, useState } from "react";
+import { RoleDeleteDialog } from "./RoleDeleteDialog";
 
 const emptyForm: TAManageableRoleMutation = {
-  location: 'lab',
+  location: "system",
   user: 0,
   role: 0,
   program: undefined,
   lab: undefined,
 };
 
-const toForm = (assignment: TAManageableRoleAssignment): TAManageableRoleMutation => ({
+const toForm = (
+  assignment: TAManageableRoleAssignment,
+): TAManageableRoleMutation => ({
   assignment_id: assignment.assignment_id,
-  location: assignment.location as 'program' | 'lab',
+  location: assignment.location as TAManageableRoleMutation["location"],
   user: assignment.user.id,
   role: assignment.role.id,
-  program: assignment.location === 'program' ? assignment.instance?.id : assignment.program?.id,
-  lab: assignment.location === 'lab' ? assignment.instance?.id : undefined,
+  program:
+    assignment.location === "program"
+      ? assignment.instance?.id
+      : assignment.location === "lab"
+        ? assignment.program?.id
+        : undefined,
+  lab: assignment.location === "lab" ? assignment.instance?.id : undefined,
 });
 
 export const RolesManager: React.FC = () => {
@@ -56,9 +64,8 @@ export const RolesManager: React.FC = () => {
   const manageableRoles = data as TAManageableRolesResponse | null;
   const [dialogOpen, setDialogOpen] = useState(false);
   const [roleDeleteDialogOpen, setRoleDeleteDialogOpen] = useState(false);
-  const [selectedAssignment, setSelectedAssignment] = useState<TAManageableRoleAssignment | null>(
-    null
-  );
+  const [selectedAssignment, setSelectedAssignment] =
+    useState<TAManageableRoleAssignment | null>(null);
   const [form, setForm] = useState<TAManageableRoleMutation>(emptyForm);
 
   const createMutation = useManageableRoleCreateMutation();
@@ -67,31 +74,57 @@ export const RolesManager: React.FC = () => {
   const rows = manageableRoles?.assignments || [];
   const labsByProgram = useMemo(() => {
     const programs = manageableRoles?.programs || [];
-    return new Map(programs.map((program) => [program.id, new Set(program.labs)]));
+    return new Map(
+      programs.map((program) => [program.id, new Set(program.labs)]),
+    );
   }, [manageableRoles?.programs]);
 
   if (!manageableRoles || manageableRoles.programs.length === 0) {
-    return null;
+    return (
+      <Stack>
+        <Typography variant="h4" component="h2" fontWeight="bold">
+          Roles Manager
+        </Typography>
+        <Typography>
+          You don't have the ability to manage roles for other uses. If you need
+          to request a new role for yourself, you can:{" "}
+          <Button
+            href="https://forms.gle/etALWnsaZd7ZyFCeA"
+            target="_blank"
+            rel="noopener noreferrer"
+            variant="outlined"
+            endIcon={<OpenInNewIcon />}
+          >
+            Request a role
+          </Button>
+        </Typography>
+      </Stack>
+    );
   }
 
   const selectedProgramLabs = manageableRoles.labs.filter((lab) =>
-    form.program ? labsByProgram.get(form.program)?.has(lab.id) : true
+    form.program ? labsByProgram.get(form.program)?.has(lab.id) : true,
   );
-  const roleOptions = manageableRoles.roles.filter((role) =>
-    form.location === 'program'
-      ? role.name === TARole.ProgramLead
-      : role.name === TARole.Expert || role.name === TARole.LabLead
+  const roleOptions = manageableRoles.roles.filter(
+    (role) =>
+      (form.location === "system" && role.name === TARole.Admin) ||
+      (form.location === "reception" && role.name === TARole.Coordinator) ||
+      (form.location === "program" && role.name === TARole.ProgramLead) ||
+      (form.location === "lab" &&
+        (role.name === TARole.Expert || role.name === TARole.LabLead)),
   );
 
   const handleAdd = () => {
     const firstProgram = manageableRoles.programs[0]?.id;
     const firstLab = manageableRoles.labs.find((lab) =>
-      firstProgram ? labsByProgram.get(firstProgram)?.has(lab.id) : true
+      firstProgram ? labsByProgram.get(firstProgram)?.has(lab.id) : true,
     )?.id;
     setForm({
       ...emptyForm,
       user: manageableRoles.users[0]?.id || 0,
-      role: manageableRoles.roles.find((role) => role.name === TARole.Expert)?.id || 0,
+      role:
+        manageableRoles.roles.find((role) => role.name === TARole.Admin)?.id ||
+        0,
       program: firstProgram,
       lab: firstLab,
     });
@@ -112,7 +145,9 @@ export const RolesManager: React.FC = () => {
     setDialogOpen(false);
   };
 
-  const handleOpenRoleDeleteDialog = (assignment: TAManageableRoleAssignment) => {
+  const handleOpenRoleDeleteDialog = (
+    assignment: TAManageableRoleAssignment,
+  ) => {
     setSelectedAssignment(assignment);
     setRoleDeleteDialogOpen(true);
   };
@@ -123,41 +158,52 @@ export const RolesManager: React.FC = () => {
 
   const columns: GridColDef<TAManageableRoleAssignment>[] = [
     {
-      field: 'user',
-      headerName: 'User',
+      field: "user",
+      headerName: "User",
       flex: 1,
       minWidth: 220,
       valueGetter: (_, row) => row.user.name || row.user.email,
     },
     {
-      field: 'location',
-      headerName: 'Level',
+      field: "location",
+      headerName: "Level",
       width: 120,
-      valueGetter: (_, row) => (row.location === 'program' ? 'Program' : 'Lab'),
+      valueGetter: (_, row) => row.location,
+      valueFormatter: (value: string) =>
+        ({
+          system: "System",
+          reception: "Reception",
+          program: "Program",
+          lab: "Lab",
+        })[value] || value,
     },
     {
-      field: 'role',
-      headerName: 'Role',
+      field: "role",
+      headerName: "Role",
       width: 140,
       valueGetter: (_, row) => row.role.name,
     },
     {
-      field: 'program',
-      headerName: 'Program',
+      field: "program",
+      headerName: "Program",
       flex: 1,
       minWidth: 200,
-      valueGetter: (_, row) => row.program?.name || row.instance?.name || '',
+      valueGetter: (_, row) =>
+        row.location === "program" || row.location === "lab"
+          ? row.program?.name || row.instance?.name || ""
+          : "",
     },
     {
-      field: 'instance',
-      headerName: 'Lab',
+      field: "instance",
+      headerName: "Lab",
       flex: 1,
       minWidth: 180,
-      valueGetter: (_, row) => (row.location === 'lab' ? row.instance?.name : ''),
+      valueGetter: (_, row) =>
+        row.location === "lab" ? row.instance?.name : "",
     },
     {
-      field: 'actions',
-      headerName: 'Actions',
+      field: "actions",
+      headerName: "Actions",
       sortable: false,
       filterable: false,
       width: 104,
@@ -167,7 +213,7 @@ export const RolesManager: React.FC = () => {
           spacing={0.5}
           alignItems="center"
           justifyContent="center"
-          sx={{ height: '100%' }}
+          sx={{ height: "100%" }}
         >
           <Tooltip title="Edit role">
             <IconButton size="small" onClick={() => handleEdit(row)}>
@@ -175,7 +221,10 @@ export const RolesManager: React.FC = () => {
             </IconButton>
           </Tooltip>
           <Tooltip title="Revoke role">
-            <IconButton size="small" onClick={() => handleOpenRoleDeleteDialog(row)}>
+            <IconButton
+              size="small"
+              onClick={() => handleOpenRoleDeleteDialog(row)}
+            >
               <DeleteIcon fontSize="small" />
             </IconButton>
           </Tooltip>
@@ -192,11 +241,23 @@ export const RolesManager: React.FC = () => {
             Roles Manager
           </Typography>
         </Box>
+        <Button
+          href="https://forms.gle/etALWnsaZd7ZyFCeA"
+          target="_blank"
+          rel="noopener noreferrer"
+          variant="outlined"
+          endIcon={<OpenInNewIcon />}
+        >
+          Request a role
+        </Button>
         <Button variant="contained" startIcon={<AddIcon />} onClick={handleAdd}>
-          Add role
+          Assign a role
         </Button>
       </Stack>
-      <Paper elevation={1} sx={{ borderWidth: 1, borderColor: 'divider', borderStyle: 'solid' }}>
+      <Paper
+        elevation={1}
+        sx={{ borderWidth: 1, borderColor: "divider", borderStyle: "solid" }}
+      >
         <DataGrid
           rows={rows}
           columns={columns}
@@ -204,11 +265,18 @@ export const RolesManager: React.FC = () => {
           disableRowSelectionOnClick
           pageSizeOptions={[10, 25, 50]}
           initialState={{ pagination: { paginationModel: { pageSize: 10 } } }}
-          sx={{ backgroundColor: 'white' }}
+          sx={{ backgroundColor: "white" }}
         />
       </Paper>
-      <Dialog open={dialogOpen} onClose={() => setDialogOpen(false)} fullWidth maxWidth="sm">
-        <DialogTitle>{form.assignment_id ? 'Edit role' : 'Add role'}</DialogTitle>
+      <Dialog
+        open={dialogOpen}
+        onClose={() => setDialogOpen(false)}
+        fullWidth
+        maxWidth="sm"
+      >
+        <DialogTitle>
+          {form.assignment_id ? "Edit role" : "Assign a new role"}
+        </DialogTitle>
         <DialogContent>
           <Stack spacing={2} sx={{ paddingTop: 1 }}>
             <FormControl fullWidth>
@@ -216,7 +284,9 @@ export const RolesManager: React.FC = () => {
               <Select
                 label="User"
                 value={form.user}
-                onChange={(event) => setForm({ ...form, user: Number(event.target.value) })}
+                onChange={(event) =>
+                  setForm({ ...form, user: Number(event.target.value) })
+                }
               >
                 {manageableRoles.users.map((user) => (
                   <MenuItem key={user.id} value={user.id}>
@@ -230,21 +300,38 @@ export const RolesManager: React.FC = () => {
               <Select
                 label="Level"
                 value={form.location}
-                onChange={(event) =>
+                onChange={(event) => {
+                  const location = event.target
+                    .value as TAManageableRoleMutation["location"];
+                  const roleName = {
+                    system: TARole.Admin,
+                    reception: TARole.Coordinator,
+                    program: TARole.ProgramLead,
+                    lab: TARole.Expert,
+                  }[location];
                   setForm({
                     ...form,
-                    location: event.target.value as 'program' | 'lab',
+                    location,
                     role:
-                      event.target.value === 'program'
-                        ? manageableRoles.roles.find((role) => role.name === TARole.ProgramLead)
-                            ?.id || 0
-                        : manageableRoles.roles.find((role) => role.name === TARole.Expert)?.id ||
-                          0,
-                  })
-                }
+                      manageableRoles.roles.find(
+                        (role) => role.name === roleName,
+                      )?.id || 0,
+                  });
+                }}
               >
-                {manageableRoles.is_admin && <MenuItem value="program">Program</MenuItem>}
-                <MenuItem value="lab">Lab</MenuItem>
+                {manageableRoles.is_admin && (
+                  <MenuItem value="system">System</MenuItem>
+                )}
+                {manageableRoles.is_admin && (
+                  <MenuItem value="reception">Reception</MenuItem>
+                )}
+                {manageableRoles.is_admin &&
+                  manageableRoles.programs.length > 0 && (
+                    <MenuItem value="program">Program</MenuItem>
+                  )}
+                {manageableRoles.programs.length > 0 && (
+                  <MenuItem value="lab">Lab</MenuItem>
+                )}
               </Select>
             </FormControl>
             <FormControl fullWidth>
@@ -252,7 +339,9 @@ export const RolesManager: React.FC = () => {
               <Select
                 label="Role"
                 value={form.role}
-                onChange={(event) => setForm({ ...form, role: Number(event.target.value) })}
+                onChange={(event) =>
+                  setForm({ ...form, role: Number(event.target.value) })
+                }
               >
                 {roleOptions.map((role) => (
                   <MenuItem key={role.id} value={role.id}>
@@ -261,33 +350,37 @@ export const RolesManager: React.FC = () => {
                 ))}
               </Select>
             </FormControl>
-            <FormControl fullWidth>
-              <InputLabel>Program</InputLabel>
-              <Select
-                label="Program"
-                value={form.program || ''}
-                onChange={(event) => {
-                  const program = Number(event.target.value);
-                  const lab = manageableRoles.labs.find((item) =>
-                    labsByProgram.get(program)?.has(item.id)
-                  )?.id;
-                  setForm({ ...form, program, lab });
-                }}
-              >
-                {manageableRoles.programs.map((program) => (
-                  <MenuItem key={program.id} value={program.id}>
-                    {program.name}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-            {form.location === 'lab' && (
+            {(form.location === "program" || form.location === "lab") && (
+              <FormControl fullWidth>
+                <InputLabel>Program</InputLabel>
+                <Select
+                  label="Program"
+                  value={form.program || ""}
+                  onChange={(event) => {
+                    const program = Number(event.target.value);
+                    const lab = manageableRoles.labs.find((item) =>
+                      labsByProgram.get(program)?.has(item.id),
+                    )?.id;
+                    setForm({ ...form, program, lab });
+                  }}
+                >
+                  {manageableRoles.programs.map((program) => (
+                    <MenuItem key={program.id} value={program.id}>
+                      {program.name}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            )}
+            {form.location === "lab" && (
               <FormControl fullWidth>
                 <InputLabel>Lab</InputLabel>
                 <Select
                   label="Lab"
-                  value={form.lab || ''}
-                  onChange={(event) => setForm({ ...form, lab: Number(event.target.value) })}
+                  value={form.lab || ""}
+                  onChange={(event) =>
+                    setForm({ ...form, lab: Number(event.target.value) })
+                  }
                 >
                   {selectedProgramLabs.map((lab) => (
                     <MenuItem key={lab.id} value={lab.id}>
@@ -309,8 +402,9 @@ export const RolesManager: React.FC = () => {
               updateMutation.isPending ||
               !form.user ||
               !form.role ||
-              !form.program ||
-              (form.location === 'lab' && !form.lab)
+              ((form.location === "program" || form.location === "lab") &&
+                !form.program) ||
+              (form.location === "lab" && !form.lab)
             }
           >
             Save
