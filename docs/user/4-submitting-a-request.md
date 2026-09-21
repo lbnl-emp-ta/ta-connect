@@ -4,7 +4,7 @@ The TA Request Form is public. Customers do not need a TA Connect account to sub
 
 Go to [https://taconnect.lbl.gov/intake](https://taconnect.lbl.gov/intake). The program is limited to state public utility commissions (PUCs) and state energy offices (SEOs). Contact `TA3@lbl.gov` for the status of an existing submission.
 
-> **Screenshot placeholder:** Full TA Request Form.
+![Full TA Request Form](../images/intake-form.png)
 
 ## Before you begin
 
@@ -36,7 +36,7 @@ Complete these sections:
 
 The description, challenges, and goals fields each accept up to 4,000 characters. Estimate work time rather than elapsed calendar time. One day of effort means eight working hours.
 
-> **Screenshot placeholder:** Request-information section and level-of-effort choices.
+![Request information section and level-of-effort choices](../images/intake-request-info.png)
 
 ## Submit the form
 
