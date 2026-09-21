@@ -2,7 +2,7 @@
 
 A request moves through five stages: **Intake**, **Assignment**, **Delivery**, **Review**, and **Completed**. The progress bar at the top of a request shows its current stage and status.
 
-> **Screenshot placeholder:** Request detail page with the five-stage progress bar highlighted.
+![Request detail page showing the five-stage workflow progress bar](../images/requests-ui.png)
 
 ## 1. Intake
 
@@ -38,7 +38,7 @@ The Expert completes the closeout form and submits it. Draft responses save auto
 
 The Lab Lead reviews the submitted form first. The Lab Lead can approve it and send it to the program, or reject it and send it back to the Expert for more information. The Program Lead then performs the same review. Program approval marks the request completed.
 
-> **Screenshot placeholder:** Closeout form with submit, approve, and return actions.
+![Closeout review showing the approve and return actions](../images/closeout-review.png)
 
 ## 5. Completed
 
@@ -59,7 +59,7 @@ The **Inactive** tab contains **Completed** and **Unable to Address** requests.
 
 In the requests sidebar you can use the program filter, search control, and sort menu to narrow the list. You can sort by newest, oldest, or status. Click a request card to open it. Use the left and right arrows in the request header to move through the current filtered and sorted list.
 
-> **Screenshot placeholder:** Active request list showing Actionable and Downstream groups, filters, and sorting.
+![Active request list showing Actionable and Downstream groups, filters, and sorting](../images/active-requests-list.png)
 
 ## Read and update a request
 
