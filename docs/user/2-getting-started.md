@@ -15,7 +15,7 @@ ORCiD provides a free, unique, persistent identifier (PID) for people engaged in
 3. Log in to ORCiD and authorize access if ORCiD asks you to do so.
 4. TA Connect returns you to the **Profile** page if this is your first login or the **Requests** page if you are already situated with your roles and user info.
 
-> **Screenshot placeholder:** TA Connect login page with the ORCiD button highlighted.
+![TA Connect login page with the Continue with ORCiD button](../images/login-page.png)
 
 If login fails, TA Connect displays the error returned by the identity provider. Click **Back to login** and try again. If the problem continues, contact the TA Connect team.
 
@@ -27,7 +27,7 @@ If your email address is missing, or if your name or phone number is incorrect, 
 
 Also note that a valid U.S. phone number and email address are required to continue using TA Connect. If this information isn't saved in the system, you will be automatically prompted to provide it.
 
-> **Screenshot placeholder:** Profile page with the contact information edit icon highlighted.
+![Profile page showing the contact information edit icon](../images/profile-edit.png)
 
 ## Check your roles
 
@@ -51,7 +51,7 @@ The navigation bar contains these pages:
 
 Use the menu with your name to return to **Profile** or to **Log out**.
 
-> **Screenshot placeholder:** Main navigation bar and user menu.
+![TA Connect main navigation bar and user menu](../images/navigation.png)
 
 ## Admin Mode
 

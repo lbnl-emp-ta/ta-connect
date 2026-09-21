@@ -74,7 +74,7 @@ The table below shows each action and if/when each role has permission to perfor
 
 Open the menu with your name and select **Profile**. The profile lists system roles and organizational roles separately. Each organizational role identifies the applicable program and laboratory.
 
-> **Screenshot placeholder:** Profile page showing system and organizational role cards.
+![Profile page showing system and organizational role cards](../images/profile-edit.png)
 
 If no roles are listed, use the role request form linked from the profile page. Having a TA Connect login does not by itself provide access to request work.
 
@@ -90,4 +90,4 @@ To add a role:
 
 Use the edit icon to change an assignment. Use the delete icon to revoke it. Revoking a role removes the user's access associated with that assignment.
 
-> **Screenshot placeholder:** Roles Manager with Add role, edit, and revoke controls.
+![Roles Manager showing role assignment, edit, and revoke controls](../images/roles-management.png)
