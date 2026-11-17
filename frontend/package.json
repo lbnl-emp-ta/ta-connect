@@ -32,7 +32,7 @@
     "@types/react": "^19.0.10",
     "@types/react-dom": "^19.0.4",
     "@vitejs/plugin-react": "^4.3.4",
-    "oxfmt": "^0.64.0",
+    "oxfmt": "^0.79.0",
     "oxlint": "^1.79.0",
     "typescript": "~5.7.2",
     "vite": "^6.4.6"
