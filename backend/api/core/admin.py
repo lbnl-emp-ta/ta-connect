@@ -124,9 +124,7 @@ def validate_admin_user_email(email: str | None, user=None) -> None:
             return
 
     if not normalized or normalized not in settings.APPROVED_ADMIN_EMAILS:
-        raise ValidationError(
-            "Email address is not approved."
-        )
+        raise ValidationError("Email address is not approved.")
 
 
 class CustomAdminUserCreationForm(AdminUserCreationForm):
