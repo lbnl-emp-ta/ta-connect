@@ -2,13 +2,6 @@
 
 GitHub Actions deploys TA Connect to staging and production. Deployment changes external environments, so review the target branch and workflow before pushing or merging.
 
-## Environments
-
-| Environment | Deployment trigger       | Frontend URL                        | API URL                                 |
-| ----------- | ------------------------ | ----------------------------------- | --------------------------------------- |
-| Staging     | `main`                   | `https://staging.taconnect.lbl.gov` | `https://api.staging.taconnect.lbl.gov` |
-| Production  | Published GitHub Release | `https://taconnect.lbl.gov`         | `https://api.taconnect.lbl.gov`         |
-
 The backend test workflow runs on every push. The deployment workflows are defined in `.github/workflows/staging.yml` and `.github/workflows/prod.yml`.
 
 ## Preparing a production release

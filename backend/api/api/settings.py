@@ -22,6 +22,13 @@ def parse_bool(value: str | None, default: bool = False) -> bool:
     return value.lower() in ("true", "1", "yes")
 
 
+def parse_csv_emails(value: str | None) -> set[str]:
+    """Separate a comma-separated string of emails into a set of lowercase emails."""
+    if not value:
+        return set()
+    return {email.strip().lower() for email in value.split(",") if email.strip()}
+
+
 # use python-dotenv for .env
 load_dotenv()
 
@@ -291,3 +298,5 @@ EMAIL_USE_TLS = True
 ENABLE_EMAIL_SENDING = parse_bool(os.getenv("TACONNECT_ENABLE_EMAIL_SENDING"))
 
 CUSTOMER_SURVEY_URL = os.getenv("TACONNECT_CUSTOMER_SURVEY_URL")
+
+APPROVED_ADMIN_EMAILS = parse_csv_emails(os.getenv("TACONNECT_APPROVED_ADMIN_EMAILS"))

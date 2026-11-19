@@ -3,13 +3,21 @@ import shutil
 import tempfile
 import zipfile
 
+from allauth.socialaccount.models import SocialAccount
+from django.conf import settings
 from django.contrib import admin
 from django.contrib.auth import get_user_model
+from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
+from django.contrib.auth.forms import (
+    AdminUserCreationForm,
+    UserChangeForm,
+)
 from django.contrib.auth.models import Group
+from django.core.exceptions import ValidationError
 from django.http import FileResponse
 from django.utils import timezone
 from import_export import fields, resources
-from import_export.admin import ImportExportModelAdmin
+from import_export.admin import ImportExportMixin, ImportExportModelAdmin
 
 from core.models import *
 
@@ -95,6 +103,67 @@ class CustomerAdmin(ImportExportModelAdmin):
     resource_classes = [CustomerResource]
 
 
+def validate_admin_user_email(email: str | None, user=None) -> None:
+    """
+    Ensure accounts created via Django admin (or email edits on non-ORCID accounts
+    in Django admin) use an email from settings.APPROVED_ADMIN_EMAILS.
+    """
+    user_model = get_user_model()
+    normalized = (email or "").strip().lower()
+
+    if user is not None and user.pk is not None and not user._state.adding:
+        if SocialAccount.objects.filter(user_id=user.pk, provider="orcid").exists():
+            return
+
+        existing_email = (
+            user_model.objects.values_list("email", flat=True)
+            .filter(pk=user.pk)
+            .first()
+        )
+        if existing_email is not None and existing_email.strip().lower() == normalized:
+            return
+
+    if not normalized or normalized not in settings.APPROVED_ADMIN_EMAILS:
+        raise ValidationError("Email address is not approved.")
+
+
+class CustomAdminUserCreationForm(AdminUserCreationForm):
+    class Meta:
+        model = get_user_model()
+        fields = ("email", "name", "phone")
+        field_classes = {}
+
+    def clean_email(self):
+        email = self.cleaned_data.get("email")
+        validate_admin_user_email(email)
+        if email and self._meta.model.objects.filter(email__iexact=email).exists():
+            raise ValidationError(
+                self.instance.unique_error_message(self._meta.model, ["email"])
+            )
+        return email
+
+
+class CustomUserChangeForm(UserChangeForm):
+    class Meta:
+        model = get_user_model()
+        fields = "__all__"
+        field_classes = {}
+
+    def clean_email(self):
+        email = self.cleaned_data.get("email")
+        validate_admin_user_email(email, user=self.instance)
+        if (
+            email
+            and self._meta.model.objects.exclude(pk=self.instance.pk)
+            .filter(email__iexact=email)
+            .exists()
+        ):
+            raise ValidationError(
+                self.instance.unique_error_message(self._meta.model, ["email"])
+            )
+        return email
+
+
 class UserResource(resources.ModelResource):
     class Meta:
         model = get_user_model()
@@ -110,9 +179,74 @@ class UserResource(resources.ModelResource):
             "date_joined",
         )
 
+    def validate_instance(
+        self, instance, import_validation_errors=None, validate_unique=True
+    ):
+        if import_validation_errors is None:
+            import_validation_errors = {}
+        else:
+            import_validation_errors = import_validation_errors.copy()
 
-class UserAdmin(ImportExportModelAdmin):
+        try:
+            validate_admin_user_email(instance.email, user=instance)
+        except ValidationError as exc:
+            import_validation_errors = ValidationError(
+                {"email": exc}
+            ).update_error_dict(import_validation_errors)
+
+        super().validate_instance(
+            instance,
+            import_validation_errors=import_validation_errors,
+            validate_unique=validate_unique,
+        )
+
+    def before_save_instance(self, instance, row, **kwargs):
+        if instance._state.adding and not instance.password:
+            instance.set_unusable_password()
+
+
+class UserAdmin(ImportExportMixin, BaseUserAdmin):
     resource_classes = [UserResource]
+    form = CustomUserChangeForm
+    add_form = CustomAdminUserCreationForm
+    fieldsets = (
+        (None, {"fields": ("email", "password")}),
+        ("Personal info", {"fields": ("name", "phone")}),
+        (
+            "Permissions",
+            {
+                "fields": (
+                    "is_active",
+                    "is_staff",
+                    "is_superuser",
+                    "groups",
+                    "user_permissions",
+                ),
+            },
+        ),
+        ("Important dates", {"fields": ("last_login", "date_joined")}),
+    )
+    add_fieldsets = (
+        (
+            None,
+            {
+                "classes": ("wide",),
+                "fields": (
+                    "email",
+                    "name",
+                    "phone",
+                    "usable_password",
+                    "password1",
+                    "password2",
+                ),
+            },
+        ),
+    )
+    readonly_fields = ("date_joined",)
+    list_display = ("email", "name", "is_staff", "is_superuser", "is_active")
+    list_filter = ("is_staff", "is_superuser", "is_active")
+    search_fields = ("email", "name")
+    ordering = ("email",)
 
 
 class OrganizationResource(resources.ModelResource):

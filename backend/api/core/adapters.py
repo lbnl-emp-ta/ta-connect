@@ -7,6 +7,12 @@ from core.models import User
 
 
 class CustomSocialAccountAdapter(DefaultSocialAccountAdapter):
+    def is_open_for_signup(self, request, sociallogin):
+        """
+        Allow signup via ORCID even though direct account signup is disabled.
+        """
+        return sociallogin.account.provider == "orcid"
+
     def populate_user(self, request, sociallogin, data):
         """
         Populates user information from social provider info.
@@ -63,6 +69,13 @@ class CustomSocialAccountAdapter(DefaultSocialAccountAdapter):
 
 
 class CustomAccountAdapter(DefaultAccountAdapter):
+    def is_open_for_signup(self, request):
+        """
+        Disable direct email/password signup via allauth endpoints;
+        frontend account creation must go through ORCID social login.
+        """
+        return False
+
     def save_user(self, request, user, form, commit=True):
         """
         Saves a new `User` instance using information provided in the
