@@ -1,6 +1,6 @@
 [project]
 name = "ta-connect-api"
-version = "1.0.0"
+version = "1.0.1"
 description = "TA Connect Django API"
 requires-python = ">=3.12,<3.14"
 dependencies = [
