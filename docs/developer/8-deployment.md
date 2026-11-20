@@ -14,7 +14,8 @@ To prepare a stable release:
 2. Choose **Run workflow**, leave the source branch as `main`, and enter a stable semantic version such as `1.0.0`. Do not include a leading `v`.
 3. Wait for the workflow to validate the version, update all version metadata, and run the backend and frontend checks.
 4. Use the workflow summary link to open a pull request from `release/<version>` into `main`.
-5. Review the preparation workflow's checks and the generated changes, then merge the pull request.
+5. Go to the Actions tab on GitHub and manually dispatch the Frontend CI and Backend CI workflows **from your new `release/<version>` branch**.
+6. Review the preparation workflow's checks and the generated changes, then merge the pull request.
 
 The preparation workflow fails rather than overwriting an existing release branch or an existing tag. It runs the backend and frontend checks before pushing a branch instead of committing directly to `main`, preserving branch protection and review. GitHub suppresses additional push-triggered workflows for branches created with the workflow token; normal push CI runs again when the pull request is merged to `main`.
 
